@@ -52,22 +52,20 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
     assessment_details = []
     assessment_count = module.assessment_count
 
-    # Determine if automated or manual (default: assume automated for now)
-    # Could be enhanced with data from CS Module Assessment Numbers.csv
+    # All assessments are assumed manual (no automated marking detail available)
     if has_new_lecturer:
-        setting_cost = config.ASSESSMENT_AUTO_NEW_SETTER * assessment_count
+        setting_cost = config.ASSESSMENT_MANUAL_NEW_SETTER * assessment_count
     else:
-        setting_cost = config.ASSESSMENT_AUTO_STANDARD * assessment_count
+        setting_cost = config.ASSESSMENT_MANUAL_STANDARD * assessment_count
 
     assessment_hours = setting_cost
-    assessment_details.append(f"{assessment_count} assessment(s) set at {config.ASSESSMENT_AUTO_STANDARD}h each")
+    assessment_details.append(f"{assessment_count} assessment(s) set at {config.ASSESSMENT_MANUAL_STANDARD}h each")
 
     # Assessment marking (split equally among teachers)
     marking_hours = 0.0
     marking_details = []
     if module.student_count > 0:
-        # Assume automated marking for now (can be enhanced)
-        per_script = config.MARKING_AUTO_MSC
+        per_script = config.MARKING_MANUAL_MSC
         total_scripts = module.student_count
         per_teacher = (total_scripts * per_script) / max(len(teachers), 1)
         marking_hours = per_teacher
@@ -77,7 +75,7 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
         )
 
     # Assessment admin flat rate
-    admin_flat = config.MARKING_AUTO_ADMIN
+    admin_flat = config.MARKING_MANUAL_ADMIN
     admin_hours = admin_flat * assessment_count
 
     # Supervision
