@@ -8,7 +8,12 @@ __pycache__/
 *$py.class
 *.so
 
-# Generated output files (in the output/ directory)
+# Generated output files
+Staff workload model.csv
+workload_summary_boxplot.png
+workload_detailed_boxplot.png
+workload_report.html
+three_way_comparison_report.md
 output/
 
 # macOS

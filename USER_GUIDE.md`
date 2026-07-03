@@ -1,0 +1,56 @@
+# User Guide - Workload Model
+
+This guide provides instructions on how to prepare the data and run the workload calculation system.
+
+## Data Configuration & Maintenance
+
+Before running the model, ensure that the following configuration files are up-to-date based on the current academic year's requirements. These files determine the multipliers, staff identities, and module groupings used in calculations.
+
+### 1. `workload_parameters.yaml`
+This is the primary source of truth for calculation constants (e.g., teaching multipliers, assessment assumptions, etc.).
+- **When to update:** When policy changes occur regarding how different components of workload are calculated.
+
+### 2. `staff_name_lookup.json`
+Used by the system to normalize various ways a staff member's name might appear in raw data (e.g., "J. Doe" vs "John Doe").
+- **When to update:** When new staff members join, leave, or change their preferred name format.
+
+### 3. `module_mapping.json`
+Defines how modules are grouped, renamed, or merged between academic years (e.g., merging "Module A" and "Module B" into a single offering).
+- **When to update:** At the start of each new academic cycle when module lists change.
+
+---
+
+## Running the Model
+
+The system is executed via `main.py`. Depending on your needs, you can run it in different modes:
+
+### Full Execution
+Runs the complete pipeline: loading data $\rightarrow$ calculating workloads $\rightarrow$ generating reports and charts.
+```bash
+python main.py
+```
+
+### Dry Run (Data Summary Only)
+Prints a summary of the loaded data and identifies missing information without performing any calculations or generating files. Use this to verify that your input CSVs are being read correctly.
+```bash
+python main.py --dry-run
+```
+
+### Interactive Mode
+If there are ambiguous staff names in the source data, this mode will prompt you for clarification during the execution.
+```bash
+python main.py --interactive
+```
+
+## Outputs
+Upon a successful full run, the following files will be generated:
+- `Staff workload model.csv`: The primary data table.
+- `workload_summary_boxplot.png`: A high-level visual summary of workloads.
+- `workload_detailed_boxplot.png`: A detailed breakdown of work components.
+- `workload_report.html`: A formatted report containing the tables and charts.
+
+## Requirements
+Ensure all dependencies are installed before running:
+```bash
+pip install -r requirements.txt
+```
