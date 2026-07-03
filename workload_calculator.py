@@ -47,6 +47,31 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
 
     teaching_hours = contact_hours * mult
 
+    # Practical sessions with repetition multiplier
+    # First practical: standard multiplier (2.5x contact hour)
+    # Each additional practical: 1.5x contact hour (repetition)
+    # Practicals are split equally among teachers
+    practical_hours = 0.0
+    practical_details = []
+    if module.practicals > 0:
+        practicals_per_teacher = module.practicals / max(len(teachers), 1)
+        # First practical gets standard rate, remaining get repetition rate
+        # practicals_per_teacher may not be a whole number (e.g., 6 practicals / 2 teachers = 3 each)
+        first_practical = min(1, practicals_per_teacher)  # At least 1 practical per teacher
+        remaining_practicals = max(0, practicals_per_teacher - first_practical)
+        practical_hours = (first_practical * config.TEACHING_MULTIPLIERS["problem_class_seminar_practical"]) + \
+                          (remaining_practicals * config.TEACHING_MULTIPLIERS["problem_class_seminar_practical"] * config.TEACHING_MULTIPLIERS.get("repetition_multiplier", 1.5))
+        practical_details.append(
+            f"Practicals: {module.practicals} total, {practicals_per_teacher:.1f} per teacher "
+            f"(1st x {config.TEACHING_MULTIPLIERS['problem_class_seminar_practical']}x, "
+            f"remaining x {config.TEACHING_MULTIPLIERS.get('repetition_multiplier', 1.5):.1f}x)"
+        )
+
+    # Add repetition_multiplier back if removed
+    if "repetition_multiplier" not in config.TEACHING_MULTIPLIERS:
+        # Will be added to YAML
+        pass
+
     # Assessment setting
     assessment_hours = 0.0
     assessment_details = []
@@ -108,7 +133,7 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
 
     # Total for the module (shared among teachers)
     total_module_hours = (engagement_share + project_setting_share + teaching_hours +
-                          assessment_hours + marking_hours + admin_hours + supervision_hours)
+                          practical_hours + assessment_hours + marking_hours + admin_hours + supervision_hours)
 
     per_teacher = total_module_hours / max(len(teachers), 1)
 
@@ -120,12 +145,13 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
                 "engagement": engagement_share,
                 "project_setting": project_setting_share,
                 "teaching": teaching_hours,
+                "practicals": practical_hours,
                 "assessment_setting": assessment_hours,
                 "marking": marking_hours,
                 "admin": admin_hours,
                 "supervision": supervision_hours,
             },
-            "detail_text": f"{teaching_details[0]}; {assessment_details[0]}; {'; '.join(marking_details)}; {'; '.join(supervision_details)}",
+            "detail_text": f"{teaching_details[0]}; {'; '.join(practical_details)}; {assessment_details[0]}; {'; '.join(marking_details)}; {'; '.join(supervision_details)}",
         }
 
     return result

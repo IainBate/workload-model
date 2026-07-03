@@ -64,6 +64,7 @@ task_multipliers:
     hw_lab: 4
     new_hw_lab: 8
     drop_in_session: 1.5
+    repetition_multiplier: 1.5
 
   supervision_hours_per_student:
     pastoral: 6
@@ -125,6 +126,7 @@ roles_percentage_of_nominal_hours:
   Graduate Chair: 0.20
   Deputy Graduate Chair: 0.10
   Graduate School Board (Ordinary member): 0.025
+  Research Group Leader: 0.10
   PhD Training Officer: 0.05
   Impact: 0.10
   Progression Panel Chair: 0.15

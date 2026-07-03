@@ -1,9 +1,9 @@
-,,,"NOTES: 
+﻿,,,"NOTES: 
 1. Workload is assumed to be split equally across N staff unless stated otherwise. 
 2. It is up to the ML in the first place to work out how to split the work but it should definitely be a discussion within the team. 
 3. DHoD(T) can be included in the workload discussion if needed, however it shouldn't normally be needed. 
 4. Expert markers have been assigned however the current plan is only to use expert markers for time limited exams where the assessment damage may be more significant when occurs occur. Therefore some will not actually have to do work when assigned.",,,,,,,,,,,
-Cohort,Code(s),Stage,Semester,Credits,Cohort,Who Teaches What (WTW) Lead,Teaching,,,Extra Markers,Expert Checker,General Checker Required?,General Checker,Module has H and M variants
+Cohort,Code(s),Stage,Semester,Credits,Cohort,Who Teaches What (WTW) Lead,Teaching,,,Extra Markers,Expert Checker,General Checker Required?,General Checker,Practicals,Module has H and M variants
 SOF1,COM00015C,1,1,20,UG1,Dawn,Kofi,Poonam,,,Kostas,TRUE,,FALSE
 THE1,COM00013C,1,1,20,UG1,Simon F,Nick,Sia,,Antonio,Pedro,TRUE,,FALSE
 HCIN ,COM00018C,1,1,20,UG1,Jacob,Paul,Katrina,,,Jo I,TRUE,,FALSE

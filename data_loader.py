@@ -30,6 +30,7 @@ class ModuleData:
     expert_checker: str
     general_checker_required: bool
     general_checker: str
+    practicals: int  # Number of practical sessions
     has_h_m_variants: bool
     contact_hours: float  # Estimated contact hours
     student_count: int  # From CS Module Numbers.csv
@@ -308,12 +309,20 @@ def _parse_wtw_csv(filepath: str, known_lecturers: Set[str] = None) -> List[Modu
 
             # Has H/M variants
             has_h_m_variants = False
-            if len(row) > 13:
-                val = row[13].strip().upper()
+            if len(row) > 14:
+                val = row[14].strip().upper()
                 has_h_m_variants = "TRUE" in val
 
             # Estimate contact hours from credits (1 hour per credit as standard)
             contact_hours = credits * config.DEFAULT_CONTACT_HOURS_PER_CREDIT
+
+            # Read practicals count from column 13 (new column)
+            practicals = 0
+            if len(row) > 13 and row[13].strip():
+                try:
+                    practicals = int(row[13].strip())
+                except ValueError:
+                    practicals = 0
 
             module = ModuleData(
                 name=name,
@@ -328,6 +337,7 @@ def _parse_wtw_csv(filepath: str, known_lecturers: Set[str] = None) -> List[Modu
                 expert_checker=expert_checker,
                 general_checker_required=general_checker_required,
                 general_checker=general_checker,
+                practicals=practicals,
                 has_h_m_variants=has_h_m_variants,
                 contact_hours=contact_hours,
                 student_count=config.DEFAULT_STUDENT_COUNT,
@@ -595,7 +605,7 @@ _WAW_ROLE_MAPPING = {
     "EC Officer (on-campus)": "EC Officer (on-campus)",
     "Chair ECA committee (online)": "Chair ECA committee (online)",
     "Undergraduate Programme Leader": "UG PL",
-    "Undergraduate Programme Leader: CS/Maths": "UG PL",
+    "Undergraduate Programme Leader: CS/Maths": "Other PLs",
     "Postgraduate Team Leader (Online): Cyber": "Other PLs",
     "Postgraduate Programme Leader (Online): CS": "Other PLs",
     "Postgraduate Programme Leader: SCSE": "Other PLs",
@@ -905,6 +915,34 @@ def load_all_data(base_dir: str = ".",
             filtered_staff[name] = data
 
     staff = filtered_staff
+
+    # Include HoD even if not in WTW (for completeness)
+    if "Iain Bate" not in staff:
+        staff["Iain Bate"] = StaffData(
+            canonical_name="Iain Bate",
+            aliases=mappings.get("Iain Bate", ["Iain B", "Iain Bate"]),
+            fte=1.0,
+            employment_start=0,
+            active=True,
+            category="ART",
+            project_load=0,
+            pastoral_load=0,
+            adjusted_project_load=0,
+            adjusted_pastoral_load=0,
+            ecr_year="N/A",
+            ecr_value=0,
+            citizenship_level=0,
+            research_grant_income="N/A",
+            research_grant_income_value=0,
+            citizenship_value=0,
+            initial_fractional_project_load=0,
+            initial_fractional_pastoral_load=0,
+            notes="HoD - added for completeness, not in WTW",
+            roles=["Head of Department"],
+            phd_supervisions=0,
+            research_projects=[{"project_id": "SCHEME", "title": "SCHEME", "fte": "100%"}],
+            saint_modules=[],
+        )
 
     return YearData(
         year_label=year_label,
