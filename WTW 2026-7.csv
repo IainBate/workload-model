@@ -1,0 +1,61 @@
+,,,"NOTES: 
+1. Workload is assumed to be split equally across N staff unless stated otherwise. 
+2. It is up to the ML in the first place to work out how to split the work but it should definitely be a discussion within the team. 
+3. DHoD(T) can be included in the workload discussion if needed, however it shouldn't normally be needed. 
+4. Expert markers have been assigned however the current plan is only to use expert markers for time limited exams where the assessment damage may be more significant when occurs occur. Therefore some will not actually have to do work when assigned.",,,,,,,,,,,
+Cohort,Code(s),Stage,Semester,Credits,Cohort,Who Teaches What (WTW) Lead,Teaching,,,Extra Markers,Expert Checker,General Checker Required?,General Checker,Module has H and M variants
+SOF1,COM00015C,1,1,20,UG1,Dawn,Kofi,Poonam,,,Kostas,TRUE,,FALSE
+THE1,COM00013C,1,1,20,UG1,Simon F,Nick,Sia,,Antonio,Pedro,TRUE,,FALSE
+HCIN ,COM00018C,1,1,20,UG1,Jacob,Paul,Katrina,,,Jo I,TRUE,,FALSE
+SOF2,COM00016C,1,2,20,UG1,Kofi,Dawn,Fang,,,Antonio,TRUE,,FALSE
+SYS1,COM00011C,1,2,20,UG1,Mike F,Andy P,Pedro,,,Ian G,FALSE,,FALSE
+THE2,COM00014C,1,2,20,UG1,Alvaro,Detlef,Sam B,,,Nick,TRUE,,FALSE
+ENG1,COM00019I,2,1,20,UG2,Kostas,Robbert,Tommy,,,Antonio,FALSE,,FALSE
+SYS2,COM00029I,2,1,20,UG2,Andy P,Mike F,Chris CB,,,Xiaotian,FALSE,,FALSE
+THE3,COM00027I,2,1,20,UG2,Detlef,Simon F,Fang,,,Alvaro,TRUE,,FALSE
+IMLO ,COM00026I,2,2,20,UG2,James W,Claudio,Pourya,,,Will,TRUE,,FALSE
+DATA ,COM00028I,2,2,20,UG2,Xinwei,Pourya,,,,Jacob,FALSE,,FALSE
+SYS3,COM00018I,2,2,20,UG2,Pengcheng,Chris CB,Da,,,Poonam,TRUE,,FALSE
+AURO,"COM00052H, COM00186M",3,1,20,"MEng Cyber, ACS, UG4, CS/M, AI",Pedro,Alvaro,Soumya,,,Pengcheng,FALSE,,TRUE
+CTAP,"COM00048H, COM00183M",3,1,20,"Cyber, ACS, UG4, CS/M",Sia,Roberto,Carlo,,,Phoebe,TRUE,,TRUE
+HINT,"COM00040H, COM00173M",3,1,20,"UG4, CS/M, ACS",Claire,Rob A,,,,Colin,TRUE,,TRUE
+HIPC,"COM00036H, COM00174M",3,2,20,"UG4, ACS",Steven W,Xiaotian,,,,Dawn,FALSE,,TRUE
+IDEV,"COM00060H, COM00179M",3,1,20,"HCIT, ACS, SMIT, UG4",Joe,Alena,,,,Jo I,FALSE,,TRUE
+ROCS,"COM00066H, COM00180M",3,1,20,"ACS, Cyber, HCIT, SCSE, UG4",Yan,Will,,,,Jen,FALSE,,TRUE
+LPTC ,LAW00062H,3,1,20,UG3,Law School,Colin,,,,n/a,FALSE,,FALSE
+NETS,"COM00056H, COM00188M",3,1,20,"Cyber, ACS, UG4",Yuchen,Vasileios,,,,Sia,FALSE,,TRUE
+QUAL,"COM00058H, COM00181M",3,1,20,"HCIT, SMIT, ACS, UG4",Jen,Jo I,,,,Paul,FALSE,,TRUE
+Projects,n/a,3,1-2,40,UG3,Jacob,,,,,n/a,FALSE,,FALSE
+GPIG ,COM00138M,3,1-2,40,UG4 only,Xinwei,Radu,,,,n/a,FALSE,,FALSE
+SAIL,"COM00050H, COM00191M",3,2,20,"UG4, CS/M",Peter,Felix,,,,Frank,TRUE,,TRUE
+EHAC,"COM00064H, COM00182M",3,2,20,"Cyber, UG4, CS/M",Roberto,Yuchen,,,,Sia,TRUE,,TRUE
+EMBS,"COM00003H, COM00175M",3,1,20,UG4,Xiaotian,Ian G,,,,Kofi,FALSE,,TRUE
+PRAD,COM00195M,3,2,20,"ACS, Cyber, HCIT, AI",Carlo,Joe,,,,Paul,FALSE,,FALSE
+TECC,"COM00054H, COM00189M",3,2,20,"HCIT, ACS, Cyber, SMIT, SCSE?, UG4",Katrina,Jen,,,,Jacob,FALSE,,TRUE
+DEEP,"COM00049H, COM00184M",3,1,20,"UG4, CS/M4, MM4, AI",Will,James S,,,,Frank,FALSE,,TRUE
+PLEI,"COM00065H, COM00190M",3,2,20,"HCIT, ACS?,  SMIT?, UG4",Alena,Jo I,,,,Joe,FALSE,,TRUE
+QUCO,"COM00042H, COM00168M",3,2,20,"UG4, CS/M4, MM4, ACS",Sam B,Stefano,,,,Carlo,TRUE,,TRUE
+ENG2,"COM00055H, COM00187M",3,2,20,UG4,Antonio,Dimitris,Kostas,,,Kostas,FALSE,,TRUE
+CBDA,"COM00068H, COM00207M",3,2,20,MSc AI ,Mike OD,Roberto,,,,Frank,FALSE,,FALSE
+GODS,"COM00063H, COM00200M",3,1,20,Cyber ,Paul,Mike OD,,,,tbd,FALSE,,TRUE
+LLMA,"COM00070H, COM00215M",3,2,20,,James S,Frank,,,,,FALSE,,TRUE
+NLPG,"COM00069H, COM00214M",3,1,20,,Dimitar,Adrian,,,,,FALSE,,TRUE
+ELLA,"COM00071H, COM00216M",3,2,20,,Robbert,Antonio,Soumya,,,,FALSE,,TRUE
+FOAM,<new for one year>,3,2,20,,Tommy,Peter,,,,,FALSE,,FALSE
+ARIA,"COM00072H, COM00217M",3,1,20,,Tommy,Peter,,,,,FALSE,,FALSE
+FSSE,"COM00006M, COM00212M",SC,-,10,SCSE,Sarah,Oleg,,,,Richard H,TRUE,,FALSE
+HRAS,COM00025M,SC,-,10,SCSE,Oleg,David P,,,,Mark,TRUE,,FALSE
+RASS,COM00164M,SC,-,10,SCSE,Mark N,Rob A,,,,Richard H,FALSE,,FALSE
+SSAS,COM00052M,SC,-,10,SCSE,Mark N,Oleg,,,,Sarah,TRUE,,FALSE
+CASA,COM00017M,SC,-,10,SCSE,Simon B,Richard H,,,,Mark S,FALSE,,FALSE
+SESA,COM00202M,SC,-,10,SCSE,Vasileios,Richard H,,,,Yan,FALSE,,FALSE
+SCDR,COM00047M,SC,-,10,SCSE,Richard H,Sarah,,,,Yan,FALSE,,FALSE
+REMS,COM00201M,SC,-,20,SCSE,Rob A,Claire,,,,Richard H,FALSE,,FALSE
+HUFS,COM00208M,SC,-,10,SCSE,Mark S,David P,Kate P,,,Joe,FALSE,,FALSE
+SMSY,COM00050M,SC,-,10,,,,,,,,FALSE,,FALSE
+TLSA,COM00059M,SC,-,10,,,,,,,,FALSE,,FALSE
+"Artificial 
+Intelligence (AI)",,SN,-,15,SAINTS,Richard W,Frank,,,,None,,,FALSE
+"Law, Ethics and Society (LES)",,SN,-,15,SAINTS,Phillip Morgan ,Jennifer Chubb,Tom Stoneham,,,None,,,FALSE
+Foundations of Safe AI (Safe AI 1),,SN,-,15,SAINTS,Ibrahim,Yan,,,,None,,,FALSE
+Designing Safe AI (Safe AI 2),,SN,-,15,SAINTS,Colin,Yan,,,,None,,,FALSE

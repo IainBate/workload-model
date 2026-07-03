@@ -1,0 +1,56 @@
+{
+  "description": "Module mapping between academic years. Maps 2025-6 modules to their 2026-7 equivalents for continuity analysis.",
+  "last_updated": "2026-07-01",
+  "merged_modules": {
+    "QUAL-H": {"2026-7": "QUAL", "notes": "Combined with QUAL-M"},
+    "QUAL-M": {"2026-7": "QUAL", "notes": "Combined with QUAL-H"},
+    "NETS-H": {"2026-7": "NETS", "notes": "Combined with NETS-M"},
+    "NETS-M": {"2026-7": "NETS", "notes": "Combined with NETS-H"},
+    "CTAP-H": {"2026-7": "CTAP", "notes": "Combined with CTAP-M"},
+    "CTAP-M": {"2026-7": "CTAP", "notes": "Combined with CTAP-H"},
+    "AURO-H": {"2026-7": "AURO", "notes": "Combined with AURO-M"},
+    "AURO-M": {"2026-7": "AURO", "notes": "Combined with AURO-H"},
+    "HINT-H": {"2026-7": "HINT", "notes": "Combined with HINT-M"},
+    "HINT-M": {"2026-7": "HINT", "notes": "Combined with HINT-H"},
+    "HIPC-H": {"2026-7": "HIPC", "notes": "Combined with HIPC-M"},
+    "HIPC-M": {"2026-7": "HIPC", "notes": "Combined with HIPC-H"},
+    "ROCS-H": {"2026-7": "ROCS", "notes": "Combined with ROCS-M"},
+    "ROCS-M": {"2026-7": "ROCS", "notes": "Combined with ROCS-H"},
+    "DEEP-H": {"2026-7": "DEEP", "notes": "Combined with DEEP-M"},
+    "DEEP-M": {"2026-7": "DEEP", "notes": "Combined with DEEP-H"},
+    "EHAC-H": {"2026-7": "EHAC", "notes": "Combined with EHAC-M"},
+    "EHAC-M": {"2026-7": "EHAC", "notes": "Combined with EHAC-H"},
+    "EMBS-H": {"2026-7": "EMBS", "notes": "Combined with EMBS-M"},
+    "EMBS-M": {"2026-7": "EMBS", "notes": "Combined with EMBS-H"},
+    "ENG2-H": {"2026-7": "ENG2", "notes": "Combined with ENG2-M"},
+    "ENG2-M": {"2026-7": "ENG2", "notes": "Combined with ENG2-H"},
+    "PLEI-H": {"2026-7": "PLEI", "notes": "Combined with PLEI-M"},
+    "PLEI-M": {"2026-7": "PLEI", "notes": "Combined with PLEI-H"},
+    "QUCO-H": {"2026-7": "QUCO", "notes": "Combined with QUCO-M"},
+    "QUCO-M": {"2026-7": "QUCO", "notes": "Combined with QUCO-H"},
+    "TECC-H": {"2026-7": "TECC", "notes": "Combined with TECC-M"},
+    "TECC-M": {"2026-7": "TECC", "notes": "Combined with TECC-H"}
+  },
+  "unified_modules": {
+    "PRAI": {"2026-7": "PRAD", "notes": "Unified into PRAD (single project module)"},
+    "PCYB": {"2026-7": "PRAD", "notes": "Unified into PRAD"},
+    "PRMH": {"2026-7": "PRAD", "notes": "Unified into PRAD"},
+    "PACS": {"2026-7": "PRAD", "notes": "Unified into PRAD"}
+  },
+  "dropped_modules": {
+    "VICO-H": {"notes": "No equivalent in 2026-7"},
+    "VICO-M": {"notes": "No equivalent in 2026-7"},
+    "AIPS-H": {"notes": "No equivalent in 2026-7"},
+    "AIPS-M": {"notes": "No equivalent in 2026-7"},
+    "EVAC-H": {"notes": "No equivalent in 2026-7"},
+    "EVAC-M": {"notes": "No equivalent in 2026-7"},
+    "PRCM": {"notes": "No equivalent in 2026-7"},
+    "PRCE": {"notes": "No equivalent in 2026-7"},
+    "PRCP": {"notes": "No equivalent in 2026-7"},
+    "PRIN": {"notes": "No equivalent in 2026-7"}
+  },
+  "new_modules": {
+    "FOAM": {"notes": "One year only, not relevant for workload"},
+    "ARIA": {"notes": "New module for 2026-7"}
+  }
+}

@@ -1,0 +1,33 @@
+# Virtual environment
+.venv/
+venv/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Generated output files (in the output/ directory)
+output/
+
+# macOS
+.DS_Store
+
+# Claude Code session data
+.claude/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS temp files
+Thumbs.db
+
+# Extracted Excel temp folder
+temp_excel/
+
+# Comparison report (generated)
+# three_way_comparison_report.md

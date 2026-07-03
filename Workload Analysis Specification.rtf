@@ -1,0 +1,37 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2870
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fswiss\fcharset0 ArialMT;}
+{\colortbl;\red255\green255\blue255;}
+{\*\expandedcolortbl;;}
+{\*\listtable{\list\listtemplateid1\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid1\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid1}
+{\list\listtemplateid2\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid101\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid2}}
+{\*\listoverridetable{\listoverride\listid1\listoverridecount0\ls1}{\listoverride\listid2\listoverridecount0\ls2}}
+\paperw11905\paperh16837\margl1440\margr1440\vieww25980\viewh16840\viewkind1
+\deftab720
+\pard\pardeftab720\ri-1\sl276\slmult1\partightenfactor0
+
+\f0\fs22 \cf0 The overall project aim is to develop a workload calculator for the department. A set of python files should be produced that read some input files and then at the end a csv file is implemented with each person\'92s workload in it. There are already some python files in the folder that should implement the WTW calculations and some other teaching related workload. In places some dummy values are inserted. These need to be detected and replaced with real data. At the end of the process, then no data should be guessed and the whole of the Workload ModelFull Description should be implemented. This should be checked and if it is not true then it should be highlighted. \
+I would suggest the project is done in phases. First check you understand what is needed, what is the best way to architect the python files, and then build / test parts of the software in a logical fashion. It might make sense that some data, e.g. names of staff and mappings between multiple staff are stored in some form of data format file however you decide that or make suggestions where I then make the decision. You might want to propose a project management plan and software architecture first.\
+There are various relevant input files:\
+\pard\tx360\tx1080\pardeftab720\li1080\fi-360\ri-1\sl276\slmult1\partightenfactor0
+\ls1\ilvl0\cf0 {\listtext	\'95	}\uc0\u9679 	Workload ModelFull Description.docx - The files describe the model that should be implemented. This needs to be parsed, the data needed and calculations that follow need to be understood and implemented.\
+{\listtext	\'95	}\uc0\u9679 	Teaching - WTW 2026-7.csv - This WTW file identifies the set of taught modules, who are the module leaders, who else teaches on them and who the assessment checker is for the module. It is noted that across the set of files some people\'92s names may be given inconsistently, e.g. Iain B or Iain Bate. I would suggest you store people\'92s names in a file with a mapping between the different versions. If you cannot make a reliable guess that Iain B and Iain Bate are probably the same people, then you should prompt the user whether two people are the same or not.\
+{\listtext	\'95	}\uc0\u9679 	Teaching - WTW 2025-6.csv - This WTW file provides the same information but for a different year. It should be assumed the filename defines the year of the WTW. The latest date is the current year. So in this case \'93WTW 2026-7.csv\'94 is the current year and \'93WTW 2025-6.csv\'94 is the previous year. The main one needed to calculate the teaching load is the current year. The previous year is only relevant for determining whether a member of staff is new to a module. The folder will need to be parsed to determine which WTW  files exist. It should be noted some modules change between years. The module can be new or just renamed. Where a module name is new, then the user should be asked. If it is renamed then a mapping should be recorded in an appropriate file. I am assuming there will be a file set up somewhere with module details that python files can parse.\
+{\listtext	\'95	}\uc0\u9679 	Teaching - Pastoral_load.csv - This file defines how many pastoral students each person has.\
+{\listtext	\'95	}\uc0\u9679 	Teaching - project_load.csv - This file defines how many pastoral students each person has.\
+{\listtext	\'95	}\uc0\u9679 	Teaching - CS Module Numbers.csv - How many students are on each module. Note if a module name is the same but they have a different ending, then they are the same module and the student numbers should be combined. For example, add QUAL-H to QUAL-M.\
+\pard\tx360\tx1080\pardeftab720\li1080\fi-360\ri-1\sl276\slmult1\partightenfactor0
+\cf0 \uc0\u9679 	Teaching - CS Module Assessment Numbers.csv - The number of assessments for each module.\
+\pard\tx360\tx1080\pardeftab720\li1080\fi-360\ri-1\sl276\slmult1\partightenfactor0
+\ls2\ilvl0\cf0 {\listtext	\'95	}\uc0\u9679 	Research - PhD Supervision Data.csv - The number of times a person is a supervisor, co-supervisor or assessor can be determined from this file.\
+{\listtext	\'95	}\uc0\u9679 	Research - % FTE for CS.csv - Details of the number of projects accepted, whether someone is the PI or CI, and the workload attached to each person (i.e. % FTE). \
+{\listtext	\'95	}\uc0\u9679 	Administration - WAW.csv - This file defines who has which role.\
+{\listtext	\'95	}\uc0\u9679 	General - Part time.csv - Identifies the staff that are part-time and how available they are.\
+\pard\pardeftab720\ri-1\sl276\slmult1\partightenfactor0
+\ls2\ilvl0\cf0 {\listtext	\'95	}Output files\
+\pard\tx360\tx1080\pardeftab720\li1080\fi-360\ri-1\sl276\slmult1\partightenfactor0
+\ls2\ilvl0\cf0 {\listtext	\'95	}\uc0\u9679 	Staff workload model.csv - This should be the output file for each person\'92s workload. The general structure should be as you go from left to right that the total workload is on the left, then the total for each of the main areas (teaching, research and administration - you may need to ask me what activities are in what section however above I have said the category before the file name, e.g. WAW is Administration) and then on the right hand side the detail of where the numbers come from. The detail should be in sections, e.g. Teaching first followed by Research followed by Administration. It may be good to have a column here followed by an explanation, for example in the project student column \'9312 UG students and 4 PGT students\'94. \
+{\listtext	\'95	}\uc0\u9679 	Stacked boxplot (summary) - For everyone in the department, their workload has three components: Teaching; Research and Administration. There should be horizontal lines showing the expected workload hours for each component plus one for the total workload available. Note some staff are not full-time (defined in Part time.csv) and therefore the hours available are pro-rata. For ART staff, the ratios are Teaching (40%), Research (40%) and Administration (20%). \
+{\listtext	\'95	}\uc0\u9679 	Stacked boxplot (detailed) - Similar to Stacked boxplot (summary) except the three components are broken down into individual activities.\
+\pard\pardeftab720\ri-1\sl276\slmult1\partightenfactor0
+\ls2\ilvl0\cf0 \
+}
