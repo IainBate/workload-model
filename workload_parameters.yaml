@@ -1,6 +1,6 @@
 # Workload Model Parameters
 # Extracted from Workload ModelFull Description.docx (Iain Bate, June 2026)
-# Last verified: 2026-07-01
+# Last verified: 2026-07-03
 
 global_parameters:
   nominal_working_hours_per_year: 1628
@@ -64,7 +64,6 @@ task_multipliers:
     hw_lab: 4
     new_hw_lab: 8
     drop_in_session: 1.5
-    repetition_multiplier: 1.5
 
   supervision_hours_per_student:
     pastoral: 6
@@ -72,6 +71,7 @@ task_multipliers:
     msc_project: 40
     project_marking_first_or_second: 2
     pgr_primary_supervisor_per_fte: 80
+    pgr_co_supervisor_per_fte: 48
     pgr_assessor: 8
 
   teaching_online_programmes:

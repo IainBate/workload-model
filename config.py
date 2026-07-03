@@ -67,7 +67,6 @@ TEACHING_NEW_PROBLEM_CLASS = TEACHING_MULTIPLIERS["new_problem_class_seminar_pra
 TEACHING_HW_LAB = TEACHING_MULTIPLIERS["hw_lab"]  # 4
 TEACHING_NEW_HW_LAB = TEACHING_MULTIPLIERS["new_hw_lab"]  # 8
 TEACHING_DROP_IN = TEACHING_MULTIPLIERS["drop_in_session"]  # 1.5
-TEACHING_REPETITION = TEACHING_MULTIPLIERS["repetition_multiplier"]  # 1.5
 
 # --- Supervision (hours per student) ---
 SUPERVISION_MULTIPLIERS: dict[str, float] = _params["task_multipliers"]["supervision_hours_per_student"]
@@ -76,6 +75,7 @@ SUPERVISION_UG_PROJECT = SUPERVISION_MULTIPLIERS["ug_project"]  # 22
 SUPERVISION_MSC_PROJECT = SUPERVISION_MULTIPLIERS["msc_project"]  # 40
 SUPERVISION_PROJECT_MARKING = SUPERVISION_MULTIPLIERS["project_marking_first_or_second"]  # 2
 SUPERVISION_PGR_PRIMARY = SUPERVISION_MULTIPLIERS["pgr_primary_supervisor_per_fte"]  # 80
+SUPERVISION_PGR_CO_SUPERVISOR = SUPERVISION_MULTIPLIERS["pgr_co_supervisor_per_fte"]  # 48 (60% of primary)
 SUPERVISION_PGR_ASSESSOR = SUPERVISION_MULTIPLIERS["pgr_assessor"]  # 8
 
 # --- Online Programmes ---

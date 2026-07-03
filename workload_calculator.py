@@ -39,8 +39,8 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
     has_new_lecturer = any(t not in known_lecturers for t in teachers)
 
     if has_new_lecturer:
-        mult = config.TEACHING_MULTIPLIERS["lecture_new_content_and_lecturer"]  # 7.5
-        teaching_details.append(f"New lecturer multiplier (7.5x) applied to {contact_hours:.0f} contact hours")
+        mult = config.TEACHING_MULTIPLIERS["lecture_new_content_or_lecturer"]  # 5
+        teaching_details.append(f"New lecturer multiplier (5x) applied to {contact_hours:.0f} contact hours")
     else:
         mult = config.TEACHING_MULTIPLIERS["lecture_standard"]  # 2.5
         teaching_details.append(f"Standard multiplier (2.5x) applied to {contact_hours:.0f} contact hours")
@@ -230,11 +230,14 @@ def calculate_workload(year_data: YearData) -> List[WorkloadResult]:
         if not staff.active:
             continue
 
+        # Nominal hours scaled by FTE for part-time staff
         nominal_hours = config.NOMINAL_WORKING_HOURS_PER_YEAR * staff.fte
 
         # Teaching
         teaching_hours = staff_teaching.get(canonical_name, {}).get("hours", 0.0)
-        teaching_details = staff_teaching.get(canonical_name, {}).get("details", [])
+
+        # Baselines: scale personal development by FTE for part-time staff
+        personal_dev = config.BASELOADS["personal_development"] * staff.fte
 
         # Research
         research_hours, research_detail = _calculate_research_workload(staff)
@@ -242,11 +245,11 @@ def calculate_workload(year_data: YearData) -> List[WorkloadResult]:
         # Administration
         admin_hours, admin_detail = _calculate_admin_workload(staff, nominal_hours)
 
-        # Total
-        total_hours = teaching_hours + research_hours + admin_hours
+        # Total: teaching + research + admin + personal development baseline
+        total_hours = teaching_hours + research_hours + admin_hours + personal_dev
 
         # Build detail strings
-        teaching_detail_str = "; ".join(teaching_details) if teaching_details else "No teaching activities"
+        teaching_detail_str = "; ".join(staff_teaching.get(canonical_name, {}).get("details", [])) if canonical_name in staff_teaching else "No teaching activities"
         if staff.saint_modules:
             teaching_detail_str += f"; Also teaches: {', '.join(staff.saint_modules)} (SAINTS - not included in workload)"
 
