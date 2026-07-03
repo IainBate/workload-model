@@ -15,6 +15,55 @@ There are **significant differences** between the code's output, the manual Exce
 4. **Different baseline treatment** (fixed hours vs derived)
 5. **Role mapping gaps** (roles in WAW with no YAML percentage)
 
+
+
+## Fixes Applied (July 3, 2026)
+
+| Issue | Fix | Status |
+|-------|-----|--------|
+| Simon B name collision | Removed "Simon B" from Simon Braunstein; added "Simon Bra" alias; updated WTW 2025-6 | ✅ Fixed |
+| Iain Bate missing from roster | Added as HoD (100% role) + SCHEME grant research project | ✅ Fixed |
+| Practical repetition multiplier | Added YAML constant (1.5), WTW CSV column, calculator logic (1st = 2.5x, rest = 1.5x) | ✅ Fixed |
+| All assessments manual | Switched from automated to manual rates (15h setting, 0.5h MSc marking, 2h checking) | ✅ Fixed |
+| Detlef Plump PL role | Changed "UG PL" (10%) → "Other PLs" (5%) | ✅ Fixed |
+| Pengcheng Liu GSB Chair | Already correctly mapped to "Graduate Chair" (20%) | ✅ Verified |
+| Jake Rigby project coordinator | Already correctly mapped to "Taught Project Coordinator" (10%) | ✅ Verified |
+| Personal development baseline | Added 75h × FTE to all staff totals | ✅ Fixed |
+| Part-time staff scaling | All baselines now scale by FTE | ✅ Fixed |
+| Research Group Leader role | Added to YAML at 10% | ✅ Fixed |
+| Nick Pears & Kofi Appiah admin | Confirmed correct in code | ✅ Verified |
+| New lecturer multiplier | Changed from 7.5 → 5 | ✅ Fixed |
+| Co-supervisor rate | Added 48h (60% of primary) | ✅ Fixed |
+| Ethics Committee members | Changed from 5% → 10% each | ✅ Fixed |
+| DEC Chair note | Added clarification (independent from BoE) | ✅ Fixed |
+| ECR/ART staff rep | Set to no percentage (0%) | ✅ Fixed |
+
+## Outstanding Issues (need your input)
+
+1. **Teaching calculation methodology** — The code uses a simplified `contact_hours × multiplier` formula. The Excel uses granular per-module calculation (first delivery, multiple delivery, seminar hours, marking %, HW labs). **You said this doesn't need to be in the code for now** since you don't have the detailed data.
+
+2. **Grant data source** — The code reads from `% FTE for CS.csv`. The Excel has grant percentages in column AB (hardcoded hours). **You confirmed the CSV percentages are correct**, so the code is right.
+
+3. **Admin base hours** — The code uses 1,628h; the Excel uses 1,642h for ART staff. **You confirmed Nick Pears and Kofi Appiah are correct in the code**, so 1,628h is the right base.
+
+4. **Staff not in WTW** — The following people appear in the Excel but not in WTW 2026-7 and are excluded per your instruction:
+   - Ana Cavalcanti (ART)
+   - Simon O'Keefe (ART)
+   - Simos Gerasimou (ART)
+   - Andrew Pomfret (T&S)
+   - Mike O'Dea (T&S)
+   - Philippa Ryan (T&S)
+   - Richard Hawkins (ART)
+   - John Oyekan (ART)
+
+5. **Practicals column empty** — The WTW 2026-7.csv now has a "Practicals" column but it's empty. **You need to fill in the practical session counts for each module.**
+
+6. **Simon Burton** — Not in WTW 2026-7. Appears in Excel ART sheet as "Chair in Systems Safety". Not included per your instruction.
+
+7. **Dawn H Wood mismatch** — "Dawn" in WTW resolves to "Dawn H Wood" correctly. Excel T&S sheet shows her with teaching hours. She appears in code output.
+
+8. **Large teaching discrepancies remain** — For staff in both code and Excel, the teaching hours still differ because the code uses the simplified formula. This is expected until you provide the granular practical/module data.
+
 ---
 
 ## 1. Staff Coverage Differences
