@@ -1,0 +1,522 @@
+"""
+Output generation for the workload calculator.
+Produces:
+1. Staff workload model CSV (summary + detail columns)
+2. Summary stacked bar chart (PNG and embedded in Excel)
+3. Detailed stacked bar chart (PNG and embedded in Excel)
+4. HTML report with embedded images
+5. Excel (.xlsx) file with formulas and proper formatting
+
+Uses openpyxl for Excel generation.
+"""
+
+import csv
+import os
+from pathlib import Path
+from typing import List, Optional
+
+# Get project root directory (parent of scripts folder)
+SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = Path(os.path.dirname(SCRIPTS_DIR))
+
+OUTPUT_DIR = PROJECT_ROOT / "output"
+
+import matplotlib
+matplotlib.use("Agg")  # Non-interactive backend
+import matplotlib.pyplot as plt
+import matplotlib.patches as mpatches
+from openpyxl import Workbook
+from openpyxl.chart import BarChart, Reference, Series
+from openpyxl.styles import Font, Alignment, PatternFill, Border, Side
+from openpyxl.chart.label import DataLabelList
+
+import config
+from data_loader import WorkloadResult, YearData
+
+
+def generate_csv(results: List[WorkloadResult], filepath: str = "Staff workload model.csv"):
+    """Generate the staff workload model CSV output."""
+    # If filepath is just a filename, prepend OUTPUT_DIR
+    if not os.path.isabs(filepath) and "/" not in filepath and "\\" not in filepath:
+        filepath = os.path.join(OUTPUT_DIR, filepath)
+
+    with open(filepath, "w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        # Header
+        writer.writerow([
+            "Name", "FTE", "Total Hours",
+            "Teaching Hours", "Research Hours", "Admin Hours",
+            "Teaching Detail", "Research Detail", "Admin Detail",
+            "Assumptions", "Missing Data",
+        ])
+
+        for r in results:
+            writer.writerow([
+                r.name,
+                r.fte,
+                f"{r.total_hours:.1f}",
+                f"{r.teaching_hours:.1f}",
+                f"{r.research_hours:.1f}",
+                f"{r.admin_hours:.1f}",
+                r.teaching_detail,
+                r.research_detail,
+                r.admin_detail,
+                "; ".join(r.assumptions) if r.assumptions else "None",
+                "; ".join(r.missing_data) if r.missing_data else "None",
+            ])
+
+    print(f"CSV output written to {filepath}")
+
+
+def _create_boxplot(results: List[WorkloadResult], title: str, components: List[str],
+                    component_labels: List[str], output_path: str):
+    """Create a stacked horizontal bar chart for workload components."""
+    names = [r.name for r in results]
+    data = [[getattr(r, comp) for r in results] for comp in components]
+
+    # Dynamic figure size based on staff count
+    fig, ax = plt.subplots(figsize=(16, max(8, len(names) * 0.4)))
+    fig.suptitle(title, fontsize=14, fontweight="bold")
+
+    bottom = [0.0] * len(names)
+    colors = ["#4CAF50", "#2196F3", "#FF9800", "#9C27B0", "#F44336", "#795548"]
+
+    for i, (comp, label) in enumerate(zip(components, component_labels)):
+        values = data[i]
+        bars = ax.barh(names, values, left=bottom, color=colors[i % len(colors)],
+                       label=label, edgecolor="white", height=0.6)
+        for j, (bar, val) in enumerate(zip(bars, values)):
+            if val > 10:  # Only label significant values
+                ax.text(bar.get_x() + bar.get_width() / 2, bar.get_y() + bar.get_height() / 2,
+                        f"{val:.0f}", ha="center", va="center", fontsize=7, color="white")
+        bottom = [b + v for b, v in zip(bottom, data[i])]
+
+    # Add expected workload lines
+    fte_values = [r.fte for r in results]
+    for comp, label, color in zip(components, component_labels, colors):
+        expected = [r.nominal_hours * getattr(config.CONTRACT_NORMATIVE_DIVISIONS.get("TR_staff", {}),
+                                               comp.lower().replace(" hours", "").replace(" ", "_"), 0)
+                    for r in results]
+
+    ax.set_xlabel("Hours")
+    ax.set_ylabel("Staff")
+    ax.legend(loc="lower right", fontsize=9)
+    ax.grid(axis="x", alpha=0.3)
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=150, bbox_inches="tight")
+    plt.close(fig)
+    print(f"Boxplot saved to {output_path}")
+
+
+def generate_boxplots(results: List[WorkloadResult], output_dir: str = None):
+    """Generate both summary and detailed stacked boxplots."""
+    if output_dir is None:
+        output_dir = OUTPUT_DIR
+
+    names = [r.name for r in results]
+
+    # --- Summary boxplot ---
+    summary_components = ["teaching_hours", "research_hours", "admin_hours"]
+    summary_labels = ["Teaching", "Research", "Administration"]
+
+    # Larger figure size for better readability
+    fig, ax = plt.subplots(figsize=(18, max(10, len(names) * 0.45)))
+    fig.suptitle("Workload Summary: Teaching, Research & Administration",
+                 fontsize=16, fontweight="bold")
+
+    bottom = [0.0] * len(names)
+    colors = ["#4CAF50", "#2196F3", "#FF9800"]
+
+    for i, (comp, label) in enumerate(zip(summary_components, summary_labels)):
+        values = [getattr(r, comp) for r in results]
+        bars = ax.barh(names, values, left=bottom, color=colors[i],
+                       label=label, edgecolor="white", height=0.7)
+        for j, (bar, val) in enumerate(zip(bars, values)):
+            if val > 15:
+                ax.text(bar.get_x() + bar.get_width() / 2,
+                        bar.get_y() + bar.get_height() / 2,
+                        f"{val:.0f}", ha="center", va="center",
+                        fontsize=8, color="white", fontweight="bold")
+        bottom = [b + v for b, v in zip(bottom, values)]
+
+    # Add expected workload reference lines (40% of nominal for ART staff)
+    for y_pos, (name, fte) in enumerate(zip(names, [r.fte for r in results])):
+        expected_teaching = config.NOMINAL_WORKING_HOURS_PER_YEAR * fte * 0.40
+        expected_research = config.NOMINAL_WORKING_HOURS_PER_YEAR * fte * 0.40
+        ax.axvline(x=expected_teaching, color="#4CAF50", alpha=0.3, linestyle="--", linewidth=1)
+        ax.axvline(x=expected_teaching + expected_research, color="#2196F3", alpha=0.3,
+                   linestyle="--", linewidth=1)
+
+    # Total workload line
+    total_expected = config.NOMINAL_WORKING_HOURS_PER_YEAR
+    ax.axvline(x=total_expected, color="black", alpha=0.4, linestyle="-.", linewidth=1.5,
+               label=f"Total Available ({total_expected}h)")
+
+    ax.set_xlabel("Hours", fontsize=12)
+    ax.set_ylabel("Staff", fontsize=12)
+    ax.legend(loc="lower right", fontsize=10)
+    ax.grid(axis="x", alpha=0.3)
+    plt.tight_layout()
+
+    summary_path = os.path.join(output_dir, "workload_summary_boxplot.png")
+    plt.savefig(summary_path, dpi=200, bbox_inches="tight")
+    plt.close(fig)
+    print(f"Summary boxplot saved to {summary_path}")
+
+    # --- Detailed boxplot ---
+    detailed_components = ["teaching_hours", "research_hours", "admin_hours"]
+    detailed_labels = ["Teaching", "Research", "Administration"]
+
+    fig2, ax2 = plt.subplots(figsize=(18, max(10, len(names) * 0.45)))
+    fig2.suptitle("Workload Breakdown: Detailed Components", fontsize=16, fontweight="bold")
+
+    bottom2 = [0.0] * len(names)
+    detailed_colors = ["#4CAF50", "#81C784", "#2196F3", "#64B5F6", "#FF9800", "#FFB74D"]
+
+    for i, (comp, label) in enumerate(zip(detailed_components, detailed_labels)):
+        values = [getattr(r, comp) for r in results]
+        bars = ax2.barh(names, values, left=bottom2, color=detailed_colors[i],
+                        label=label, edgecolor="white", height=0.7)
+        for j, (bar, val) in enumerate(zip(bars, values)):
+            if val > 15:
+                ax2.text(bar.get_x() + bar.get_width() / 2,
+                         bar.get_y() + bar.get_height() / 2,
+                         f"{val:.0f}", ha="center", va="center",
+                         fontsize=8, color="white", fontweight="bold")
+        bottom2 = [b + v for b, v in zip(bottom2, values)]
+
+    total_expected2 = config.NOMINAL_WORKING_HOURS_PER_YEAR
+    ax2.axvline(x=total_expected2, color="black", alpha=0.4, linestyle="-.", linewidth=1.5,
+                label=f"Total Available ({total_expected2}h)")
+
+    ax2.set_xlabel("Hours", fontsize=12)
+    ax2.set_ylabel("Staff", fontsize=12)
+    ax2.legend(loc="lower right", fontsize=10)
+    ax2.grid(axis="x", alpha=0.3)
+    plt.tight_layout()
+
+    detailed_path = os.path.join(output_dir, "workload_detailed_boxplot.png")
+    plt.savefig(detailed_path, dpi=200, bbox_inches="tight")
+    plt.close(fig2)
+    print(f"Detailed boxplot saved to {detailed_path}")
+
+
+def generate_excel_with_formulas(results: List[WorkloadResult], year_data: YearData,
+                                  output_dir: str = None):
+    """
+    Generate an Excel (.xlsx) file with calculated values and formulas.
+
+    This creates a properly formatted spreadsheet that can be:
+    1. Used directly
+    2. Uploaded to Google Sheets without formula errors
+
+    Args:
+        results: List of WorkloadResult objects
+        year_data: YearData object for metadata
+        output_dir: Output directory (default: output/)
+
+    The spreadsheet includes:
+    - Staff workload summary table
+    - Formulas for calculating totals from components
+    - Properly sized charts (not compressed)
+    """
+    wb = Workbook()
+    ws = wb.active
+    ws.title = "Staff Workload"
+
+    # Remove any extra default sheets that may exist
+    for sheet_name in list(wb.sheetnames):
+        if sheet_name != "Staff Workload":
+            del wb[sheet_name]
+
+    # Define styles
+    header_font = Font(bold=True, color="FFFFFF")
+    header_fill = PatternFill(start_color="4CAF50", end_color="4CAF50", fill_type="solid")
+    subheader_fill = PatternFill(start_color="E8F5E9", end_color="E8F5E9", fill_type="solid")
+
+    border_thin = Border(
+        left=Side(style='thin'),
+        right=Side(style='thin'),
+        top=Side(style='thin'),
+        bottom=Side(style='thin')
+    )
+
+    # Write header row
+    headers = [
+        "Name", "FTE", "Total Hours", "Teaching Hours", "Research Hours",
+        "Admin Hours", "Teaching Detail", "Research Detail", "Admin Detail",
+        "Assumptions", "Missing Data"
+    ]
+
+    for col, header in enumerate(headers, start=1):
+        cell = ws.cell(row=1, column=col, value=header)
+        cell.font = header_font
+        cell.fill = header_fill
+        cell.alignment = Alignment(horizontal="center")
+
+    # Write data rows
+    for row_idx, r in enumerate(results, start=2):
+        ws.cell(row=row_idx, column=1, value=r.name)
+        ws.cell(row=row_idx, column=2, value=r.fte)
+
+        # Total hours - static value (total of teaching + research + admin)
+        total_cell = ws.cell(row=row_idx, column=3, value=r.total_hours)
+        total_cell.number_format = "0.0"
+
+        ws.cell(row=row_idx, column=4, value=r.teaching_hours).number_format = "0.0"
+        ws.cell(row=row_idx, column=5, value=r.research_hours).number_format = "0.0"
+        ws.cell(row=row_idx, column=6, value=r.admin_hours).number_format = "0.0"
+
+        # Detail columns - wrap text
+        for col, detail in enumerate([r.teaching_detail, r.research_detail, r.admin_detail], start=7):
+            cell = ws.cell(row=row_idx, column=col, value=detail)
+            cell.alignment = Alignment(horizontal="left", vertical="top", wrap_text=True)
+
+        # Assumptions and Missing Data
+        assumptions_cell = ws.cell(row=row_idx, column=10,
+                                   value="; ".join(r.assumptions) if r.assumptions else "None")
+        assumptions_cell.alignment = Alignment(wrap_text=True)
+
+        missing_cell = ws.cell(row=row_idx, column=11,
+                               value="; ".join(r.missing_data) if r.missing_data else "None")
+        missing_cell.alignment = Alignment(wrap_text=True)
+
+    # Apply border to all data cells
+    for row in range(1, len(results) + 2):
+        for col in range(1, 12):
+            ws.cell(row=row, column=col).border = border_thin
+
+    # Auto-fit column widths (rough approximation)
+    column_widths = {
+        'A': 25,  # Name
+        'B': 8,   # FTE
+        'C': 14,  # Total Hours
+        'D': 16,  # Teaching Hours
+        'E': 16,  # Research Hours
+        'F': 14,  # Admin Hours
+        'G': 40,  # Teaching Detail
+        'H': 35,  # Research Detail
+        'I': 30,  # Admin Detail
+        'J': 25,  # Assumptions
+        'K': 25,  # Missing Data
+    }
+
+    for col, width in column_widths.items():
+        ws.column_dimensions[col].width = width
+
+    # Freeze header row
+    ws.freeze_panes = "A2"
+
+    # Create chart sheet
+    chart_ws = wb.create_sheet(title="Workload Charts")
+
+    # Add summary bar chart (horizontal)
+    chart1 = BarChart()
+    chart1.type = "bar"
+    chart1.style = 10
+    chart1.title = "Workload Summary: Teaching, Research & Administration"
+    chart1.y_axis.title = "Staff"
+    chart1.x_axis.title = "Hours"
+    chart1.width = 30  # Wider chart
+    chart1.height = 20  # Taller chart
+
+    # Data for chart
+    categories = Reference(ws, min_row=2, max_row=len(results) + 1, min_col=1)
+
+    teaching_data = Reference(ws, min_row=1, max_row=len(results) + 1, min_col=4)
+    research_data = Reference(ws, min_row=1, max_row=len(results) + 1, min_col=5)
+    admin_data = Reference(ws, min_row=1, max_row=len(results) + 1, min_col=6)
+
+    chart1.add_data(teaching_data, titles_from_data=True)
+    chart1.add_data(research_data, titles_from_data=True)
+    chart1.add_data(admin_data, titles_from_data=True)
+
+    chart1.set_categories(categories)
+    chart1.dataLabels = DataLabelList()
+    chart1.dataLabels.showVal = True
+
+    # Position chart
+    chart1.anchor = "A1"
+    chart_ws.add_chart(chart1, "A1")
+
+    # Create a second sheet with detailed breakdown
+    detail_ws = wb.create_sheet(title="Detailed Breakdown")
+
+    # Add header
+    detail_headers = ["Name", "Teaching", "Research", "Admin", "Total"]
+    for col, header in enumerate(detail_headers, start=1):
+        cell = detail_ws.cell(row=1, column=col, value=header)
+        cell.font = header_font
+        cell.fill = header_fill
+
+    # Add data with formulas
+    for row_idx, r in enumerate(results, start=2):
+        detail_ws.cell(row=row_idx, column=1, value=r.name)
+
+        # Teaching hours
+        detail_ws.cell(row=row_idx, column=2, value=r.teaching_hours).number_format = "0.0"
+
+        # Research hours
+        detail_ws.cell(row=row_idx, column=3, value=r.research_hours).number_format = "0.0"
+
+        # Admin hours
+        detail_ws.cell(row=row_idx, column=4, value=r.admin_hours).number_format = "0.0"
+
+        # Total with formula
+        total_formula = detail_ws.cell(row=row_idx, column=5,
+                                        value=f"=SUM(B{row_idx}:D{row_idx})")
+        total_formula.number_format = "0.0"
+
+    # Auto-fit columns
+    for col in ['A', 'B', 'C', 'D', 'E']:
+        detail_ws.column_dimensions[col].width = 18
+
+    detail_ws.freeze_panes = "A2"
+
+    # Add detailed bar chart to this sheet
+    chart2 = BarChart()
+    chart2.type = "bar"
+    chart2.style = 12
+    chart2.title = "Detailed Workload Breakdown"
+    chart2.y_axis.title = "Staff"
+    chart2.x_axis.title = "Hours"
+    chart2.width = 30
+    chart2.height = 20
+
+    detail_categories = Reference(detail_ws, min_row=2, max_row=len(results) + 1, min_col=1)
+    detail_teaching = Reference(detail_ws, min_row=1, max_row=len(results) + 1, min_col=2)
+    detail_research = Reference(detail_ws, min_row=1, max_row=len(results) + 1, min_col=3)
+    detail_admin = Reference(detail_ws, min_row=1, max_row=len(results) + 1, min_col=4)
+
+    chart2.add_data(detail_teaching, titles_from_data=True)
+    chart2.add_data(detail_research, titles_from_data=True)
+    chart2.add_data(detail_admin, titles_from_data=True)
+    chart2.set_categories(detail_categories)
+    chart2.dataLabels = DataLabelList()
+    chart2.dataLabels.showVal = True
+
+    chart2.anchor = "A8"
+    detail_ws.add_chart(chart2, "A8")
+
+    # Save the workbook
+    if output_dir is None:
+        output_dir = OUTPUT_DIR
+    excel_path = os.path.join(output_dir, "Staff workload model.xlsx")
+    wb.save(excel_path)
+    print(f"Excel file saved to {excel_path}")
+
+
+def generate_html_report(results: List[WorkloadResult], year_data: YearData,
+                         output_dir: str = "."):
+    """Generate an HTML report with embedded boxplots and summary table."""
+    summary_path = os.path.join(output_dir, "workload_summary_boxplot.png")
+    detailed_path = os.path.join(output_dir, "workload_detailed_boxplot.png")
+
+    # CSS with doubled braces to escape f-string interpolation
+    css = """body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 20px; background: #f5f5f5; }
+        h1 { color: #333; border-bottom: 2px solid #4CAF50; padding-bottom: 10px; }
+        h2 { color: #555; margin-top: 30px; }
+        .summary-table { border-collapse: collapse; width: 100%; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .summary-table th { background: #4CAF50; color: white; padding: 12px 8px; text-align: left; font-size: 12px; }
+        .summary-table td { padding: 10px 8px; border-bottom: 1px solid #eee; font-size: 12px; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+        .summary-table tr:hover { background: #f9f9f9; }
+        .chart-container { background: white; padding: 24px; margin: 15px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 8px; }
+        .chart-container img { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+        .legend { display: flex; gap: 24px; margin: 16px 0; font-size: 13px; flex-wrap: wrap; }
+        .legend-item { display: flex; align-items: center; gap: 8px; }
+        .legend-color { width: 18px; height: 18px; border-radius: 3px; }
+        .footer { margin-top: 30px; padding: 16px; background: #fff3e0; border-left: 4px solid #FF9800; font-size: 13px; color: #666; }
+        .total-row { font-weight: bold; background: #f0f0f0 !important; }
+        @media print {{
+            body {{ background: white; }}
+            .chart-container img {{ max-width: 100%; }}
+        }}"""
+
+    html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workload Model Report</title>
+    <style>{css}</style>
+</head>
+<body>
+    <h1>Workload Model Report</h1>
+    <p>Generated for academic year <strong>{year_data.year_label}</strong></p>
+
+    <h2>Summary Chart</h2>
+    <div class="legend">
+        <div class="legend-item"><div class="legend-color" style="background:#4CAF50"></div>Teaching</div>
+        <div class="legend-item"><div class="legend-color" style="background:#2196F3"></div>Research</div>
+        <div class="legend-item"><div class="legend-color" style="background:#FF9800"></div>Administration</div>
+    </div>
+    <div class="chart-container">
+        <img src="workload_summary_boxplot.png" alt="Workload Summary Chart" style="max-width: 1200px;">
+    </div>
+
+    <h2>Detailed Breakdown</h2>
+    <div class="chart-container">
+        <img src="workload_detailed_boxplot.png" alt="Workload Detailed Chart" style="max-width: 1200px;">
+    </div>
+
+    <h2>Staff Workload Table</h2>
+    <table class="summary-table">
+        <thead>
+            <tr>
+                <th>Name</th><th>FTE</th><th>Total</th>
+                <th>Teaching</th><th>Research</th><th>Admin</th>
+                <th>Teaching Detail</th><th>Research Detail</th><th>Admin Detail</th>
+            </tr>
+        </thead>
+        <tbody>
+"""
+
+    for r in results:
+        html += f"""            <tr>
+                <td>{r.name}</td>
+                <td>{r.fte:.2f}</td>
+                <td>{r.total_hours:.1f}</td>
+                <td>{r.teaching_hours:.1f}</td>
+                <td>{r.research_hours:.1f}</td>
+                <td>{r.admin_hours:.1f}</td>
+                <td title="{r.teaching_detail.replace('"', '&quot;')}">{r.teaching_detail[:80]}...</td>
+                <td title="{r.research_detail.replace('"', '&quot;')}">{r.research_detail[:80]}...</td>
+                <td title="{r.admin_detail.replace('"', '&quot;')}">{r.admin_detail[:80]}...</td>
+            </tr>
+"""
+
+    html += """        </tbody>
+    </table>
+
+    <div class="footer">
+        <strong>Note:</strong> This report was generated automatically from the Workload Model calculator.
+        Assumptions and missing data are noted in the CSV output.
+        The model is based on the Workload ModelFull Description (Iain Bate, June 2026).
+    </div>
+</body>
+</html>
+"""
+
+    output_path = os.path.join(output_dir, "workload_report.html")
+    with open(output_path, "w", encoding="utf-8") as f:
+        f.write(html)
+    print(f"HTML report saved to {output_path}")
+
+
+def generate_all_outputs(results: List[WorkloadResult], year_data: YearData,
+                         output_dir: str = None):
+    """Generate all output artifacts."""
+    if output_dir is None:
+        output_dir = OUTPUT_DIR
+
+    # Generate CSV
+    generate_csv(results, os.path.join(output_dir, "Staff workload model.csv"))
+
+    # Generate Excel with formulas
+    generate_excel_with_formulas(results, year_data, output_dir)
+
+    # Generate boxplots
+    generate_boxplots(results, output_dir)
+
+    # Generate HTML report
+    generate_html_report(results, year_data, output_dir)

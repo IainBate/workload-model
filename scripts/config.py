@@ -9,12 +9,16 @@ import yaml
 from pathlib import Path
 from typing import Any
 
+# Get project root directory (parent of scripts folder)
+SCRIPTS_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = SCRIPTS_DIR.parent
+
 
 def _load_yaml(filepath: str) -> dict:
-    """Load a YAML file and return its contents as a dict."""
-    path = Path(filepath)
+    """Load a YAML file from params folder and return its contents as a dict."""
+    path = PROJECT_ROOT / "params" / filepath
     if not path.exists():
-        raise FileNotFoundError(f"Configuration file not found: {filepath}")
+        raise FileNotFoundError(f"Configuration file not found: {path}")
     with open(path, "r", encoding="utf-8") as f:
         return yaml.safe_load(f)
 
@@ -23,12 +27,21 @@ def _load_yaml(filepath: str) -> dict:
 _params = _load_yaml("workload_parameters.yaml")
 
 # Global parameters
-NOMINAL_WORKING_HOURS_PER_YEAR: int = _params["global_parameters"]["nominal_working_hours_per_year"]  # 1628
+NOMINAL_WORKING_HOURS_PER_YEAR: int = _params["global_parameters"]["nominal_working_hours_per_year"]  # 1642
 WEEKS_PER_YEAR: int = _params["global_parameters"]["weeks_per_year"]  # 44
 HOURS_PER_WEEK: int = _params["global_parameters"]["hours_per_week"]  # 37
 
+# Service points (university-level committee work, not from WAW.csv)
+SERVICE_POINTS_DEFAULT: float = 175.0  # Default service points for HoD and other admin staff
+
 # Baseline workloads (fixed hours)
 BASELOADS: dict[str, float] = _params["baselines_hours"]
+
+# Minimum teaching load for administrative staff who don't teach modules
+MIN_ADMIN_TEACHING_HOURS: float = BASELOADS.get("min_admin_teaching", 30.0)
+
+# Research allowances
+RESEARCH_ALLOWANCES: dict[str, float] = _params.get("research_allowances", {})
 
 # Contract normative divisions (percentage of nominal hours)
 CONTRACT_NORMATIVE_DIVISIONS: dict[str, dict[str, float]] = _params["contract_normative_divisions"]

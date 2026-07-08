@@ -14,12 +14,32 @@ import os
 import sys
 import glob
 
-# Add project root to path
-sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+# Get project root (parent of scripts folder)
+SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
+PROJECT_ROOT = os.path.dirname(SCRIPTS_DIR)
+
+# Add project root to path for imports
+sys.path.insert(0, SCRIPTS_DIR)
 
 from data_loader import load_all_data, normalize_name, _load_name_lookup, _build_reverse_lookup
 from workload_calculator import calculate_workload
-from output_generator import generate_all_outputs
+from output_generator import OUTPUT_DIR, generate_all_outputs
+
+# Try to import Google Sheets integration (optional)
+try:
+    from google_sheets import write_workload_to_google_sheets
+    GOOGLE_SHEETS_AVAILABLE = True
+except ImportError:
+    GOOGLE_SHEETS_AVAILABLE = False
+
+
+def prompt_google_sheets_upload() -> bool:
+    """Ask user if they want to upload results to Google Sheets."""
+    try:
+        response = input("\nUpload results to Google Sheets? (y/n): ").strip().lower()
+        return response == "y"
+    except EOFError:
+        return False
 
 
 def prompt_name_match(user_name: str, canonical_name=None) -> bool:
@@ -94,11 +114,17 @@ def main():
     parser = argparse.ArgumentParser(description="Workload Model Calculator")
     parser.add_argument("--year", type=str, default=None, help="Academic year (e.g., 2026-7)")
     parser.add_argument("--output-dir", type=str, default=".", help="Output directory")
+    parser.add_argument("--data-dir", type=str, default=None, help="Data directory (default: data/)")
     parser.add_argument("--dry-run", action="store_true", help="Show data summary only")
     parser.add_argument("--interactive", action="store_true", help="Prompt for unknown names")
+    parser.add_argument("--google-sheets", action="store_true", help="Upload results to Google Sheets after calculation")
     args = parser.parse_args()
 
-    base_dir = os.path.dirname(os.path.abspath(__file__))
+    # Get project root (parent of scripts folder)
+    SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
+    PROJECT_ROOT = os.path.dirname(SCRIPTS_DIR)
+
+    base_dir = os.path.join(PROJECT_ROOT, "data") if args.data_dir is None else args.data_dir
 
     # Detect WTW files
     wtw_files = detect_wtw_files(base_dir)
@@ -109,14 +135,14 @@ def main():
     print(f"Found WTW files: {', '.join(os.path.basename(f) for f in wtw_files)}")
     print(f"Using: {os.path.basename(wtw_files[-1])}")
 
-    # Load all data
+    # Load all data (data_dir is passed, defaults to DATA_DIR inside load_all_data)
     print("\nLoading data...")
     unknown_callback = prompt_name_match if args.interactive else None
     if not args.interactive:
         # In non-interactive mode, pass None so unknown names are kept as-is
-        year_data = load_all_data(base_dir, unknown_callback=None)
+        year_data = load_all_data(data_dir=base_dir, unknown_callback=None)
     else:
-        year_data = load_all_data(base_dir, unknown_callback=prompt_name_match)
+        year_data = load_all_data(data_dir=base_dir, unknown_callback=prompt_name_match)
 
     # Print summary
     print_data_summary(year_data)
@@ -134,7 +160,22 @@ def main():
 
     # Generate outputs
     print("\nGenerating outputs...")
-    generate_all_outputs(results, year_data, args.output_dir)
+    output_dir = OUTPUT_DIR if args.output_dir == "." else os.path.join(PROJECT_ROOT, args.output_dir)
+    generate_all_outputs(results, year_data, output_dir)
+
+    print(f"\nOutput files in {output_dir}:")
+    for f in os.listdir(output_dir):
+        if any(ext in f for ext in ['.csv', '.xlsx', '.png', '.html']):
+            size = os.path.getsize(os.path.join(output_dir, f))
+            print(f"  - {f} ({size:,} bytes)")
+
+    # Upload to Google Sheets if requested
+    if args.google_sheets:
+        if not GOOGLE_SHEETS_AVAILABLE:
+            print("\nGoogle Sheets integration is not available.")
+            print("Install with: pip install gspread")
+        else:
+            write_workload_to_google_sheets(results, year_data)
 
     print("\nDone.")
 

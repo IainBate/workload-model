@@ -54,16 +54,18 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
     practical_hours = 0.0
     practical_details = []
     if module.practicals > 0:
+        # Use actual contact hours per practical from CSV if available, else fall back to credit-based estimate
+        contact_per_practical = module.practical_contact_hours if module.practical_contact_hours > 0 else module.contact_hours
         practicals_per_teacher = module.practicals / max(len(teachers), 1)
         # First practical gets standard rate, remaining get repetition rate
         # practicals_per_teacher may not be a whole number (e.g., 6 practicals / 2 teachers = 3 each)
         first_practical = min(1, practicals_per_teacher)  # At least 1 practical per teacher
         remaining_practicals = max(0, practicals_per_teacher - first_practical)
-        practical_hours = (first_practical * config.TEACHING_MULTIPLIERS["problem_class_seminar_practical"]) + \
-                          (remaining_practicals * config.TEACHING_MULTIPLIERS["problem_class_seminar_practical"] * config.TEACHING_MULTIPLIERS.get("repetition_multiplier", 1.5))
+        practical_hours = (first_practical * config.TEACHING_MULTIPLIERS["problem_class_seminar_practical"] * contact_per_practical) + \
+                          (remaining_practicals * config.TEACHING_MULTIPLIERS["problem_class_seminar_practical"] * config.TEACHING_MULTIPLIERS.get("repetition_multiplier", 1.5) * contact_per_practical)
         practical_details.append(
             f"Practicals: {module.practicals} total, {practicals_per_teacher:.1f} per teacher "
-            f"(1st x {config.TEACHING_MULTIPLIERS['problem_class_seminar_practical']}x, "
+            f"({contact_per_practical:.1f}h each; 1st x {config.TEACHING_MULTIPLIERS['problem_class_seminar_practical']}x, "
             f"remaining x {config.TEACHING_MULTIPLIERS.get('repetition_multiplier', 1.5):.1f}x)"
         )
 
@@ -168,13 +170,39 @@ def _calculate_research_workload(staff_member: StaffData) -> tuple:
     total = 0.0
     details = []
 
-    # PhD supervision (primary supervisor)
+    # Primary research allowance (ART baseline)
+    primary_allowance = config.RESEARCH_ALLOWANCES.get("primary_research_allowance_art", 328.4)
+    total += primary_allowance
+    details.append(f"Primary research allowance: {primary_allowance:.1f}h")
+
+    # PhD supervision work (supervisor, co-supervisor and assessor are part of research workload)
+    phd_hours = 0.0
+    phd_details = []
+
+    # Sole supervisors (primary supervisor role)
     if staff_member.phd_supervisions > 0:
-        # Use adjusted project load if available
-        pgr_count = staff_member.phd_supervisions
-        phd_hours = pgr_count * config.SUPERVISION_MULTIPLIERS["pgr_primary_supervisor_per_fte"]
+        sole_count = staff_member.phd_supervisions
+        sole_hours = sole_count * config.SUPERVISION_MULTIPLIERS["pgr_primary_supervisor_per_fte"]
+        phd_hours += sole_hours
+        phd_details.append(f"{sole_count}x primary supervisor ({config.SUPERVISION_MULTIPLIERS['pgr_primary_supervisor_per_fte']}h each)")
+
+    # Co-supervisors
+    if staff_member.phd_co_supervisions > 0:
+        co_count = staff_member.phd_co_supervisions
+        co_hours = co_count * config.SUPERVISION_MULTIPLIERS["pgr_co_supervisor_per_fte"]
+        phd_hours += co_hours
+        phd_details.append(f"{co_count}x co-supervisor ({config.SUPERVISION_MULTIPLIERS['pgr_co_supervisor_per_fte']}h each)")
+
+    # TAP assessor work (assessor for PhD students)
+    if staff_member.phd_assessor_count > 0:
+        assessor_count = staff_member.phd_assessor_count
+        assessor_hours = assessor_count * config.SUPERVISION_MULTIPLIERS["pgr_assessor"]
+        phd_hours += assessor_hours
+        phd_details.append(f"{assessor_count}x assessor ({config.SUPERVISION_MULTIPLIERS['pgr_assessor']}h each)")
+
+    if phd_hours > 0:
         total += phd_hours
-        details.append(f"PhD primary supervisor: {pgr_count} x {config.SUPERVISION_MULTIPLIERS['pgr_primary_supervisor_per_fte']}h = {phd_hours:.1f}h")
+        details.append(f"PhD supervision: {'; '.join(phd_details)} = {phd_hours:.1f}h")
 
     # Research grant time (from % FTE for CS.csv)
     for proj in staff_member.research_projects:
@@ -194,7 +222,7 @@ def _calculate_research_workload(staff_member: StaffData) -> tuple:
 
 def _calculate_admin_workload(staff_member: StaffData, nominal_hours: float) -> tuple:
     """
-    Calculate administration workload from departmental roles.
+    Calculate administration workload from departmental roles and service points.
 
     Returns (hours, detail_string)
     """
@@ -206,6 +234,13 @@ def _calculate_admin_workload(staff_member: StaffData, nominal_hours: float) -> 
         hours = nominal_hours * percentage
         total += hours
         details.append(f"{role}: {percentage*100:.0f}% of {nominal_hours:.0f}h = {hours:.1f}h")
+
+    # Add service points (university-level committee work) for administrative staff
+    # Service points are typically 175h for HoD and other senior admin roles
+    if staff_member.roles:  # Only add service points if they have any departmental roles
+        service_hours = config.SERVICE_POINTS_DEFAULT
+        total += service_hours
+        details.append(f"Service points (committee work): {service_hours:.0f}h")
 
     return total, "; ".join(details) if details else "No administrative roles"
 
@@ -257,8 +292,25 @@ def calculate_workload(year_data: YearData) -> List[WorkloadResult]:
         # Nominal hours scaled by FTE for part-time staff
         nominal_hours = config.NOMINAL_WORKING_HOURS_PER_YEAR * staff.fte
 
-        # Teaching
+        # Teaching - default to minimum teaching hours for administrative staff
         teaching_hours = staff_teaching.get(canonical_name, {}).get("hours", 0.0)
+
+        # Add minimum teaching load for HoD and other admin staff who don't teach modules
+        # Original model shows ~30h teaching for HoD (reduced from full teaching load)
+        has_module_teaching = canonical_name in staff_teaching and len(staff_teaching[canonical_name].get("details", [])) > 0
+
+        if not has_module_teaching:
+            # Administrative staff need a minimum teaching component
+            # HoD typically has reduced teaching - use default of 30h
+            if "Head of Department" in staff.roles or len(staff.roles) > 1:
+                min_teaching = config.BASELOADS.get("min_admin_teaching", 30.0)
+                if min_teaching > 0:
+                    teaching_hours = min_teaching
+                    # Add detail for minimum admin teaching
+                    staff_teaching[canonical_name]["hours"] = min_teaching
+                    staff_teaching[canonical_name]["details"].append(
+                        f"Minimum administrative teaching load: {min_teaching:.0f}h"
+                    )
 
         # Baselines: scale personal development by FTE for part-time staff
         personal_dev = config.BASELOADS["personal_development"] * staff.fte

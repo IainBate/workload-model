@@ -2,3 +2,6 @@ python-docx>=1.0
 matplotlib>=3.7
 pandas>=2.0
 pyyaml>=6.0
+
+# Google Sheets integration (optional - for advanced features)
+gspread>=6.0

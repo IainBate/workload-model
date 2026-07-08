@@ -12,6 +12,10 @@ from dataclasses import dataclass, field
 from typing import List, Dict, Optional, Set, Tuple
 from pathlib import Path
 
+# Get project root directory (parent of scripts folder)
+SCRIPTS_DIR = Path(__file__).resolve().parent
+PROJECT_ROOT = SCRIPTS_DIR.parent
+
 import config
 
 
@@ -32,10 +36,11 @@ class ModuleData:
     general_checker: str
     practicals: int  # Number of practical sessions
     has_h_m_variants: bool
-    contact_hours: float  # Estimated contact hours
-    student_count: int  # From CS Module Numbers.csv
-    assessment_count: int  # From CS Module Assessment Numbers.csv
-    source_year: str  # e.g., "2026-7"
+    contact_hours: float  # Estimated contact hours (from credits)
+    practical_contact_hours: float = 0.0  # Actual contact hours per practical session (from CSV)
+    student_count: int = 0  # From CS Module Numbers.csv
+    assessment_count: int = 1  # From CS Module Assessment Numbers.csv
+    source_year: str = ""  # e.g., "2026-7"
 
 
 @dataclass
@@ -61,7 +66,9 @@ class StaffData:
     initial_fractional_pastoral_load: float
     notes: str
     roles: List[str]  # From WAW.csv
-    phd_supervisions: int  # From PhD Supervision Data.csv
+    phd_supervisions: int  # Sole supervisors from PhD Supervision Data.csv
+    phd_co_supervisions: int  # Co-supervisors from PhD Supervision Data.csv
+    phd_assessor_count: int  # TAP assessor instances from PhD Supervision Data.csv
     research_projects: List[dict]  # From % FTE for CS.csv
     saint_modules: List[str]  # SAINTS modules they teach
     unallocated_students: int = 0  # Remaining students after allocation
@@ -99,9 +106,11 @@ class YearData:
 
 # --- Staff Name Normalization ---
 
+DATA_DIR = PROJECT_ROOT / "data"
+
 def _load_name_lookup(filepath: str = "staff_name_lookup.json") -> Dict[str, List[str]]:
     """Load the staff name lookup table."""
-    path = Path(filepath)
+    path = DATA_DIR / filepath
     if not path.exists():
         return {}
     with open(path, "r", encoding="utf-8") as f:
@@ -354,7 +363,7 @@ def _parse_wtw_csv(filepath: str, known_lecturers: Set[str] = None) -> List[Modu
 
 def _load_student_counts(filepath: str = "CS Module Numbers.csv") -> Dict[str, int]:
     """Load student counts from CS Module Numbers.csv. Returns {module_code: count}."""
-    path = Path(filepath)
+    path = DATA_DIR / filepath
     if not path.exists():
         return {}
 
@@ -376,7 +385,7 @@ def _load_student_counts(filepath: str = "CS Module Numbers.csv") -> Dict[str, i
 
 def _load_assessment_counts(filepath: str = "CS Module Assessment Numbers.csv") -> Dict[str, int]:
     """Load assessment counts from CS Module Assessment Numbers.csv. Returns {module_code: count}."""
-    path = Path(filepath)
+    path = DATA_DIR / filepath
     if not path.exists():
         return {}
 
@@ -396,9 +405,45 @@ def _load_assessment_counts(filepath: str = "CS Module Assessment Numbers.csv") 
     return counts
 
 
+def _load_practical_data(filepath: str = "CS Module Assessment Numbers.csv") -> Dict[str, dict]:
+    """Load practical data from CS Module Assessment Numbers.csv.
+    Returns {module_code: {practicals: int, practical_contact_hours: float}}.
+    practical_contact_hours = Total Duration / Number of Practicals (hours per session).
+    """
+    path = DATA_DIR / filepath
+    if not path.exists():
+        return {}
+
+    data = {}
+    with open(path, "r", encoding="utf-8-sig") as f:
+        reader = csv.DictReader(f)
+        for row in reader:
+            code = row.get("Module Code", "").strip()
+            acronym = row.get("Module Acronym", "").strip()
+            n_str = row.get("Number of Practicals", "").strip()
+            duration_str = row.get("Total Duration", "").strip()
+            if not n_str or n_str.upper() == "NA":
+                continue
+            try:
+                n_practicals = int(n_str)
+            except ValueError:
+                continue
+            # Parse duration: "X hours" or "Y hours"
+            duration_hours = 0.0
+            if duration_str:
+                dur_match = re.search(r"([\d.]+)\s*hours?", duration_str)
+                if dur_match:
+                    duration_hours = float(dur_match.group(1))
+            # Contact hours per practical session
+            contact_per = duration_hours / n_practicals if n_practicals > 0 else 0.0
+            data[code] = {"practicals": n_practicals, "practical_contact_hours": contact_per}
+            data[acronym] = {"practicals": n_practicals, "practical_contact_hours": contact_per}
+    return data
+
+
 def _load_pastoral_load(filepath: str = "pastoral_load.csv") -> Dict[str, int]:
     """Load pastoral load data. Returns {supervisor_name: total_students}."""
-    path = Path(filepath)
+    path = DATA_DIR / filepath
     if not path.exists():
         return {}
 
@@ -417,7 +462,7 @@ def _load_pastoral_load(filepath: str = "pastoral_load.csv") -> Dict[str, int]:
 
 def _load_project_load(filepath: str = "project_load.csv") -> Dict[str, dict]:
     """Load project load data from project_load.csv. Returns {canonical_name: data_dict}."""
-    path = Path(filepath)
+    path = DATA_DIR / filepath
     if not path.exists():
         return {}
 
@@ -455,7 +500,7 @@ def _load_project_load(filepath: str = "project_load.csv") -> Dict[str, dict]:
 
 def _load_phd_supervision(filepath: str = "PhD Supervision Data.csv") -> Dict[str, dict]:
     """Load PhD supervision data. Returns {name: {total, sole, co, tap, combined}}."""
-    path = Path(filepath)
+    path = DATA_DIR / filepath
     if not path.exists():
         return {}
 
@@ -481,7 +526,7 @@ def _load_phd_supervision(filepath: str = "PhD Supervision Data.csv") -> Dict[st
 
 def _load_fte_data(filepath: str = "% FTE for CS.csv") -> Dict[str, list]:
     """Load research grant/FTE data. Returns {person: [projects]}."""
-    path = Path(filepath)
+    path = DATA_DIR / filepath
     if not path.exists():
         return {}
 
@@ -508,7 +553,7 @@ def _load_fte_data(filepath: str = "% FTE for CS.csv") -> Dict[str, list]:
 
 def _load_waw_roles(filepath: str = "WAW.csv") -> Dict[str, list]:
     """Load departmental roles from WAW.csv. Returns {role_name: [(staff_name, percentage)]}."""
-    path = Path(filepath)
+    path = DATA_DIR / filepath
     if not path.exists():
         return {}
 
@@ -536,7 +581,7 @@ def _load_waw_roles(filepath: str = "WAW.csv") -> Dict[str, list]:
 
 def _load_part_time(filepath: str = "Part time.csv") -> Dict[str, dict]:
     """Load part-time data. Returns {person_name: {fte, ...}}."""
-    path = Path(filepath)
+    path = DATA_DIR / filepath
     if not path.exists():
         return {}
 
@@ -564,11 +609,17 @@ def _load_part_time(filepath: str = "Part time.csv") -> Dict[str, dict]:
     return data
 
 
-def load_wtw_files(base_dir: str = ".") -> Tuple[List[ModuleData], str]:
+def load_wtw_files(base_dir: str = None) -> Tuple[List[ModuleData], str]:
     """
     Load the current year's WTW file. Returns (modules, year_label).
     Auto-detects the latest WTW file.
+
+    Args:
+        base_dir: Directory containing WTW files. Defaults to data folder.
     """
+    if base_dir is None:
+        base_dir = DATA_DIR
+
     wtw_files = sorted(glob.glob(os.path.join(base_dir, "WTW *.csv")))
     if not wtw_files:
         raise FileNotFoundError("No WTW CSV files found in the data directory.")
@@ -580,8 +631,15 @@ def load_wtw_files(base_dir: str = ".") -> Tuple[List[ModuleData], str]:
     return modules, year
 
 
-def load_previous_wtw(base_dir: str = ".") -> Optional[List[ModuleData]]:
-    """Load the previous year's WTW file for new lecturer detection."""
+def load_previous_wtw(base_dir: str = None) -> Optional[List[ModuleData]]:
+    """Load the previous year's WTW file for new lecturer detection.
+
+    Args:
+        base_dir: Directory containing WTW files. Defaults to data folder.
+    """
+    if base_dir is None:
+        base_dir = DATA_DIR
+
     wtw_files = sorted(glob.glob(os.path.join(base_dir, "WTW *.csv")))
     if len(wtw_files) < 2:
         return None
@@ -681,30 +739,33 @@ _WAW_ROLE_MAPPING = {
 
 _UNSET = object()
 
-def load_all_data(base_dir: str = ".",
+def load_all_data(data_dir: str = None,
                   unknown_callback=_UNSET) -> YearData:
     """
     Load all data sources and merge into a YearData object.
     This is the main entry point for data loading.
 
     Args:
-        base_dir: Directory containing data files.
+        data_dir: Directory containing data files. Defaults to 'data' folder.
         unknown_callback: Callback for unknown names, or _UNSET for auto-detect.
                           Pass None for non-interactive mode (keep names as-is).
                           Pass _UNSET or omit to auto-detect (use interactive prompt).
     """
+    if data_dir is None:
+        data_dir = DATA_DIR
+
     if unknown_callback is _UNSET:
         unknown_callback = _prompt_name_match
 
-    # Load name lookup and build reverse lookup
-    mappings = _load_name_lookup(os.path.join(base_dir, "staff_name_lookup.json"))
+    # Load name lookup and build reverse lookup (DATA_DIR is used internally)
+    mappings = _load_name_lookup()
     reverse_lookup = _build_reverse_lookup(mappings)
 
-    # Load current year WTW
-    modules, year_label = load_wtw_files(base_dir)
+    # Load current year WTW (data_dir is passed to load_wtw_files)
+    modules, year_label = load_wtw_files(data_dir)
 
-    # Load previous year WTW for known lecturers
-    prev_modules = load_previous_wtw(base_dir)
+    # Load previous year WTW for known lecturers (data_dir is passed to load_previous_wtw)
+    prev_modules = load_previous_wtw(data_dir)
     known_lecturers = set()
     if prev_modules:
         for m in prev_modules:
@@ -713,9 +774,10 @@ def load_all_data(base_dir: str = ".",
                 if name:
                     known_lecturers.add(name)
 
-    # Load student counts and assessment counts
-    student_counts = _load_student_counts(os.path.join(base_dir, "CS Module Numbers.csv"))
-    assessment_counts = _load_assessment_counts(os.path.join(base_dir, "CS Module Assessment Numbers.csv"))
+    # Load student counts, assessment counts, and practical data (DATA_DIR is used internally)
+    student_counts = _load_student_counts()
+    assessment_counts = _load_assessment_counts()
+    practical_data = _load_practical_data()
 
     # Merge student counts for H/M variants (combine numbers for same module)
     # e.g., COM00056H (NETS-H) + COM00188M (NETS-M) should be combined
@@ -752,12 +814,25 @@ def load_all_data(base_dir: str = ".",
         if module.assessment_count == 1 and module.name in assessment_counts:
             module.assessment_count = assessment_counts[module.name]
 
-    # Load supplementary data
-    project_load_data = _load_project_load(os.path.join(base_dir, "project_load.csv"))
-    phd_data = _load_phd_supervision(os.path.join(base_dir, "PhD Supervision Data.csv"))
-    fte_data = _load_fte_data(os.path.join(base_dir, "% FTE for CS.csv"))
-    waw_roles = _load_waw_roles(os.path.join(base_dir, "WAW.csv"))
-    part_time_data = _load_part_time(os.path.join(base_dir, "Part time.csv"))
+        # Apply practical data (real contact hours per session)
+        for code in module.codes:
+            if code in practical_data:
+                pdata = practical_data[code]
+                module.practicals = pdata["practicals"]
+                module.practical_contact_hours = pdata["practical_contact_hours"]
+                break
+        # If no code match, try by acronym
+        if module.practical_contact_hours == 0.0 and module.name in practical_data:
+            pdata = practical_data[module.name]
+            module.practicals = pdata["practicals"]
+            module.practical_contact_hours = pdata["practical_contact_hours"]
+
+    # Load supplementary data (DATA_DIR is used internally for all file loading)
+    project_load_data = _load_project_load()
+    phd_data = _load_phd_supervision()
+    fte_data = _load_fte_data()
+    waw_roles = _load_waw_roles()
+    part_time_data = _load_part_time()
 
     # Build staff roster from all data sources
     staff = {}
@@ -883,7 +958,9 @@ def load_all_data(base_dir: str = ".",
                 initial_fractional_pastoral_load=proj_data["initial_fractional_pastoral_load"] if proj_data else 0,
                 notes=proj_data["notes"] if proj_data else "",
                 roles=staff_roles,
-                phd_supervisions=phd_info["total_as_supervisor"] if phd_info else 0,
+                phd_supervisions=phd_info["sole_supervisor"] if phd_info else 0,
+                phd_co_supervisions=phd_info["co_supervisor"] if phd_info else 0,
+                phd_assessor_count=phd_info["tap_member"] if phd_info else 0,
                 research_projects=fte_info if fte_info else [],
                 saint_modules=list(set(saint_modules)),
             )
@@ -918,6 +995,14 @@ def load_all_data(base_dir: str = ".",
 
     # Include HoD even if not in WTW (for completeness)
     if "Iain Bate" not in staff:
+        # Look up Iain's PhD info specifically
+        iain_phd_info = None
+        for key, val in phd_data.items():
+            norm_key = normalize_name(key, reverse_lookup, unknown_callback=None)
+            if norm_key == "Iain Bate":
+                iain_phd_info = val
+                break
+
         staff["Iain Bate"] = StaffData(
             canonical_name="Iain Bate",
             aliases=mappings.get("Iain Bate", ["Iain B", "Iain Bate"]),
@@ -939,8 +1024,10 @@ def load_all_data(base_dir: str = ".",
             initial_fractional_pastoral_load=0,
             notes="HoD - added for completeness, not in WTW",
             roles=["Head of Department"],
-            phd_supervisions=0,
-            research_projects=[{"project_id": "SCHEME", "title": "SCHEME", "fte": "100%"}],
+            phd_supervisions=iain_phd_info["sole_supervisor"] if iain_phd_info else 0,
+            phd_co_supervisions=iain_phd_info["co_supervisor"] if iain_phd_info else 0,
+            phd_assessor_count=iain_phd_info["tap_member"] if iain_phd_info else 0,
+            research_projects=[{"project_id": "SCHEME", "title": "SCHEME", "fte": "20%"}],
             saint_modules=[],
         )
 
@@ -995,7 +1082,10 @@ def _deduplicate_staff(staff: Dict[str, StaffData], mappings: Dict[str, List[str
                     merged_data.research_projects = list(set(
                         str(p) for p in merged_data.research_projects + data.research_projects
                     ))
+                # Merge PhD supervision counts (take max for each type)
                 merged_data.phd_supervisions = max(merged_data.phd_supervisions, data.phd_supervisions)
+                merged_data.phd_co_supervisions = max(merged_data.phd_co_supervisions, data.phd_co_supervisions)
+                merged_data.phd_assessor_count = max(merged_data.phd_assessor_count, data.phd_assessor_count)
                 if data.saint_modules:
                     merged_data.saint_modules = list(set(merged_data.saint_modules + data.saint_modules))
             merged[canonical] = merged_data

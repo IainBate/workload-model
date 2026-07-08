@@ -3,7 +3,7 @@
 # Last verified: 2026-07-03
 
 global_parameters:
-  nominal_working_hours_per_year: 1628
+  nominal_working_hours_per_year: 1642
   weeks_per_year: 44
   hours_per_week: 37
 
@@ -12,6 +12,11 @@ baselines_hours:
   project_setting: 6
   personal_development: 75
   proposing_projects_to_offer: 6
+  min_admin_teaching: 30
+
+# Fixed research components
+research_allowances:
+  primary_research_allowance_art: 328.4
 
 contract_normative_divisions:
   TR_staff:
