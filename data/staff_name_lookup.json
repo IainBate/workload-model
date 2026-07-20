@@ -1,90 +1,415 @@
 {
   "description": "Staff name normalization lookup table. Maps canonical full names to all known name variants across WTW, WAW, and other CSV files. Updated annually as staff change.",
-  "last_updated": "2026-07-01",
+  "last_updated": "2026-07-20",
   "mappings": {
-    "Mike O'Dea": ["Mike OD", "Mike O'Dea"],
-    "Steven Xiaotian Dai": ["Xiaotian", "Xiaotian Dai", "Steven Xiaotian Dai"],
-    "Simon O'Keefe": ["Simon OK", "Simon O'Keefe"],
-    "Christopher Crispin-Bailey": ["Chris CB", "Chris", "Christopher", "Christopher Crispin-Bailey", "Chris Crispin-Bailey"],
-    "Andrew Pomfret": ["Andy P", "Andrew Pomfret"],
-    "William Smith": ["Will", "Will Smith"],
-    "Iain Bate": ["Iain B", "Iain Bate"],
-    "Rob Alexander": ["Rob A", "Rob", "Rob Alexander"],
-    "James Stovold": ["James S", "James Stovold"],
-    "Pourya Shamsolmoali": ["Pourya", "Pourya Shamsolmoali"],
-    "Yan Jia": ["Yan", "Yan Jia"],
-    "Alvaro Miyazawa": ["Alvaro", "Alvaro Miyazawa"],
-    "Dawn H Wood": ["Dawn", "Dawn H Wood", "Dawn Wood"],
-    "Fang Yan": ["Fang", "Fang Yan"],
-    "Kofi Appiah": ["Kofi", "Kofi Appiah"],
-    "Kostas Barmpis": ["Kostas", "Kostas Barmpis"],
-    "Jo Iacovides": ["Jo I", "Jo", "Jo Iacovides"],
-    "Jen Beeston": ["Jen", "Jen Beeston"],
-    "Sam Braunstein": ["Sam B", "Sam Braunstein"],
-    "David Pumfrey": ["David P", "David Pumfrey"],
-    "Oleg Lisagor": ["Oleg", "Oleg Lisagor", "Olegs", "Olegs Lisagors"],
-    "Jacob Rigby": ["Jacob", "Jacob Rigby", "Jake Rigby"],
-    "Mike Freeman": ["Mike F", "Mike Freeman"],
-    "Poonam Yadav": ["Poonam", "Poonam Yadav"],
-    "Ian Gray": ["Ian G", "Ian Gray"],
-    "Paul Cairns": ["Paul", "Paul Cairns"],
-    "Siamak Shahandashti": ["Sia", "Siamak Shahandashti"],
-    "Carlo Ottaviani": ["Carlo", "Carlo Ottaviani"],
-    "Joe Cutting": ["Joe", "Joe Cutting"],
-    "Frank Soboczenski": ["Frank", "Frank Soboczenski"],
-    "Roberto Metere": ["Roberto", "Roberto Metere"],
-    "Yuchen Zhao": ["Yuchen", "Yuchen Zhao"],
-    "Vasileios Vasilakis": ["Vasileios", "Vasileios Vasilakis"],
-    "Richard Hawkins": ["Richard H", "Richard Hawkins"],
-    "Richard Wilson": ["Richard W", "Richard Wilson"],
-    "Detlef Plump": ["Detlef", "Detlef Plump"],
-    "Colin Paterson": ["Colin", "Colin Paterson"],
-    "Claire Ingram": ["Claire", "Clare", "Claire Ingram"],
-    "Claudio Guarnera": ["Claudio", "Claudio Guarnera"],
-    "Peter Nightingale": ["Peter", "Peter Nightingale"],
-    "Alena Denisova": ["Alena", "Alena Denisova"],
-    "Antonio Garcia-Dominguez": ["Antonio", "Antonio Garcia-Dominguez"],
-    "Pengcheng Liu": ["Pengcheng", "Pengcheng Liu"],
-    "Radu Calinescu": ["Radu", "Radu Calinescu"],
-    "Stefano Pirandola": ["Stefano", "Stefano Pirandola"],
-    "Dimitar Kazakov": ["Dimitar", "Dimitar Kazakov"],
-    "Dimitris Kolovos": ["Dimitris", "Dimitris Kolovos"],
-    "Mark Nicholson": ["Mark N", "Mark Nicholson"],
-    "Adrian Bors": ["Adrian", "Adrian Bors"],
-    "Xinwei Fang": ["Xinwei", "Xinwei Fang"],
-    "Tommy Yuan": ["Tommy", "Tommy Yuan"],
-    "Steven Wright": ["Steven W", "Steven Wright"],
-    "Ana Cavalcanti": ["Ana", "Ana Cavalcanti"],
-    "John McDermid": ["John", "John McDermid"],
-    "John Oyekan": ["John O", "John Oyekan"],
-    "Felix Ulrich-Oltean": ["Felix", "Felix Ulrich-Oltean"],
-    "Da Li": ["Da", "Da Li"],
-    "Sarah Carrington": ["Sarah", "Sarah Carrington"],
-    "Mark Sujan": ["Mark S", "Mark Sujan"],
-    "Lilian Blot": ["Lilian", "Lillian", "Lilian Blot", "Lillian Blot"],
-    "Burak Merdenyan": ["Burak", "Burak Merdenyan"],
-    "Chris Smith": ["Chris", "Chris Smith"],
-    "Susan Stepney": ["Susan", "Susan Stepney"],
-    "Leonardo Sandoval Guzman": ["Leonardo", "Leonardo Sandoval Guzman"],
-    "David Zendle": ["David Zendle"],
-    "Rahul Ruttun": ["Rahul", "Rahul Ruttun"],
-    "Grace Eden": ["Grace", "Grace Eden"],
-    "Steve King": ["Steve", "Steve King"],
-    "Christina Vasiliou": ["Christina", "Christina Vasiliou"],
-    "James Yu": ["James Y", "James Yu"],
-    "Robbert Jongeling": ["Robbert", "Robbert Jongeling"],
-    "Nick Pears": ["Nick", "Nick Pears"],
-    "Ibrahim Habli": ["Ibrahim", "Ibrahim Habli"],
-    "James Walker": ["James W", "James Walker"],
-    "Katrina Attwood": ["Katrina", "Katrina Attwood"],
-    "Pedro Ribeiro": ["Pedro", "Pedro Ribeiro"],
-    "Simon Foster": ["Simon F", "Simon Foster"],
-    "Simon Burton": ["Simon B", "Simon Burton"],
-    "Soumya Banerjee": ["Soumya", "Soumya Banerjee"],
-    "Phoebe": ["Phoebe", "Phoebe"],
-    "Kate P": ["Kate P", "Kate P"],
-    "Phillip Morgan": ["Phillip Morgan", "Phillip Morgan"],
-    "Tom Stoneham": ["Tom Stoneham", "Tom Stoneham"],
-    "Jennifer Chubb": ["Jennifer Chubb", "Jennifer Chubb"]
+    "Mike O'Dea": [
+      "Mike OD",
+      "Mike O'Dea"
+    ],
+    "Steven Xiaotian Dai": [
+      "Xiaotian",
+      "Xiaotian Dai",
+      "Steven Xiaotian Dai"
+    ],
+    "Simon O'Keefe": [
+      "Simon OK",
+      "Simon O'Keefe"
+    ],
+    "Christopher Crispin-Bailey": [
+      "Chris CB",
+      "Chris",
+      "Christopher",
+      "Christopher Crispin-Bailey",
+      "Chris Crispin-Bailey"
+    ],
+    "Andrew Pomfret": [
+      "Andy P",
+      "Andrew Pomfret",
+      "Andy Pomfret"
+    ],
+    "William Smith": [
+      "Will",
+      "Will Smith"
+    ],
+    "Iain Bate": [
+      "Iain B",
+      "Iain Bate"
+    ],
+    "Rob Alexander": [
+      "Rob A",
+      "Rob",
+      "Rob Alexander"
+    ],
+    "James Stovold": [
+      "James S",
+      "James Stovold"
+    ],
+    "Pourya Shamsolmoali": [
+      "Pourya",
+      "Pourya Shamsolmoali",
+      "Pourya Shamsolmaoli"
+    ],
+    "Yan Jia": [
+      "Yan",
+      "Yan Jia"
+    ],
+    "Alvaro Miyazawa": [
+      "Alvaro",
+      "Alvaro Miyazawa"
+    ],
+    "Dawn H Wood": [
+      "Dawn",
+      "Dawn H Wood",
+      "Dawn Wood"
+    ],
+    "Fang Yan": [
+      "Fang",
+      "Fang Yan"
+    ],
+    "Kofi Appiah": [
+      "Kofi",
+      "Kofi Appiah"
+    ],
+    "Kostas Barmpis": [
+      "Kostas",
+      "Kostas Barmpis",
+      "Konstantinos Barmpis"
+    ],
+    "Jo Iacovides": [
+      "Jo I",
+      "Jo",
+      "Jo Iacovides"
+    ],
+    "Jen Beeston": [
+      "Jen",
+      "Jen Beeston"
+    ],
+    "Sam Braunstein": [
+      "Sam B",
+      "Sam Braunstein"
+    ],
+    "David Pumfrey": [
+      "David P",
+      "David Pumfrey"
+    ],
+    "Oleg Lisagor": [
+      "Oleg",
+      "Oleg Lisagor",
+      "Olegs",
+      "Olegs Lisagors",
+      "Oleg Lisagors"
+    ],
+    "Jacob Rigby": [
+      "Jacob",
+      "Jacob Rigby",
+      "Jake Rigby"
+    ],
+    "Mike Freeman": [
+      "Mike F",
+      "Mike Freeman"
+    ],
+    "Poonam Yadav": [
+      "Poonam",
+      "Poonam Yadav"
+    ],
+    "Ian Gray": [
+      "Ian G",
+      "Ian Gray"
+    ],
+    "Paul Cairns": [
+      "Paul",
+      "Paul Cairns"
+    ],
+    "Siamak Shahandashti": [
+      "Sia",
+      "Siamak Shahandashti",
+      "Sia Shahandashti"
+    ],
+    "Carlo Ottaviani": [
+      "Carlo",
+      "Carlo Ottaviani"
+    ],
+    "Joe Cutting": [
+      "Joe",
+      "Joe Cutting"
+    ],
+    "Frank Soboczenski": [
+      "Frank",
+      "Frank Soboczenski"
+    ],
+    "Roberto Metere": [
+      "Roberto",
+      "Roberto Metere"
+    ],
+    "Yuchen Zhao": [
+      "Yuchen",
+      "Yuchen Zhao"
+    ],
+    "Vasileios Vasilakis": [
+      "Vasileios",
+      "Vasileios Vasilakis",
+      "Vasili Vasilakis"
+    ],
+    "Richard Hawkins": [
+      "Richard H",
+      "Richard Hawkins"
+    ],
+    "Richard Wilson": [
+      "Richard W",
+      "Richard Wilson"
+    ],
+    "Detlef Plump": [
+      "Detlef",
+      "Detlef Plump"
+    ],
+    "Colin Paterson": [
+      "Colin",
+      "Colin Paterson"
+    ],
+    "Claire Ingram": [
+      "Claire",
+      "Clare",
+      "Claire Ingram"
+    ],
+    "Claudio Guarnera": [
+      "Claudio",
+      "Claudio Guarnera"
+    ],
+    "Peter Nightingale": [
+      "Peter",
+      "Peter Nightingale"
+    ],
+    "Alena Denisova": [
+      "Alena",
+      "Alena Denisova"
+    ],
+    "Antonio Garcia-Dominguez": [
+      "Antonio",
+      "Antonio Garcia-Dominguez"
+    ],
+    "Pengcheng Liu": [
+      "Pengcheng",
+      "Pengcheng Liu"
+    ],
+    "Radu Calinescu": [
+      "Radu",
+      "Radu Calinescu"
+    ],
+    "Stefano Pirandola": [
+      "Stefano",
+      "Stefano Pirandola"
+    ],
+    "Dimitar Kazakov": [
+      "Dimitar",
+      "Dimitar Kazakov"
+    ],
+    "Dimitris Kolovos": [
+      "Dimitris",
+      "Dimitris Kolovos",
+      "Dimitris Kovolos"
+    ],
+    "Mark Nicholson": [
+      "Mark N",
+      "Mark Nicholson"
+    ],
+    "Adrian Bors": [
+      "Adrian",
+      "Adrian Bors"
+    ],
+    "Xinwei Fang": [
+      "Xinwei",
+      "Xinwei Fang"
+    ],
+    "Tommy Yuan": [
+      "Tommy",
+      "Tommy Yuan"
+    ],
+    "Steven Wright": [
+      "Steven W",
+      "Steven Wright"
+    ],
+    "Ana Cavalcanti": [
+      "Ana",
+      "Ana Cavalcanti"
+    ],
+    "John McDermid": [
+      "John",
+      "John McDermid"
+    ],
+    "John Oyekan": [
+      "John O",
+      "John Oyekan"
+    ],
+    "Felix Ulrich-Oltean": [
+      "Felix",
+      "Felix Ulrich-Oltean"
+    ],
+    "Da Li": [
+      "Da",
+      "Da Li"
+    ],
+    "Sarah Carrington": [
+      "Sarah",
+      "Sarah Carrington"
+    ],
+    "Mark Sujan": [
+      "Mark S",
+      "Mark Sujan"
+    ],
+    "Lilian Blot": [
+      "Lilian",
+      "Lillian",
+      "Lilian Blot",
+      "Lillian Blot"
+    ],
+    "Burak Merdenyan": [
+      "Burak",
+      "Burak Merdenyan"
+    ],
+    "Chris Smith": [
+      "Chris",
+      "Chris Smith"
+    ],
+    "Susan Stepney": [
+      "Susan",
+      "Susan Stepney"
+    ],
+    "Leonardo Sandoval Guzman": [
+      "Leonardo",
+      "Leonardo Sandoval Guzman"
+    ],
+    "David Zendle": [
+      "David Zendle"
+    ],
+    "Rahul Ruttun": [
+      "Rahul",
+      "Rahul Ruttun"
+    ],
+    "Grace Eden": [
+      "Grace",
+      "Grace Eden"
+    ],
+    "Steve King": [
+      "Steve",
+      "Steve King"
+    ],
+    "Christina Vasiliou": [
+      "Christina",
+      "Christina Vasiliou"
+    ],
+    "James Yu": [
+      "James Y",
+      "James Yu"
+    ],
+    "Robbert Jongeling": [
+      "Robbert",
+      "Robbert Jongeling"
+    ],
+    "Nick Pears": [
+      "Nick",
+      "Nick Pears"
+    ],
+    "Ibrahim Habli": [
+      "Ibrahim",
+      "Ibrahim Habli"
+    ],
+    "James Walker": [
+      "James W",
+      "James Walker"
+    ],
+    "Katrina Attwood": [
+      "Katrina",
+      "Katrina Attwood"
+    ],
+    "Pedro Ribeiro": [
+      "Pedro",
+      "Pedro Ribeiro"
+    ],
+    "Simon Foster": [
+      "Simon F",
+      "Simon Foster"
+    ],
+    "Simon Burton": [
+      "Simon B",
+      "Simon Burton"
+    ],
+    "Soumya Banerjee": [
+      "Soumya",
+      "Soumya Banerjee"
+    ],
+    "Phoebe": [
+      "Phoebe",
+      "Phoebe"
+    ],
+    "Kate P": [
+      "Kate P",
+      "Kate P"
+    ],
+    "Phillip Morgan": [
+      "Phillip Morgan",
+      "Phillip Morgan"
+    ],
+    "Tom Stoneham": [
+      "Tom Stoneham",
+      "Tom Stoneham"
+    ],
+    "Jennifer Chubb": [
+      "Jennifer Chubb",
+      "Jennifer Chubb"
+    ],
+    "Andrea Palmer": [
+      "Andrea Palmer"
+    ],
+    "Farid Bello": [
+      "Farid Bello"
+    ],
+    "Fahad Alvi": [
+      "Fahad Alvi"
+    ],
+    "Joseph Akinyemi": [
+      "Joseph Akinyemi"
+    ],
+    "Josh Levett": [
+      "Josh Levett"
+    ],
+    "Philippa Ryan": [
+      "Philippa Ryan"
+    ],
+    "Piyush Dhawankar": [
+      "Piyush Dhawankar"
+    ],
+    "Simos Gerasimou": [
+      "Simos Gerasimou"
+    ],
+    "Tina Baker": [
+      "Tina Baker"
+    ],
+    "Tony Knowles": [
+      "Tony Knowles"
+    ],
+    "Saul Cross": [
+      "Saul Cross"
+    ],
+    "Alan Millard": [
+      "Alan Millard"
+    ],
+    "Daniel Franks": [
+      "Daniel Franks"
+    ],
+    "James Woodcock": [
+      "James Woodcock"
+    ],
+    "Jeremy Jacob": [
+      "Jeremy Jacob"
+    ],
+    "Leandro Soares Indrusiak": [
+      "Leandro Soares Indrusiak"
+    ],
+    "Mike O Dea": [
+      "Mike O Dea"
+    ],
+    "Prof Alan Burns": [
+      "Prof Alan Burns"
+    ]
   }
 }

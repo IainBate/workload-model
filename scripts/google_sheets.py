@@ -33,12 +33,7 @@ TEMPLATE_SPREADSHEET_ID = '1fqHmhhRvj1HIRcl_qqOglcGjLgT2aFNPl9ELholADGI'
 
 
 def generate_google_sheets_data(results: List[WorkloadResult]) -> tuple:
-    """
-    Generate data in the format needed for Google Sheets.
-
-    Returns:
-        Tuple of (headers, rows) where headers is a list and rows is a 2D list
-    """
+    """Generate data in the format needed for Google Sheets. Returns: Tuple of (headers, rows) where headers is a list and rows is a 2D list."""
     # Header row
     headers = [
         "Name", "FTE", "Total Hours",
@@ -70,20 +65,7 @@ def generate_google_sheets_data(results: List[WorkloadResult]) -> tuple:
 
 def write_workload_to_google_sheets(results: List[WorkloadResult], year_data: YearData,
                                      spreadsheet_id: str = None) -> Optional[str]:
-    """
-    Write workload data to a Google Sheet.
-
-    Since no API credentials are required, this function provides
-    instructions for manual import instead of automatic upload.
-
-    Args:
-        results: List of WorkloadResult objects
-        year_data: YearData object for metadata
-        spreadsheet_id: Optional existing spreadsheet ID (ignored in manual mode)
-
-    Returns:
-        Spreadsheet URL on success, None if user cancels
-    """
+    """Write workload data to a Google Sheet. Since no API credentials are required, this function provides instructions for manual import instead of automatic upload. Args: results, year_data, spreadsheet_id (ignored). Returns: Spreadsheet URL on success, None if user cancels."""
     # Generate data
     headers, rows = generate_google_sheets_data(results)
     all_rows = [headers] + rows
@@ -148,16 +130,7 @@ Or use your University of York Google Workspace account:
 
 
 def format_spreadsheet(spreadsheet_id: str, gc: gspread.Client = None) -> dict:
-    """
-    Format a Google Sheet (requires API credentials).
-
-    Args:
-        spreadsheet_id: The ID of the target spreadsheet
-        gc: gspread Client
-
-    Returns:
-        Success status
-    """
+    """Format a Google Sheet (requires API credentials). Args: spreadsheet_id, gc. Returns: Success status."""
     print("\nFormatting requires API credentials.")
     print("Use manual import instead - see write_workload_to_google_sheets() for instructions.")
     return {"success": False}

@@ -20,6 +20,18 @@ PROJECT_ROOT = SCRIPTS_DIR.parent
 import config
 
 
+@dataclass(frozen=True)
+class SupervisionAllocation:
+    """Immutable record of supervision hours allocated to each staff member.
+
+    This is a pure data container - no side effects or calculations.
+    Each teacher receives their supervision allocation exactly once per calculation run.
+    """
+    pastoral_students: Dict[str, int]      # canonical_name -> count
+    project_loads: Dict[str, float]        # canonical_name -> project load (ceiling'd)
+    phd_supervisions: Dict[str, int]       # canonical_name -> count
+
+
 @dataclass
 class ModuleData:
     """Structured representation of a module from WTW CSV."""
@@ -78,7 +90,7 @@ class StaffData:
     pastoral_students: int = 0  # Number of pastoral students assigned
 
 
-@dataclass
+@dataclass(frozen=True)
 class WorkloadResult:
     """Complete workload calculation for a single staff member."""
     name: str
@@ -87,12 +99,20 @@ class WorkloadResult:
     teaching_hours: float
     research_hours: float
     admin_hours: float
-    teaching_detail: str
-    research_detail: str
-    admin_detail: str
-    assumptions: List[str]  # Items where data was guessed or defaulted
-    missing_data: List[str]  # Items where data is genuinely missing
+    assumptions: Tuple[str, ...]  # Immutable tuple for assumptions
+    missing_data: Tuple[str, ...]  # Immutable tuple for missing data
+
+    teaching_detail: str = ""
+    research_detail: str = ""
+    admin_detail: str = ""
     nominal_hours: float = 0.0  # FTE-adjusted nominal hours for reference
+    teaching_breakdown: Dict[str, float] = None  # Detailed breakdown of teaching components
+    research_breakdown: Dict[str, float] = None  # Detailed breakdown of research components
+    admin_breakdown: Dict[str, float] = None  # Detailed breakdown of admin components
+    grant_titles: Dict[str, str] = None  # Mapping of project IDs to display titles
+    module_details: Tuple[str, ...] = ()  # Details of modules taught (immutable tuple)
+    supervision_details: Tuple[str, ...] = ()  # Supervision details (to be shown separately)
+
 
 
 @dataclass
@@ -594,7 +614,7 @@ def _load_project_load(filepath: str = "project_load.csv") -> Dict[str, dict]:
                     "employment_start": emp_start,
                     "active": active_val,
                     "project_load": project_load_ceil,
-                    "pastoral_load": pastoral_load,
+                    "pastoral_load": pastoral_load_raw,
                     "ecr_year": ecr_year,
                     "ecr_value": ecr_value,
                     "citizenship_level": citizenship_level,
@@ -863,6 +883,33 @@ _WAW_ROLE_MAPPING = {
 }
 
 
+def allocate_supervision(staff_data: Dict[str, StaffData]) -> SupervisionAllocation:
+    """
+    Calculate supervision allocation for all staff members.
+
+    This is a pure function that reads from staff data and returns an immutable
+    SupervisionAllocation. It should be called once per calculation run before
+    teaching workload calculations.
+
+    Args:
+        staff_data: Mapping of canonical_name to StaffData
+
+    Returns:
+        Immutable SupervisionAllocation containing pastoral counts, project loads,
+        and PhD supervision counts for each staff member.
+    """
+    pastoral = {}
+    projects = {}
+    phd = {}
+
+    for name, staff in staff_data.items():
+        pastoral[name] = staff.pastoral_students
+        projects[name] = staff.project_load  # Already ceiling'd in data_loader.py
+        phd[name] = staff.phd_supervisions
+
+    return SupervisionAllocation(pastoral, projects, phd)
+
+
 _UNSET = object()
 
 def load_all_data(data_dir: str = None,
@@ -959,6 +1006,7 @@ def load_all_data(data_dir: str = None,
 
     # Load supplementary data (DATA_DIR is used internally for all file loading)
     project_load_data = _load_project_load()
+    pastoral_load_data = _load_pastoral_load()
     phd_data = _load_phd_supervision()
     fte_data = _load_fte_data()
     waw_roles = _load_waw_roles()
@@ -1067,14 +1115,20 @@ def load_all_data(data_dir: str = None,
                 saint_modules.extend(modules_list)
 
         if canonical not in staff:
-            # Extract pastoral students from project_load data (Pastoral Load column)
+            # Extract pastoral students from pastoral_load_data (prioritized) or project_load data
             pastoral_students = 0
-            if proj_data and "pastoral_load_raw" in proj_data:
-                try:
-                    # Pastoral load is stored as raw float, convert to int for student count
-                    pastoral_students = int(float(proj_data.get("pastoral_load_raw", 0)))
-                except (ValueError, TypeError):
-                    pastoral_students = 0
+            # First try to get from dedicated pastoral_load_data
+            if raw_name.upper() in pastoral_load_data:
+                pastoral_students = pastoral_load_data[raw_name.upper()]
+            elif canonical.upper() in pastoral_load_data:
+                pastoral_students = pastoral_load_data[canonical.upper()]
+            else:
+                # Fall back to project_load.csv Pastoral Load column
+                if proj_data and "pastoral_load" in proj_data:
+                    try:
+                        pastoral_students = int(float(proj_data.get("pastoral_load", 0)))
+                    except (ValueError, TypeError):
+                        pastoral_students = 0
 
             staff[canonical] = StaffData(
                 canonical_name=canonical,
@@ -1184,10 +1238,7 @@ def load_all_data(data_dir: str = None,
 
 
 def _deduplicate_staff(staff: Dict[str, StaffData], mappings: Dict[str, List[str]]) -> Dict[str, StaffData]:
-    """
-    Second-pass deduplication: merge staff entries that share the same lookup mapping.
-    E.g., 'Chris Crispin-Bailey' and 'Christopher Crispin-Bailey' should be merged.
-    """
+    """Second-pass deduplication: merge staff entries that share the same lookup mapping. E.g., 'Chris Crispin-Bailey' and 'Christopher Crispin-Bailey' should be merged."""
     # Build reverse: alias -> canonical
     alias_to_canonical = {}
     for canonical, aliases in mappings.items():

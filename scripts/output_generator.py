@@ -452,24 +452,23 @@ def generate_html_report(results: List[WorkloadResult], year_data: YearData,
     detailed_path = os.path.join(output_dir, "workload_detailed_boxplot.png")
 
     # CSS with doubled braces to escape f-string interpolation
-    css = """body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 20px; background: #f5f5f5; }
-        h1 { color: #333; border-bottom: 2px solid #4CAF50; padding-bottom: 10px; }
-        h2 { color: #555; margin-top: 30px; }
-        .summary-table { border-collapse: collapse; width: 100%; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-        .summary-table th { background: #4CAF50; color: white; padding: 12px 8px; text-align: left; font-size: 12px; }
-        .summary-table td { padding: 10px 8px; border-bottom: 1px solid #eee; font-size: 12px; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .summary-table tr:hover { background: #f9f9f9; }
-        .chart-container { background: white; padding: 24px; margin: 15px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 8px; }
-        .chart-container img { max-width: 100%; height: auto; display: block; margin: 0 auto; }
-        .legend { display: flex; gap: 24px; margin: 16px 0; font-size: 13px; flex-wrap: wrap; }
-        .legend-item { display: flex; align-items: center; gap: 8px; }
-        .legend-color { width: 18px; height: 18px; border-radius: 3px; }
-        .footer { margin-top: 30px; padding: 16px; background: #fff3e0; border-left: 4px solid #FF9800; font-size: 13px; color: #666; }
-        .total-row { font-weight: bold; background: #f0f0f0 !important; }
-        @media print {{
-            body {{ background: white; }}
-            .chart-container img {{ max-width: 100%; }}
-        }}"""
+    css = (
+        "body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 20px; background: #f5f5f5; } "
+        "h1 { color: #333; border-bottom: 2px solid #4CAF50; padding-bottom: 10px; } "
+        "h2 { color: #555; margin-top: 30px; } "
+        ".summary-table { border-collapse: collapse; width: 100%; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); } "
+        ".summary-table th { background: #4CAF50; color: white; padding: 12px 8px; text-align: left; font-size: 12px; } "
+        ".summary-table td { padding: 10px 8px; border-bottom: 1px solid #eee; font-size: 12px; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } "
+        ".summary-table tr:hover { background: #f9f9f9; } "
+        ".chart-container { background: white; padding: 24px; margin: 15px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 8px; } "
+        ".chart-container img { max-width: 100%; height: auto; display: block; margin: 0 auto; } "
+        ".legend { display: flex; gap: 24px; margin: 16px 0; font-size: 13px; flex-wrap: wrap; } "
+        ".legend-item { display: flex; align-items: center; gap: 8px; } "
+        ".legend-color { width: 18px; height: 18px; border-radius: 3px; } "
+        ".footer { margin-top: 30px; padding: 16px; background: #fff3e0; border-left: 4px solid #FF9800; font-size: 13px; color: #666; } "
+        ".total-row { font-weight: bold; background: #f0f0f0 !important; } "
+        "@media print { body { background: white; } .chart-container img { max-width: 100%; } }"
+    )
 
     html = f"""<!DOCTYPE html>
 <html lang="en">
@@ -552,38 +551,40 @@ def generate_per_staff_reports(results: List[WorkloadResult], year_data: YearDat
     staff_reports_dir = os.path.join(output_dir, "Staff Reports")
     os.makedirs(staff_reports_dir, exist_ok=True)
 
-    css = """body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 30px; background: #f5f5f5; }
-        .report-container { max-width: 1200px; margin: 0 auto; background: white; padding: 40px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-radius: 8px; }
-        h1 { color: #333; border-bottom: 3px solid #4CAF50; padding-bottom: 15px; margin-top: 0; }
-        h2 { color: #4CAF50; border-left: 4px solid #4CAF50; padding-left: 12px; margin-top: 35px; }
-        h3 { color: #666; margin: 20px 0 10px 0; font-size: 1.1em; }
-        .staff-header { background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); color: white; padding: 25px; border-radius: 8px; margin-bottom: 30px; }
-        .staff-name { font-size: 2em; font-weight: bold; }
-        .staff-meta { display: flex; gap: 40px; margin-top: 10px; font-size: 1.1em; opacity: 0.95; }
-        .meta-item { display: flex; flex-direction: column; align-items: center; min-width: 80px; }
-        .meta-label { font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.8; margin-bottom: 4px; }
-        .meta-value { font-weight: bold; font-size: 1.3em; }
-        .section-card { background: #f9f9f9; border-radius: 8px; padding: 25px; margin-top: 20px; border-left: 5px solid #4CAF50; }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .card-title { font-weight: bold; color: #333; font-size: 1.2em; }
-        .card-total { font-size: 1.4em; font-weight: bold; color: #4CAF50; }
-        .detail-item { padding: 10px 0; border-bottom: 1px solid #eee; display: grid; grid-template-columns: 2fr 1fr 1.5fr; gap: 15px; align-items: center; }
-        .detail-item:last-child { border-bottom: none; }
-        .detail-name { font-weight: 500; color: #555; }
-        .detail-hours { text-align: right; font-family: monospace; font-size: 1.1em; color: #666; }
-        .detail-activity { text-align: center; padding: 4px 12px; background: #e8f5e9; border-radius: 4px; font-size: 0.85em; color: #2e7d32; }
-        .teaching-item .detail-activity { background: #e3f2fd; color: #1565c0; }
-        .research-item .detail-activity { background: #fff3e0; color: #ef6c00; }
-        .admin-item .detail-activity { background: #fce4ec; color: #c2185b; }
-        .calc-breakdown { font-size: 0.9em; color: #777; margin-top: 10px; padding-top: 15px; border-top: 2px dashed #ddd; line-height: 1.6; }
-        .assumptions-box, .missing-data-box { background: #fff3e0; border-radius: 8px; padding: 20px; margin-top: 30px; }
-        .assumptions-box h3, .missing-data-box h3 { color: #ef6c00; border-left-color: #ff9800; margin-top: 0; }
-        .missing-data-box { background: #ffebee; }
-        .missing-data-box h3 { color: #c62828; border-left-color: #e53935; }
-        .footer { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 2px solid #eee; font-size: 0.85em; color: #888; }
-        .total-bar { display: flex; align-items: center; gap: 15px; margin-top: 30px; padding: 20px; background: linear-gradient(90deg, #4CAF50 0%, #2e7d32 100%); border-radius: 8px; }
-        .total-bar .label { color: white; font-size: 1.2em; font-weight: bold; min-width: 150px; }
-        .total-bar .value { color: white; font-size: 2em; font-weight: bold; flex-grow: 1; text-align: right; }"""
+    css = (
+        "body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 30px; background: #f5f5f5; } "
+        ".report-container { max-width: 1200px; margin: 0 auto; background: white; padding: 40px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-radius: 8px; } "
+        "h1 { color: #333; border-bottom: 3px solid #4CAF50; padding-bottom: 15px; margin-top: 0; } "
+        "h2 { color: #4CAF50; border-left: 4px solid #4CAF50; padding-left: 12px; margin-top: 35px; } "
+        "h3 { color: #666; margin: 20px 0 10px 0; font-size: 1.1em; } "
+        ".staff-header { background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); color: white; padding: 25px; border-radius: 8px; margin-bottom: 30px; } "
+        ".staff-name { font-size: 2em; font-weight: bold; } "
+        ".staff-meta { display: flex; gap: 40px; margin-top: 10px; font-size: 1.1em; opacity: 0.95; } "
+        ".meta-item { display: flex; flex-direction: column; align-items: center; min-width: 80px; } "
+        ".meta-label { font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.8; margin-bottom: 4px; } "
+        ".meta-value { font-weight: bold; font-size: 1.3em; } "
+        ".section-card { background: #f9f9f9; border-radius: 8px; padding: 25px; margin-top: 20px; border-left: 5px solid #4CAF50; } "
+        ".card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; } "
+        ".card-title { font-weight: bold; color: #333; font-size: 1.2em; } "
+        ".card-total { font-size: 1.4em; font-weight: bold; color: #4CAF50; } "
+        ".detail-item { padding: 10px 0; border-bottom: 1px solid #eee; display: grid; grid-template-columns: 2fr 1fr 1.5fr; gap: 15px; align-items: center; } "
+        ".detail-item:last-child { border-bottom: none; } "
+        ".detail-name { font-weight: 500; color: #555; } "
+        ".detail-hours { text-align: right; font-family: monospace; font-size: 1.1em; color: #666; } "
+        ".detail-activity { text-align: center; padding: 4px 12px; background: #e8f5e9; border-radius: 4px; font-size: 0.85em; color: #2e7d32; } "
+        ".teaching-item .detail-activity { background: #e3f2fd; color: #1565c0; } "
+        ".research-item .detail-activity { background: #fff3e0; color: #ef6c00; } "
+        ".admin-item .detail-activity { background: #fce4ec; color: #c2185b; } "
+        ".calc-breakdown { font-size: 0.9em; color: #777; margin-top: 10px; padding-top: 15px; border-top: 2px dashed #ddd; line-height: 1.6; } "
+        ".assumptions-box, .missing-data-box { background: #fff3e0; border-radius: 8px; padding: 20px; margin-top: 30px; } "
+        ".assumptions-box h3, .missing-data-box h3 { color: #ef6c00; border-left-color: #ff9800; margin-top: 0; } "
+        ".missing-data-box { background: #ffebee; } "
+        ".missing-data-box h3 { color: #c62828; border-left-color: #e53935; } "
+        ".footer { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 2px solid #eee; font-size: 0.85em; color: #888; } "
+        ".total-bar { display: flex; align-items: center; gap: 15px; margin-top: 30px; padding: 20px; background: linear-gradient(90deg, #4CAF50 0%, #2e7d32 100%); border-radius: 8px; } "
+        ".total-bar .label { color: white; font-size: 1.2em; font-weight: bold; min-width: 150px; } "
+        ".total-bar .value { color: white; font-size: 2em; font-weight: bold; flex-grow: 1; text-align: right; }"
+    )
 
     for r in results:
         # Get module details if available
@@ -627,6 +628,7 @@ def generate_per_staff_reports(results: List[WorkloadResult], year_data: YearDat
                             module_teaching_map[module_name]['num_teachers'] = num_teachers
 
         def format_detail_section(title, hours, breakdown, css_class, is_teaching=False, supervision_details=None):
+            """Format a detail section for the workload report HTML."""
             if not breakdown or all(v == 0 for v in breakdown.values()):
                 return f"""<div class="section-card {css_class}">
                 <div class="card-header">
@@ -773,8 +775,6 @@ def generate_per_staff_reports(results: List[WorkloadResult], year_data: YearDat
 
                     # Practicals
                     practical_match = re.search(r'Practicals:\s*(\d+)', detail, re.IGNORECASE)
-                    contact_per_prac_match = re.search(r'([\d.]+)h\s+each', detail, re.IGNORECASE)
-                    prac_rate_match = re.search(r'x\s+([\d.]+)x', detail, re.IGNORECASE)
 
                     if practical_match:
                         # Extract practical hours directly from the detail string (not from breakdown)
@@ -782,23 +782,16 @@ def generate_per_staff_reports(results: List[WorkloadResult], year_data: YearDat
                         prac_hours_match = re.search(r'=\s*([\d.]+)h', detail, re.IGNORECASE)
                         prac_hours = float(prac_hours_match.group(1)) if prac_hours_match else 0
 
+                        # Extract contact per practical from the actual practicals section only
+                        # The pattern should be "X groups shared by Y lecturers" or similar
+                        contact_per_prac_match = re.search(r'Practicals:\s*\d+\s*groups.*?([\d.]+)h\s+contact', detail, re.IGNORECASE)
+
+                        # Extract repetition rate (1.5x for repeats), not the first delivery rate
+                        # Look for "weeks X @ Yx" pattern which indicates repetition multiplier
+                        prac_rate_match = re.search(r'weeks\s+[\d,\s]+\s*@\s*([\d.]+)x', detail, re.IGNORECASE)
+
                         contact_per_prac = float(contact_per_prac_match.group(1)) if contact_per_prac_match else 0
-                        rate = float(prac_rate_match.group(1)) if prac_rate_match else 2.5
-
-                        # DEBUG: Print detail and values for verification
-                        import sys
-                        print(f"DEBUG: detail='{detail[:80]}...'", file=sys.stderr)
-                        print(f"DEBUG: prac_hours={prac_hours}, contact_per_prac (initial)={contact_per_prac}, rate={rate}", file=sys.stderr)
-
-                        # Extract parallel groups to calculate contact per practical if not found directly
-                        if contact_per_prac == 0:
-                            # Try to extract n_groups from "X parallel groups"
-                            n_groups_match = re.search(r'(\d+(?:\.\d+)?)\s+parallel\s+groups?', detail, re.IGNORECASE)
-                            n_groups = float(n_groups_match.group(1)) if n_groups_match else 0
-                            print(f"DEBUG: n_groups={n_groups}", file=sys.stderr)
-                            if n_groups > 0:
-                                contact_per_prac = prac_hours / n_groups
-                                print(f"DEBUG: calculated contact_per_prac={contact_per_prac}", file=sys.stderr)
+                        rate = float(prac_rate_match.group(1)) if prac_rate_match else config.REPETITION_MULTIPLIER
 
                         items_html_parts.append(f"""<div class="detail-item {css_class}">
                             <span class="detail-name">Practical Sessions</span>
@@ -840,14 +833,14 @@ def generate_per_staff_reports(results: List[WorkloadResult], year_data: YearDat
                 proj_projects_total = 0
 
                 for detail in supervision_details_list:
-                    # Pastoral: "Pastoral: X - Y students x Zh = Wh"
-                    past_match = re.search(r'Pastoral:\s*[^-]*-\s*(\d+(?:\.\d+)?)\s+students\s*x\s*(\d+(?:\.\d+)?)h\s*=\s*(\d+(?:\.\d+)?)h', detail)
+                    # Pastoral: "Pastoral: X students x Zh = Wh" (or with teacher prefix like "Name: Pastoral: ...")
+                    past_match = re.search(r'(?:.*?:\s*)?Pastoral:\s*(\d+(?:\.\d+)?)\s+students\s*x\s*(\d+(?:\.\d+)?)h\s*=\s*(\d+(?:\.\d+)?)h', detail)
                     if past_match:
                         past_students_total += int(float(past_match.group(1)))
                         past_hours_total += float(past_match.group(3))
 
-                    # Projects: "Projects: X - Y projects x Zh = Wh"
-                    proj_match = re.search(r'Projects:\s*[^-]*-\s*(\d+(?:\.\d+)?)\s+projects\s*x\s*(\d+(?:\.\d+)?)h\s*=\s*(\d+(?:\.\d+)?)h', detail)
+                    # Projects: "Projects: X projects x Zh = Wh" (or with teacher prefix like "Name: Projects: ...")
+                    proj_match = re.search(r'(?:.*?:\s*)?Projects:\s*(\d+(?:\.\d+)?)\s+projects\s*x\s*(\d+(?:\.\d+)?)h\s*=\s*(\d+(?:\.\d+)?)h', detail)
                     if proj_match:
                         proj_projects_total += int(float(proj_match.group(1)))
                         proj_hours_total += float(proj_match.group(3))
@@ -872,6 +865,15 @@ def generate_per_staff_reports(results: List[WorkloadResult], year_data: YearDat
                             <span class="detail-activity" style="background:#fce4ec;color:#c2185b;">Supervision</span>
                         </div>
                     </div>
+                </div>""")
+
+            # Project setting allowance (fixed amount for all staff)
+            project_setting = breakdown.get('project_setting', 0)
+            if project_setting > 0:
+                items_html_parts.append(f"""<div class="detail-item {css_class}">
+                    <span class="detail-name">Project Setting (fixed)</span>
+                    <span class="detail-hours">{project_setting:.1f}h</span>
+                    <span class="detail-activity" style="background:#e8f5e9;color:#2e7d32;">Teaching</span>
                 </div>""")
 
             # Minimum admin teaching load (if present)
