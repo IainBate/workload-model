@@ -8,13 +8,18 @@ global_parameters:
   hours_per_week: 37
 
 baselines_hours:
-  engagement: 100
-  project_setting: 6
-  personal_development: 75
-  proposing_projects_to_offer: 6
-  min_admin_teaching: 30
+  # General baseline activities (outside teaching/research/admin)
+  engagement: 100          # University-wide engagement activities
+  personal_development: 75 # Mandated by university for all researchers
 
-# Fixed research components
+  # Teaching-related baselines (project_setting is now per-staff based on project_load.csv)
+  min_admin_teaching: 30   # Minimum teaching load for admin staff
+
+# Protected research time baseline (10% of nominal hours = 164.2h)
+# This is the minimum protected research time per year
+protected_research_baseline: 164.2
+
+# Research allowances (additional to protected baseline)
 research_allowances:
   primary_research_allowance_art: 328.4
 
@@ -113,7 +118,8 @@ roles_percentage_of_nominal_hours:
   UG PL: 0.10
   Other PLs: 0.05
   Module Leader: 0.025
-  Ethics: 0.05
+  Ethics Committee Chair: 0.20
+  Ethics Committee Member: 0.20
   ECA committees: 0.05
   Student Disability Representative: 0.20
   Director of Admissions: 0.05

@@ -37,6 +37,9 @@ SERVICE_POINTS_DEFAULT: float = 175.0  # Default service points for HoD and othe
 # Baseline workloads (fixed hours)
 BASELOADS: dict[str, float] = _params["baselines_hours"]
 
+# Protected research time baseline (10% of nominal hours = 164.2h)
+PROTECTED_RESEARCH_BASELINE: float = _params.get("protected_research_baseline", 164.2)
+
 # Minimum teaching load for administrative staff who don't teach modules
 MIN_ADMIN_TEACHING_HOURS: float = BASELOADS.get("min_admin_teaching", 30.0)
 
@@ -78,6 +81,9 @@ TEACHING_NEW_VIDEO = TEACHING_MULTIPLIERS["lecture_new_video"]  # 10
 TEACHING_PROBLEM_CLASS = TEACHING_MULTIPLIERS["problem_class_seminar_practical"]  # 2.5
 TEACHING_NEW_PROBLEM_CLASS = TEACHING_MULTIPLIERS["new_problem_class_seminar_practical"]  # 5
 TEACHING_HW_LAB = TEACHING_MULTIPLIERS["hw_lab"]  # 4
+
+# Repetition multiplier for additional practical sessions
+REPETITION_MULTIPLIER: float = TEACHING_MULTIPLIERS["repetition_multiplier"]  # 1.5
 TEACHING_NEW_HW_LAB = TEACHING_MULTIPLIERS["new_hw_lab"]  # 8
 TEACHING_DROP_IN = TEACHING_MULTIPLIERS["drop_in_session"]  # 1.5
 
@@ -100,6 +106,9 @@ ROLES_PERCENTAGE: dict[str, float] = _params["roles_percentage_of_nominal_hours"
 # Defaults
 DEFAULT_STUDENT_COUNT: int = 100  # Default when student count is unknown
 DEFAULT_CONTACT_HOURS_PER_CREDIT: float = 1.0  # Standard contact hours per credit point
+
+# Project setting allowance - given once per year to each supervisor with non-zero project load
+PROJECT_SETTING_ALLOWANCE: float = 6.0  # Teaching-related, for setting projects for students
 
 
 def get_role_hours(role_name: str, nominal_hours: float) -> float:

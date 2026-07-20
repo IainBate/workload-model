@@ -41,10 +41,55 @@ Workload Model/
 ```
 
 ## Core Logic & Rules
-- **Workload Calculation:** The engine calculates work as: `Base + Teaching + Assessment + Supervision + Online Extras`.
-- **New Lecturer Rule:** If a lecturer is identified as "new" (not present in the previous year's dataset), they are assigned higher multipliers to account for initial content development.
-- **Assessment Assumptions:** Currently assumes automated marking unless specified otherwise.
-- **Supervision Defaults:** Based on current project parameters, each teacher accounts for 20 pastoral and 10 project students (scaled by the multiplier).
+
+### Workload Calculation Formula
+
+The total workload is calculated as:
+
+```
+Total = Teaching + Research (Protected + Additional) + Admin + General Baseline
+```
+
+Where:
+
+#### 1. Teaching Activities
+- **Contact hours** x multiplier (2.5x standard, 5x new lecturer, etc.)
+- **Practicals** with repetition multiplier (1.5x for additional sessions)
+- **Assessment setting**: Based on marking type and whether it's a new assessment
+- **Marking**: MSc 0.5h/script, UG 0.33h/script (manual); half for automated
+- **Supervision**: Pastoral 6h/student, Projects vary by level
+- **Minimum admin teaching load**: 30h for HoD and other administrative staff
+
+#### 2. Research Activities (Protected Baseline + Additional)
+
+**Protected Research Time (10% of nominal hours = 164.2h)**
+This is the minimum protected research time per year per FTE, mandated by university policy.
+
+**Additional Research:**
+- **Primary research allowance** (ART): 328.4h (if applicable)
+- **PhD supervision**: Primary supervisor 80h/FTE, Co-supervisor 48h/FTE, Assessor 8h/student
+- **Research grants**: FTE percentage x nominal hours
+
+#### 3. Administration Activities
+- **Departmental roles** at specified percentages of nominal hours:
+  - Head of Department: 100%
+  - Deputy Head (Research): 40%
+  - Deputy Head (Teaching): 50%
+  - PLs, Committee chairs, etc.
+- **Service points**: 175h default for committee work
+
+#### 4. General Baseline (Outside Teaching/Research/Admin)
+- **Engagement**: 100h university-wide engagement activities
+- **Personal Development**: 75h mandated by university for all researchers
+
+### New Lecturer Rule
+If a lecturer is identified as "new" (not present in the previous year's dataset), they are assigned higher multipliers to account for initial content development.
+
+### Assessment Assumptions
+Currently assumes manual marking unless specified otherwise.
+
+### Supervision Defaults
+Based on current project parameters, each teacher accounts for 20 pastoral and 10 project students (scaled by the multiplier).
 
 ## Development & Execution
 

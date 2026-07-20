@@ -5,6 +5,7 @@ Handles CSV ingestion, staff name normalization, module mapping, and data mergin
 
 import csv
 import json
+import math
 import glob
 import os
 import re
@@ -38,6 +39,8 @@ class ModuleData:
     has_h_m_variants: bool
     contact_hours: float  # Estimated contact hours (from credits)
     practical_contact_hours: float = 0.0  # Actual contact hours per practical session (from CSV)
+    practical_groups: int = 0  # Number of parallel groups for practicals
+    practical_weeks: List[int] = field(default_factory=list)  # Weeks when practicals occur
     student_count: int = 0  # From CS Module Numbers.csv
     assessment_count: int = 1  # From CS Module Assessment Numbers.csv
     source_year: str = ""  # e.g., "2026-7"
@@ -72,6 +75,7 @@ class StaffData:
     research_projects: List[dict]  # From % FTE for CS.csv
     saint_modules: List[str]  # SAINTS modules they teach
     unallocated_students: int = 0  # Remaining students after allocation
+    pastoral_students: int = 0  # Number of pastoral students assigned
 
 
 @dataclass
@@ -407,7 +411,8 @@ def _load_assessment_counts(filepath: str = "CS Module Assessment Numbers.csv") 
 
 def _load_practical_data(filepath: str = "CS Module Assessment Numbers.csv") -> Dict[str, dict]:
     """Load practical data from CS Module Assessment Numbers.csv.
-    Returns {module_code: {practicals: int, practical_contact_hours: float}}.
+    Returns {module_code: {practicals: int, practical_contact_hours: float,
+                           practical_groups: int, practical_weeks: List[int]}}.
     practical_contact_hours = Total Duration / Number of Practicals (hours per session).
     """
     path = DATA_DIR / filepath
@@ -422,12 +427,36 @@ def _load_practical_data(filepath: str = "CS Module Assessment Numbers.csv") -> 
             acronym = row.get("Module Acronym", "").strip()
             n_str = row.get("Number of Practicals", "").strip()
             duration_str = row.get("Total Duration", "").strip()
+            groups_str = row.get("Number of Practical Groups", "").strip()
+            notes_str = row.get("Notes on practicals", "").strip()
+
             if not n_str or n_str.upper() == "NA":
                 continue
             try:
                 n_practicals = int(n_str)
             except ValueError:
                 continue
+
+            # Parse groups (Number of Practical Groups column)
+            groups = 0
+            if groups_str and groups_str.upper() != "N/A" and groups_str.strip():
+                try:
+                    groups = int(groups_str)
+                except ValueError:
+                    groups = 0
+
+            # Parse weeks from notes (e.g., "Weeks 1,2,3,4,5")
+            weeks: List[int] = []
+            if notes_str:
+                week_match = re.search(r"Weeks?\s+([,\d\s]+)", notes_str, re.IGNORECASE)
+                if week_match:
+                    week_str = week_match.group(1)
+                    for w in week_str.split(","):
+                        try:
+                            weeks.append(int(w.strip()))
+                        except ValueError:
+                            pass
+
             # Parse duration: "X hours" or "Y hours"
             duration_hours = 0.0
             if duration_str:
@@ -436,8 +465,19 @@ def _load_practical_data(filepath: str = "CS Module Assessment Numbers.csv") -> 
                     duration_hours = float(dur_match.group(1))
             # Contact hours per practical session
             contact_per = duration_hours / n_practicals if n_practicals > 0 else 0.0
-            data[code] = {"practicals": n_practicals, "practical_contact_hours": contact_per}
-            data[acronym] = {"practicals": n_practicals, "practical_contact_hours": contact_per}
+
+            data[code] = {
+                "practicals": n_practicals,
+                "practical_contact_hours": contact_per,
+                "practical_groups": groups,
+                "practical_weeks": weeks
+            }
+            data[acronym] = {
+                "practicals": n_practicals,
+                "practical_contact_hours": contact_per,
+                "practical_groups": groups,
+                "practical_weeks": weeks
+            }
     return data
 
 
@@ -474,26 +514,103 @@ def _load_project_load(filepath: str = "project_load.csv") -> Dict[str, dict]:
             if not person or person == "Total FTE":
                 continue
             try:
+                # Parse Employment Start - may be N/A, int, or float
+                emp_start_val = row.get("Employment Start", 0) or 0
+                if str(emp_start_val).strip() == "N/A" or not emp_start_val:
+                    emp_start = 0
+                else:
+                    try:
+                        emp_start = int(float(emp_start_val))
+                    except ValueError:
+                        emp_start = 0
+
+                active_val = row.get("Active", "TRUE").strip().upper() == "TRUE"
+                proj_load = float(row.get("Base project load", 0) or 0)
+                pastoral_load = float(row.get("Base pastoral load", 0) or 0)
+                ecr_year = row.get("ECR Year", "N/A").strip()
+
+                # Parse ECR Value
+                ecr_value_raw = row.get("ECR Value", 0) or 0
+                if str(ecr_value_raw).strip() == "N/A":
+                    ecr_value = 0.0
+                else:
+                    ecr_value = float(ecr_value_raw)
+
+                # Parse Citizenship Level - may be N/A, int, or float
+                citizenship_level_raw = row.get("Citizenship Level", 0)
+                if str(citizenship_level_raw).strip() == "N/A" or not citizenship_level_raw:
+                    citizenship_level = 0
+                else:
+                    try:
+                        citizenship_level = int(float(citizenship_level_raw))
+                    except ValueError:
+                        citizenship_level = 0
+
+                research_grant_income = row.get("Research Grant Income", "N/A").strip()
+                research_grant_income_value_raw = row.get("Research Grant Income Value", 0) or 0
+                if str(research_grant_income_value_raw).strip() == "N/A":
+                    research_grant_income_value = 0.0
+                else:
+                    research_grant_income_value = float(research_grant_income_value_raw)
+
+                citizenship_value_raw = row.get("Citizen value", 0) or 0
+                if str(citizenship_value_raw).strip() == "N/A":
+                    citizenship_value = 0.0
+                else:
+                    citizenship_value = float(citizenship_value_raw)
+
+                initial_fractional_project_load_raw = row.get("Initial Fractional Project Load", 0) or 0
+                if str(initial_fractional_project_load_raw).strip() == "N/A":
+                    initial_fractional_project_load = 0.0
+                else:
+                    initial_fractional_project_load = float(initial_fractional_project_load_raw)
+
+                initial_fractional_pastoral_load_raw = row.get("Initial Fractional Pastoral Group Load", 0) or 0
+                if str(initial_fractional_pastoral_load_raw).strip() == "N/A":
+                    initial_fractional_pastoral_load = 0.0
+                else:
+                    initial_fractional_pastoral_load = float(initial_fractional_pastoral_load_raw)
+
+                adjusted_project_load_raw = row.get("Adjusted Project Load", 0) or 0
+                if str(adjusted_project_load_raw).strip() == "N/A":
+                    adjusted_project_load = 0.0
+                else:
+                    adjusted_project_load = float(adjusted_project_load_raw)
+
+                adjusted_pastoral_load_raw = row.get("Adjusted Pastoral Group Load", 0) or 0
+                if str(adjusted_pastoral_load_raw).strip() == "N/A":
+                    adjusted_pastoral_load = 0.0
+                else:
+                    adjusted_pastoral_load = float(adjusted_pastoral_load_raw)
+
+                project_load_raw = float(row.get("Project Load", 0) or 0)
+                pastoral_load_raw = float(row.get("Pastoral Load", 0) or 0)
+                notes = row.get("Notes", "").strip()
+
+                # Ceiling project load to nearest integer
+                project_load_ceil = math.ceil(project_load_raw) if project_load_raw > 0 else 0
+
                 data[person] = {
-                    "employment_start": int(row.get("Employment Start", 0) or 0),
-                    "active": row.get("Active", "TRUE").strip().upper() == "TRUE",
-                    "project_load": float(row.get("Base project load", 0) or 0),
-                    "pastoral_load": float(row.get("Base pastoral load", 0) or 0),
-                    "ecr_year": row.get("ECR Year", "N/A").strip(),
-                    "ecr_value": float(row.get("ECR Value", 0) or 0),
-                    "citizenship_level": int(row.get("Citizenship Level", 0) or 0),
-                    "research_grant_income": row.get("Research Grant Income", "N/A").strip(),
-                    "research_grant_income_value": float(row.get("Research Grant Income Value", 0) or 0),
-                    "citizenship_value": float(row.get("Citizen value", 0) or 0),
-                    "initial_fractional_project_load": float(row.get("Initial Fractional Project Load", 0) or 0),
-                    "initial_fractional_pastoral_load": float(row.get("Initial Fractional Pastoral Group Load", 0) or 0),
-                    "adjusted_project_load": float(row.get("Adjusted Project Load", 0) or 0),
-                    "adjusted_pastoral_load": float(row.get("Adjusted Pastoral Group Load", 0) or 0),
-                    "project_load_raw": float(row.get("Project Load", 0) or 0),
-                    "pastoral_load_raw": float(row.get("Pastoral Load", 0) or 0),
-                    "notes": row.get("Notes", "").strip(),
+                    "employment_start": emp_start,
+                    "active": active_val,
+                    "project_load": project_load_ceil,
+                    "pastoral_load": pastoral_load,
+                    "ecr_year": ecr_year,
+                    "ecr_value": ecr_value,
+                    "citizenship_level": citizenship_level,
+                    "research_grant_income": research_grant_income,
+                    "research_grant_income_value": research_grant_income_value,
+                    "citizenship_value": citizenship_value,
+                    "initial_fractional_project_load": initial_fractional_project_load,
+                    "initial_fractional_pastoral_load": initial_fractional_pastoral_load,
+                    "adjusted_project_load": adjusted_project_load,
+                    "adjusted_pastoral_load": adjusted_pastoral_load,
+                    "project_load_raw": project_load_raw,
+                    "pastoral_load_raw": pastoral_load_raw,
+                    "notes": notes,
                 }
-            except (ValueError, KeyError):
+            except (ValueError, KeyError) as e:
+                # Skip rows with unparseable data
                 pass
     return data
 
@@ -512,12 +629,21 @@ def _load_phd_supervision(filepath: str = "PhD Supervision Data.csv") -> Dict[st
             if not staff or staff == "Total as supervisor":
                 continue
             try:
+                def parse_int_or_na(val) -> int:
+                    """Parse int value that may be N/A, empty, or a number."""
+                    if str(val).strip() == "N/A" or not val:
+                        return 0
+                    try:
+                        return int(float(val))
+                    except ValueError:
+                        return 0
+
                 data[staff] = {
-                    "total_as_supervisor": int(row.get("Total as supervisor", 0) or 0),
-                    "sole_supervisor": int(row.get("Sole supervisor", 0) or 0),
-                    "co_supervisor": int(row.get("Co-supervisor", 0) or 0),
-                    "tap_member": int(row.get("TAP member", 0) or 0),
-                    "combined": int(row.get("Total as supervisor (sole or co-supervisor) AND TAP member", 0) or 0),
+                    "total_as_supervisor": parse_int_or_na(row.get("Total as supervisor", 0)),
+                    "sole_supervisor": parse_int_or_na(row.get("Sole supervisor", 0)),
+                    "co_supervisor": parse_int_or_na(row.get("Co-supervisor", 0)),
+                    "tap_member": parse_int_or_na(row.get("TAP member", 0)),
+                    "combined": parse_int_or_na(row.get("Total as supervisor (sole or co-supervisor) AND TAP member", 0)),
                 }
             except (ValueError, KeyError):
                 pass
@@ -820,12 +946,16 @@ def load_all_data(data_dir: str = None,
                 pdata = practical_data[code]
                 module.practicals = pdata["practicals"]
                 module.practical_contact_hours = pdata["practical_contact_hours"]
+                module.practical_groups = pdata.get("practical_groups", 0)
+                module.practical_weeks = pdata.get("practical_weeks", [])
                 break
         # If no code match, try by acronym
         if module.practical_contact_hours == 0.0 and module.name in practical_data:
             pdata = practical_data[module.name]
             module.practicals = pdata["practicals"]
             module.practical_contact_hours = pdata["practical_contact_hours"]
+            module.practical_groups = pdata.get("practical_groups", 0)
+            module.practical_weeks = pdata.get("practical_weeks", [])
 
     # Load supplementary data (DATA_DIR is used internally for all file loading)
     project_load_data = _load_project_load()
@@ -937,6 +1067,15 @@ def load_all_data(data_dir: str = None,
                 saint_modules.extend(modules_list)
 
         if canonical not in staff:
+            # Extract pastoral students from project_load data (Pastoral Load column)
+            pastoral_students = 0
+            if proj_data and "pastoral_load_raw" in proj_data:
+                try:
+                    # Pastoral load is stored as raw float, convert to int for student count
+                    pastoral_students = int(float(proj_data.get("pastoral_load_raw", 0)))
+                except (ValueError, TypeError):
+                    pastoral_students = 0
+
             staff[canonical] = StaffData(
                 canonical_name=canonical,
                 aliases=mappings.get(canonical, [canonical]),
@@ -963,6 +1102,7 @@ def load_all_data(data_dir: str = None,
                 phd_assessor_count=phd_info["tap_member"] if phd_info else 0,
                 research_projects=fte_info if fte_info else [],
                 saint_modules=list(set(saint_modules)),
+                pastoral_students=pastoral_students,
             )
 
     # Deduplicate staff roster
