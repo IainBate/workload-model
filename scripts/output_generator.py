@@ -8,11 +8,13 @@ Produces:
 5. Excel (.xlsx) file with formulas and proper formatting
 
 Uses openpyxl for Excel generation.
+
+The output generator uses structured breakdown data from workload calculations
+instead of parsing free-form detail strings.
 """
 
 import csv
 import os
-import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Optional, Dict, Any
@@ -25,8 +27,13 @@ OUTPUT_DIR = PROJECT_ROOT / "output"
 
 
 @dataclass(frozen=True)
-class DetailParseResult:
-    """Result from parsing a teaching detail string."""
+class TeachingBreakdown:
+    """
+    Structured teaching activity breakdown.
+
+    Replaces DetailParseResult by using the structured data directly
+    from workload_calculator.py instead of parsing strings.
+    """
     delivery_hours: float
     delivery_multiplier: Optional[str]
     practical_hours: float
@@ -37,7 +44,9 @@ class DetailParseResult:
     marking_detail: Optional[str]
 
 
-class DetailParser:
+def parse_teaching_breakdown(teaching_breakdown: Dict[str, float],
+                             detail_text: str = "",
+                             supervision_details: Tuple[str, ...] = ()) -> TeachingBreakdown:
     """
     Parser for teaching activity detail strings.
 
