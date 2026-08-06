@@ -712,15 +712,16 @@ def _calculate_admin_workload(staff_member: StaffData, nominal_hours: float) -> 
     # Add service points - general baseline activities for all staff
     # This includes engagement (email/meetings) and personal development
     # Based on BASELOADS: engagement=100h + personal_development=75h = 175h total
-    engagement_hours = config.BASELOADS.get('engagement', 100.0)
-    personal_dev_hours = config.BASELOADS.get('personal_development', 75.0)
+    # Scale by FTE to handle part-time staff correctly
+    engagement_hours = config.BASELOADS.get('engagement', 100.0) * fte_value
+    personal_dev_hours = config.BASELOADS.get('personal_development', 75.0) * fte_value
     service_hours = engagement_hours + personal_dev_hours
 
     total += service_hours
     breakdown["engagement"] = engagement_hours
     breakdown["personal_development"] = personal_dev_hours
     details.append(f"Engagement (email/meetings): {engagement_hours:.1f}h")
-    details.append(f"Personal development: {personal_dev_hours:.1f}h")
+    details.append(f"Personal development: {personal_dev_hours:.1f}h (FTE: {fte_value:.2f})")
 
     return total, breakdown, "; ".join(details) if details else "No administrative roles"
 
