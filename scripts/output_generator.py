@@ -13,11 +13,27 @@ The output generator uses structured breakdown data from workload calculations
 instead of parsing free-form detail strings.
 """
 
+"""
+Output generation for the workload calculator.
+Produces:
+1. Staff workload model CSV (summary + detail columns)
+2. Summary stacked bar chart (PNG and embedded in Excel)
+3. Detailed stacked bar chart (PNG and embedded in Excel)
+4. HTML report with embedded images
+5. Excel (.xlsx) file with formulas and proper formatting
+
+Uses openpyxl for Excel generation.
+
+The output generator uses structured breakdown data from workload calculations
+instead of parsing free-form detail strings.
+"""
+
 import csv
 import os
-from dataclasses import dataclass
+import re
+from dataclasses import dataclass, field
 from pathlib import Path
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Tuple
 
 # Get project root directory (parent of scripts folder)
 SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -48,225 +64,32 @@ def parse_teaching_breakdown(teaching_breakdown: Dict[str, float],
                              detail_text: str = "",
                              supervision_details: Tuple[str, ...] = ()) -> TeachingBreakdown:
     """
-    Parser for teaching activity detail strings.
+    Extract structured teaching breakdown from workload calculation data.
 
-    Extracts structured data from free-form teaching activity descriptions
-    such as "New lecturer (5x): 16.7h base @ 2.5x + content dev = 83h" or
-    "Practicals: 5 groups shared by 3 lecturers, 11w - New: 24.0h/week @ 5x".
+    This function converts the structured breakdown dictionaries from
+    workload_calculator.py into a consistent TeachingBreakdown format
+    for report generation.
 
-    This consolidates regex-based parsing logic for teaching activity breakdowns.
+    Args:
+        teaching_breakdown: Dict with keys like 'delivery', 'practicals',
+            'assessment_setting', 'marking' containing hour values
+        detail_text: Optional detailed description string for additional context
+        supervision_details: Tuple of supervision-related strings (pastoral, projects)
+
+    Returns:
+        TeachingBreakdown with all teaching components properly structured
     """
-
-    # Regex patterns for parsing detail strings
-    DELIVERY_PATTERN = re.compile(
-        r'(New lecturer|Standard)\s*\((\d+)x\):\s*([\d.]+)h\s*(?:base\s*)?(?:@[\d.]+\s*x\s*\+\s*content\s+dev\s*=\s*([\d.]+)h)?'
+    return TeachingBreakdown(
+        delivery_hours=teaching_breakdown.get('delivery', 0.0),
+        delivery_multiplier=None,
+        practical_hours=teaching_breakdown.get('practicals', 0.0),
+        practical_detail=None,
+        assessment_setting_hours=teaching_breakdown.get('assessment_setting', 0.0),
+        assessment_setting_detail=None,
+        marking_hours=teaching_breakdown.get('marking', 0.0),
+        marking_detail=None
     )
 
-    PRACTICALS_PATTERN = re.compile(
-        r'Practicals:\s*(\d+)\s*groups\s+shared\s+by\s+(\d+)\s+lecturers.*?(\d+)w'
-    )
-
-    NEW_PRACTICE_RATE_PATTERN = re.compile(r'New:\s*([\d.]+)h/week\s*@ ([\d.]+)x')
-    STD_PRACTICE_RATE_PATTERN = re.compile(r'Standard:\s*([\d.]+)h/week\s*@ ([\d.]+)x')
-    REPEAT_SESSION_PATTERN = re.compile(r'(\d+)\s+grps?\s*@ ([\d.]+)x')
-
-    ASSESSMENT_SETTING_PATTERN = re.compile(
-        r'(?:New setter|Standard)\s*\([^)]+\):\s*([\d.]+)h\s+main\s*\+\s*([\d.]+)h\s+resit\s*=\s*([\d.]+)h'
-    )
-
-    MARKING_PATTERN = re.compile(
-        r'(\d+)\s+scripts\s*\+\s*(\d+)\s+resits\s+x\s*([\d.]+)h\s*=\s*([\d.]+)h\s+total\s*\(([\d.]+)h\s+initial'
-    )
-
-    def __init__(self, detail_string: str):
-        """
-        Initialize parser with a teaching activity detail string.
-
-        Args:
-            detail_string: The free-form text describing teaching activities,
-                e.g., "New lecturer (5x): 16.7h base @ 2.5x + content dev = 83h"
-        """
-        self.detail = detail_string
-
-    def parse_delivery(self) -> Dict[str, Any]:
-        """
-        Parse delivery/lecture information from the detail string.
-
-        Returns:
-            Dict with keys: hours, multiplier, is_new_lecturer, base_hours, content_dev
-        """
-        match = self.DELIVERY_PATTERN.search(self.detail)
-        if not match:
-            return {'hours': 0.0, 'multiplier': None, 'is_new_lecturer': False}
-
-        lecturer_type = match.group(1)
-        multiplier = int(match.group(2))
-        base_hours = float(match.group(3))
-        total_hours = float(match.group(4)) if match.group(4) else base_hours
-
-        is_new = lecturer_type == "New lecturer"
-        content_dev = total_hours - base_hours if is_new else 0.0
-
-        return {
-            'hours': total_hours,
-            'multiplier': f"{multiplier}x",
-            'is_new_lecturer': is_new,
-            'base_hours': base_hours,
-            'content_dev': content_dev
-        }
-
-    def parse_practicals(self, lecturer_is_new: bool = False) -> Dict[str, Any]:
-        """
-        Parse practical session information from the detail string.
-
-        Args:
-            lecturer_is_new: Whether this lecturer is new (for rate determination)
-
-        Returns:
-            Dict with keys: hours, first_session_rate, repeat_share, weeks
-        """
-        prac_match = self.PRACTICALS_PATTERN.search(self.detail)
-        if not prac_match:
-            return {'hours': 0.0, 'first_session_rate': None, 'repeat_share': 0.0, 'weeks': 0}
-
-        groups = int(prac_match.group(1))
-        lecturers = int(prac_match.group(2))
-        weeks = int(prac_match.group(3))
-
-        # Extract first session rate (5x or 2.5x) based on lecturer type
-        new_prac_match = self.NEW_PRACTICE_RATE_PATTERN.search(self.detail)
-        std_prac_match = self.STD_PRACTICE_RATE_PATTERN.search(self.detail)
-
-        if new_prac_match and std_prac_match:
-            # Mixed new and standard lecturers
-            first_session_rate = float(new_prac_match.group(1)) if lecturer_is_new else float(std_prac_match.group(1))
-        elif new_prac_match:
-            # All new lecturers
-            first_session_rate = float(new_prac_match.group(1))
-        elif std_prac_match:
-            # All standard lecturers
-            first_session_rate = float(std_prac_match.group(1))
-        else:
-            return {'hours': 0.0, 'first_session_rate': None, 'repeat_share': 0.0, 'weeks': weeks}
-
-        # Calculate repeat share per lecturer
-        repeat_match = self.REPEAT_SESSION_PATTERN.search(self.detail)
-        if repeat_match:
-            repeats = int(repeat_match.group(1))
-            rep_rate = float(repeat_match.group(2))
-            repeat_share_per_week = (repeats * 2.0 * rep_rate) / lecturers
-        else:
-            repeat_share_per_week = 0.0
-
-        total_per_week = first_session_rate + repeat_share_per_week
-        total_practicals = total_per_week * weeks
-
-        return {
-            'hours': total_practicals,
-            'first_session_rate': f"{first_session_rate:.1f}h/week",
-            'repeat_share': repeat_share_per_week,
-            'weeks': weeks
-        }
-
-    def parse_assessment_setting(self) -> Dict[str, Any]:
-        """
-        Parse assessment setting information from the detail string.
-
-        Returns:
-            Dict with keys: main_hours, resit_hours, total_hours
-        """
-        match = self.ASSESSMENT_SETTING_PATTERN.search(self.detail)
-        if not match:
-            return {'main_hours': 0.0, 'resit_hours': 0.0, 'total_hours': 0.0}
-
-        return {
-            'main_hours': float(match.group(1)),
-            'resit_hours': float(match.group(2)),
-            'total_hours': float(match.group(3))
-        }
-
-    def parse_marking(self) -> Dict[str, Any]:
-        """
-        Parse marking information from the detail string.
-
-        Returns:
-            Dict with keys: initial_scripts, resit_count, per_script_hours,
-                          total_hours, initial_hours, resit_hours
-        """
-        match = self.MARKING_PATTERN.search(self.detail)
-        if not match:
-            return {
-                'initial_scripts': 0, 'resit_count': 0, 'per_script_hours': 0.0,
-                'total_hours': 0.0, 'initial_hours': 0.0, 'resit_hours': 0.0
-            }
-
-        initial_scripts = int(match.group(1))
-        resit_count = int(match.group(2))
-        per_script = float(match.group(3))
-        total_hours = float(match.group(4))
-        initial_hours = float(match.group(5))
-
-        return {
-            'initial_scripts': initial_scripts,
-            'resit_count': resit_count,
-            'per_script_hours': per_script,
-            'total_hours': total_hours,
-            'initial_hours': initial_hours,
-            'resit_hours': total_hours - initial_hours
-        }
-
-    def parse_all(self) -> DetailParseResult:
-        """
-        Parse all teaching activity components from the detail string.
-
-        Returns:
-            DetailParseResult with all parsed values
-        """
-        delivery = self.parse_delivery()
-        practicals = self.parse_practicals(lecturer_is_new=delivery['is_new_lecturer'])
-        assessment = self.parse_assessment_setting()
-        marking = self.parse_marking()
-
-        return DetailParseResult(
-            delivery_hours=delivery['hours'],
-            delivery_multiplier=delivery['multiplier'],
-            practical_hours=practicals['hours'],
-            practical_detail=self._format_practical_detail(practicals),
-            assessment_setting_hours=assessment['total_hours'],
-            assessment_setting_detail=self._format_assessment_detail(assessment),
-            marking_hours=marking['total_hours'],
-            marking_detail=self._format_marking_detail(marking)
-        )
-
-    def _format_practical_detail(self, prac: Dict[str, Any]) -> Optional[str]:
-        """Format practical session detail string."""
-        if not prac.get('first_session_rate'):
-            return None
-        if prac.get('repeat_share', 0) > 0:
-            return (
-                f"First session: {prac['first_session_rate']}; "
-                f"Repeat share: {prac['repeat_share']:.1f}h/week ({prac['weeks']}w = {prac['hours']:.1f}h)"
-            )
-        return f"{prac['first_session_rate']} for {prac['weeks']}w = {prac['hours']:.1f}h"
-
-    def _format_assessment_detail(self, ass: Dict[str, Any]) -> Optional[str]:
-        """Format assessment setting detail string."""
-        if ass['total_hours'] == 0:
-            return None
-        return f"Main paper: {ass['main_hours']:.1f}h; Resit paper: {ass['resit_hours']:.1f}h = {ass['total_hours']:.1f}h"
-
-    def _format_marking_detail(self, mark: Dict[str, Any]) -> Optional[str]:
-        """Format marking detail string."""
-        if mark['total_hours'] == 0:
-            return None
-        resit_count = mark.get('resit_count', 0)
-        per_script = mark.get('per_script_hours', 0.5)
-        initial_scripts = mark.get('initial_scripts', 0)
-
-        resit_str = f"; {resit_count} resits x {per_script:.2f}h" if resit_count > 0 else ""
-        return (
-            f"{initial_scripts} scripts x {per_script:.2f}h = {mark['initial_hours']:.1f}h initial{resit_str}"
-        )
 
 import matplotlib
 matplotlib.use("Agg")  # Non-interactive backend
