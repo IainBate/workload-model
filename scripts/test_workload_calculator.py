@@ -509,7 +509,6 @@ class TestEdgeCases:
             student_count=0,
             teachers=["John Smith"],
             lead_name=None,
-            notes="",
         )
 
         result = _calculate_teaching_workload(
