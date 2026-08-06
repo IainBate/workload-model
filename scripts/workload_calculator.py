@@ -688,6 +688,32 @@ def _calculate_admin_workload(staff_member: StaffData, nominal_hours: float) -> 
 # --- Main Calculation ---
 
 def calculate_workload(year_data: YearData) -> List[WorkloadResult]:
+    """
+    Calculate the complete workload for all staff members.
+
+    This is the main entry point for the workload calculation engine. It processes
+    all modules and staff, applying teaching multipliers, research allowances,
+    and administrative role percentages to compute total workload hours.
+
+    Args:
+        year_data: YearData object containing module data, staff data, known lecturers,
+            and metadata for the academic year
+
+    Returns:
+        List of WorkloadResult objects, one per active staff member.
+        Each result contains:
+            - name: Staff member's canonical name
+            - fte: Full-time equivalent (1.0 for full-time)
+            - total_hours: Total workload (teaching + research + admin)
+            - teaching_hours: Teaching-related activities
+            - research_hours: Research time (protected baseline + additional)
+            - admin_hours: Administrative role hours
+            - teaching/research/admin_details: Human-readable breakdown strings
+            - teaching/research/admin_breakdown: Structured hour allocations by category
+
+    The workload formula is:
+        Total = Teaching + Research (Protected + Additional) + Admin
+    """
     # Convert tuples to dicts for internal use (YearData is immutable at the container level)
     staff_dict = {s.canonical_name: s for s in year_data.staff}
 
