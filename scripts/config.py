@@ -31,9 +31,6 @@ NOMINAL_WORKING_HOURS_PER_YEAR: int = _params["global_parameters"]["nominal_work
 WEEKS_PER_YEAR: int = _params["global_parameters"]["weeks_per_year"]  # 44
 HOURS_PER_WEEK: int = _params["global_parameters"]["hours_per_week"]  # 37
 
-# Service points (university-level committee work, not from WAW.csv)
-SERVICE_POINTS_DEFAULT: float = 175.0  # Default service points for HoD and other admin staff
-
 # Baseline workloads (fixed hours)
 BASELOADS: dict[str, float] = _params["baselines_hours"]
 
