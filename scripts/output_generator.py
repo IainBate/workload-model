@@ -980,90 +980,17 @@ def generate_per_staff_reports(results: List[WorkloadResult], year_data: YearDat
 
                     detail = mod['detail']
 
-                    # Parse the detail string to extract calculation breakdowns
-                    # The detail_text format is: "New lecturer (5x): 16.7h base @ 2.5x + content dev = 83h; Practical: ...; ..."
-                    delivery_detail = ""
-                    practical_detail = ""
-                    assessment_setting_detail = ""
-                    marking_detail = ""
-
                     # Determine if this staff member is new or standard for this module
-                    # by checking known_lecturers_per_module (if available)
                     is_new_lecturer = _determine_lecturer_type(r.name, stage, known_lecturers_per_module or {})
 
-                    if detail:
-                        # Use DetailParser to extract structured data from the detail string
-                        parser = DetailParser(detail)
-
-                        # Parse all components using DetailParser
-                        parsed_delivery = parser.parse_delivery()
-                        parsed_practicals = parser.parse_practicals(lecturer_is_new=is_new_lecturer)
-                        parsed_assessment = parser.parse_assessment_setting()
-                        parsed_marking = parser.parse_marking()
-
-                        # Format delivery detail string
-                        if parsed_delivery['hours'] > 0:
-                            if parsed_delivery['is_new_lecturer']:
-                                content_dev = parsed_delivery.get('content_dev', 0.0)
-                                delivery_detail = f"Base share: {parsed_delivery.get('base_hours', 0):.1f}h @ 2.5x; Content development: {content_dev:.1f}h = {parsed_delivery['hours']:.0f}h"
-                            else:
-                                multiplier = parsed_delivery['multiplier']
-                                delivery_detail = f"{parsed_delivery['hours']:.1f}h @ Standard ({multiplier})"
-
-                        # Format practical detail string
-                        if parsed_practicals['hours'] > 0 and parsed_practicals.get('first_session_rate'):
-                            repeat_share = parsed_practicals.get('repeat_share', 0.0)
-                            weeks = parsed_practicals['weeks']
-                            prac_hours = parsed_practicals['hours']
-                            first_session_rate = parsed_practicals['first_session_rate']
-
-                            if repeat_share > 0:
-                                practical_detail = (
-                                    f"First session: {first_session_rate}; "
-                                    f"Repeat share: {repeat_share:.1f}h/week ({weeks}w = {prac_hours:.1f}h)"
-                                )
-                            else:
-                                practical_detail = f"{first_session_rate} for {weeks}w = {prac_hours:.1f}h"
-
-                        # Format assessment setting detail string
-                        if parsed_assessment['total_hours'] > 0:
-                            assessment_setting_detail = (
-                                f"Main paper: {parsed_assessment['main_hours']:.1f}h; "
-                                f"Resit paper: {parsed_assessment['resit_hours']:.1f}h = {parsed_assessment['total_hours']:.1f}h"
-                            )
-
-                        # Format marking detail string
-                        if parsed_marking['total_hours'] > 0:
-                            resit_count = parsed_marking.get('resit_count', 0)
-                            per_script = parsed_marking.get('per_script_hours', 0.5)
-                            initial_scripts = parsed_marking.get('initial_scripts', 0)
-                            initial_hours = parsed_marking['initial_hours']
-                            resit_hours = parsed_marking['resit_hours']
-
-                            marking_detail = (
-                                f"{initial_scripts} scripts x {per_script:.2f}h = {initial_hours:.1f}h initial; "
-                                f"{resit_count} resits x {per_script:.2f}h = {resit_hours:.1f}h resit"
-                            )
-
-                    # Calculate practical hours for this staff member using parsed data
-                    if parsed_practicals['hours'] > 0:
-                        prac_hours = parsed_practicals['hours']
-                    else:
-                        # Fallback to breakdown-based calculation
-                        prac_new_std_match = re.search(r'New:\s*([\d.]+)h\s*,\s*Standard:\s*([\d.]+)h', detail)
-                        total_prac_match = re.search(r'Total:\s*([\d.]+)h', detail)
-
-                        if prac_new_std_match and is_new_lecturer:
-                            prac_hours = float(prac_new_std_match.group(1))
-                        elif prac_new_std_match and not is_new_lecturer:
-                            prac_hours = float(prac_new_std_match.group(2))
-                        elif total_prac_match:
-                            prac_hours = float(total_prac_match.group(1))
-                        else:
-                            prac_hours = breakdown.get('practicals', 0) / max(len(modules_in_stage), 1)
+                    # Calculate per-module hours from structured breakdown data
+                    n_modules_in_stage = max(len(modules_in_stage), 1)
+                    delivery_per_module = breakdown.get('teaching', 0) / n_modules_in_stage
+                    practicals_per_module = breakdown.get('practicals', 0) / n_modules_in_stage
+                    assessment_setting_per_module = breakdown.get('assessment_setting', 0) / n_modules_in_stage
+                    marking_per_module = breakdown.get('marking', 0) / n_modules_in_stage
 
                     # Delivery/lectures - show hours with detailed breakdown
-                    teaching_hours_for_module = breakdown.get('teaching', 0) / max(len(modules_in_stage), 1)
                     if teaching_hours_for_module > 0:
                         lecturer_type = "New lecturer (5x)" if is_new_lecturer else "Standard (2.5x)"
                         items_html_parts.append(f"""<div class="detail-item {css_class}">
