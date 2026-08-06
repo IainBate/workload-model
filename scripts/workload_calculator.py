@@ -98,13 +98,22 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
         # This handles new modules or modules without previous year data
         known_lecturers_for_module = known_lecturers_global
 
-    # Calculate lecture multiplier per-teacher based on whether THAT teacher is new for THIS module
+    # Check if this is a new content module (for 7.5x rate when teacher is also new)
+    is_new_content_module = getattr(module, 'new_content', False)
+
+    # Calculate lecture multiplier per-teacher based on:
+    # - Whether THAT teacher is new for THIS module
+    # - Whether THIS module has new content (for combined "new lecturer AND new content" 7.5x rate)
     # New lecturers get 5x for content development + delivery
+    # New lecturers on NEW content get 7.5x (additional content dev time)
     # Existing lecturers get 2.5x for delivery only (content already developed)
     lecture_multipliers = {}
     for t in teachers:
         if t not in known_lecturers_for_module:
-            lecture_multipliers[t] = config.TEACHING_MULTIPLIERS["lecture_new_content_or_lecturer"]  # 5
+            if is_new_content_module:
+                lecture_multipliers[t] = config.TEACHING_MULTIPLIERS["lecture_new_content_and_lecturer"]  # 7.5
+            else:
+                lecture_multipliers[t] = config.TEACHING_MULTIPLIERS["lecture_new_content_or_lecturer"]  # 5
         else:
             lecture_multipliers[t] = config.TEACHING_MULTIPLIERS["lecture_standard"]  # 2.5
 
@@ -115,6 +124,7 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
     # Calculate lecture hours using the new approach:
     # 1. All lecturers get an equal "base" share at standard rate (2.5x)
     # 2. New lecturers get additional time to account for content development
+    # 3. New lecturers on NEW content get extra additional time (7.5x total)
     #
     # This reflects that existing lecturers (e.g., Mike, Andy) just deliver,
     # while new lecturers need time to develop materials in addition to delivery.
@@ -125,24 +135,31 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
 
     # Calculate per-teacher hours:
     # - Standard lecturers: base_share * standard_multiplier (just delivery)
-    # - New lecturers: base_share * standard_multiplier + content_dev_time
+    # - New lecturers on existing content: base + 2.5x content dev (5x total)
+    # - New lecturers on NEW content: base + 5x content dev (7.5x total)
     #
     # The content_dev_time represents the additional effort for new material.
-    # Since 5x vs 2.5x means 2.5x additional, we add this to their share.
     lecture_hours_with_mult = {}
     detail_parts = []
 
     for t in teachers:
         if t not in known_lecturers_for_module:
-            # New lecturer: base delivery + content development
-            # At 5x total vs standard 2.5x, the difference is 2.5x
-            # This represents time spent developing new materials
-            delivery_hours = base_lecture_share * config.TEACHING_MULTIPLIERS["lecture_standard"]
-            content_dev_hours = base_lecture_share * (config.TEACHING_MULTIPLIERS["lecture_new_content_or_lecturer"] - config.TEACHING_MULTIPLIERS["lecture_standard"])
-            total_hours = delivery_hours + content_dev_hours
+            if is_new_content_module:
+                # New lecturer on NEW content: 7.5x total
+                delivery_hours = base_lecture_share * config.TEACHING_MULTIPLIERS["lecture_standard"]
+                content_dev_hours = base_lecture_share * (config.TEACHING_MULTIPLIERS["lecture_new_content_and_lecturer"] - config.TEACHING_MULTIPLIERS["lecture_standard"])
+                total_hours = delivery_hours + content_dev_hours
 
-            lecture_hours_with_mult[t] = total_hours
-            detail_parts.append(f"New lecturer ({config.TEACHING_MULTIPLIERS['lecture_new_content_or_lecturer']}x): {base_lecture_share:.1f}h base @ 2.5x = {delivery_hours:.1f}h + {content_dev_hours:.1f}h content dev")
+                lecture_hours_with_mult[t] = total_hours
+                detail_parts.append(f"New lecturer + new content ({config.TEACHING_MULTIPLIERS['lecture_new_content_and_lecturer']}x): {base_lecture_share:.1f}h base @ 2.5x = {delivery_hours:.1f}h + {content_dev_hours:.1f}h content dev")
+            else:
+                # New lecturer on existing content: 5x total
+                delivery_hours = base_lecture_share * config.TEACHING_MULTIPLIERS["lecture_standard"]
+                content_dev_hours = base_lecture_share * (config.TEACHING_MULTIPLIERS["lecture_new_content_or_lecturer"] - config.TEACHING_MULTIPLIERS["lecture_standard"])
+                total_hours = delivery_hours + content_dev_hours
+
+                lecture_hours_with_mult[t] = total_hours
+                detail_parts.append(f"New lecturer ({config.TEACHING_MULTIPLIERS['lecture_new_content_or_lecturer']}x): {base_lecture_share:.1f}h base @ 2.5x = {delivery_hours:.1f}h + {content_dev_hours:.1f}h content dev")
         else:
             # Standard lecturer: just delivery at standard rate
             total_hours = base_lecture_share * config.TEACHING_MULTIPLIERS["lecture_standard"]
