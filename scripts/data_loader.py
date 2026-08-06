@@ -274,7 +274,17 @@ def _detect_year_from_filename(filename: str) -> str:
     return base
 
 
-def _parse_wtw_csv(filepath: str, known_lecturers: Set[str] = None) -> List[ModuleData]:
+def _load_module_mapping() -> Dict[str, Any]:
+    """Load module mapping JSON to identify new modules for new_content detection."""
+    path = PROJECT_ROOT / "data" / "module_mapping.json"
+    if not path.exists():
+        return {}
+    with open(path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def _parse_wtw_csv(filepath: str, known_lecturers: Set[str] = None,
+                   new_modules: Set[str] = None) -> List[ModuleData]:
     """
     Parse a WTW CSV file into ModuleData objects.
     Handles both 2025-6 and 2026-7 formats.
