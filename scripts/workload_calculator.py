@@ -906,11 +906,7 @@ def calculate_workload(year_data: YearData) -> List[WorkloadResult]:
                 f"Projects: {teacher_project_load} projects x {proj_level} ({proj_mult}h) = {project_hours:.1f}h"
             )
 
-        # General baseline (outside teaching/research/admin)
-        # Engagement and personal dev are per staff member, not shared
-        engagement_baseline = config.BASELOADS.get("engagement", 100)
-        personal_dev = config.BASELOADS["personal_development"] * fte_value
-
+        # General baseline is handled within _calculate_admin_workload via service_points
         # Protected research baseline (10% of nominal hours) - included in all staff totals
         protected_research = config.PROTECTED_RESEARCH_BASELINE * fte_value
 
