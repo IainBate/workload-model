@@ -441,10 +441,22 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
 
     # Assessment marking (split equally among teachers)
     # Assume 20% of students do resits (additional marking workload)
+    # Select rates based on module stage: MSc (3+) uses automated by default, UG uses manual
+    # Can be overridden via module.marking_type field
     marking_hours_per_teacher = 0.0
     marking_details = []
     if module.student_count > 0:
-        per_script = config.MARKING_MANUAL_MSC
+        # Determine marking type and rates
+        is_automated = getattr(module, 'marking_type', 'manual') == 'automated'
+        is_msc = module.stage >= 3  # Stage 3+ typically MSc level
+
+        if is_automated:
+            per_script = config.MARKING_AUTO_MSC if is_msc else config.MARKING_AUTO_UG
+            admin_flat = config.MARKING_AUTO_ADMIN
+        else:
+            per_script = config.MARKING_MANUAL_MSC if is_msc else config.MARKING_MANUAL_UG
+            admin_flat = config.MARKING_MANUAL_ADMIN
+
         initial_students = module.student_count
         resit_proportion = 0.20  # 20% of students do resits
 
@@ -461,7 +473,7 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
         resit_hours = resit_scripts * per_script
 
         marking_details.append(
-            f"{initial_scripts} scripts + {resit_scripts} resits x {per_script}h = "
+            f"{initial_scripts} scripts + {resit_scripts} resits x {per_script:.3f}h = "
             f"{total_scripts * per_script:.1f}h total ({initial_hours:.1f}h initial + {resit_hours:.1f}h resit), "
             f"{marking_hours_per_teacher:.1f}h per teacher"
         )
