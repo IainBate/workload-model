@@ -548,7 +548,8 @@ class TestEdgeCases:
         )
 
         total, breakdown, detail, grant_titles = _calculate_research_workload(staff)
-        assert total == config.PROTECTED_RESEARCH_BASELINE
+        # _calculate_research_workload does not include protected baseline
+        assert total == 0
 
     def test_multiple_teachers_shared_hours(self):
         """Test that hours are shared correctly among multiple teachers."""
