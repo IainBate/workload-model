@@ -713,6 +713,7 @@ def _calculate_admin_workload(staff_member: StaffData, nominal_hours: float) -> 
     # This includes engagement (email/meetings) and personal development
     # Based on BASELOADS: engagement=100h + personal_development=75h = 175h total
     # Scale by FTE to handle part-time staff correctly
+    fte_value = nominal_hours / config.NOMINAL_WORKING_HOURS_PER_YEAR if nominal_hours > 0 else 1.0
     engagement_hours = config.BASELOADS.get('engagement', 100.0) * fte_value
     personal_dev_hours = config.BASELOADS.get('personal_development', 75.0) * fte_value
     service_hours = engagement_hours + personal_dev_hours
