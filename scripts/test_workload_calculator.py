@@ -79,7 +79,6 @@ class TestTeachingWorkload:
             student_count=100,
             teachers=["New Lecturer"],
             lead_name=None,
-            notes="",
         )
 
         teachers = ["New Lecturer"]
