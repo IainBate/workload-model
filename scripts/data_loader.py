@@ -238,6 +238,9 @@ def normalize_name(name: str, reverse_lookup: Dict[str, str],
     if unknown_callback:
         if unknown_callback(name, None):
             return name
+        else:
+            # User said no - skip this unknown staff member
+            return None
     # Non-interactive mode: return the raw name (will be flagged later)
     # Also skip obvious non-person entries
     if name.strip().lower() in _NON_PERSON_ENTRIES:
