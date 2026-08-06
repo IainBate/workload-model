@@ -30,9 +30,9 @@ class SupervisionAllocation:
     Note: While frozen=True prevents reassignment, the Dict values are still mutable
     references. Callers should treat these as read-only.
     """
-    pastoral_students: Dict[str, int]      # canonical_name -> count
-    project_loads: Dict[str, float]        # canonical_name -> project load (ceiling'd)
-    phd_supervisions: Dict[str, int]       # canonical_name -> count
+    pastoral_students: Dict[str, int] = field(default_factory=dict)
+    project_loads: Dict[str, float] = field(default_factory=dict)
+    phd_supervisions: Dict[str, int] = field(default_factory=dict)
 
 
 @dataclass
