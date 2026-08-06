@@ -1050,6 +1050,16 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
         if validation_info.get('has_warnings'):
             assumptions.append("Data contains warnings - values may be outside typical ranges")
 
+        # Track default student count assumption (if module had 0 students)
+        for detail in staff_teaching.get(canonical_name, {}).get("details", []):
+            if "student" in detail.lower() or "scripts" in detail.lower():
+                if "0 scripts" in detail:
+                    assumptions.append(Assumption(
+                        category="student_count",
+                        description="Module had 0 students - marking not calculated",
+                        module_code=detail.split(":")[0].strip() if ":" in detail else None
+                    ).description)
+
         result = WorkloadResult(
             name=canonical_name,
             fte=staff.fte,
