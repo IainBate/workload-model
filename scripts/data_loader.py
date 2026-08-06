@@ -1143,7 +1143,7 @@ def load_all_data(data_dir: str = None,
         saint_modules = []
         for saint_name, modules_list in saint_module_map.items():
             if raw_name.upper() == saint_name.upper() or \
-               canonical in saint_name or \
+               saint_name.lower() in canonical.lower() or \
                saint_name.lower() in raw_name.lower():
                 saint_modules.extend(modules_list)
 
