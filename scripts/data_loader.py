@@ -42,29 +42,29 @@ class ModuleData:
     Fields are mutable to allow enrichment during loading (student counts, assessment counts).
     After load_all_data() completes, the data should be treated as immutable.
     """
-    name: str
-    codes: Tuple[str, ...]  # Immutable tuple for consistency
-    stage: int
-    semester: int
-    credits: int
-    cohort: str
-    lead_name: str
-    teachers: Tuple[str, ...]  # Immutable tuple for consistency
-    extra_markers: Tuple[str, ...]  # Immutable tuple for consistency
-    expert_checker: str
-    general_checker_required: bool
-    general_checker: str
-    practicals: int  # Number of practical sessions
-    has_h_m_variants: bool
-    contact_hours: float  # Estimated contact hours (from credits)
+    name: str = ""
+    codes: Tuple[str, ...] = field(default_factory=tuple)
+    stage: int = 0
+    semester: int = 1
+    credits: int = 20
+    cohort: str = "standard"
+    lead_name: str = ""
+    teachers: Tuple[str, ...] = field(default_factory=tuple)
+    extra_markers: Tuple[str, ...] = field(default_factory=tuple)
+    expert_checker: str = ""
+    general_checker_required: bool = False
+    general_checker: str = ""
+    practicals: int = 0
+    has_h_m_variants: bool = False
+    contact_hours: float = 0.0  # Estimated contact hours (from credits)
     practical_contact_hours: float = 0.0  # Actual contact hours per practical session (from CSV)
     practical_groups: int = 0  # Number of parallel groups for practicals
     practical_weeks: Tuple[int, ...] = field(default_factory=tuple)  # Weeks when practicals occur (immutable)
     student_count: int = 0  # From CS Module Numbers.csv - set during loading
     assessment_count: int = 1  # From CS Module Assessment Numbers.csv - set during loading
     source_year: str = ""  # e.g., "2026-7"
-    marking_type: str = field(default="manual")  # "automated" or "manual"
-    new_content: bool = field(default=False)  # True if this is new content for the teacher
+    marking_type: str = "manual"  # "automated" or "manual"
+    new_content: bool = False  # True if this is new content for the teacher
 
 
 @dataclass(frozen=True)
