@@ -895,6 +895,24 @@ def _determine_lecturer_type(
 
 def generate_per_staff_reports(results: List[WorkloadResult], year_data: YearData,
                                 output_dir: str = None):
+    """
+    Generate individual detailed workload reports for each staff member.
+
+    Creates an HTML report for each staff member showing:
+    1. Staff header with FTE, nominal hours, and total workload
+    2. Teaching activities breakdown (modules, practicals, assessment, supervision)
+    3. Research activities breakdown (protected baseline, grants, PhD supervision)
+    4. Admin activities breakdown (departmental roles, engagement, personal dev)
+    5. Calculation breakdown with formula explanation
+
+    Args:
+        results: List of WorkloadResult objects from calculate_workload()
+        year_data: YearData object containing module and staff metadata
+        output_dir: Output directory for reports (default: OUTPUT_DIR)
+
+    Output Files:
+        - Staff Reports/*.html: Individual HTML report per staff member
+    """
     if output_dir is None:
         output_dir = OUTPUT_DIR
 
