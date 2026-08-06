@@ -502,6 +502,18 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
     # Assume 20% of students do resits (additional marking workload)
     # Select rates based on module stage: MSc (3+) uses automated by default, UG uses manual
     # Can be overridden via module.marking_type field
+
+    # Track assumption about resit proportion if not explicitly set
+    assumptions_list = supervision.get('assumptions', [])
+    resit_proportion = 0.20  # Default assumption: 20% of students do resits
+    if "default_resit_proportion" not in [a.category for a in assumptions_list]:
+        assumptions_list.append(Assumption(
+            category="resit_proportion",
+            description="Default resit proportion assumed (20%)",
+            module_code=module.codes[0] if module.codes else None,
+            default_value=0.20
+        ))
+
     marking_hours_per_teacher = 0.0
     marking_details = []
     if module.student_count > 0:
