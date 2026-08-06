@@ -12,6 +12,12 @@ from typing import List, Dict
 
 import config
 from data_loader import YearData, ModuleData, StaffData, WorkloadResult, SupervisionAllocation, allocate_supervision, normalize_name
+from validation import (
+    validate_year_data,
+    run_validation_pipeline,
+    ValidationResult,
+    ValidationLevel
+)
 
 
 # --- Constants ---
