@@ -1541,7 +1541,20 @@ def generate_per_staff_reports(results: List[WorkloadResult], year_data: YearDat
 
 def generate_all_outputs(results: List[WorkloadResult], year_data: YearData,
                          output_dir: str = None):
-    """Generate all output artifacts."""
+    """
+    Generate all output artifacts for the workload model results.
+
+    Calls each output generator in sequence:
+    - CSV file with per-staff workload data
+    - Summary and detailed boxplot PNG charts
+    - Excel workbook with formulas
+    - HTML report with embedded charts
+
+    Args:
+        results: List of WorkloadResult objects from calculate_workload()
+        year_data: YearData object containing metadata for the academic year
+        output_dir: Output directory for all artifacts (default: OUTPUT_DIR)
+    """
     if output_dir is None:
         output_dir = OUTPUT_DIR
 
