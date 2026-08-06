@@ -70,31 +70,31 @@ class ModuleData:
 @dataclass(frozen=True)
 class StaffData:
     """Complete data for a single staff member."""
-    canonical_name: str
-    aliases: Tuple[str, ...]  # Immutable tuple for frozen dataclass
-    fte: float  # From Part time.csv
-    employment_start: int
-    active: bool
-    category: str  # "ART" or "T and S"
-    project_load: float
-    pastoral_load: float
-    adjusted_project_load: float
-    adjusted_pastoral_load: float
-    ecr_year: str
-    ecr_value: float
-    citizenship_level: int
-    research_grant_income: str
-    research_grant_income_value: float
-    citizenship_value: float
-    initial_fractional_project_load: float
-    initial_fractional_pastoral_load: float
-    notes: str
-    roles: Tuple[str, ...]  # Immutable tuple for frozen dataclass
-    phd_supervisions: int  # Sole supervisors from PhD Supervision Data.csv
-    phd_co_supervisions: int  # Co-supervisors from PhD Supervision Data.csv
-    phd_assessor_count: int  # TAP assessor instances from PhD Supervision Data.csv
-    research_projects: Tuple[dict, ...]  # Immutable tuple for frozen dataclass
-    saint_modules: Tuple[str, ...]  # SAINTS modules they teach (immutable)
+    canonical_name: str = ""
+    aliases: Tuple[str, ...] = field(default_factory=tuple)
+    fte: float = 1.0
+    employment_start: int = 2020
+    active: bool = True
+    category: str = "T and S"
+    project_load: float = 0.0
+    pastoral_load: float = 0.0
+    adjusted_project_load: float = 0.0
+    adjusted_pastoral_load: float = 0.0
+    ecr_year: str = ""
+    ecr_value: float = 0.0
+    citizenship_level: int = 1
+    research_grant_income: str = "None"
+    research_grant_income_value: float = 0.0
+    citizenship_value: float = 0.0
+    initial_fractional_project_load: float = 0.0
+    initial_fractional_pastoral_load: float = 0.0
+    notes: str = ""
+    roles: Tuple[str, ...] = field(default_factory=tuple)
+    phd_supervisions: int = 0
+    phd_co_supervisions: int = 0
+    phd_assessor_count: int = 0
+    research_projects: Tuple[dict, ...] = field(default_factory=tuple)
+    saint_modules: Tuple[str, ...] = field(default_factory=tuple)
     unallocated_students: int = 0  # Remaining students after allocation
     pastoral_students: int = 0  # Number of pastoral students assigned
 
