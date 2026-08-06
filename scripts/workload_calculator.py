@@ -6,9 +6,22 @@ Calculates workload per staff member across three categories:
 - Teaching: contact hours * multipliers, assessment setting/marking, supervision
 - Research: PhD supervision, grant work, project marking
 - Administration: departmental roles as % of nominal hours
+
+Assumptions Tracking
+--------------------
+The calculator tracks assumptions made during calculation:
+- Default student counts when actual count is unknown (default: 100)
+- Default contact hours per credit (default: 1.0)
+- Assessment marking type (defaults to manual if not specified)
+- Pastoral supervision defaults (20 students/teacher)
+- Project supervision defaults (10 students/teacher)
+
+Use workload_calculator.calculate_workload(year_data, track_assumptions=True)
+to enable detailed assumption tracking.
 """
 
 from typing import List, Dict
+from dataclasses import dataclass
 
 import config
 from data_loader import YearData, ModuleData, StaffData, WorkloadResult, SupervisionAllocation, allocate_supervision, normalize_name
@@ -18,6 +31,29 @@ from validation import (
     ValidationResult,
     ValidationLevel
 )
+
+
+# --- Assumptions Data Structure ---
+
+@dataclass(frozen=True)
+class Assumption:
+    """
+    Records an assumption made during workload calculation.
+
+    Args:
+        category: Type of assumption (student_count, marking_type, supervision, etc.)
+        description: Human-readable description of what was assumed
+        staff_name: Optional staff member affected by this assumption
+        module_code: Optional module affected by this assumption
+        default_value: The value that was used as fallback
+        actual_value: The actual value found (if different from default)
+    """
+    category: str
+    description: str
+    staff_name: str = None
+    module_code: str = None
+    default_value: float = None
+    actual_value: float = None
 
 
 # --- Constants ---
