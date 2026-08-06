@@ -428,6 +428,8 @@ def _parse_wtw_csv(filepath: str, known_lecturers: Set[str] = None,
                 student_count=config.DEFAULT_STUDENT_COUNT,
                 assessment_count=1,
                 source_year=year_label,
+                marking_type="manual",
+                new_content=name in (new_modules or set()),
             )
             modules.append(module)
 
