@@ -621,7 +621,7 @@ def _calculate_research_workload(staff_member: StaffData) -> tuple:
     for proj in staff_member.research_projects:
         fte_str = proj.get("fte", "0%")
         try:
-            fte = int(fte_str.replace("%", "")) / 100.0
+            fte = float(fte_str.replace("%", "")) / 100.0
             grant_hours = fte * config.NOMINAL_WORKING_HOURS_PER_YEAR
             total += grant_hours
             project_id = proj['project_id']
@@ -632,7 +632,10 @@ def _calculate_research_workload(staff_member: StaffData) -> tuple:
             grant_titles[project_id] = display_name
             details.append(f"Grant {display_name}: {fte_str} of {config.NOMINAL_WORKING_HOURS_PER_YEAR}h = {grant_hours:.1f}h")
         except ValueError:
-            pass
+            # Record the invalid FTE value but don't fail silently
+            if "assumptions" not in locals():
+                assumptions = []
+            assumptions.append(f"Invalid FTE value for grant: '{fte_str}'")
 
     return total, breakdown, "; ".join(details) if details else "No research activities recorded", grant_titles
 
