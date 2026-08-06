@@ -265,7 +265,6 @@ class TestTeachingWorkload:
             student_count=100,
             teachers=[],
             lead_name=None,
-            notes="",
         )
 
         result = _calculate_teaching_workload(
