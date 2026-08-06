@@ -1025,85 +1025,31 @@ def generate_per_staff_reports(results: List[WorkloadResult], year_data: YearDat
                             <span class="detail-hours">{first_session_rate}x first session, {rep_rate}x repeats</span>
                         </div>""")
 
-                    # Assessment setting - parse detail string for main/resit breakdown with detailed calculation
-                    ass_match = re.search(r'(\d+)\s+assessment', detail, re.IGNORECASE)
-                    if ass_match:
-                        ass_hours = breakdown.get('assessment_setting', 0) / max(len(modules_in_stage), 1)
+                    # Assessment setting - use structured breakdown data directly
+                    if assessment_setting_per_module > 0:
+                        items_html_parts.append(f"""<div class="detail-item {css_class}">
+                            <span class="detail-name">Assessment Setting</span>
+                            <span class="detail-hours">{assessment_setting_per_module:.1f}h</span>
+                            <span class="detail-activity" style="background:#e8f5e9;color:#2e7d32;">Teaching</span>
+                        </div>""")
+                        # Show calculation detail
+                        items_html_parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+                            <span class="detail-name" style="color:#333;">Calculation</span>
+                            <span class="detail-hours">{assessment_setting_per_module:.1f}h total (main + resit)</span>
+                        </div>""")
 
-                        # Check if we have parsed assessment setting detail from the detail string
-                        if assessment_setting_detail:
-                            total_ass = ass_hours
-                            items_html_parts.append(f"""<div class="detail-item {css_class}">
-                                <span class="detail-name">Assessment Setting</span>
-                                <span class="detail-hours">{total_ass:.1f}h</span>
-                                <span class="detail-activity" style="background:#e8f5e9;color:#2e7d32;">Teaching</span>
-                            </div>""")
-                            items_html_parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
-                                <span class="detail-name" style="color:#333;">Calculation</span>
-                                <span class="detail-hours">{assessment_setting_detail}</span>
-                            </div>""")
-                        else:
-                            # Check if detail contains main/resit split info
-                            main_resit_match = re.search(r'\(([\d.]+)h\s+main\s+paper.*?([\d.]+)h\s+resit', detail, re.IGNORECASE)
-                            if main_resit_match:
-                                main_hours = float(main_resit_match.group(1)) / max(len(modules_in_stage), 1)
-                                resit_hours = float(main_resit_match.group(2)) / max(len(modules_in_stage), 1)
-                                total_setting = main_hours + resit_hours
-                                items_html_parts.append(f"""<div class="detail-item {css_class}">
-                                    <span class="detail-name">Assessment Setting</span>
-                                    <span class="detail-hours">{main_hours:.1f}h main + {resit_hours:.1f}h resit = {total_setting:.1f}h</span>
-                                    <span class="detail-activity" style="background:#e8f5e9;color:#2e7d32;">Teaching</span>
-                                </div>""")
-                            else:
-                                items_html_parts.append(f"""<div class="detail-item {css_class}">
-                                    <span class="detail-name">Assessment Setting</span>
-                                    <span class="detail-hours">{ass_hours:.1f}h</span>
-                                    <span class="detail-activity" style="background:#e8f5e9;color:#2e7d32;">Teaching</span>
-                                </div>""")
-
-                    # Marking - parse detail string for resit breakdown with detailed calculation
-                    mark_match = re.search(r'(\d+)\s+script', detail, re.IGNORECASE)
-                    if mark_match:
-                        mark_hours = breakdown.get('marking', 0) / max(len(modules_in_stage), 1)
-
-                        # Check if we have parsed marking detail from the detail string
-                        if marking_detail:
-                            total_marking = mark_hours
-                            items_html_parts.append(f"""<div class="detail-item {css_class}">
-                                <span class="detail-name">Assessment Marking</span>
-                                <span class="detail-hours">{total_marking:.1f}h</span>
-                                <span class="detail-activity" style="background:#e8f5e9;color:#2e7d32;">Teaching</span>
-                            </div>""")
-                            items_html_parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
-                                <span class="detail-name" style="color:#333;">Calculation</span>
-                                <span class="detail-hours">{marking_detail}</span>
-                            </div>""")
-                        else:
-                            # Check if detail contains resit info (format: "scripts + X resits x Yh = Z total...")
-                            resit_match = re.search(r'(\d+)\s+scripts\s*\+\s*(\d+)\s+resits\s+x\s+([\d.]+)h\s*=\s*([\d.]+)h\s+total\s*\(([\d.]+)h\s+initial', detail, re.IGNORECASE)
-                            if resit_match:
-                                initial_scripts = int(resit_match.group(1))
-                                resit_count = int(resit_match.group(2))
-                                per_script = float(resit_match.group(3))
-                                total_hours = float(resit_match.group(4))
-                                initial_hours = float(resit_match.group(5))
-
-                                num_modules = max(len(modules_in_stage), 1)
-                                resit_hours_per_teacher = (total_hours - initial_hours) / num_modules
-                                initial_per_teacher = initial_hours / num_modules
-                                total_marking_per_teacher = (total_hours) / num_modules
-
-                                items_html_parts.append(f"""<div class="detail-item {css_class}">
-                                    <span class="detail-name">Assessment Marking</span>
-                                    <span class="detail-hours">{initial_per_teacher:.1f}h initial + {resit_hours_per_teacher:.1f}h resit = {total_marking_per_teacher:.1f}h</span>
-                                    <span class="detail-activity" style="background:#e8f5e9;color:#2e7d32;">Teaching</span>
-                                </div>""")
-                            else:
-                                items_html_parts.append(f"""<div class="detail-item {css_class}">
-                                    <span class="detail-name">Assessment Marking</span>
-                                    <span class="detail-hours">{mark_hours:.1f}h</span>
-                                    <span class="detail-activity" style="background:#e8f5e9;color:#2e7d32;">Teaching</span>
-                                </div>""")
+                    # Marking - use structured breakdown data directly
+                    if marking_per_module > 0:
+                        items_html_parts.append(f"""<div class="detail-item {css_class}">
+                            <span class="detail-name">Assessment Marking</span>
+                            <span class="detail-hours">{marking_per_module:.1f}h</span>
+                            <span class="detail-activity" style="background:#e8f5e9;color:#2e7d32;">Teaching</span>
+                        </div>""")
+                        # Show calculation detail
+                        items_html_parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+                            <span class="detail-name" style="color:#333;">Calculation</span>
+                            <span class="detail-hours">{marking_per_module:.1f}h total (initial + resit)</span>
+                        </div>""")
 
                     items_html_parts.append("</div>")  # Close module div
 
