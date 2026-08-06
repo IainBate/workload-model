@@ -64,6 +64,7 @@ class ModuleData:
     assessment_count: int = 1  # From CS Module Assessment Numbers.csv - set during loading
     source_year: str = ""  # e.g., "2026-7"
     marking_type: str = field(default="manual")  # "automated" or "manual"
+    new_content: bool = field(default=False)  # True if this is new content for the teacher
 
 
 @dataclass(frozen=True)
