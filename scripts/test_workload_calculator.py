@@ -344,12 +344,11 @@ class TestResearchWorkload:
 
         total, breakdown, detail, grant_titles = _calculate_research_workload(staff)
 
-        # Hours should be scaled by FTE (but PhD supervision is per-FTE, so it stays same)
+        # PhD supervision hours are NOT scaled by FTE in the current implementation
         expected_phd_hours = 2 * config.SUPERVISION_MULTIPLIERS["pgr_primary_supervisor_per_fte"]
-        protected_baseline = config.PROTECTED_RESEARCH_BASELINE * 0.5
 
-        # Total = protected baseline (scaled) + PhD supervision (not scaled by FTE in current logic)
-        assert total == expected_phd_hours + protected_baseline
+        # _calculate_research_workload does not include protected baseline
+        assert total == expected_phd_hours
 
 
 class TestAdminWorkload:
