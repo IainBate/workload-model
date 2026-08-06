@@ -991,31 +991,39 @@ def generate_per_staff_reports(results: List[WorkloadResult], year_data: YearDat
                     marking_per_module = breakdown.get('marking', 0) / n_modules_in_stage
 
                     # Delivery/lectures - show hours with detailed breakdown
-                    if teaching_hours_for_module > 0:
+                    if delivery_per_module > 0:
                         lecturer_type = "New lecturer (5x)" if is_new_lecturer else "Standard (2.5x)"
                         items_html_parts.append(f"""<div class="detail-item {css_class}">
                             <span class="detail-name">Delivery (Lectures)</span>
-                            <span class="detail-hours">{teaching_hours_for_module:.1f}h @ {lecturer_type}</span>
+                            <span class="detail-hours">{delivery_per_module:.1f}h @ {lecturer_type}</span>
                             <span class="detail-activity" style="background:#e3f2fd;color:#1565c0;">Teaching</span>
                         </div>""")
-                        if delivery_detail:
+                        if is_new_lecturer:
+                            delivery_base = delivery_per_module / 5.0
+                            content_dev = delivery_per_module - delivery_base
                             items_html_parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
                                 <span class="detail-name" style="color:#333;">Calculation</span>
-                                <span class="detail-hours">{delivery_detail}</span>
+                                <span class="detail-hours">{delivery_base:.1f}h base @ 2.5x + {content_dev:.1f}h content dev = {delivery_per_module:.0f}h</span>
+                            </div>""")
+                        else:
+                            items_html_parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+                                <span class="detail-name" style="color:#333;">Calculation</span>
+                                <span class="detail-hours">{delivery_per_module:.1f}h @ Standard (2.5x)</span>
                             </div>""")
 
                     # Practicals - show the per-teacher practical hours with detailed breakdown
-                    if prac_hours > 0:
+                    if practicals_per_module > 0:
                         items_html_parts.append(f"""<div class="detail-item {css_class}">
                             <span class="detail-name">Practical Sessions</span>
-                            <span class="detail-hours">{prac_hours:.1f}h</span>
+                            <span class="detail-hours">{practicals_per_module:.1f}h</span>
                             <span class="detail-activity" style="background:#fff3e0;color:#ef6c00;">Teaching</span>
                         </div>""")
-                        if practical_detail:
-                            items_html_parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
-                                <span class="detail-name" style="color:#333;">Calculation</span>
-                                <span class="detail-hours">{practical_detail}</span>
-                            </div>""")
+                        first_session_rate = config.TEACHING_MULTIPLIERS.get('lecture_new_content_or_lecturer', 5.0)
+                        rep_rate = config.REPETITION_MULTIPLIER
+                        items_html_parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+                            <span class="detail-name" style="color:#333;">Calculation</span>
+                            <span class="detail-hours">{first_session_rate}x first session, {rep_rate}x repeats</span>
+                        </div>""")
 
                     # Assessment setting - parse detail string for main/resit breakdown with detailed calculation
                     ass_match = re.search(r'(\d+)\s+assessment', detail, re.IGNORECASE)
