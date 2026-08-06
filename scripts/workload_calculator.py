@@ -997,6 +997,11 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
         if not staff.roles:
             missing_data.append("No administrative roles assigned")
 
+        # Add assumptions from validation
+        validation_info = getattr(year_data, 'validation_info', {})
+        if validation_info.get('has_warnings'):
+            assumptions.append("Data contains warnings - values may be outside typical ranges")
+
         result = WorkloadResult(
             name=canonical_name,
             fte=staff.fte,
