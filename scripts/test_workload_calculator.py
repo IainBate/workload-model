@@ -117,7 +117,6 @@ class TestTeachingWorkload:
             student_count=100,
             teachers=["New Content Lecturer"],
             lead_name=None,
-            notes="",
         )
         # Mark as new content
         module.new_content = True
