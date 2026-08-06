@@ -990,8 +990,21 @@ def load_all_data(data_dir: str = None,
     mappings = _load_name_lookup()
     reverse_lookup = _build_reverse_lookup(mappings)
 
+    # Load module mapping to identify new modules for new_content detection
+    module_mapping = _load_module_mapping()
+
+    # Get new_modules set from the mapping
+    new_modules: Set[str] = set()
+    if "new_modules" in module_mapping:
+        new_modules = set(module_mapping["new_modules"].keys())
+
     # Load current year WTW (data_dir is passed to load_wtw_files)
     modules, year_label = load_wtw_files(data_dir)
+
+    # Mark new content on modules that appear in new_modules
+    for module in modules:
+        if module.name in new_modules:
+            module.new_content = True
 
     # Load previous year WTW for known lecturers (data_dir is passed to load_previous_wtw)
     prev_modules = load_previous_wtw(data_dir)
