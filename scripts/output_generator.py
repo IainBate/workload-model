@@ -386,9 +386,10 @@ def _create_boxplot(results: List[WorkloadResult], title: str, components: List[
     # Add expected workload lines
     fte_values = [r.fte for r in results]
     for comp, label, color in zip(components, component_labels, colors):
-        expected = [r.nominal_hours * getattr(config.CONTRACT_NORMATIVE_DIVISIONS.get("TR_staff", {}),
-                                               comp.lower().replace(" hours", "").replace(" ", "_"), 0)
-                    for r in results]
+        # Map component name to key for CONTRACT_NORMATIVE_DIVISIONS
+        comp_key = comp.lower().replace(" hours", "").replace(" ", "_")
+        expected_division = config.CONTRACT_NORMATIVE_DIVISIONS.get("TR_staff", {}).get(comp_key, 0)
+        expected = [r.nominal_hours * expected_division for r in results]
 
     ax.set_xlabel("Hours")
     ax.set_ylabel("Staff")
