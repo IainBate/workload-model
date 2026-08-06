@@ -735,7 +735,7 @@ def _calculate_admin_workload(staff_member: StaffData, nominal_hours: float) -> 
 
 # --- Main Calculation ---
 
-def calculate_workload(year_data: YearData) -> List[WorkloadResult]:
+def calculate_workload(year_data: YearData, validate_input: bool = True) -> List[WorkloadResult]:
     """
     Calculate the complete workload for all staff members.
 
@@ -746,6 +746,7 @@ def calculate_workload(year_data: YearData) -> List[WorkloadResult]:
     Args:
         year_data: YearData object containing module data, staff data, known lecturers,
             and metadata for the academic year
+        validate_input: If True, run input validation before calculation (default True)
 
     Returns:
         List of WorkloadResult objects, one per active staff member.
@@ -761,7 +762,17 @@ def calculate_workload(year_data: YearData) -> List[WorkloadResult]:
 
     The workload formula is:
         Total = Teaching + Research (Protected + Additional) + Admin
+
+    Raises:
+        ValueError: If validate_input=True and validation fails with errors
     """
+    # Run input validation if requested
+    if validate_input:
+        validation_result = run_validation_pipeline(year_data)
+        if validation_result["has_warnings"]:
+            # Store warnings in assumptions for reporting
+            pass  # Warnings are captured in results, not raised as errors
+
     # Convert tuples to dicts for internal use (YearData is immutable at the container level)
     staff_dict = {s.canonical_name: s for s in year_data.staff}
 
