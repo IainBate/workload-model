@@ -14,10 +14,16 @@ baselines_hours:
 
   # Teaching-related baselines (project_setting is now per-staff based on project_load.csv)
   min_admin_teaching: 30   # Minimum teaching load for admin staff
+  teaching_weeks_per_semester: 11  # Number of teaching weeks per semester
 
 # Protected research time baseline (10% of nominal hours = 164.2h)
 # This is the minimum protected research time per year
 protected_research_baseline: 164.2
+
+# ART staff expected workload split (as percentage of nominal hours)
+art_staff_split:
+  teaching: 0.40
+  research: 0.40
 
 # Research allowances (additional to protected baseline)
 research_allowances:
@@ -40,6 +46,9 @@ contract_normative_divisions:
     protected_baseline: 0.15
 
 task_multipliers:
+  # Project supervision settings (per project student)
+  project_setting_allowance: 6.0  # Additional hours allowance per project student
+
   assessment_setting_hours_per_paper:
     automated_marked:
       standard: 25
@@ -77,9 +86,9 @@ task_multipliers:
     repetition_multiplier: 1.5
 
   supervision_hours_per_student:
-    pastoral: 6
-    ug_project: 22
-    msc_project: 40
+    pastoral: 3
+    ug_project: 16
+    msc_project: 24
     project_marking_first_or_second: 2
     pgr_primary_supervisor_per_fte: 80
     pgr_co_supervisor_per_fte: 48

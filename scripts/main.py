@@ -69,8 +69,10 @@ def print_data_summary(year_data, results=None):
         student_info = f"{m.student_count} students" if m.student_count > 0 else "no student data"
         print(f"  - {m.name} ({m.codes[0]}) [{m.credits}cr, Stage {m.stage}] - {student_info}")
 
+    # Convert staff tuple to dict for iteration
+    staff_dict = {s.canonical_name: s for s in year_data.staff}
     print(f"\nStaff in roster: {len(year_data.staff)}")
-    for name, staff in sorted(year_data.staff.items()):
+    for name, staff in sorted(staff_dict.items()):
         fte_str = f"FTE {staff.fte}" if staff.fte else "FTE unknown"
         cat_str = f" ({staff.category})" if staff.category else ""
         print(f"  - {name} [{fte_str}{cat_str}]")

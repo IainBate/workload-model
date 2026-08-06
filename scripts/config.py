@@ -40,8 +40,16 @@ BASELOADS: dict[str, float] = _params["baselines_hours"]
 # Protected research time baseline (10% of nominal hours = 164.2h)
 PROTECTED_RESEARCH_BASELINE: float = _params.get("protected_research_baseline", 164.2)
 
+# ART staff expected workload split (as percentage of nominal hours)
+ART_STAFF_SPLIT: dict[str, float] = _params.get("art_staff_split", {"teaching": 0.40, "research": 0.40})
+ART_TEACHING_PERCENTAGE: float = ART_STAFF_SPLIT.get("teaching", 0.40)
+ART_RESEARCH_PERCENTAGE: float = ART_STAFF_SPLIT.get("research", 0.40)
+
 # Minimum teaching load for administrative staff who don't teach modules
 MIN_ADMIN_TEACHING_HOURS: float = BASELOADS.get("min_admin_teaching", 30.0)
+
+# Teaching weeks per semester (for practical schedule calculations)
+TEACHING_WEEKS_PER_SEMESTER: int = BASELOADS.get("teaching_weeks_per_semester", 11)
 
 # Research allowances
 RESEARCH_ALLOWANCES: dict[str, float] = _params.get("research_allowances", {})
@@ -89,9 +97,9 @@ TEACHING_DROP_IN = TEACHING_MULTIPLIERS["drop_in_session"]  # 1.5
 
 # --- Supervision (hours per student) ---
 SUPERVISION_MULTIPLIERS: dict[str, float] = _params["task_multipliers"]["supervision_hours_per_student"]
-SUPERVISION_PASTORAL = SUPERVISION_MULTIPLIERS["pastoral"]  # 6
-SUPERVISION_UG_PROJECT = SUPERVISION_MULTIPLIERS["ug_project"]  # 22
-SUPERVISION_MSC_PROJECT = SUPERVISION_MULTIPLIERS["msc_project"]  # 40
+SUPERVISION_PASTORAL = SUPERVISION_MULTIPLIERS["pastoral"]  # 3
+SUPERVISION_UG_PROJECT = SUPERVISION_MULTIPLIERS["ug_project"]  # 16
+SUPERVISION_MSC_PROJECT = SUPERVISION_MULTIPLIERS["msc_project"]  # 24
 SUPERVISION_PROJECT_MARKING = SUPERVISION_MULTIPLIERS["project_marking_first_or_second"]  # 2
 SUPERVISION_PGR_PRIMARY = SUPERVISION_MULTIPLIERS["pgr_primary_supervisor_per_fte"]  # 80
 SUPERVISION_PGR_CO_SUPERVISOR = SUPERVISION_MULTIPLIERS["pgr_co_supervisor_per_fte"]  # 48 (60% of primary)

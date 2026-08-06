@@ -26,6 +26,9 @@ class SupervisionAllocation:
 
     This is a pure data container - no side effects or calculations.
     Each teacher receives their supervision allocation exactly once per calculation run.
+
+    Note: While frozen=True prevents reassignment, the Dict values are still mutable
+    references. Callers should treat these as read-only.
     """
     pastoral_students: Dict[str, int]      # canonical_name -> count
     project_loads: Dict[str, float]        # canonical_name -> project load (ceiling'd)
@@ -34,16 +37,20 @@ class SupervisionAllocation:
 
 @dataclass
 class ModuleData:
-    """Structured representation of a module from WTW CSV."""
+    """Structured representation of a module from WTW CSV.
+
+    Fields are mutable to allow enrichment during loading (student counts, assessment counts).
+    After load_all_data() completes, the data should be treated as immutable.
+    """
     name: str
-    codes: List[str]
+    codes: Tuple[str, ...]  # Immutable tuple for consistency
     stage: int
     semester: int
     credits: int
     cohort: str
     lead_name: str
-    teachers: List[str]
-    extra_markers: List[str]
+    teachers: Tuple[str, ...]  # Immutable tuple for consistency
+    extra_markers: Tuple[str, ...]  # Immutable tuple for consistency
     expert_checker: str
     general_checker_required: bool
     general_checker: str
@@ -52,17 +59,17 @@ class ModuleData:
     contact_hours: float  # Estimated contact hours (from credits)
     practical_contact_hours: float = 0.0  # Actual contact hours per practical session (from CSV)
     practical_groups: int = 0  # Number of parallel groups for practicals
-    practical_weeks: List[int] = field(default_factory=list)  # Weeks when practicals occur
-    student_count: int = 0  # From CS Module Numbers.csv
-    assessment_count: int = 1  # From CS Module Assessment Numbers.csv
+    practical_weeks: Tuple[int, ...] = field(default_factory=tuple)  # Weeks when practicals occur (immutable)
+    student_count: int = 0  # From CS Module Numbers.csv - set during loading
+    assessment_count: int = 1  # From CS Module Assessment Numbers.csv - set during loading
     source_year: str = ""  # e.g., "2026-7"
 
 
-@dataclass
+@dataclass(frozen=True)
 class StaffData:
     """Complete data for a single staff member."""
     canonical_name: str
-    aliases: List[str]
+    aliases: Tuple[str, ...]  # Immutable tuple for frozen dataclass
     fte: float  # From Part time.csv
     employment_start: int
     active: bool
@@ -80,12 +87,12 @@ class StaffData:
     initial_fractional_project_load: float
     initial_fractional_pastoral_load: float
     notes: str
-    roles: List[str]  # From WAW.csv
+    roles: Tuple[str, ...]  # Immutable tuple for frozen dataclass
     phd_supervisions: int  # Sole supervisors from PhD Supervision Data.csv
     phd_co_supervisions: int  # Co-supervisors from PhD Supervision Data.csv
     phd_assessor_count: int  # TAP assessor instances from PhD Supervision Data.csv
-    research_projects: List[dict]  # From % FTE for CS.csv
-    saint_modules: List[str]  # SAINTS modules they teach
+    research_projects: Tuple[dict, ...]  # Immutable tuple for frozen dataclass
+    saint_modules: Tuple[str, ...]  # SAINTS modules they teach (immutable)
     unallocated_students: int = 0  # Remaining students after allocation
     pastoral_students: int = 0  # Number of pastoral students assigned
 
@@ -106,26 +113,50 @@ class WorkloadResult:
     research_detail: str = ""
     admin_detail: str = ""
     nominal_hours: float = 0.0  # FTE-adjusted nominal hours for reference
-    teaching_breakdown: Dict[str, float] = None  # Detailed breakdown of teaching components
-    research_breakdown: Dict[str, float] = None  # Detailed breakdown of research components
-    admin_breakdown: Dict[str, float] = None  # Detailed breakdown of admin components
-    grant_titles: Dict[str, str] = None  # Mapping of project IDs to display titles
+    teaching_breakdown: Dict[str, float] = field(default_factory=dict)  # Detailed breakdown of teaching components
+    research_breakdown: Dict[str, float] = field(default_factory=dict)  # Detailed breakdown of research components
+    admin_breakdown: Dict[str, float] = field(default_factory=dict)  # Detailed breakdown of admin components
+    grant_titles: Dict[str, str] = field(default_factory=dict)  # Mapping of project IDs to display titles
     module_details: Tuple[str, ...] = ()  # Details of modules taught (immutable tuple)
     supervision_details: Tuple[str, ...] = ()  # Supervision details (to be shown separately)
 
 
 
-@dataclass
+@dataclass(frozen=True)
 class YearData:
-    """All data for a single academic year."""
+    """All data for a single academic year.
+
+    This is the root immutable container for all loaded data. Once created,
+    no fields should be modified - any "updates" require creating a new instance.
+    """
     year_label: str  # e.g., "2026-7"
-    modules: List[ModuleData]
-    student_counts: Dict[str, int]  # module_code -> count
-    assessment_counts: Dict[str, int]  # module_code -> count
-    staff: Dict[str, StaffData]  # canonical_name -> StaffData
-    known_lecturers: Set[str]  # From previous year's WTW
-    name_lookup: Dict[str, str] = field(default_factory=dict)  # alias -> canonical (reverse lookup)
+    modules: Tuple[ModuleData, ...]  # Immutable tuple of modules
+    student_counts: Dict[str, int]  # module_code -> count (value is immutable int)
+    assessment_counts: Dict[str, int]  # module_code -> count (value is immutable int)
+    staff: Tuple[StaffData, ...]  # Immutable tuple of staff data
+    known_lecturers: frozenset  # From previous year's WTW - global set (immutable set)
+    known_lecturers_per_module: Dict[str, frozenset]  # module_code -> frozenset of teachers from prev year
+    reverse_lookup: Dict[str, str] = field(default_factory=dict)  # alias -> canonical (reverse lookup)
     canonical_lookup: Dict[str, List[str]] = field(default_factory=dict)  # canonical -> aliases (for reference)
+
+    @classmethod
+    def create(cls, year_label: str, modules: List[ModuleData], student_counts: Dict[str, int],
+               assessment_counts: Dict[str, int], staff: Dict[str, StaffData],
+               known_lecturers: Set[str], known_lecturers_per_module: Dict[str, Set[str]]) -> "YearData":
+        """Factory method to create a YearData instance with proper immutability."""
+        # Convert all module teacher sets to frozensets
+        frozen_per_module = {code: frozenset(teachers) for code, teachers in known_lecturers_per_module.items()}
+        return cls(
+            year_label=year_label,
+            modules=tuple(modules),
+            student_counts=dict(student_counts),
+            assessment_counts=dict(assessment_counts),
+            staff=tuple(staff.values()),
+            known_lecturers=frozenset(known_lecturers),
+            known_lecturers_per_module=frozen_per_module,
+            reverse_lookup={},
+            canonical_lookup={}
+        )
 
 
 # --- Staff Name Normalization ---
@@ -277,7 +308,7 @@ def _parse_wtw_csv(filepath: str, known_lecturers: Set[str] = None) -> List[Modu
 
             # Module codes
             codes_str = row[1] if len(row) > 1 else ""
-            codes = [c.strip() for c in codes_str.split(",") if c.strip()]
+            codes = tuple(c.strip() for c in codes_str.split(",") if c.strip())
             if not codes:
                 continue
 
@@ -303,22 +334,28 @@ def _parse_wtw_csv(filepath: str, known_lecturers: Set[str] = None) -> List[Modu
             lead_name = row[6].strip() if len(row) > 6 else ""
 
             # Teachers - varies by year format
-            teachers = []
+            teachers_list = []
             if year_label.startswith("2026"):
                 # 2026-7 format: columns 7, 8 are teachers
                 for idx in [7, 8]:
                     if len(row) > idx and row[idx].strip():
-                        teachers.append(row[idx].strip())
+                        teachers_list.append(row[idx].strip())
+                # Add lead to teachers list (lead is column 6)
+                # This ensures leads who are also teaching get included in workload calculation
+                if lead_name and lead_name not in teachers_list:
+                    teachers_list.insert(0, lead_name)
             else:
                 # 2025-6 format: columns 4, 5, 6 are teachers (different layout)
                 for idx in [4, 5, 6]:
                     if len(row) > idx and row[idx].strip():
-                        teachers.append(row[idx].strip())
+                        teachers_list.append(row[idx].strip())
+            teachers = tuple(teachers_list)
 
-            # Extra markers
-            extra_markers = []
+            # Extra markers - convert to tuple
+            extra_markers_str = ""
             if len(row) > 9 and row[9].strip():
-                extra_markers = [m.strip() for m in row[9].split(",") if m.strip()]
+                extra_markers_str = row[9]
+            extra_markers = tuple(m.strip() for m in extra_markers_str.split(",") if m.strip())
 
             # Expert checker
             expert_checker = ""
@@ -433,7 +470,7 @@ def _load_practical_data(filepath: str = "CS Module Assessment Numbers.csv") -> 
     """Load practical data from CS Module Assessment Numbers.csv.
     Returns {module_code: {practicals: int, practical_contact_hours: float,
                            practical_groups: int, practical_weeks: List[int]}}.
-    practical_contact_hours = Total Duration / Number of Practicals (hours per session).
+    practical_contact_hours = Total Duration per practical session (hours).
     """
     path = DATA_DIR / filepath
     if not path.exists():
@@ -484,7 +521,9 @@ def _load_practical_data(filepath: str = "CS Module Assessment Numbers.csv") -> 
                 if dur_match:
                     duration_hours = float(dur_match.group(1))
             # Contact hours per practical session
-            contact_per = duration_hours / n_practicals if n_practicals > 0 else 0.0
+            # Note: "Total Duration" in CSV represents the duration of each practical session,
+            # not a total across all practicals (so we don't divide by n_practicals)
+            contact_per = duration_hours if n_practicals > 0 else 0.0
 
             data[code] = {
                 "practicals": n_practicals,
@@ -614,7 +653,7 @@ def _load_project_load(filepath: str = "project_load.csv") -> Dict[str, dict]:
                     "employment_start": emp_start,
                     "active": active_val,
                     "project_load": project_load_ceil,
-                    "pastoral_load": pastoral_load_raw,
+                    "pastoral_load": math.ceil(pastoral_load_raw) if pastoral_load_raw > 0 else 0,
                     "ecr_year": ecr_year,
                     "ecr_value": ecr_value,
                     "citizenship_level": citizenship_level,
@@ -940,12 +979,25 @@ def load_all_data(data_dir: str = None,
     # Load previous year WTW for known lecturers (data_dir is passed to load_previous_wtw)
     prev_modules = load_previous_wtw(data_dir)
     known_lecturers = set()
+    known_lecturers_per_module: Dict[str, Set[str]] = {}  # module_code -> set of teachers
+
     if prev_modules:
         for m in prev_modules:
+            # Track teachers per module
+            module_teachers: Set[str] = set()
             for t in m.teachers:
                 name = normalize_name(t, reverse_lookup, unknown_callback)
                 if name:
                     known_lecturers.add(name)
+                    module_teachers.add(name)
+
+            # Store the set of teachers for this module (use canonical names from codes)
+            # Track by ALL codes AND by module name to handle code changes between years
+            all_keys = set(m.codes)
+            all_keys.add(m.name)  # Add module name like "SYS3" as key
+            if module_teachers:
+                for key in all_keys:
+                    known_lecturers_per_module[key] = module_teachers.copy()
 
     # Load student counts, assessment counts, and practical data (DATA_DIR is used internally)
     student_counts = _load_student_counts()
@@ -1046,49 +1098,30 @@ def load_all_data(data_dir: str = None,
         "Colin": ["Designing Safe AI (Safe AI 2)"],
     }
 
+    # Build consolidated data lookup in a single pass per source
+    # This avoids multiple loops over all_names and all data sources
+    def _find_data(raw_name: str, canonical: str, data_source: Dict) -> Optional[Dict]:
+        """Find matching data from a source using raw name or canonical name."""
+        # Direct match on raw name (case-insensitive)
+        for key, val in data_source.items():
+            if key.upper() == raw_name.upper() or key.lower() == raw_name.lower():
+                return val
+        # Match via canonical name
+        for key, val in data_source.items():
+            norm_key = normalize_name(key, reverse_lookup, unknown_callback)
+            if norm_key == canonical:
+                return val
+        return None
+
     for raw_name in all_names:
         canonical = normalize_name(raw_name, reverse_lookup, unknown_callback)
         if not canonical:
             continue
 
-        # Find matching data from all sources
-        proj_data = None
-        for key, val in project_load_data.items():
-            if key.upper() == raw_name.upper() or key.lower() == raw_name.lower():
-                proj_data = val
-                break
-        if not proj_data:
-            # Try canonical name
-            for key, val in project_load_data.items():
-                norm_key = normalize_name(key, reverse_lookup, unknown_callback)
-                if norm_key == canonical:
-                    proj_data = val
-                    break
-
-        phd_info = None
-        for key, val in phd_data.items():
-            if key.upper() == raw_name.upper() or key.lower() == raw_name.lower():
-                phd_info = val
-                break
-        if not phd_info:
-            for key, val in phd_data.items():
-                norm_key = normalize_name(key, reverse_lookup, unknown_callback)
-                if norm_key == canonical:
-                    phd_info = val
-                    break
-
-        fte_info = None
-        for key, val in fte_data.items():
-            if key.upper() == raw_name.upper() or key.lower() == raw_name.lower():
-                fte_info = val
-                break
-        if not fte_info:
-            for key, val in fte_data.items():
-                norm_key = normalize_name(key, reverse_lookup, unknown_callback)
-                if norm_key == canonical:
-                    fte_info = val
-                    break
-
+        # Single-pass lookup from each data source
+        proj_data = _find_data(raw_name, canonical, project_load_data)
+        phd_info = _find_data(raw_name, canonical, phd_data)
+        fte_info = _find_data(raw_name, canonical, fte_data)
         pt_info = None
         for key, val in part_time_data.items():
             if key.upper() == raw_name.upper() or key.lower() == raw_name.lower():
@@ -1132,7 +1165,7 @@ def load_all_data(data_dir: str = None,
 
             staff[canonical] = StaffData(
                 canonical_name=canonical,
-                aliases=mappings.get(canonical, [canonical]),
+                aliases=tuple(mappings.get(canonical, [canonical])),
                 fte=pt_info["fte"] if pt_info else 1.0,
                 employment_start=proj_data["employment_start"] if proj_data else 0,
                 active=proj_data["active"] if proj_data else True,
@@ -1150,12 +1183,12 @@ def load_all_data(data_dir: str = None,
                 initial_fractional_project_load=proj_data["initial_fractional_project_load"] if proj_data else 0,
                 initial_fractional_pastoral_load=proj_data["initial_fractional_pastoral_load"] if proj_data else 0,
                 notes=proj_data["notes"] if proj_data else "",
-                roles=staff_roles,
+                roles=tuple(staff_roles),
                 phd_supervisions=phd_info["sole_supervisor"] if phd_info else 0,
                 phd_co_supervisions=phd_info["co_supervisor"] if phd_info else 0,
                 phd_assessor_count=phd_info["tap_member"] if phd_info else 0,
-                research_projects=fte_info if fte_info else [],
-                saint_modules=list(set(saint_modules)),
+                research_projects=tuple(fte_info) if fte_info else (),
+                saint_modules=tuple(set(saint_modules)),
                 pastoral_students=pastoral_students,
             )
 
@@ -1199,7 +1232,7 @@ def load_all_data(data_dir: str = None,
 
         staff["Iain Bate"] = StaffData(
             canonical_name="Iain Bate",
-            aliases=mappings.get("Iain Bate", ["Iain B", "Iain Bate"]),
+            aliases=tuple(mappings.get("Iain Bate", ["Iain B", "Iain Bate"])),
             fte=1.0,
             employment_start=0,
             active=True,
@@ -1217,22 +1250,29 @@ def load_all_data(data_dir: str = None,
             initial_fractional_project_load=0,
             initial_fractional_pastoral_load=0,
             notes="HoD - added for completeness, not in WTW",
-            roles=["Head of Department"],
+            roles=tuple(["Head of Department"]),
             phd_supervisions=iain_phd_info["sole_supervisor"] if iain_phd_info else 0,
             phd_co_supervisions=iain_phd_info["co_supervisor"] if iain_phd_info else 0,
             phd_assessor_count=iain_phd_info["tap_member"] if iain_phd_info else 0,
-            research_projects=[{"project_id": "SCHEME", "title": "SCHEME", "fte": "20%"}],
-            saint_modules=[],
+            research_projects=tuple([{"project_id": "SCHEME", "title": "SCHEME", "fte": "20%"}]),
+            saint_modules=(),
         )
+
+    # Convert modules to tuple for frozen YearData
+    modules_tuple = tuple(modules)
+
+    # Convert per-module teacher sets to frozensets
+    frozen_per_module = {code: frozenset(teachers) for code, teachers in known_lecturers_per_module.items()}
 
     return YearData(
         year_label=year_label,
-        modules=modules,
-        student_counts=merged_student_counts,
-        assessment_counts=assessment_counts,
-        staff=staff,
-        known_lecturers=known_lecturers,
-        name_lookup=reverse_lookup,
+        modules=modules_tuple,
+        student_counts=dict(merged_student_counts),
+        assessment_counts=dict(assessment_counts),
+        staff=tuple(staff.values()),
+        known_lecturers=frozenset(known_lecturers),
+        known_lecturers_per_module=frozen_per_module,
+        reverse_lookup=reverse_lookup,
         canonical_lookup=mappings,
     )
 
@@ -1252,33 +1292,67 @@ def _deduplicate_staff(staff: Dict[str, StaffData], mappings: Dict[str, List[str
         resolved = alias_to_canonical.get(name.lower(), name)
         groups.setdefault(resolved, []).append((name, data))
 
-    # Merge each group
+    # Merge each group - create new StaffData entries since they are frozen
     merged = {}
     for canonical, entries in groups.items():
         if len(entries) == 1:
             merged[canonical] = entries[0][1]
         else:
-            # Merge: prefer non-zero/non-empty values
-            merged_data = entries[0][1]
-            for _, data in entries[1:]:
-                if data.fte and data.fte > 0:
-                    merged_data.fte = data.fte
-                if data.category:
-                    merged_data.category = data.category
-                if data.notes:
-                    merged_data.notes = merged_data.notes + "; " + data.notes if merged_data.notes else data.notes
-                if data.roles:
-                    merged_data.roles = list(set(merged_data.roles + data.roles))
-                if data.research_projects:
-                    merged_data.research_projects = list(set(
-                        str(p) for p in merged_data.research_projects + data.research_projects
-                    ))
-                # Merge PhD supervision counts (take max for each type)
-                merged_data.phd_supervisions = max(merged_data.phd_supervisions, data.phd_supervisions)
-                merged_data.phd_co_supervisions = max(merged_data.phd_co_supervisions, data.phd_co_supervisions)
-                merged_data.phd_assessor_count = max(merged_data.phd_assessor_count, data.phd_assessor_count)
-                if data.saint_modules:
-                    merged_data.saint_modules = list(set(merged_data.saint_modules + data.saint_modules))
-            merged[canonical] = merged_data
+            # Collect all values from duplicate entries
+            all_aliases = set()
+            all_roles = set()
+            all_research_projects = []
+            all_saint_modules = []
+
+            for _, data in entries:
+                all_aliases.update(data.aliases)
+                all_roles.update(data.roles)
+                all_research_projects.extend(data.research_projects)
+                all_saint_modules.extend(data.saint_modules)
+
+            # Take the max values for numeric fields
+            merged_fte = max((e[1].fte for e in entries if e[1].fte), default=0.0)
+            merged_category = next((e[1].category for e in entries if e[1].category), "")
+            merged_notes = "; ".join(set(e[1].notes for e in entries if e[1].notes))
+            merged_employment_start = max((e[1].employment_start for e in entries), default=0)
+            merged_active = any(e[1].active for e in entries)
+
+            # Merge PhD supervision counts (take max for each type)
+            merged_phd_supervisions = max((e[1].phd_supervisions for e in entries), default=0)
+            merged_phd_co_supervisions = max((e[1].phd_co_supervisions for e in entries), default=0)
+            merged_phd_assessor_count = max((e[1].phd_assessor_count for e in entries), default=0)
+
+            # Get first non-zero values for other fields
+            proj_data = next((e[1] for e in entries if e[1].project_load > 0), entries[0][1])
+
+            merged[canonical] = StaffData(
+                canonical_name=canonical,
+                aliases=tuple(all_aliases),
+                fte=merged_fte,
+                employment_start=merged_employment_start,
+                active=merged_active,
+                category=merged_category,
+                project_load=proj_data.project_load,
+                pastoral_load=proj_data.pastoral_load,
+                adjusted_project_load=proj_data.adjusted_project_load,
+                adjusted_pastoral_load=proj_data.adjusted_pastoral_load,
+                ecr_year=proj_data.ecr_year,
+                ecr_value=proj_data.ecr_value,
+                citizenship_level=proj_data.citizenship_level,
+                research_grant_income=proj_data.research_grant_income,
+                research_grant_income_value=proj_data.research_grant_income_value,
+                citizenship_value=proj_data.citizenship_value,
+                initial_fractional_project_load=proj_data.initial_fractional_project_load,
+                initial_fractional_pastoral_load=proj_data.initial_fractional_pastoral_load,
+                notes=merged_notes,
+                roles=tuple(all_roles),
+                phd_supervisions=merged_phd_supervisions,
+                phd_co_supervisions=merged_phd_co_supervisions,
+                phd_assessor_count=merged_phd_assessor_count,
+                research_projects=tuple(all_research_projects),
+                saint_modules=tuple(all_saint_modules),
+                unallocated_students=0,
+                pastoral_students=0,
+            )
 
     return merged

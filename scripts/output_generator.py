@@ -13,14 +13,251 @@ Uses openpyxl for Excel generation.
 import csv
 import os
 import re
+from dataclasses import dataclass
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 
 # Get project root directory (parent of scripts folder)
 SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = Path(os.path.dirname(SCRIPTS_DIR))
 
 OUTPUT_DIR = PROJECT_ROOT / "output"
+
+
+@dataclass(frozen=True)
+class DetailParseResult:
+    """Result from parsing a teaching detail string."""
+    delivery_hours: float
+    delivery_multiplier: Optional[str]
+    practical_hours: float
+    practical_detail: Optional[str]
+    assessment_setting_hours: float
+    assessment_setting_detail: Optional[str]
+    marking_hours: float
+    marking_detail: Optional[str]
+
+
+class DetailParser:
+    """
+    Parser for teaching activity detail strings.
+
+    Extracts structured data from free-form teaching activity descriptions
+    such as "New lecturer (5x): 16.7h base @ 2.5x + content dev = 83h" or
+    "Practicals: 5 groups shared by 3 lecturers, 11w - New: 24.0h/week @ 5x".
+
+    This consolidates regex-based parsing logic for teaching activity breakdowns.
+    """
+
+    # Regex patterns for parsing detail strings
+    DELIVERY_PATTERN = re.compile(
+        r'(New lecturer|Standard)\s*\((\d+)x\):\s*([\d.]+)h\s*(?:base\s*)?(?:@[\d.]+\s*x\s*\+\s*content\s+dev\s*=\s*([\d.]+)h)?'
+    )
+
+    PRACTICALS_PATTERN = re.compile(
+        r'Practicals:\s*(\d+)\s*groups\s+shared\s+by\s+(\d+)\s+lecturers.*?(\d+)w'
+    )
+
+    NEW_PRACTICE_RATE_PATTERN = re.compile(r'New:\s*([\d.]+)h/week\s*@ ([\d.]+)x')
+    STD_PRACTICE_RATE_PATTERN = re.compile(r'Standard:\s*([\d.]+)h/week\s*@ ([\d.]+)x')
+    REPEAT_SESSION_PATTERN = re.compile(r'(\d+)\s+grps?\s*@ ([\d.]+)x')
+
+    ASSESSMENT_SETTING_PATTERN = re.compile(
+        r'(?:New setter|Standard)\s*\([^)]+\):\s*([\d.]+)h\s+main\s*\+\s*([\d.]+)h\s+resit\s*=\s*([\d.]+)h'
+    )
+
+    MARKING_PATTERN = re.compile(
+        r'(\d+)\s+scripts\s*\+\s*(\d+)\s+resits\s+x\s*([\d.]+)h\s*=\s*([\d.]+)h\s+total\s*\(([\d.]+)h\s+initial'
+    )
+
+    def __init__(self, detail_string: str):
+        """
+        Initialize parser with a teaching activity detail string.
+
+        Args:
+            detail_string: The free-form text describing teaching activities,
+                e.g., "New lecturer (5x): 16.7h base @ 2.5x + content dev = 83h"
+        """
+        self.detail = detail_string
+
+    def parse_delivery(self) -> Dict[str, Any]:
+        """
+        Parse delivery/lecture information from the detail string.
+
+        Returns:
+            Dict with keys: hours, multiplier, is_new_lecturer, base_hours, content_dev
+        """
+        match = self.DELIVERY_PATTERN.search(self.detail)
+        if not match:
+            return {'hours': 0.0, 'multiplier': None, 'is_new_lecturer': False}
+
+        lecturer_type = match.group(1)
+        multiplier = int(match.group(2))
+        base_hours = float(match.group(3))
+        total_hours = float(match.group(4)) if match.group(4) else base_hours
+
+        is_new = lecturer_type == "New lecturer"
+        content_dev = total_hours - base_hours if is_new else 0.0
+
+        return {
+            'hours': total_hours,
+            'multiplier': f"{multiplier}x",
+            'is_new_lecturer': is_new,
+            'base_hours': base_hours,
+            'content_dev': content_dev
+        }
+
+    def parse_practicals(self, lecturer_is_new: bool = False) -> Dict[str, Any]:
+        """
+        Parse practical session information from the detail string.
+
+        Args:
+            lecturer_is_new: Whether this lecturer is new (for rate determination)
+
+        Returns:
+            Dict with keys: hours, first_session_rate, repeat_share, weeks
+        """
+        prac_match = self.PRACTICALS_PATTERN.search(self.detail)
+        if not prac_match:
+            return {'hours': 0.0, 'first_session_rate': None, 'repeat_share': 0.0, 'weeks': 0}
+
+        groups = int(prac_match.group(1))
+        lecturers = int(prac_match.group(2))
+        weeks = int(prac_match.group(3))
+
+        # Extract first session rate (5x or 2.5x) based on lecturer type
+        new_prac_match = self.NEW_PRACTICE_RATE_PATTERN.search(self.detail)
+        std_prac_match = self.STD_PRACTICE_RATE_PATTERN.search(self.detail)
+
+        if new_prac_match and std_prac_match:
+            # Mixed new and standard lecturers
+            first_session_rate = float(new_prac_match.group(1)) if lecturer_is_new else float(std_prac_match.group(1))
+        elif new_prac_match:
+            # All new lecturers
+            first_session_rate = float(new_prac_match.group(1))
+        elif std_prac_match:
+            # All standard lecturers
+            first_session_rate = float(std_prac_match.group(1))
+        else:
+            return {'hours': 0.0, 'first_session_rate': None, 'repeat_share': 0.0, 'weeks': weeks}
+
+        # Calculate repeat share per lecturer
+        repeat_match = self.REPEAT_SESSION_PATTERN.search(self.detail)
+        if repeat_match:
+            repeats = int(repeat_match.group(1))
+            rep_rate = float(repeat_match.group(2))
+            repeat_share_per_week = (repeats * 2.0 * rep_rate) / lecturers
+        else:
+            repeat_share_per_week = 0.0
+
+        total_per_week = first_session_rate + repeat_share_per_week
+        total_practicals = total_per_week * weeks
+
+        return {
+            'hours': total_practicals,
+            'first_session_rate': f"{first_session_rate:.1f}h/week",
+            'repeat_share': repeat_share_per_week,
+            'weeks': weeks
+        }
+
+    def parse_assessment_setting(self) -> Dict[str, Any]:
+        """
+        Parse assessment setting information from the detail string.
+
+        Returns:
+            Dict with keys: main_hours, resit_hours, total_hours
+        """
+        match = self.ASSESSMENT_SETTING_PATTERN.search(self.detail)
+        if not match:
+            return {'main_hours': 0.0, 'resit_hours': 0.0, 'total_hours': 0.0}
+
+        return {
+            'main_hours': float(match.group(1)),
+            'resit_hours': float(match.group(2)),
+            'total_hours': float(match.group(3))
+        }
+
+    def parse_marking(self) -> Dict[str, Any]:
+        """
+        Parse marking information from the detail string.
+
+        Returns:
+            Dict with keys: initial_scripts, resit_count, per_script_hours,
+                          total_hours, initial_hours, resit_hours
+        """
+        match = self.MARKING_PATTERN.search(self.detail)
+        if not match:
+            return {
+                'initial_scripts': 0, 'resit_count': 0, 'per_script_hours': 0.0,
+                'total_hours': 0.0, 'initial_hours': 0.0, 'resit_hours': 0.0
+            }
+
+        initial_scripts = int(match.group(1))
+        resit_count = int(match.group(2))
+        per_script = float(match.group(3))
+        total_hours = float(match.group(4))
+        initial_hours = float(match.group(5))
+
+        return {
+            'initial_scripts': initial_scripts,
+            'resit_count': resit_count,
+            'per_script_hours': per_script,
+            'total_hours': total_hours,
+            'initial_hours': initial_hours,
+            'resit_hours': total_hours - initial_hours
+        }
+
+    def parse_all(self) -> DetailParseResult:
+        """
+        Parse all teaching activity components from the detail string.
+
+        Returns:
+            DetailParseResult with all parsed values
+        """
+        delivery = self.parse_delivery()
+        practicals = self.parse_practicals(lecturer_is_new=delivery['is_new_lecturer'])
+        assessment = self.parse_assessment_setting()
+        marking = self.parse_marking()
+
+        return DetailParseResult(
+            delivery_hours=delivery['hours'],
+            delivery_multiplier=delivery['multiplier'],
+            practical_hours=practicals['hours'],
+            practical_detail=self._format_practical_detail(practicals),
+            assessment_setting_hours=assessment['total_hours'],
+            assessment_setting_detail=self._format_assessment_detail(assessment),
+            marking_hours=marking['total_hours'],
+            marking_detail=self._format_marking_detail(marking)
+        )
+
+    def _format_practical_detail(self, prac: Dict[str, Any]) -> Optional[str]:
+        """Format practical session detail string."""
+        if not prac.get('first_session_rate'):
+            return None
+        if prac.get('repeat_share', 0) > 0:
+            return (
+                f"First session: {prac['first_session_rate']}; "
+                f"Repeat share: {prac['repeat_share']:.1f}h/week ({prac['weeks']}w = {prac['hours']:.1f}h)"
+            )
+        return f"{prac['first_session_rate']} for {prac['weeks']}w = {prac['hours']:.1f}h"
+
+    def _format_assessment_detail(self, ass: Dict[str, Any]) -> Optional[str]:
+        """Format assessment setting detail string."""
+        if ass['total_hours'] == 0:
+            return None
+        return f"Main paper: {ass['main_hours']:.1f}h; Resit paper: {ass['resit_hours']:.1f}h = {ass['total_hours']:.1f}h"
+
+    def _format_marking_detail(self, mark: Dict[str, Any]) -> Optional[str]:
+        """Format marking detail string."""
+        if mark['total_hours'] == 0:
+            return None
+        resit_count = mark.get('resit_count', 0)
+        per_script = mark.get('per_script_hours', 0.5)
+        initial_scripts = mark.get('initial_scripts', 0)
+
+        resit_str = f"; {resit_count} resits x {per_script:.2f}h" if resit_count > 0 else ""
+        return (
+            f"{initial_scripts} scripts x {per_script:.2f}h = {mark['initial_hours']:.1f}h initial{resit_str}"
+        )
 
 import matplotlib
 matplotlib.use("Agg")  # Non-interactive backend
@@ -43,6 +280,12 @@ def _fix_category_references(chart: BarChart) -> None:
     openpyxl's BarChart.set_categories() always creates NumRef even when
     referencing text cells. This causes charts to render incorrectly with
     text categories (staff names). Convert to StrRef for proper rendering.
+
+    Args:
+        chart: BarChart object from openpyxl that needs category axis fixup
+
+    Side Effects:
+        Modifies the chart's category references in-place to use StrRef instead of NumRef
     """
     for ser in chart.series:
         if hasattr(ser.cat, 'numRef') and ser.cat.numRef is not None:
@@ -51,8 +294,28 @@ def _fix_category_references(chart: BarChart) -> None:
             ser.cat.numRef = None
 
 
+"""
+Generate a CSV report of staff workload calculations.
+
+The CSV contains one row per staff member with breakdowns by teaching,
+research, and administration, plus detail columns explaining each calculation.
+
+Args:
+    results: List of WorkloadResult objects from calculate_workload()
+    filepath: Output file path (default: OUTPUT_DIR/Staff workload model.csv)
+
+CSV Columns:
+    - Name: Staff member's canonical name
+    - FTE: Full-time equivalent value
+    - Total Hours: Sum of teaching + research + admin hours
+    - Teaching Hours: Contact, assessment, supervision activities
+    - Research Hours: Protected baseline + additional work
+    - Admin Hours: Departmental role percentages
+    - Teaching/Research/Admin Detail: Human-readable breakdown strings
+    - Assumptions: List of any assumptions made during calculation
+    - Missing Data: List of missing or unknown data points
+"""
 def generate_csv(results: List[WorkloadResult], filepath: str = "Staff workload model.csv"):
-    """Generate the staff workload model CSV output."""
     # If filepath is just a filename, prepend OUTPUT_DIR
     if not os.path.isabs(filepath) and "/" not in filepath and "\\" not in filepath:
         filepath = os.path.join(OUTPUT_DIR, filepath)
@@ -87,7 +350,19 @@ def generate_csv(results: List[WorkloadResult], filepath: str = "Staff workload 
 
 def _create_boxplot(results: List[WorkloadResult], title: str, components: List[str],
                     component_labels: List[str], output_path: str):
-    """Create a stacked horizontal bar chart for workload components."""
+    """
+    Create a stacked horizontal bar chart for workload components.
+
+    Args:
+        results: List of WorkloadResult objects containing workload data
+        title: Chart title to display at the top
+        components: List of attribute names to plot (e.g., ["teaching_hours", "research_hours"])
+        component_labels: Display labels corresponding to each component
+        output_path: File path where the PNG chart will be saved
+
+    Side Effects:
+        Creates and saves a matplotlib figure as a PNG file; prints confirmation message
+    """
     names = [r.name for r in results]
     data = [[getattr(r, comp) for r in results] for comp in components]
 
@@ -125,8 +400,22 @@ def _create_boxplot(results: List[WorkloadResult], title: str, components: List[
     print(f"Boxplot saved to {output_path}")
 
 
+"""
+Generate both summary and detailed stacked boxplots.
+
+Creates two PNG files showing workload breakdowns:
+1. Summary boxplot: Teaching, Research, Administration as stacked bars
+2. Detailed boxplot: Expanded view with subcategories
+
+Args:
+    results: List of WorkloadResult objects from calculate_workload()
+    output_dir: Output directory for PNG files (default: OUTPUT_DIR)
+
+Output Files:
+    - workload_summary_boxplot.png: Three-component stacked bar chart
+    - workload_detailed_boxplot.png: Multi-category breakdown chart
+"""
 def generate_boxplots(results: List[WorkloadResult], output_dir: str = None):
-    """Generate both summary and detailed stacked boxplots."""
     if output_dir is None:
         output_dir = OUTPUT_DIR
 
@@ -156,10 +445,10 @@ def generate_boxplots(results: List[WorkloadResult], output_dir: str = None):
                         fontsize=8, color="white", fontweight="bold")
         bottom = [b + v for b, v in zip(bottom, values)]
 
-    # Add expected workload reference lines (40% of nominal for ART staff)
+    # Add expected workload reference lines (ART staff split from config)
     for y_pos, (name, fte) in enumerate(zip(names, [r.fte for r in results])):
-        expected_teaching = config.NOMINAL_WORKING_HOURS_PER_YEAR * fte * 0.40
-        expected_research = config.NOMINAL_WORKING_HOURS_PER_YEAR * fte * 0.40
+        expected_teaching = config.NOMINAL_WORKING_HOURS_PER_YEAR * fte * config.ART_TEACHING_PERCENTAGE
+        expected_research = config.NOMINAL_WORKING_HOURS_PER_YEAR * fte * config.ART_RESEARCH_PERCENTAGE
         ax.axvline(x=expected_teaching, color="#4CAF50", alpha=0.3, linestyle="--", linewidth=1)
         ax.axvline(x=expected_teaching + expected_research, color="#2196F3", alpha=0.3,
                    linestyle="--", linewidth=1)
@@ -228,14 +517,17 @@ def generate_excel_with_formulas(results: List[WorkloadResult], year_data: YearD
     2. Uploaded to Google Sheets without formula errors
 
     Args:
-        results: List of WorkloadResult objects
-        year_data: YearData object for metadata
-        output_dir: Output directory (default: output/)
+        results: List of WorkloadResult objects from calculate_workload()
+        year_data: YearData object containing module and staff metadata
+        output_dir: Output directory (default: OUTPUT_DIR)
 
     The spreadsheet includes:
-    - Staff workload summary table
-    - Formulas for calculating totals from components
-    - Properly sized charts (not compressed)
+    - Staff workload summary table with all components
+    - Formatted headers, borders, and column widths
+    - Charts embedded in separate sheet for visual breakdown
+
+    Output File:
+        - Staff workload model.xlsx: Complete Excel workbook with data and charts
     """
     wb = Workbook()
     ws = wb.active
@@ -445,9 +737,24 @@ def generate_excel_with_formulas(results: List[WorkloadResult], year_data: YearD
     print(f"Excel file saved to {excel_path}")
 
 
+"""
+Generate an HTML report with embedded boxplots and summary table.
+
+Creates a self-contained HTML document showing:
+1. Summary chart (teaching, research, administration stacked bars)
+2. Detailed breakdown chart
+3. Staff workload summary table
+
+Args:
+    results: List of WorkloadResult objects from calculate_workload()
+    year_data: YearData object containing academic year metadata
+    output_dir: Output directory for HTML file and referenced images
+
+Output File:
+    - workload_report.html: Complete HTML report with embedded charts
+"""
 def generate_html_report(results: List[WorkloadResult], year_data: YearData,
                          output_dir: str = "."):
-    """Generate an HTML report with embedded boxplots and summary table."""
     summary_path = os.path.join(output_dir, "workload_summary_boxplot.png")
     detailed_path = os.path.join(output_dir, "workload_detailed_boxplot.png")
 
@@ -541,9 +848,53 @@ def generate_html_report(results: List[WorkloadResult], year_data: YearData,
     print(f"HTML report saved to {output_path}")
 
 
+def _determine_lecturer_type(
+    staff_name: Optional[str],
+    module_stage: str,
+    known_lecturers_per_module: Dict[str, frozenset]
+) -> bool:
+    """
+    Determine if a lecturer is new (not present in previous year's data).
+
+    Uses per-module tracking when available, falling back to common suffixes
+    (-M, -H) for module variants. Defaults to "new" if module or staff name
+    cannot be matched.
+
+    Args:
+        staff_name: Name of the current staff member
+        module_stage: Module code/stage to check (e.g., "SYS2", "ELLA")
+        known_lecturers_per_module: Dict mapping module codes to frozensets of lecturers from previous year
+
+    Returns:
+        True if lecturer is new (not in previous year's data), False otherwise
+    """
+    if not staff_name or not known_lecturers_per_module:
+        return True  # Default to new if we can't determine
+
+    mod_code_lookup = None
+
+    # First, try the exact stage name
+    if module_stage in known_lecturers_per_module:
+        mod_code_lookup = module_stage
+    else:
+        # Try with common suffixes that might be appended to module codes
+        for suffix in ['-M', '-H', '']:
+            test_key = module_stage + suffix
+            if test_key in known_lecturers_per_module:
+                mod_code_lookup = test_key
+                break
+
+    if mod_code_lookup is not None:
+        if staff_name not in known_lecturers_per_module[mod_code_lookup]:
+            return True  # Not in previous year's list -> new
+        else:
+            return False  # Was lecturing last year -> standard
+
+    return True  # Module not found in previous year data -> assume new
+
+
 def generate_per_staff_reports(results: List[WorkloadResult], year_data: YearData,
                                 output_dir: str = None):
-    """Generate individual detailed workload reports for each staff member."""
     if output_dir is None:
         output_dir = OUTPUT_DIR
 
@@ -627,7 +978,8 @@ def generate_per_staff_reports(results: List[WorkloadResult], year_data: YearDat
                             num_teachers = int(round(float(teacher_match.group(1))))
                             module_teaching_map[module_name]['num_teachers'] = num_teachers
 
-        def format_detail_section(title, hours, breakdown, css_class, is_teaching=False, supervision_details=None):
+        def format_detail_section(title, hours, breakdown, css_class, is_teaching=False, supervision_details=None,
+                                   known_lecturers_per_module=None):
             """Format a detail section for the workload report HTML."""
             if not breakdown or all(v == 0 for v in breakdown.values()):
                 return f"""<div class="section-card {css_class}">
@@ -640,7 +992,8 @@ def generate_per_staff_reports(results: List[WorkloadResult], year_data: YearDat
 
             # Special handling for teaching - show hierarchical structure
             if is_teaching:
-                return format_teaching_section(title, hours, breakdown, css_class, supervision_details)
+                return format_teaching_section(title, hours, breakdown, css_class, supervision_details,
+                                                known_lecturers_per_module)
 
             # Group items by subcategory for research/admin
             def get_category(item_name):
@@ -672,7 +1025,14 @@ def generate_per_staff_reports(results: List[WorkloadResult], year_data: YearDat
 
                 if len(items) == 1:
                     item_name, item_value = items[0]
-                    display_name = item_name.replace('_', ' ').title()
+                    # Use display-friendly names for specific items
+                    display_names = {
+                        "service_points": "University committee work",
+                        "engagement": "Email/Meetings",
+                        "personal_development": "Personal Development",
+                        "protected_research_baseline": "Protected research baseline"
+                    }
+                    display_name = display_names.get(item_name, item_name.replace('_', ' ').title())
                     items_html_parts.append(f"""<div class="detail-item {css_class}">
                         <span class="detail-name">{display_name}</span>
                         <span class="detail-hours">{item_value:.1f}h</span>
@@ -705,14 +1065,20 @@ def generate_per_staff_reports(results: List[WorkloadResult], year_data: YearDat
                 <p style="font-size:0.85em;color:#666;padding-top:10px;">Subtotal: {hours:.1f}h</p>
             </div>"""
 
-        def format_teaching_section(title, hours, breakdown, css_class, supervision_details=None):
+        def format_teaching_section(title, hours, breakdown, css_class, supervision_details=None,
+                                     known_lecturers_per_module=None):
             """Format teaching section with hierarchical structure:
             - Modules grouped by stage (SYS2, SYS3)
+              - Module info header
               - Delivery (lectures)
               - Practicals
               - Assessment setting
               - Marking
             - Supervision (pastoral + projects as separate sections)
+
+            Args:
+                known_lecturers_per_module: Dict mapping module code to frozenset of lecturers
+                    from previous year. Used to determine if current staff is new or standard.
             """
             import re
 
@@ -747,6 +1113,9 @@ def generate_per_staff_reports(results: List[WorkloadResult], year_data: YearDat
                     stages[stage] = []
                 stages[stage].append(mod)
 
+            # Build a map of module codes to their details for lookup
+            code_to_detail = {mod['stage']: mod for mod in module_info_list}
+
             # Process each stage with hierarchical breakdown
             for stage in sorted(stages.keys()):
                 modules_in_stage = stages[stage]
@@ -758,66 +1127,197 @@ def generate_per_staff_reports(results: List[WorkloadResult], year_data: YearDat
                     code = mod['code']
                     info = mod['info']
 
-                    items_html_parts.append(f"""<div style="margin-bottom:15px;padding-left:20px;border-left:2px solid #e0e0e0;">
-                        <h5 style="color:#4CAF50;margin:0 0 8px 0;">{code} - {info}</h5>""")
-
                     detail = mod['detail']
 
-                    # Delivery/lectures
-                    delivery_match = re.search(r'(\d+(?:\.\d+)?)h\s+lectures?', detail, re.IGNORECASE)
-                    if delivery_match:
-                        del_hours = float(delivery_match.group(1))
+                    # Parse the detail string to extract calculation breakdowns
+                    # The detail_text format is: "New lecturer (5x): 16.7h base @ 2.5x + content dev = 83h; Practical: ...; ..."
+                    delivery_detail = ""
+                    practical_detail = ""
+                    assessment_setting_detail = ""
+                    marking_detail = ""
+
+                    # Determine if this staff member is new or standard for this module
+                    # by checking known_lecturers_per_module (if available)
+                    is_new_lecturer = _determine_lecturer_type(r.name, stage, known_lecturers_per_module or {})
+
+                    if detail:
+                        # Use DetailParser to extract structured data from the detail string
+                        parser = DetailParser(detail)
+
+                        # Parse all components using DetailParser
+                        parsed_delivery = parser.parse_delivery()
+                        parsed_practicals = parser.parse_practicals(lecturer_is_new=is_new_lecturer)
+                        parsed_assessment = parser.parse_assessment_setting()
+                        parsed_marking = parser.parse_marking()
+
+                        # Format delivery detail string
+                        if parsed_delivery['hours'] > 0:
+                            if parsed_delivery['is_new_lecturer']:
+                                content_dev = parsed_delivery.get('content_dev', 0.0)
+                                delivery_detail = f"Base share: {parsed_delivery.get('base_hours', 0):.1f}h @ 2.5x; Content development: {content_dev:.1f}h = {parsed_delivery['hours']:.0f}h"
+                            else:
+                                multiplier = parsed_delivery['multiplier']
+                                delivery_detail = f"{parsed_delivery['hours']:.1f}h @ Standard ({multiplier})"
+
+                        # Format practical detail string
+                        if parsed_practicals['hours'] > 0 and parsed_practicals.get('first_session_rate'):
+                            repeat_share = parsed_practicals.get('repeat_share', 0.0)
+                            weeks = parsed_practicals['weeks']
+                            prac_hours = parsed_practicals['hours']
+                            first_session_rate = parsed_practicals['first_session_rate']
+
+                            if repeat_share > 0:
+                                practical_detail = (
+                                    f"First session: {first_session_rate}; "
+                                    f"Repeat share: {repeat_share:.1f}h/week ({weeks}w = {prac_hours:.1f}h)"
+                                )
+                            else:
+                                practical_detail = f"{first_session_rate} for {weeks}w = {prac_hours:.1f}h"
+
+                        # Format assessment setting detail string
+                        if parsed_assessment['total_hours'] > 0:
+                            assessment_setting_detail = (
+                                f"Main paper: {parsed_assessment['main_hours']:.1f}h; "
+                                f"Resit paper: {parsed_assessment['resit_hours']:.1f}h = {parsed_assessment['total_hours']:.1f}h"
+                            )
+
+                        # Format marking detail string
+                        if parsed_marking['total_hours'] > 0:
+                            resit_count = parsed_marking.get('resit_count', 0)
+                            per_script = parsed_marking.get('per_script_hours', 0.5)
+                            initial_scripts = parsed_marking.get('initial_scripts', 0)
+                            initial_hours = parsed_marking['initial_hours']
+                            resit_hours = parsed_marking['resit_hours']
+
+                            marking_detail = (
+                                f"{initial_scripts} scripts x {per_script:.2f}h = {initial_hours:.1f}h initial; "
+                                f"{resit_count} resits x {per_script:.2f}h = {resit_hours:.1f}h resit"
+                            )
+
+                    # Calculate practical hours for this staff member using parsed data
+                    if parsed_practicals['hours'] > 0:
+                        prac_hours = parsed_practicals['hours']
+                    else:
+                        # Fallback to breakdown-based calculation
+                        prac_new_std_match = re.search(r'New:\s*([\d.]+)h\s*,\s*Standard:\s*([\d.]+)h', detail)
+                        total_prac_match = re.search(r'Total:\s*([\d.]+)h', detail)
+
+                        if prac_new_std_match and is_new_lecturer:
+                            prac_hours = float(prac_new_std_match.group(1))
+                        elif prac_new_std_match and not is_new_lecturer:
+                            prac_hours = float(prac_new_std_match.group(2))
+                        elif total_prac_match:
+                            prac_hours = float(total_prac_match.group(1))
+                        else:
+                            prac_hours = breakdown.get('practicals', 0) / max(len(modules_in_stage), 1)
+
+                    # Delivery/lectures - show hours with detailed breakdown
+                    teaching_hours_for_module = breakdown.get('teaching', 0) / max(len(modules_in_stage), 1)
+                    if teaching_hours_for_module > 0:
+                        lecturer_type = "New lecturer (5x)" if is_new_lecturer else "Standard (2.5x)"
                         items_html_parts.append(f"""<div class="detail-item {css_class}">
                             <span class="detail-name">Delivery (Lectures)</span>
-                            <span class="detail-hours">{del_hours:.1f}h</span>
+                            <span class="detail-hours">{teaching_hours_for_module:.1f}h @ {lecturer_type}</span>
                             <span class="detail-activity" style="background:#e3f2fd;color:#1565c0;">Teaching</span>
                         </div>""")
+                        if delivery_detail:
+                            items_html_parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+                                <span class="detail-name" style="color:#333;">Calculation</span>
+                                <span class="detail-hours">{delivery_detail}</span>
+                            </div>""")
 
-                    # Practicals
-                    practical_match = re.search(r'Practicals:\s*(\d+)', detail, re.IGNORECASE)
-
-                    if practical_match:
-                        # Extract practical hours directly from the detail string (not from breakdown)
-                        # since each module has its own practical count and calculation
-                        prac_hours_match = re.search(r'=\s*([\d.]+)h', detail, re.IGNORECASE)
-                        prac_hours = float(prac_hours_match.group(1)) if prac_hours_match else 0
-
-                        # Extract contact per practical from the actual practicals section only
-                        # The pattern should be "X groups shared by Y lecturers" or similar
-                        contact_per_prac_match = re.search(r'Practicals:\s*\d+\s*groups.*?([\d.]+)h\s+contact', detail, re.IGNORECASE)
-
-                        # Extract repetition rate (1.5x for repeats), not the first delivery rate
-                        # Look for "weeks X @ Yx" pattern which indicates repetition multiplier
-                        prac_rate_match = re.search(r'weeks\s+[\d,\s]+\s*@\s*([\d.]+)x', detail, re.IGNORECASE)
-
-                        contact_per_prac = float(contact_per_prac_match.group(1)) if contact_per_prac_match else 0
-                        rate = float(prac_rate_match.group(1)) if prac_rate_match else config.REPETITION_MULTIPLIER
-
+                    # Practicals - show the per-teacher practical hours with detailed breakdown
+                    if prac_hours > 0:
                         items_html_parts.append(f"""<div class="detail-item {css_class}">
                             <span class="detail-name">Practical Sessions</span>
-                            <span class="detail-hours">{prac_hours:.1f}h ({contact_per_prac:.1f}h contact x {rate}x)</span>
+                            <span class="detail-hours">{prac_hours:.1f}h</span>
                             <span class="detail-activity" style="background:#fff3e0;color:#ef6c00;">Teaching</span>
                         </div>""")
+                        if practical_detail:
+                            items_html_parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+                                <span class="detail-name" style="color:#333;">Calculation</span>
+                                <span class="detail-hours">{practical_detail}</span>
+                            </div>""")
 
-                    # Assessment setting
+                    # Assessment setting - parse detail string for main/resit breakdown with detailed calculation
                     ass_match = re.search(r'(\d+)\s+assessment', detail, re.IGNORECASE)
                     if ass_match:
                         ass_hours = breakdown.get('assessment_setting', 0) / max(len(modules_in_stage), 1)
-                        items_html_parts.append(f"""<div class="detail-item {css_class}">
-                            <span class="detail-name">Assessment Setting</span>
-                            <span class="detail-hours">{ass_hours:.1f}h</span>
-                            <span class="detail-activity" style="background:#e8f5e9;color:#2e7d32;">Teaching</span>
-                        </div>""")
 
-                    # Marking
+                        # Check if we have parsed assessment setting detail from the detail string
+                        if assessment_setting_detail:
+                            total_ass = ass_hours
+                            items_html_parts.append(f"""<div class="detail-item {css_class}">
+                                <span class="detail-name">Assessment Setting</span>
+                                <span class="detail-hours">{total_ass:.1f}h</span>
+                                <span class="detail-activity" style="background:#e8f5e9;color:#2e7d32;">Teaching</span>
+                            </div>""")
+                            items_html_parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+                                <span class="detail-name" style="color:#333;">Calculation</span>
+                                <span class="detail-hours">{assessment_setting_detail}</span>
+                            </div>""")
+                        else:
+                            # Check if detail contains main/resit split info
+                            main_resit_match = re.search(r'\(([\d.]+)h\s+main\s+paper.*?([\d.]+)h\s+resit', detail, re.IGNORECASE)
+                            if main_resit_match:
+                                main_hours = float(main_resit_match.group(1)) / max(len(modules_in_stage), 1)
+                                resit_hours = float(main_resit_match.group(2)) / max(len(modules_in_stage), 1)
+                                total_setting = main_hours + resit_hours
+                                items_html_parts.append(f"""<div class="detail-item {css_class}">
+                                    <span class="detail-name">Assessment Setting</span>
+                                    <span class="detail-hours">{main_hours:.1f}h main + {resit_hours:.1f}h resit = {total_setting:.1f}h</span>
+                                    <span class="detail-activity" style="background:#e8f5e9;color:#2e7d32;">Teaching</span>
+                                </div>""")
+                            else:
+                                items_html_parts.append(f"""<div class="detail-item {css_class}">
+                                    <span class="detail-name">Assessment Setting</span>
+                                    <span class="detail-hours">{ass_hours:.1f}h</span>
+                                    <span class="detail-activity" style="background:#e8f5e9;color:#2e7d32;">Teaching</span>
+                                </div>""")
+
+                    # Marking - parse detail string for resit breakdown with detailed calculation
                     mark_match = re.search(r'(\d+)\s+script', detail, re.IGNORECASE)
                     if mark_match:
                         mark_hours = breakdown.get('marking', 0) / max(len(modules_in_stage), 1)
-                        items_html_parts.append(f"""<div class="detail-item {css_class}">
-                            <span class="detail-name">Assessment Marking</span>
-                            <span class="detail-hours">{mark_hours:.1f}h</span>
-                            <span class="detail-activity" style="background:#e8f5e9;color:#2e7d32;">Teaching</span>
-                        </div>""")
+
+                        # Check if we have parsed marking detail from the detail string
+                        if marking_detail:
+                            total_marking = mark_hours
+                            items_html_parts.append(f"""<div class="detail-item {css_class}">
+                                <span class="detail-name">Assessment Marking</span>
+                                <span class="detail-hours">{total_marking:.1f}h</span>
+                                <span class="detail-activity" style="background:#e8f5e9;color:#2e7d32;">Teaching</span>
+                            </div>""")
+                            items_html_parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+                                <span class="detail-name" style="color:#333;">Calculation</span>
+                                <span class="detail-hours">{marking_detail}</span>
+                            </div>""")
+                        else:
+                            # Check if detail contains resit info (format: "scripts + X resits x Yh = Z total...")
+                            resit_match = re.search(r'(\d+)\s+scripts\s*\+\s*(\d+)\s+resits\s+x\s+([\d.]+)h\s*=\s*([\d.]+)h\s+total\s*\(([\d.]+)h\s+initial', detail, re.IGNORECASE)
+                            if resit_match:
+                                initial_scripts = int(resit_match.group(1))
+                                resit_count = int(resit_match.group(2))
+                                per_script = float(resit_match.group(3))
+                                total_hours = float(resit_match.group(4))
+                                initial_hours = float(resit_match.group(5))
+
+                                num_modules = max(len(modules_in_stage), 1)
+                                resit_hours_per_teacher = (total_hours - initial_hours) / num_modules
+                                initial_per_teacher = initial_hours / num_modules
+                                total_marking_per_teacher = (total_hours) / num_modules
+
+                                items_html_parts.append(f"""<div class="detail-item {css_class}">
+                                    <span class="detail-name">Assessment Marking</span>
+                                    <span class="detail-hours">{initial_per_teacher:.1f}h initial + {resit_hours_per_teacher:.1f}h resit = {total_marking_per_teacher:.1f}h</span>
+                                    <span class="detail-activity" style="background:#e8f5e9;color:#2e7d32;">Teaching</span>
+                                </div>""")
+                            else:
+                                items_html_parts.append(f"""<div class="detail-item {css_class}">
+                                    <span class="detail-name">Assessment Marking</span>
+                                    <span class="detail-hours">{mark_hours:.1f}h</span>
+                                    <span class="detail-activity" style="background:#e8f5e9;color:#2e7d32;">Teaching</span>
+                                </div>""")
 
                     items_html_parts.append("</div>")  # Close module div
 
@@ -839,11 +1339,11 @@ def generate_per_staff_reports(results: List[WorkloadResult], year_data: YearDat
                         past_students_total += int(float(past_match.group(1)))
                         past_hours_total += float(past_match.group(3))
 
-                    # Projects: "Projects: X projects x Zh = Wh" (or with teacher prefix like "Name: Projects: ...")
-                    proj_match = re.search(r'(?:.*?:\s*)?Projects:\s*(\d+(?:\.\d+)?)\s+projects\s*x\s*(\d+(?:\.\d+)?)h\s*=\s*(\d+(?:\.\d+)?)h', detail)
+                    # Projects: "Projects: X projects x UG/MSc (Zh) = Wh" (or with teacher prefix like "Name: Projects: ...")
+                    proj_match = re.search(r'(?:.*?:\s*)?Projects:\s*(\d+(?:\.\d+)?)\s+projects\s+x\s+(UG|MSc)\s*\((\d+(?:\.\d+)?)h\)\s*=\s*(\d+(?:\.\d+)?)h', detail)
                     if proj_match:
                         proj_projects_total += int(float(proj_match.group(1)))
-                        proj_hours_total += float(proj_match.group(3))
+                        proj_hours_total += float(proj_match.group(4))
 
                 items_html_parts.append(f"""<div style="margin-bottom:25px;">
                     <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #FF9800;padding-left:10px;">Pastoral Supervision ({past_hours_total:.1f}h)</h4>
@@ -909,7 +1409,8 @@ def generate_per_staff_reports(results: List[WorkloadResult], year_data: YearDat
 
         teaching_section = format_detail_section(
             "Teaching Activities", r.teaching_hours, teaching_breakdown, "teaching-item", is_teaching=True,
-            supervision_details=r.supervision_details or []
+            supervision_details=r.supervision_details or [],
+            known_lecturers_per_module=year_data.known_lecturers_per_module
         )
         research_section = format_detail_section(
             "Research Activities", r.research_hours, research_breakdown, "research-item"
@@ -988,11 +1489,14 @@ def generate_per_staff_reports(results: List[WorkloadResult], year_data: YearDat
                 <ul>
                     <li><strong>Teaching:</strong> {r.teaching_hours:.1f}h</li>
                     <li><strong>Research (protected baseline):</strong> {config.PROTECTED_RESEARCH_BASELINE * r.fte:.1f}h</li>
-                    <li><strong>Research (additional - grants, supervision):</strong> {r.research_hours - config.PROTECTED_RESEARCH_BASELINE * r.fte:.1f}h</li>
+                    <li><strong>Research (additional - grants, supervision):</strong> {max(0, r.research_hours - config.PROTECTED_RESEARCH_BASELINE * r.fte):.1f}h</li>
                     <li><strong>Admin:</strong> {r.admin_hours:.1f}h</li>
-                    <li><strong>General Baseline (engagement + personal dev):</strong> {(config.BASELOADS.get('engagement', 100) / len(results) + config.BASELOADS['personal_development'] * r.fte):.1f}h</li>
+                    <li><ul style="margin: 5px 0; padding-left: 20px;">
+                        <li>Engagement (email/meetings): {(config.BASELOADS.get('engagement', 100) * r.fte):.1f}h</li>
+                        <li>Personal development: {config.BASELOADS['personal_development'] * r.fte:.1f}h</li>
+                    </ul></li>
                 </ul>
-                <p style="margin-top:20px;"><em>Total: {total_for_display:.1f} hours = {r.teaching_hours:.1f} + {config.PROTECTED_RESEARCH_BASELINE * r.fte:.1f} + {r.research_hours - config.PROTECTED_RESEARCH_BASELINE * r.fte:.1f} + {r.admin_hours:.1f} + {(config.BASELOADS.get('engagement', 100) / len(results) + config.BASELOADS['personal_development'] * r.fte):.1f}</em></p>
+                <p style="margin-top:20px;"><em>Total: {total_for_display:.1f} hours = {r.teaching_hours:.1f} + {config.PROTECTED_RESEARCH_BASELINE * r.fte:.1f} + {max(0, r.research_hours - config.PROTECTED_RESEARCH_BASELINE * r.fte):.1f} + {r.admin_hours:.1f}</em></p>
             </div>
         </div>
 

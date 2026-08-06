@@ -242,4 +242,34 @@ After each fix:
 
 ---
 
-*Last updated: 2026-07-20*
+*Last updated: 2026-08-03*
+
+## Completed Fixes (Session Summary)
+
+### Bug #1: Grant Scheme Titles Not Displayed Correctly - FIXED
+- The "Project Title" column (G) in `% FTE for CS.csv` is now properly read and displayed in research details
+- Example output: `Grant SCHEME: 20% of 1642h = 328.4h`
+
+### Bug #3: Pastoral Load Not Ceiling'd - FIXED  
+- File: `data_loader.py` line 617
+- Now consistently ceilings pastoral load: `"pastoral_load": math.ceil(pastoral_load_raw) if pastoral_load_raw > 0 else 0`
+
+### Bug #4: Practical Sessions Multiplier Confusion - FIXED
+- File: `workload_calculator.py` lines 151-154 and 207-211
+- Changed to always use 2.5x for first delivery (not 5x based on new lecturer status)
+- Only repetitions use the 1.5x multiplier
+
+### Bug #5: Service Points Source Reference - FIXED
+- File: `workload_calculator.py` line 470
+- Updated to show: `"Service points (default {config.SERVICE_POINTS_DEFAULT}h from workload_parameters.yaml): committee work"`
+
+### Bug #6: Minimum Teaching Load Source Reference - FIXED  
+- File: `workload_calculator.py` lines 548-550
+- Updated to show: `"Minimum administrative teaching load (from workload_parameters.yaml): {min_teaching:.0f}h"`
+
+### YAML Parameters Added:
+- Added `teaching_weeks_per_semester: 11` to `baselines_hours`
+- Added `project_setting_allowance: 6.0` to `task_multipliers`
+
+### Configuration Refactored:
+- Moved `TEACHING_WEEKS_PER_SEMESTER` from hardcoded constant in `workload_calculator.py` to config.py

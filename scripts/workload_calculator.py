@@ -16,22 +16,38 @@ from data_loader import YearData, ModuleData, StaffData, WorkloadResult, Supervi
 
 # --- Constants ---
 
-TEACHING_WEEKS_PER_SEMESTER = 11  # Actual teaching weeks per semester (UK academic calendar)
+from config import TEACHING_WEEKS_PER_SEMESTER
 
 
 # --- Teaching Workload ---
 
+
 def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
-                                  known_lecturers: set,
+                                  known_lecturers_global: set,
+                                  known_lecturers_per_module: Dict[str, frozenset],
                                   staff_data: Dict[str, StaffData],
                                   supervision: SupervisionAllocation) -> dict:
     """
     Calculate teaching workload for a single module, split by teacher.
 
-    Returns a dict: {teacher_name: {hours, details}}
+    Applies multipliers based on lecturer experience (new vs. established) and
+    account for lecture hours, practical sessions with repetition, assessment
+    setting and marking, and supervision activities.
 
-    The supervision allocation is passed as an immutable SupervisionAllocation
-    object. Teachers receive their supervision hours exactly once per calculation run.
+    Args:
+        module: ModuleData object with contact hours, assessments, and practicals
+        teachers: List of teacher names (canonical)
+        known_lecturers_global: Set of lecturers from previous year (for new lecturer detection)
+        known_lecturers_per_module: Dict mapping module codes to sets of previous lecturers
+        staff_data: Dict mapping staff names to StaffData objects
+        supervision: SupervisionAllocation with pastoral counts and project loads
+
+    Returns:
+        Dict mapping teacher names to their teaching breakdown, including:
+            - hours: Total teaching workload for this module
+            - detail_text: Human-readable summary of activities
+            - teaching_breakdown: Structured hour allocations by category
+            - supervision_details: List of supervision activity strings
     """
     if not teachers:
         return {}
@@ -60,54 +76,102 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
 
     teaching_details = []
 
-    # Calculate lecture multiplier per-teacher based on whether THAT teacher is new
+    # Store individual practical hours per teacher (initialized here for all cases)
+    individual_practical_hours = {}
+
+    # Determine which teachers from last year taught THIS specific module
+    # Use per-module tracking first, fall back to global set for modules without tracking
+    module_code = module.codes[0] if module.codes else None
+
+    # Try looking up by full code first (e.g., COM00029I)
+    known_teachers_this_module = known_lecturers_per_module.get(module_code)
+
+    # If not found, try the module name (e.g., "SYS2") which may be stored
+    if known_teachers_this_module is None:
+        known_teachers_this_module = known_lecturers_per_module.get(module.name)
+
+    # If we have module-specific tracking, use it; otherwise use global known lecturers
+    if known_teachers_this_module is not None:
+        known_lecturers_for_module = known_teachers_this_module
+    else:
+        # No per-module tracking available - fall back to global set
+        # This handles new modules or modules without previous year data
+        known_lecturers_for_module = known_lecturers_global
+
+    # Calculate lecture multiplier per-teacher based on whether THAT teacher is new for THIS module
+    # New lecturers get 5x for content development + delivery
+    # Existing lecturers get 2.5x for delivery only (content already developed)
     lecture_multipliers = {}
     for t in teachers:
-        if t not in known_lecturers:
+        if t not in known_lecturers_for_module:
             lecture_multipliers[t] = config.TEACHING_MULTIPLIERS["lecture_new_content_or_lecturer"]  # 5
         else:
             lecture_multipliers[t] = config.TEACHING_MULTIPLIERS["lecture_standard"]  # 2.5
 
     # Build teaching details string showing multiplier type for each teacher
-    new_lecturers = [t for t in teachers if t not in known_lecturers]
-    standard_lecturers = [t for t in teachers if t in known_lecturers]
+    new_lecturers = [t for t in teachers if t not in known_lecturers_for_module]
+    standard_lecturers = [t for t in teachers if t in known_lecturers_for_module]
 
-    # Calculate base lecture hours (before multiplier) and total with multipliers
-    lecture_base = lecture_hours  # Base lecture hours from contact time minus practicals
+    # Calculate lecture hours using the new approach:
+    # 1. All lecturers get an equal "base" share at standard rate (2.5x)
+    # 2. New lecturers get additional time to account for content development
+    #
+    # This reflects that existing lecturers (e.g., Mike, Andy) just deliver,
+    # while new lecturers need time to develop materials in addition to delivery.
+    n_teachers = len(teachers)
 
+    # Base share: divide total contact hours equally among all teachers
+    base_lecture_share = lecture_hours / n_teachers
+
+    # Calculate per-teacher hours:
+    # - Standard lecturers: base_share * standard_multiplier (just delivery)
+    # - New lecturers: base_share * standard_multiplier + content_dev_time
+    #
+    # The content_dev_time represents the additional effort for new material.
+    # Since 5x vs 2.5x means 2.5x additional, we add this to their share.
+    lecture_hours_with_mult = {}
     detail_parts = []
-    if new_lecturers:
-        # New lecturer gets: contact hours x multiplier (e.g., 18h x 5x = 90h)
-        new_hours_with_mult = lecture_base * config.TEACHING_MULTIPLIERS["lecture_new_content_or_lecturer"]
-        detail_parts.append(f"New lecturer ({config.TEACHING_MULTIPLIERS['lecture_new_content_or_lecturer']}x): {lecture_base:.1f}h x {config.TEACHING_MULTIPLIERS['lecture_new_content_or_lecturer']} = {new_hours_with_mult:.0f}h")
-    if standard_lecturers:
-        # Standard lecturer gets: contact hours x multiplier (e.g., 18h x 2.5x = 45h)
-        std_hours_with_mult = lecture_base * config.TEACHING_MULTIPLIERS["lecture_standard"]
-        detail_parts.append(f"Standard ({config.TEACHING_MULTIPLIERS['lecture_standard']}x): {lecture_base:.1f}h x {config.TEACHING_MULTIPLIERS['lecture_standard']} = {std_hours_with_mult:.0f}h")
+
+    for t in teachers:
+        if t not in known_lecturers_for_module:
+            # New lecturer: base delivery + content development
+            # At 5x total vs standard 2.5x, the difference is 2.5x
+            # This represents time spent developing new materials
+            delivery_hours = base_lecture_share * config.TEACHING_MULTIPLIERS["lecture_standard"]
+            content_dev_hours = base_lecture_share * (config.TEACHING_MULTIPLIERS["lecture_new_content_or_lecturer"] - config.TEACHING_MULTIPLIERS["lecture_standard"])
+            total_hours = delivery_hours + content_dev_hours
+
+            lecture_hours_with_mult[t] = total_hours
+            detail_parts.append(f"New lecturer ({config.TEACHING_MULTIPLIERS['lecture_new_content_or_lecturer']}x): {base_lecture_share:.1f}h base @ 2.5x = {delivery_hours:.1f}h + {content_dev_hours:.1f}h content dev")
+        else:
+            # Standard lecturer: just delivery at standard rate
+            total_hours = base_lecture_share * config.TEACHING_MULTIPLIERS["lecture_standard"]
+            lecture_hours_with_mult[t] = total_hours
+            detail_parts.append(f"Standard ({config.TEACHING_MULTIPLIERS['lecture_standard']}x): {base_lecture_share:.1f}h @ 2.5x = {total_hours:.1f}h")
 
     teaching_details.append("; ".join(detail_parts))
-
-    # Calculate per-teacher lecture hours with their specific multiplier
-    # Lectures are shared among teachers, so divide by number of teachers first
-    lecture_hours_with_mult = {t: (lecture_hours / len(teachers)) * lecture_multipliers[t] for t in teachers}
 
     # --- Practical Sessions with Repetition Multiplier ---
     # Per the spec: "For each repetition of an identical class (e.g. 2nd and 3rd version)
     # have a multiplier of 1.5 times contact duration."
     #
-    # Each week has a NEW class pattern:
-    # - First delivery: new content at 5x contact time
-    # - Subsequent deliveries: repetition at 1.5x contact time per session
+    # Each week has multiple practical sessions:
+    # - First session delivered by one lecturer at 2.5x (first delivery rate)
+    # - Remaining sessions delivered by other lecturers at 1.5x (repetition rate)
+    #
+    # With n_groups shared among n_teachers:
+    # - Each week: 1 session × contact × 2.5x + (n_groups-1) sessions × contact × 1.5x
+    # - Per-teacher weekly hours = total_week_hours / n_teachers
     #
     # If practical_weeks is specified (from CSV Notes column), only count those weeks.
-    # Example: "Practicals only in weeks 7, 8, 9" means:
-    #   - Week 7: first delivery at 5x
-    #   - Weeks 8, 9: repeats at 1.5x each
 
     practical_hours_total = 0.0  # Total for all teachers combined
     practical_hours_one = 0.0  # Per-teacher hours
     practical_details = []
     practical_breakdown = {}  # For structured teaching breakdown
+
+    # Initialize practical_week_count (used even when practicals_count == 0)
+    practical_week_count = TEACHING_WEEKS_PER_SEMESTER if practicals_count > 0 else 0
 
     if practicals_count > 0:
         contact_per_practical = module.practical_contact_hours if module.practical_contact_hours > 0 else (contact_hours / max(practicals_count, 1))
@@ -116,129 +180,187 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
         # Determine weeks with practicals
         if module.practical_weeks is not None and len(module.practical_weeks) > 0:
             # Use specified weeks from CSV notes
-            practical_week_count = len(module.practical_weeks)
-            first_week = min(module.practical_weeks)
-            other_weeks = [w for w in module.practical_weeks if w != first_week]
+            practical_weeks_list = sorted(module.practical_weeks)
+            practical_week_count = len(practical_weeks_list)
+            first_week = practical_weeks_list[0]
+            other_weeks = practical_weeks_list[1:]  # All weeks after the first
         else:
             # Default: all teaching weeks (1-11)
             practical_week_count = TEACHING_WEEKS_PER_SEMESTER
             first_week = 1
             other_weeks = list(range(2, TEACHING_WEEKS_PER_SEMESTER + 1))
 
+        n_teachers = len(teachers)
+
+        # Identify new vs standard lecturers for practical calculations (use per-module tracking)
+        new_lecturers_practical = [t for t in teachers if t not in known_lecturers_for_module]
+        standard_lecturers_practical = [t for t in teachers if t in known_lecturers_for_module]
+
+        # Store individual practical hours per teacher
+        individual_practical_hours = {}
+
         if n_groups > 0:
             # With parallel groups:
-            # Groups are shared among teachers. If 3 lecturers share 5 groups,
-            # each lecturer gets 5/3 = 1.67 groups per week.
+            # Each week, lecturers deliver first-session sessions.
+            # - Standard lecturers: deliver at 2.5x rate (delivery only)
+            # - New lecturers: deliver at 5x rate (content development + delivery)
+            # - Additional repeat sessions: 1.5x regardless of who delivers
             #
-            # For each lecturer:
-            # - First delivery (first week) at their personal first-delivery multiplier
-            #   (2.5x standard, or higher if they're new to the content)
-            # - Subsequent deliveries (other weeks) at repetition rate (1.5x)
-
-            n_teachers = len(teachers)
-            groups_per_teacher = n_groups / n_teachers
+            # Strategy:
+            # 1. Each lecturer gets one "first" session slot per week
+            # 2. Standard lecturers' first sessions = contact × 2.5x
+            # 3. New lecturers' first sessions = contact × 5x (extra for content dev)
+            # 4. Repeat sessions are split among all, at 1.5x each
 
             rep_rate = config.REPETITION_MULTIPLIER  # 1.5
 
-            # Calculate per-teacher hours (not summed across teachers)
-            teacher_first_mult = None
-            weekly_first_one = 0.0
-            weekly_repeat_one = 0.0
+            repeat_sessions = max(0, n_groups - n_teachers)
 
-            iteration = 0
+            # Calculate weekly hours per teacher
+            # Each lecturer gets one first-delivery session slot
+            # New lecturers: 5x multiplier for their first session (content dev + delivery)
+            # Standard lecturers: 2.5x multiplier for their first session (delivery only)
+            #
+            # Note: practicals_count represents the number of practical sessions per week.
+            # Each session has contact_per_practical duration, so we multiply by practicals_count
+            # to get total weekly hours for all sessions delivered by a teacher.
+
             for t in teachers:
-                iteration += 1
-                if t not in known_lecturers:
-                    first_time_mult = config.TEACHING_MULTIPLIERS["lecture_new_content_or_lecturer"]  # 5
+                if t in new_lecturers_practical:
+                    # New lecturer: their first session at 5x + share of repeats
+                    # Multiply by practicals_count since each teacher delivers that many sessions per week
+                    first_session = contact_per_practical * config.TEACHING_MULTIPLIERS["lecture_new_content_or_lecturer"] * practicals_count
+                    repeat_share = (repeat_sessions * contact_per_practical * rep_rate * practicals_count) / n_teachers
+                    individual_practical_hours[t] = first_session + repeat_share
                 else:
-                    first_time_mult = config.TEACHING_MULTIPLIERS["problem_class_seminar_practical"]  # 2.5
+                    # Standard lecturer: their first session at 2.5x + share of repeats
+                    first_session = contact_per_practical * config.TEACHING_MULTIPLIERS["problem_class_seminar_practical"] * practicals_count
+                    repeat_share = (repeat_sessions * contact_per_practical * rep_rate * practicals_count) / n_teachers
+                    individual_practical_hours[t] = first_session + repeat_share
 
-                if teacher_first_mult is None:
-                    teacher_first_mult = first_time_mult
+            # Total hours across all teachers (for tracking total workload)
+            practical_hours_total = sum(individual_practical_hours.values())
 
-                contribution = groups_per_teacher * contact_per_practical * first_time_mult
-                contrib = groups_per_teacher * contact_per_practical * first_time_mult
-                weekly_first_one += contrib
-                repeat_contribution = len(other_weeks) * groups_per_teacher * contact_per_practical * rep_rate
-                weekly_repeat_one += repeat_contribution
-
-            # Each teacher gets their own share (we sum then divide by n_teachers since loop accumulated)
-            practical_hours_one = (weekly_first_one + weekly_repeat_one) / n_teachers
-            practical_hours_total = practical_hours_one * n_teachers  # Total for all teachers
-
-            # Build display details - show groups per teacher and their multiplier
-            first_time_groups = groups_per_teacher * contact_per_practical * teacher_first_mult
-            repeat_groups_total = len(other_weeks) * groups_per_teacher * contact_per_practical * rep_rate
-
-            first_time_display = f"{groups_per_teacher:.1f} grps @ {teacher_first_mult}x (week {first_week})"
-            repeat_count = len(other_weeks)
+            # Build display details - each week pattern
+            repeat_count = len(other_weeks) if module.practical_weeks and len(module.practical_weeks) > 1 else TEACHING_WEEKS_PER_SEMESTER - 1
             if repeat_count > 0:
-                weeks_str = ", ".join(str(w) for w in other_weeks)
-                repeat_display = f"weeks {weeks_str} @ {rep_rate}x"
+                weeks_str = ", ".join(str(w) for w in other_weeks[:5]) + ("..." if repeat_count > 5 else "")
+                repeat_display = f"{repeat_count}w @ {rep_rate}x (weeks {weeks_str})"
             else:
                 repeat_display = "no repeats"
 
-            practical_details.append(
-                f"Practicals: {n_groups} groups shared by {n_teachers} lecturers, "
-                f"{practical_week_count}w - week {first_week}: {groups_per_teacher:.1f} grps x {contact_per_practical:.1f}h x {teacher_first_mult}x = {first_time_groups:.1f}h; "
-                f"{repeat_display}: {len(other_weeks)}w x {groups_per_teacher:.1f} grps x {contact_per_practical:.1f}h x {rep_rate}x = {repeat_groups_total:.1f}h; "
-                f"Total: {first_time_groups + repeat_groups_total:.1f}h / {n_teachers} teachers = {practical_hours_one:.1f}h/teacher"
-            )
+            # Calculate per-teacher breakdown details
+            new_first_per_session = contact_per_practical * config.TEACHING_MULTIPLIERS["lecture_new_content_or_lecturer"] * practicals_count
+            std_first_per_session = contact_per_practical * config.TEACHING_MULTIPLIERS["problem_class_seminar_practical"] * practicals_count
 
-            # Add to breakdown (per-teacher values)
-            practical_breakdown["practicals_first_time"] = weekly_first_one / n_teachers if n_teachers > 0 else 0
-            if weekly_repeat_one > 0:
-                practical_breakdown["practicals_repeat"] = weekly_repeat_one / n_teachers if n_teachers > 0 else 0
+            # Display individual practical hours per teacher type
+            # Note: first_session values are weekly hours (include practicals_count)
+            if new_lecturers_practical and standard_lecturers_practical:
+                total_new = individual_practical_hours[new_lecturers_practical[0]] * practical_week_count
+                total_std = individual_practical_hours[standard_lecturers_practical[0]] * practical_week_count
+                practical_details.append(
+                    f"Practicals: {n_groups} groups shared by {n_teachers} lecturers, "
+                    f"{practical_week_count}w - New: {new_first_per_session:.1f}h/week @ 5x + repeats; "
+                    f"Standard: {std_first_per_session:.1f}h/week @ 2.5x + repeats ({repeat_sessions} grps @ {rep_rate}x); "
+                    f"{repeat_display}; "
+                    f"New: {total_new:.1f}h, Standard: {total_std:.1f}h"
+                )
+            elif new_lecturers_practical:
+                # All are new lecturers
+                total_new = individual_practical_hours[new_lecturers_practical[0]] * practical_week_count
+                practical_details.append(
+                    f"Practicals: {n_groups} groups shared by {n_teachers} lecturers, "
+                    f"{practical_week_count}w - New: {new_first_per_session:.1f}h/week @ 5x + repeats; "
+                    f"{repeat_display}; "
+                    f"Total: {total_new:.1f}h"
+                )
+            else:
+                # All are standard lecturers
+                total_std = individual_practical_hours[standard_lecturers_practical[0]] * practical_week_count
+                practical_details.append(
+                    f"Practicals: {n_groups} groups shared by {n_teachers} lecturers, "
+                    f"{practical_week_count}w - Standard: {std_first_per_session:.1f}h/week @ 2.5x + repeats ({repeat_sessions} grps @ {rep_rate}x); "
+                    f"{repeat_display}; "
+                    f"Total: {total_std:.1f}h"
+                )
+
+            # Add to breakdown (per-teacher values - use individual hours)
+            for t in teachers:
+                if t not in practical_breakdown.get("practicals_per_teacher", {}):
+                    if "practicals_per_teacher" not in practical_breakdown:
+                        practical_breakdown["practicals_per_teacher"] = {}
+                    practical_breakdown["practicals_per_teacher"][t] = individual_practical_hours[t] * practical_week_count
+
         else:
             # No parallel groups - single session type shared by all teachers
-            # Per spec: "For each repetition of an identical class have a multiplier of 1.5 times contact duration."
-            # - First delivery (first week): first-delivery rate for each teacher based on their status
-            # - Subsequent deliveries (other weeks): repetition rate (1.5x)
+            # Each week: one session delivered once at 2.5x (first delivery) or 1.5x (repeat)
 
             rep_rate = config.REPETITION_MULTIPLIER  # 1.5
 
-            n_teachers = len(teachers)
+            # No parallel groups - single session shared by all teachers
+            # Each week: one session delivered once
+            # First delivery (week 1) at higher rate, repeats at lower rate
+            #
+            # For new lecturers: first session = 5x (content dev + delivery)
+            # For standard lecturers: first session = 2.5x (delivery only)
+            # Alllecturers share the same session, so we calculate total then divide
 
-            # Calculate per-teacher hours (not summed across teachers)
-            teacher_first_mult = None
-            weekly_first_one = 0.0
-            weekly_repeat_one = 0.0
+            if practical_week_count > 0:
+                # First week's session - split by lecturer type
+                # Multiply by practicals_count since each teacher delivers that many sessions per week
+                first_week_first_delivery = contact_per_practical * config.TEACHING_MULTIPLIERS["lecture_new_content_or_lecturer"] * practicals_count
+                first_week_std_delivery = contact_per_practical * config.TEACHING_MULTIPLIERS["problem_class_seminar_practical"] * practicals_count
 
-            for t in teachers:
-                if t not in known_lecturers:
-                    first_time_mult = config.TEACHING_MULTIPLIERS["lecture_new_content_or_lecturer"]  # 5
+                # Total for first week (all lecturers combined)
+                first_week_total = (
+                    len(new_lecturers_practical) * first_week_first_delivery +
+                    len(standard_lecturers_practical) * first_week_std_delivery
+                )
+                first_week_per_teacher = first_week_total / n_teachers
+
+                # Other weeks - all at repetition rate (1.5x)
+                other_weeks_count = max(0, practical_week_count - 1)
+                if other_weeks_count > 0:
+                    repeat_session_hours = contact_per_practical * rep_rate * practicals_count
+                    other_weeks_total = other_weeks_count * repeat_session_hours * n_teachers
+                    other_weeks_per_teacher = other_weeks_total / n_teachers
+
+                    practical_hours_one = first_week_per_teacher + other_weeks_per_teacher
                 else:
-                    first_time_mult = config.TEACHING_MULTIPLIERS["problem_class_seminar_practical"]  # 2.5
+                    practical_hours_one = first_week_per_teacher
+            else:
+                practical_hours_one = 0.0
 
-                if teacher_first_mult is None:
-                    teacher_first_mult = first_time_mult
-
-                weekly_first_one += contact_per_practical * first_time_mult
-                weekly_repeat_one += len(other_weeks) * contact_per_practical * rep_rate
-
-            # Each teacher gets their own share (we sum then divide by n_teachers since loop accumulated)
-            practical_hours_one = (weekly_first_one + weekly_repeat_one) / n_teachers
             practical_hours_total = practical_hours_one * n_teachers  # Total for all teachers
 
-            # Calculate breakdown for display
-            first_time_total = contact_per_practical * teacher_first_mult
-            repeat_weeks_total = len(other_weeks) * contact_per_practical * rep_rate
+            # Store per-teacher practical hours (same for all when no parallel groups)
+            for t in teachers:
+                individual_practical_hours[t] = practical_hours_one
 
-            if other_weeks:
-                weeks_str = ", ".join(str(w) for w in other_weeks)
-                repeat_display = f"weeks {weeks_str} @ {rep_rate}x"
+            # Build display details
+            repeat_count = max(0, practical_week_count - 1)
+            if repeat_count > 0:
+                weeks_str = ", ".join(str(w) for w in other_weeks[:5])
+                if len(other_weeks) > 5:
+                    weeks_str += "..."
+                repeat_display = f"{repeat_count}w @ {rep_rate}x (weeks {weeks_str})"
             else:
                 repeat_display = "no repeats"
 
+            new_first_per_session = contact_per_practical * config.TEACHING_MULTIPLIERS["lecture_new_content_or_lecturer"] * practicals_count
+            std_first_per_session = contact_per_practical * config.TEACHING_MULTIPLIERS["problem_class_seminar_practical"] * practicals_count
+
+            total_for_all_teachers = practical_hours_one
             practical_details.append(
-                f"Practicals: {practical_week_count}w - week {first_week}: 1 grp x {contact_per_practical:.1f}h x {teacher_first_mult}x = {first_time_total:.1f}h; "
-                f"{repeat_display}: {len(other_weeks)}w x 1 grp x {contact_per_practical:.1f}h x {rep_rate}x = {repeat_weeks_total:.1f}h; "
-                f"Total: {first_time_total + repeat_weeks_total:.1f}h / {n_teachers} teachers = {practical_hours_one:.1f}h/teacher"
+                f"Practicals: {practical_week_count}w - New lecturers: {new_first_per_session:.1f}h/week @ 5x; "
+                f"Standard lecturers: {std_first_per_session:.1f}h/week @ 2.5x; "
+                f"{repeat_display}: {contact_per_practical * practicals_count:.1f}h @ {rep_rate}x = {contact_per_practical * rep_rate * practicals_count:.1f}h/week; "
+                f"Total: {total_for_all_teachers:.1f}h/teacher"
             )
 
-            practical_breakdown["practicals_first_time"] = weekly_first_one / n_teachers if n_teachers > 0 else 0
-            if weekly_repeat_one > 0:
-                practical_breakdown["practicals_repeat"] = weekly_repeat_one / n_teachers if n_teachers > 0 else 0
+            practical_breakdown["practicals_first_time"] = first_week_per_teacher if practical_week_count > 0 else 0.0
+            if repeat_count > 0:
+                practical_breakdown["practicals_repeat"] = contact_per_practical * rep_rate
 
     # Add repetition_multiplier back if removed
     if "repetition_multiplier" not in config.TEACHING_MULTIPLIERS:
@@ -246,32 +368,101 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
         pass
 
     # Assessment setting (per teacher based on whether THEY are new)
+    # New lecturers get higher multiplier for first-time assessment setup
+    # Standard lecturers get lower multiplier for familiar assessment formats
+    # Split into main paper and resit paper for display purposes
     assessment_hours = {t: 0.0 for t in teachers}
     assessment_details = []
     assessment_count = module.assessment_count
 
     if assessment_count > 0:
+        # Calculate base setting cost at standard rate for all assessments
+        base_setting_cost = config.ASSESSMENT_MANUAL_STANDARD * assessment_count
+
+        # Resit papers take the same time to set as main papers (same effort)
+        # The 20% resit student assumption only applies to marking, not setting
+        # For display: split total setting time equally between main and resit
+        resit_paper_proportion = 1.0  # Resit papers take full setting time
+
+        # New lecturers get additional time for first-time setup
+        # Difference: new_setter_same_format (22.5) - standard (15) = 7.5h per assessment
+        std_per_assessment = base_setting_cost / assessment_count if assessment_count > 0 else 0
+
         setting_details_parts = []
         for t in teachers:
-            if t not in known_lecturers:
-                setting_cost = config.ASSESSMENT_MANUAL_NEW_SETTER * assessment_count
-                assessment_hours[t] = setting_cost / len(teachers)
+            if t not in known_lecturers_for_module:
+                # New setter: standard time + additional content development time
+                # At 22.5h vs 15h per assessment, the difference is 7.5h
+                base_hours = base_setting_cost / len(teachers)
+                content_dev_per_assessment = config.ASSESSMENT_MANUAL_NEW_SETTER - config.ASSESSMENT_MANUAL_STANDARD
+                additional_content_hours = (content_dev_per_assessment * assessment_count) / len(teachers)
+                total_hours = base_hours + additional_content_hours
+
+                assessment_hours[t] = total_hours
+                # Resit papers take same time to set as main papers
+                # For display: split equally since each paper type requires full setting effort
+                main_paper_hours = (base_setting_cost / 2) / len(teachers)
+                resit_paper_hours = (base_setting_cost / 2) / len(teachers)
+                setting_details_parts.append(
+                    f"New setter ({config.ASSESSMENT_MANUAL_NEW_SETTER}h/assess): "
+                    f"{main_paper_hours:.1f}h main + {resit_paper_hours:.1f}h resit = {total_hours:.1f}h"
+                )
             else:
-                setting_cost = config.ASSESSMENT_MANUAL_STANDARD * assessment_count
-                assessment_hours[t] = setting_cost / len(teachers)
+                # Standard setter: just the base cost divided equally
+                base_hours = base_setting_cost / len(teachers)
+                assessment_hours[t] = base_hours
+
+                # Split between main and resit for display (equal portions, both full setting time)
+                main_paper_hours = (base_setting_cost / 2) / len(teachers)
+                resit_paper_hours = (base_setting_cost / 2) / len(teachers)
+
+                setting_details_parts.append(
+                    f"Standard ({config.ASSESSMENT_MANUAL_STANDARD}h/assess): "
+                    f"{main_paper_hours:.1f}h main + {resit_paper_hours:.1f}h resit = {base_hours:.1f}h"
+                )
 
         # Use standard cost for display (all teachers share same assessment count)
-        assessment_details.append(f"{assessment_count} assessment(s) set at {config.ASSESSMENT_MANUAL_STANDARD}h each")
+        # Each assessment includes both main and resit papers = 2 papers
+        # For display: show the split as equal portions of total setting time
+        num_papers = assessment_count * 2  # Main + resit for each assessment
+        paper_total_per_assessment = config.ASSESSMENT_MANUAL_STANDARD
+        total_setting_cost = num_papers * paper_total_per_assessment / len(teachers)
+
+        main_paper_total = (assessment_count * paper_total_per_assessment) / 2 / len(teachers)
+        resit_paper_total = (assessment_count * paper_total_per_assessment) / 2 / len(teachers)
+
+        # Display: show both main and resit papers separately in the count
+        # Each assessment has 2 papers (main + resit), so total papers = assessments * 2
+        num_papers = assessment_count * 2
+        assessment_details.append(
+            f"{num_papers} paper(s) set ({assessment_count} assessment(s)): "
+            f"{paper_total_per_assessment:.1f}h each ({main_paper_total:.1f}h main + {resit_paper_total:.1f}h resit)"
+        )
 
     # Assessment marking (split equally among teachers)
+    # Assume 20% of students do resits (additional marking workload)
     marking_hours_per_teacher = 0.0
     marking_details = []
     if module.student_count > 0:
         per_script = config.MARKING_MANUAL_MSC
-        total_scripts = module.student_count
+        initial_students = module.student_count
+        resit_proportion = 0.20  # 20% of students do resits
+
+        # Calculate main and resit script counts
+        initial_scripts = initial_students
+        resit_students = int(initial_students * resit_proportion)
+        resit_scripts = resit_students
+
+        total_scripts = initial_scripts + resit_scripts
         marking_hours_per_teacher = (total_scripts * per_script) / max(len(teachers), 1)
+
+        # Breakdown showing main paper, resit papers, and total
+        initial_hours = initial_scripts * per_script
+        resit_hours = resit_scripts * per_script
+
         marking_details.append(
-            f"{total_scripts} scripts x {per_script}h = {total_scripts * per_script:.1f}h total, "
+            f"{initial_scripts} scripts + {resit_scripts} resits x {per_script}h = "
+            f"{total_scripts * per_script:.1f}h total ({initial_hours:.1f}h initial + {resit_hours:.1f}h resit), "
             f"{marking_hours_per_teacher:.1f}h per teacher"
         )
 
@@ -279,41 +470,12 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
     admin_flat = config.MARKING_MANUAL_ADMIN
     admin_hours_per_teacher = (admin_flat * assessment_count) / max(len(teachers), 1)
 
-    # Supervision - calculate per-teacher based on their individual project load
+    # Supervision - moved outside per-module calculation since it's staff-level, not module-level
     # The supervision allocation is passed as an immutable object containing
-    # pastoral counts and project loads for all teachers
-    supervision_details = []
-    teacher_supervision_hours = {}  # {teacher: hours}
-
-    proj_mult = config.SUPERVISION_MULTIPLIERS["ug_project"] if module.stage < 10 else config.SUPERVISION_MULTIPLIERS["msc_project"]
-
-    for teacher in teachers:
-        # Teacher names are already normalized to canonical form by the caller
-        # Use them directly as keys into supervision allocation
-
-        supervision_hours = 0.0
-        teacher_details = []
-
-        # Get pastoral student count from supervision allocation
-        pastoral_count = supervision.pastoral_students.get(teacher, 0)
-
-        if pastoral_count > 0:
-            pastoral_hours = pastoral_count * config.SUPERVISION_MULTIPLIERS["pastoral"]
-            supervision_hours += pastoral_hours
-            teacher_details.append(f"Pastoral: {pastoral_count:.1f} students x {config.SUPERVISION_MULTIPLIERS['pastoral']}h = {pastoral_hours:.0f}h")
-
-        # Get project load for this teacher from supervision allocation (already ceiling'd)
-        teacher_project_load = supervision.project_loads.get(teacher, 0)
-
-        if teacher_project_load > 0:
-            teacher_project_hours = teacher_project_load * proj_mult
-            supervision_hours += teacher_project_hours
-            teacher_details.append(f"Projects: {teacher_project_load:.1f} projects x {proj_mult}h = {teacher_project_hours:.1f}h")
-
-        teacher_supervision_hours[teacher] = supervision_hours
-
-        if teacher_details:
-            supervision_details.append(f"{teacher}: {'; '.join(teacher_details)}")
+    # pastoral counts and project loads for all teachers. We track it here but
+    # the actual hours will be added once at the end in calculate_workload()
+    teacher_supervision_hours = {t: 0.0 for t in teachers}  # Placeholder - not used per module
+    supervision_details = []  # Not populated per-module anymore
 
     # Calculate per-teacher total for this module
     result = {}
@@ -325,9 +487,10 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
         teacher_assessment_hours = assessment_hours.get(teacher, 0.0)
 
         # Total for this teacher from module activities (shared items divided by num_teachers)
+        # Note: practicals are multiplied by weeks to get yearly total
         total_teacher_hours = (
             teacher_lecture_hours_with_mult +
-            practical_hours_one +  # Already per-teacher
+            individual_practical_hours.get(teacher, practical_hours_one) * practical_week_count +  # Yearly practical hours
             teacher_assessment_hours +
             marking_hours_per_teacher +
             admin_hours_per_teacher +
@@ -335,23 +498,30 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
         )
 
         # Calculate base lecture hours for display
-        teacher_lecture_base = lecture_hours / lecture_multipliers[teacher] if lecture_multipliers[teacher] > 0 else lecture_hours
+        # For new lecturers: total = delivery + content_dev = (base × 2.5) + (base × 2.5)
+        # where base = lecture_hours / num_teachers
+        # Display shows the actual per-teacher calculation
         module_detail_parts = []
         if lecture_multipliers[teacher] == config.TEACHING_MULTIPLIERS["lecture_new_content_or_lecturer"]:
-            module_detail_parts.append(f"New lecturer (5x): {teacher_lecture_base:.1f}h x 5 = {teacher_lecture_hours_with_mult:.0f}h")
+            # For new lecturer, show: base_share × 5x = total (delivery + content dev)
+            base_share = lecture_hours / len(teachers) if teachers else 0
+            module_detail_parts.append(f"New lecturer ({config.TEACHING_MULTIPLIERS['lecture_new_content_or_lecturer']}x): {base_share:.1f}h base @ 2.5x + content dev = {teacher_lecture_hours_with_mult:.0f}h")
         else:
-            module_detail_parts.append(f"Standard (2.5x): {teacher_lecture_base:.1f}h x 2.5 = {teacher_lecture_hours_with_mult:.0f}h")
+            module_detail_parts.append(f"Standard ({config.TEACHING_MULTIPLIERS['lecture_standard']}x): {teacher_lecture_hours_with_mult:.1f}h")
 
         if practical_details:
             module_detail_parts.extend(practical_details)
         module_detail_parts.append(assessment_details[0] if assessment_details else "")
         module_detail_parts.extend(marking_details)
 
+        # Calculate total practical hours for this teacher (per-week × weeks)
+        teacher_practical_total = individual_practical_hours.get(teacher, practical_hours_one) * practical_week_count
+
         result[teacher] = {
             "hours": total_teacher_hours,
             "teaching_breakdown": {
                 "teaching": teacher_lecture_hours_with_mult,
-                "practicals": practical_hours_one,
+                "practicals": teacher_practical_total,  # Total practical hours (weekly × weeks)
                 "assessment_setting": teacher_assessment_hours,
                 "marking": marking_hours_per_teacher,
                 "admin": admin_hours_per_teacher,
@@ -366,6 +536,7 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
 
 # --- Research Workload ---
 
+
 def _calculate_research_workload(staff_member: StaffData) -> tuple:
     """
     Calculate research workload for a staff member.
@@ -373,44 +544,53 @@ def _calculate_research_workload(staff_member: StaffData) -> tuple:
     Returns (total_hours, breakdown_dict, detail_string, grant_titles_dict)
     where grant_titles_dict maps project_id -> display title for output.
 
-    ART staff only get the protected baseline (10% of nominal hours = 164.2h).
-    Non-ART staff (with research grants) also get the primary research allowance.
+    University now has only 10% protected baseline for all staff.
+    Only IGGI project staff get an additional primary research allowance (20%).
+    ART staff only get the protected baseline (no additional allowance).
+
+    Research workload consists of:
+        - Protected baseline: 10% of nominal hours (164.2h for full-time)
+        - Additional work from PhD supervision, research grants, and project marking
+
+    Args:
+        staff_member: StaffData object with supervision counts and grant data
+
+    Returns:
+        Tuple of (total_hours, breakdown_dict, detail_string, grant_titles_dict) where:
+            - total_hours: Sum of all research activities
+            - breakdown_dict: Category-wise hour allocations
+            - detail_string: Human-readable summary
+            - grant_titles_dict: Mapping of project IDs to display titles
     """
     total = 0.0
     details = []
     breakdown = {}
     grant_titles = {}  # project_id -> title mapping for output display
 
-    # ART staff only get the protected baseline, not the additional primary research allowance
-    is_art_staff = (staff_member.category or "").upper() == "ART"
 
-    if not is_art_staff and staff_member.research_projects:
-        # Non-ART staff with research grants get primary research allowance
-        primary_allowance = config.RESEARCH_ALLOWANCES.get("primary_research_allowance_art", 328.4)
-        total += primary_allowance
-        breakdown["primary_research_allowance"] = primary_allowance
-        details.append(f"Primary research allowance: {primary_allowance:.1f}h")
+    # Note: IGGI project staff are identified by their grant in % FTE for CS.csv
+    # There is no separate "primary research allowance" - all research work comes from grants
 
     # PhD supervision work (supervisor, co-supervisor and assessor are part of research workload)
     phd_hours = 0.0
     phd_details = []
     phd_breakdown = {}
 
-    # Sole supervisors (primary supervisor role)
+    # Sole supervisors (primary supervisor role) - full-time PhD students
     if staff_member.phd_supervisions > 0:
         sole_count = staff_member.phd_supervisions
         sole_hours = sole_count * config.SUPERVISION_MULTIPLIERS["pgr_primary_supervisor_per_fte"]
         phd_hours += sole_hours
         phd_breakdown["primary_supervisor"] = sole_hours
-        phd_details.append(f"{sole_count}x primary supervisor ({config.SUPERVISION_MULTIPLIERS['pgr_primary_supervisor_per_fte']}h each)")
+        phd_details.append(f"{sole_count}x full-time PhD student × {config.SUPERVISION_MULTIPLIERS['pgr_primary_supervisor_per_fte']}h/FTE")
 
-    # Co-supervisors
+    # Co-supervisors - part-time PhD students (60% of primary)
     if staff_member.phd_co_supervisions > 0:
         co_count = staff_member.phd_co_supervisions
         co_hours = co_count * config.SUPERVISION_MULTIPLIERS["pgr_co_supervisor_per_fte"]
         phd_hours += co_hours
         phd_breakdown["co_supervisor"] = co_hours
-        phd_details.append(f"{co_count}x co-supervisor ({config.SUPERVISION_MULTIPLIERS['pgr_co_supervisor_per_fte']}h each)")
+        phd_details.append(f"{co_count}x part-time PhD student × {config.SUPERVISION_MULTIPLIERS['pgr_co_supervisor_per_fte']}h/FTE")
 
     # TAP assessor work (assessor for PhD students)
     if staff_member.phd_assessor_count > 0:
@@ -423,7 +603,18 @@ def _calculate_research_workload(staff_member: StaffData) -> tuple:
     if phd_hours > 0:
         total += phd_hours
         breakdown["phd_supervision"] = phd_hours
-        details.append(f"PhD supervision: {'; '.join(phd_details)} = {phd_hours:.1f}h")
+        # Build formula string showing N × 80 + M × 48 structure
+        formula_parts = []
+        if staff_member.phd_supervisions > 0:
+            formula_parts.append(f"{staff_member.phd_supervisions} × {config.SUPERVISION_MULTIPLIERS['pgr_primary_supervisor_per_fte']}")
+        if staff_member.phd_co_supervisions > 0:
+            formula_parts.append(f"{staff_member.phd_co_supervisions} × {config.SUPERVISION_MULTIPLIERS['pgr_co_supervisor_per_fte']}")
+        if staff_member.phd_assessor_count > 0:
+            formula_parts.append(f"{assessor_count} × {config.SUPERVISION_MULTIPLIERS['pgr_assessor']}")
+        formula_str = " + ".join(formula_parts) if formula_parts else ""
+        # Add explanation of what's included in PhD supervision
+        explanation = "PhD supervision (primary supervisor, co-supervisor & assessor)"
+        details.append(f"{explanation} ({formula_str}): {'; '.join(phd_details)} = {phd_hours:.1f}h")
 
     # Research grant time (from % FTE for CS.csv)
     grant_titles = {}  # project_id -> title mapping for output display
@@ -448,15 +639,27 @@ def _calculate_research_workload(staff_member: StaffData) -> tuple:
 
 # --- Administration Workload ---
 
+
 def _calculate_admin_workload(staff_member: StaffData, nominal_hours: float) -> tuple:
     """
     Calculate administration workload from departmental roles and service points.
 
-    Returns (total_hours, breakdown_dict, detail_string)
+    Args:
+        staff_member: StaffData object with role assignments
+        nominal_hours: Annual working hours (scaled by FTE)
+
+    Returns:
+        Tuple of (total_hours, breakdown_dict, detail_string) where:
+            - total_hours: Sum of all administrative activities
+            - breakdown_dict: Role-wise hour allocations
+            - detail_string: Human-readable summary
     """
     total = 0.0
     details = []
     breakdown = {}
+
+    # Track which roles have been counted to avoid double-counting
+    counted_roles = set()
 
     for role in staff_member.roles:
         percentage = config.ROLES_PERCENTAGE.get(role, 0.0)
@@ -464,38 +667,82 @@ def _calculate_admin_workload(staff_member: StaffData, nominal_hours: float) -> 
         total += hours
         breakdown[role] = hours
         details.append(f"{role}: {percentage*100:.0f}% of {nominal_hours:.0f}h = {hours:.1f}h")
+        counted_roles.add(role)
 
-    # Add service points (university-level committee work) for administrative staff
-    # Service points are typically 175h for HoD and other senior admin roles
-    if staff_member.roles:  # Only add service points if they have any departmental roles
-        service_hours = config.SERVICE_POINTS_DEFAULT
-        total += service_hours
-        breakdown["service_points"] = service_hours
-        details.append(f"Service points (committee work): {service_hours:.0f}h")
+    # Add service points - general baseline activities for all staff
+    # This includes engagement (email/meetings) and personal development
+    # Based on BASELOADS: engagement=100h + personal_development=75h = 175h total
+    engagement_hours = config.BASELOADS.get('engagement', 100.0)
+    personal_dev_hours = config.BASELOADS.get('personal_development', 75.0)
+    service_hours = engagement_hours + personal_dev_hours
+
+    total += service_hours
+    breakdown["engagement"] = engagement_hours
+    breakdown["personal_development"] = personal_dev_hours
+    details.append(f"Engagement (email/meetings): {engagement_hours:.1f}h")
+    details.append(f"Personal development: {personal_dev_hours:.1f}h")
 
     return total, breakdown, "; ".join(details) if details else "No administrative roles"
 
 
 # --- Main Calculation ---
 
+"""
+Calculate the complete workload for all staff members.
+
+This is the main entry point for the workload calculation engine. It processes
+all modules and staff, applying teaching multipliers, research allowances,
+and administrative role percentages to compute total workload hours.
+
+Args:
+    year_data: YearData object containing module data, staff data, known lecturers,
+        and metadata for the academic year
+
+Returns:
+    List of WorkloadResult objects, one per active staff member.
+    Each result contains:
+        - name: Staff member's canonical name
+        - fte: Full-time equivalent (1.0 for full-time)
+        - total_hours: Total workload (teaching + research + admin)
+        - teaching_hours: Teaching-related activities
+        - research_hours: Research time (protected baseline + additional)
+        - admin_hours: Administrative role hours
+        - teaching/research/admin_details: Human-readable breakdown strings
+        - teaching/research/admin_breakdown: Structured hour allocations by category
+
+The workload formula is:
+    Total = Teaching + Research (Protected + Additional) + Admin
+"""
 def calculate_workload(year_data: YearData) -> List[WorkloadResult]:
-    """Calculate the complete workload for all staff members. Returns a list of WorkloadResult, one per staff member."""
+    # Convert tuples to dicts for internal use (YearData is immutable at the container level)
+    staff_dict = {s.canonical_name: s for s in year_data.staff}
+
     # Allocate supervision once for all teachers (pure function)
-    supervision = allocate_supervision(year_data.staff)
+    supervision = allocate_supervision(staff_dict)
 
     # Initialize per-staff teaching totals
-    staff_teaching = {name: {"hours": 0.0, "details": []} for name in year_data.staff}
+    staff_teaching = {name: {"hours": 0.0, "details": []} for name in staff_dict}
 
     # Process each module
     for module in year_data.modules:
-        # Normalize teacher names
+        # Normalize teacher names (use reverse_lookup instead of name_lookup)
         normalized_teachers = []
         for t in module.teachers:
-            name = normalize_name(t.strip(), year_data.name_lookup, unknown_callback=None)
+            name = normalize_name(t.strip(), year_data.reverse_lookup, unknown_callback=None)
             if name:
                 normalized_teachers.append(name)
             else:
                 normalized_teachers.append(t.strip())
+
+        # Include the module lead as a teacher only if they're also listed as one of the teachers
+        # The lead column (column 6 in WTW CSV) is separate from the teacher columns (7-8)
+        # Only add lead to teachers list if they're teaching the module
+        if module.lead_name:
+            lead_name = normalize_name(module.lead_name.strip(), year_data.reverse_lookup, unknown_callback=None)
+            # Only add if lead is also in the teachers list (i.e., they're actually teaching)
+            if lead_name and lead_name in normalized_teachers:
+                # Lead is already in the list, no need to add again
+                pass
 
         if not normalized_teachers:
             # Module has no teachers - flag as incomplete
@@ -503,7 +750,8 @@ def calculate_workload(year_data: YearData) -> List[WorkloadResult]:
 
         # Calculate teaching workload (supervision passed as immutable allocation)
         module_teaching = _calculate_teaching_workload(
-            module, normalized_teachers, year_data.known_lecturers, year_data.staff,
+            module, normalized_teachers, year_data.known_lecturers,
+            year_data.known_lecturers_per_module, staff_dict,
             supervision=supervision
         )
 
@@ -525,12 +773,13 @@ def calculate_workload(year_data: YearData) -> List[WorkloadResult]:
 
     # Build results
     results = []
-    for canonical_name, staff in year_data.staff.items():
+    for canonical_name, staff in staff_dict.items():
         if not staff.active:
             continue
 
-        # Nominal hours scaled by FTE for part-time staff
-        nominal_hours = config.NOMINAL_WORKING_HOURS_PER_YEAR * staff.fte
+        # Nominal hours scaled by FTE for part-time staff (StaffData is now frozen)
+        fte_value = staff.fte if staff.fte > 0 else 1.0
+        nominal_hours = config.NOMINAL_WORKING_HOURS_PER_YEAR * fte_value
 
         # Teaching - default to minimum teaching hours for administrative staff
         teaching_hours = staff_teaching.get(canonical_name, {}).get("hours", 0.0)
@@ -542,15 +791,15 @@ def calculate_workload(year_data: YearData) -> List[WorkloadResult]:
 
         if not has_module_teaching:
             # Administrative staff need a minimum teaching component
-            # HoD typically has reduced teaching - use default of 30h
+            # HoD typically has reduced teaching - use default from config (from workload_parameters.yaml)
             if "Head of Department" in staff.roles or len(staff.roles) > 1:
-                min_teaching = config.BASELOADS.get("min_admin_teaching", 30.0)
+                min_teaching = config.MIN_ADMIN_TEACHING_HOURS
                 if min_teaching > 0:
                     teaching_hours = min_teaching
-                    # Add detail for minimum admin teaching
+                    # Add detail for minimum admin teaching - show source reference
                     staff_teaching[canonical_name]["hours"] = min_teaching
                     staff_teaching[canonical_name]["details"].append(
-                        f"Minimum administrative teaching load: {min_teaching:.0f}h"
+                        f"Minimum administrative teaching load (from workload_parameters.yaml): {min_teaching:.0f}h"
                     )
                     # Also set up the teaching_breakdown for this entry
                     if "teaching_breakdown" not in staff_teaching[canonical_name]:
@@ -573,28 +822,73 @@ def calculate_workload(year_data: YearData) -> List[WorkloadResult]:
         staff_teaching[canonical_name]["hours"] += project_setting_hours
         staff_teaching[canonical_name]["teaching_breakdown"]["project_setting"] = project_setting_hours
 
+        # Supervision - add once per staff member (not per module)
+        # Get pastoral and project supervision from the allocation object
+        pastoral_count = supervision.pastoral_students.get(canonical_name, 0)
+        if pastoral_count > 0:
+            pastoral_hours = pastoral_count * config.SUPERVISION_MULTIPLIERS["pastoral"]
+            teaching_hours += pastoral_hours
+            staff_teaching[canonical_name]["hours"] += pastoral_hours
+            if "teaching_breakdown" not in staff_teaching[canonical_name]:
+                staff_teaching[canonical_name]["teaching_breakdown"] = {}
+            staff_teaching[canonical_name]["teaching_breakdown"]["pastoral_supervision"] = pastoral_hours
+            # Add supervision detail for HTML display
+            if "supervision_details" not in staff_teaching[canonical_name]:
+                staff_teaching[canonical_name]["supervision_details"] = []
+            staff_teaching[canonical_name]["supervision_details"].append(
+                f"Pastoral: {pastoral_count} students x {config.SUPERVISION_MULTIPLIERS['pastoral']}h = {pastoral_hours:.1f}h"
+            )
+
+        # Get project load for this teacher from supervision allocation (already ceiling'd)
+        teacher_project_load = supervision.project_loads.get(canonical_name, 0)
+
+        if teacher_project_load > 0:
+            proj_mult = config.SUPERVISION_MULTIPLIERS["ug_project"]
+            if canonical_name in staff_dict:
+                # Use stage from staff's modules to determine project multiplier
+                for mod in year_data.modules:
+                    if canonical_name in [normalize_name(t, year_data.reverse_lookup, unknown_callback=None) or t for t in mod.teachers]:
+                        if mod.stage >= 10:  # MSc and above
+                            proj_mult = config.SUPERVISION_MULTIPLIERS["msc_project"]
+                            break
+            project_hours = teacher_project_load * proj_mult
+            teaching_hours += project_hours
+            staff_teaching[canonical_name]["hours"] += project_hours
+            if "teaching_breakdown" not in staff_teaching[canonical_name]:
+                staff_teaching[canonical_name]["teaching_breakdown"] = {}
+            staff_teaching[canonical_name]["teaching_breakdown"]["project_supervision"] = project_hours
+            # Add supervision detail for HTML display
+            if "supervision_details" not in staff_teaching[canonical_name]:
+                staff_teaching[canonical_name]["supervision_details"] = []
+            proj_level = "UG" if proj_mult == config.SUPERVISION_MULTIPLIERS["ug_project"] else "MSc"
+            staff_teaching[canonical_name]["supervision_details"].append(
+                f"Projects: {teacher_project_load} projects x {proj_level} ({proj_mult}h) = {project_hours:.1f}h"
+            )
+
         # General baseline (outside teaching/research/admin)
         # Engagement and personal dev are per staff member, not shared
         engagement_baseline = config.BASELOADS.get("engagement", 100)
-        personal_dev = config.BASELOADS["personal_development"] * staff.fte
+        personal_dev = config.BASELOADS["personal_development"] * fte_value
 
-        # Protected research baseline (10% of nominal hours)
-        protected_research = config.PROTECTED_RESEARCH_BASELINE * staff.fte
+        # Protected research baseline (10% of nominal hours) - included in all staff totals
+        protected_research = config.PROTECTED_RESEARCH_BASELINE * fte_value
 
-        # Research (additional to protected baseline - grants, supervision)
+        # Research (grants, supervision - additional to protected baseline)
         research_hours, research_breakdown, research_detail, grant_titles = _calculate_research_workload(staff)
 
-        # Total research includes protected baseline + additional work
-        research_total = protected_research + research_hours
+        # Add protected baseline to breakdown
+        research_breakdown['protected_research_baseline'] = protected_research
 
-        # Add protected research baseline to breakdown for transparency in reports
-        research_breakdown["protected_research_baseline"] = protected_research
+        # Total research = protected baseline + additional work from grants/supervision
+        research_total = protected_research + research_hours
 
         # Administration
         admin_hours, admin_breakdown, admin_detail = _calculate_admin_workload(staff, nominal_hours)
 
-        # Total: teaching + research (protected + additional) + admin + general baseline
-        total_hours = teaching_hours + research_total + admin_hours + engagement_baseline + personal_dev
+        # Admin hours already include service_points (engagement + personal_dev)
+        # So we don't add them separately to avoid double-counting
+        # Total: teaching + research (protected + additional) + admin
+        total_hours = teaching_hours + research_total + admin_hours
 
         # Build detail strings
         teaching_detail_str = "; ".join(staff_teaching.get(canonical_name, {}).get("details", [])) if canonical_name in staff_teaching else "No teaching activities"
@@ -638,8 +932,12 @@ def calculate_workload(year_data: YearData) -> List[WorkloadResult]:
 
         if not staff.fte or staff.fte == 0:
             missing_data.append("FTE not found (defaulting to 1.0)")
-            staff.fte = 1.0
+            fte_for_calculation = 1.0
             nominal_hours = config.NOMINAL_WORKING_HOURS_PER_YEAR
+        else:
+            fte_for_calculation = staff.fte
+            # Nominal hours scaled by FTE for part-time staff
+            nominal_hours = config.NOMINAL_WORKING_HOURS_PER_YEAR * fte_for_calculation
 
         if not staff.roles:
             missing_data.append("No administrative roles assigned")
