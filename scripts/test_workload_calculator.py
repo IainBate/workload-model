@@ -751,6 +751,47 @@ class TestEdgeCases:
         assert len(result) == 3
 
 
+class TestNormalizeName:
+    """Tests for name normalization functionality (P1-3)."""
+
+    def test_normalize_name_rejects_no_answer(self):
+        """Test that normalize_name respects False return from unknown_callback (P1-3)."""
+        from data_loader import normalize_name
+
+        reverse_lookup = {
+            "john smith": "John Smith",
+            "jane doe": "Jane Doe"
+        }
+
+        # Create a mock callback that always returns False
+        def reject_all_callback(user_name, canonical_name):
+            return False
+
+        # When the callback returns False, should not use the partial match
+        result = normalize_name("john s", reverse_lookup, unknown_callback=reject_all_callback)
+
+        # Should be None (rejected), not "John Smith"
+        assert result is None
+
+    def test_normalize_name_accepts_yes_answer(self):
+        """Test that normalize_name accepts True return from unknown_callback."""
+        from data_loader import normalize_name
+
+        reverse_lookup = {
+            "john smith": "John Smith",
+            "jane doe": "Jane Doe"
+        }
+
+        # Create a mock callback that always returns True
+        def accept_all_callback(user_name, canonical_name):
+            return True
+
+        result = normalize_name("john s", reverse_lookup, unknown_callback=accept_all_callback)
+
+        # Should be "John Smith" (accepted)
+        assert result == "John Smith"
+
+
 class TestAssumptionsTracking:
     """Tests for assumptions tracking functionality."""
 
