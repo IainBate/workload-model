@@ -602,6 +602,10 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
         teacher_lecture_hours_with_mult = lecture_hours_with_mult.get(teacher, 0.0)
         teacher_assessment_hours = assessment_hours.get(teacher, 0.0)
 
+        # HW lab and drop-in hours per teacher
+        teacher_hw_lab = individual_hw_lab_hours.get(teacher, 0.0)
+        teacher_drop_in = individual_drop_in_hours.get(teacher, 0.0)
+
         # Total for this teacher from module activities (shared items divided by num_teachers)
         # Note: practicals are multiplied by weeks to get yearly total
         total_teacher_hours = (
@@ -610,7 +614,9 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
             teacher_assessment_hours +
             marking_hours_per_teacher +
             admin_hours_per_teacher +
-            teacher_supervision_hours.get(teacher, 0.0)
+            teacher_supervision_hours.get(teacher, 0.0) +
+            teacher_hw_lab +
+            teacher_drop_in
         )
 
         # Calculate base lecture hours for display
@@ -627,6 +633,10 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
 
         if practical_details:
             module_detail_parts.extend(practical_details)
+        if hw_lab_details:
+            module_detail_parts.extend(hw_lab_details)
+        if drop_in_details:
+            module_detail_parts.extend(drop_in_details)
         module_detail_parts.append(assessment_details[0] if assessment_details else "")
         module_detail_parts.extend(marking_details)
 
@@ -642,6 +652,8 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
                 "marking": marking_hours_per_teacher,
                 "admin": admin_hours_per_teacher,
                 "supervision": teacher_supervision_hours.get(teacher, 0.0),
+                "hw_lab": teacher_hw_lab,
+                "drop_in": teacher_drop_in,
             },
             "detail_text": "; ".join(module_detail_parts),
             "supervision_details": [d for d in supervision_details if teacher in d],
