@@ -607,7 +607,7 @@ def _format_detailed_section_v2(title: str, detail_text: str) -> str:
 
     # Save last module if exists
     if current_module and current_segments:
-        modules[current_module] = current_segments
+        modules[current_module] = current_segments[:]
 
     # Build HTML output
     html_parts = []
