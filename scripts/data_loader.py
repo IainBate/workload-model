@@ -258,9 +258,10 @@ def normalize_name(name: str, reverse_lookup: Dict[str, str],
             if unknown_callback:
                 if unknown_callback(name, canonical):
                     return canonical
-                # User said no - don't match this alias
+                # User said no - don't match this alias, try next one
                 continue
-            return canonical
+            else:
+                return canonical
 
     # If nothing matches, ask the user or return as-is
     if unknown_callback:
