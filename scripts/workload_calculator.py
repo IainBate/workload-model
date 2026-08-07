@@ -914,6 +914,9 @@ def _calculate_research_workload(staff_member: StaffData) -> tuple:
 
     if phd_hours > 0:
         total += phd_hours
+        # Add detailed breakdown items first (primary, co-supervisor, assessor)
+        breakdown.update(phd_breakdown)
+        # Then add the combined total for reference
         breakdown["phd_supervision"] = phd_hours
         # Build formula string showing N × 80 + M × 48 structure
         formula_parts = []
