@@ -1367,12 +1367,10 @@ def generate_all_outputs(results: List[WorkloadResult], year_data: YearData,
     # Generate HTML report
     generate_html_report(results, year_data, output_dir)
 
-    # Generate role-based reports (four different formats)
+    # Generate role-based reports (individual and department summary only)
     print("\n" + "=" * 60)
     print("Generating Role-Based Reports")
     print("=" * 60)
 
     generate_individual_reports(results, year_data, INDIVIDUAL_DIR)
     generate_department_summary(results, year_data, DEPARTMENT_DIR)
-    generate_hybrid_dashboard(results, year_data, HYBRID_DIR)
-    generate_role_based_reports(results, year_data, ROLE_BASED_DIR)
