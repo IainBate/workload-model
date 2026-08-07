@@ -344,7 +344,7 @@ def generate_boxplots(results: List[WorkloadResult], year_data: YearData, output
         bottom2 = [b + v for b, v in zip(bottom2, values)]
 
     # Add expected workload reference lines AFTER bars - category-aware
-    staff_category_map = {s.canonical_name: s.category for s in year_data.staff.values()}
+    staff_category_map = {s.canonical_name: s.category for s in year_data.staff}
 
     for i, (comp, label, color) in enumerate(zip(detailed_components, detailed_labels, detailed_colors)):
         for j, (name, result) in enumerate(zip(names, results)):
