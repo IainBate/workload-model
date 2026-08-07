@@ -289,6 +289,7 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
 
             # Add Grants section if any (filter out 0.0h items)
             if grants:
+                research_html += "<tr><td colspan='2' style='padding-top:15px;font-weight:bold;color:#4CAF50;letter-spacing:0.5px'>Grants</td></tr>"
                 for key, val in sorted(grants.items(), key=lambda x: -x[1]):
                     if val > 0:  # Skip zero-value items
                         display_name = key.replace('_', ' ').title()
@@ -297,6 +298,7 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
 
             # Add PhD Students section if any (filter out 0.0h items)
             if phd_items:
+                research_html += "<tr><td colspan='2' style='padding-top:15px;font-weight:bold;color:#4CAF50;letter-spacing:0.5px'>PhD Students</td></tr>"
                 for key, val in sorted(phd_items.items(), key=lambda x: -x[1]):
                     if val > 0:  # Skip zero-value items
                         display_name = key.replace('_', ' ').title()
@@ -305,6 +307,7 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
 
             # Add other research items (filter out 0.0h items)
             if other_research:
+                research_html += "<tr><td colspan='2' style='padding-top:15px;font-weight:bold;color:#4CAF50;letter-spacing:0.5px'>Other Research</td></tr>"
                 for key, val in sorted(other_research.items(), key=lambda x: -x[1]):
                     if val > 0:  # Skip zero-value items
                         display_name = key.replace('_', ' ').title()
