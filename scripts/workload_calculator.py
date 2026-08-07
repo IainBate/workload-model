@@ -1266,7 +1266,11 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
             teaching_detail_str += f"; Also teaches: {', '.join(staff.saint_modules)} (SAINTS - not included in workload)"
 
         # Get module details list for reporting
-        module_details = staff_teaching.get(canonical_name, {}).get("details", [])
+        module_details = list(staff_teaching.get(canonical_name, {}).get("details", []))
+        # Add unique supervision details (Pastoral, Projects) to the module_details list
+        # so they appear as separate rows in the HTML table
+        if unique_supervision:
+            module_details.extend(unique_supervision)
 
         # Build structured teaching breakdown from per-module data
         teaching_breakdown = {}
