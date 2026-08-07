@@ -889,7 +889,8 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
         else:
             # For standard lecturers, show the calculation breakdown
             base_share = lecture_hours / len(teachers) if teachers else 0
-            module_detail_parts.append(f"Standard ({config.TEACHING_MULTIPLIERS['lecture_standard']}x): {base_share:.1f}h base @ 2.5x = {teacher_lecture_hours_with_mult:.1f}h")
+            total_for_display = base_share * config.TEACHING_MULTIPLIERS["lecture_standard"]
+            module_detail_parts.append(f"Standard ({config.TEACHING_MULTIPLIERS['lecture_standard']}x): {base_share:.1f}h/teacher @ 2.5x = {total_for_display:.1f}h")
 
         if practical_details:
             module_detail_parts.extend(practical_details)
