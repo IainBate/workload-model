@@ -450,94 +450,41 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
             # Combine new lecturers and existing with new content for display
             n_new_or_content = len(new_lecturers_practical) + len(existing_with_new_content_practical)
 
-            if new_lecturers_practical or existing_with_new_content_practical:
-                total_new_or_content = individual_practical_hours[new_lecturers_practical[0] if new_lecturers_practical else existing_with_new_content_practical[0]] * practical_week_count
-                repeat_hrs_per_week = (repeat_sessions * contact_per_practical * rep_rate)
-                # Calculate repeat sessions per teacher: each lecturer gets some share of repeat sessions
-                # repeat_sessions is the number of groups that don't have a "first" delivery slot
-                # Each lecturer gets one first session, so repeats are split among all teachers
-                repeats_per_lecturer = repeat_sessions / n_teachers if n_teachers > 0 else 0
-                if standard_lecturers_practical:
-                    total_std = individual_practical_hours[standard_lecturers_practical[0]] * practical_week_count
-                    # First time delivery section - each lecturer gets one first session per week
-                    first_time_sessions = min(n_groups, n_teachers)
-                    practical_details.append(
-                        f"First time delivery: {first_time_sessions} group(s) (one per lecturer) for {practical_week_count} weeks"
-                    )
-                    if n_new_or_content == 1:
-                        practical_details.append(
-                            f"  - New/new-content lecturer: {new_first_per_session:.1f}h/week @ 5x (one first session per week)"
-                        )
-                    else:
-                        practical_details.append(
-                            f"  - New/new-content lecturers ({n_new_or_content}): {new_first_per_session:.1f}h/week @ 5x each (one first session per week)"
-                        )
-                    if len(standard_lecturers_practical) == 1:
-                        practical_details.append(
-                            f"  - Standard lecturer: {std_first_per_session:.1f}h/week @ 2.5x (one first session per week)"
-                        )
-                    else:
-                        practical_details.append(
-                            f"  - Standard lecturers ({len(standard_lecturers_practical)}): {std_first_per_session:.1f}h/week @ 2.5x each (one first session per week)"
-                        )
-                    # Repeated sessions section
-                    if repeat_hrs_per_week > 0:
-                        practical_details.append(
-                            f"Repeated sessions: {repeat_sessions} group(s) without first-session slots, repeated weekly at {rep_rate}x"
-                        )
-                        practical_details.append(
-                            f"  - Total repeat rate: {repeat_hrs_per_week:.1f}h/week ({contact_per_practical:.1f}h/group × {repeat_sessions} groups × {rep_rate}x)"
-                        )
-                else:
-                    # All are new lecturers or have new content
-                    repeats_per_lecturer = repeat_sessions / n_teachers if n_teachers > 0 else 0
-                    # First time delivery section - each lecturer gets one first session per week
-                    first_time_sessions = min(n_groups, n_teachers)
-                    practical_details.append(
-                        f"First time delivery: {first_time_sessions} group(s) (one per lecturer) for {practical_week_count} weeks"
-                    )
-                    if n_new_or_content == 1:
-                        practical_details.append(
-                            f"  - New/new-content lecturer: {new_first_per_session:.1f}h/week @ 5x (one first session per week)"
-                        )
-                    else:
-                        practical_details.append(
-                            f"  - New/new-content lecturers ({n_new_or_content}): {new_first_per_session:.1f}h/week @ 5x each (one first session per week)"
-                        )
-                    # Repeated sessions section
-                    if repeat_hrs_per_week > 0:
-                        practical_details.append(
-                            f"Repeated sessions: {repeat_sessions} group(s) without first-session slots, repeated weekly at {rep_rate}x"
-                        )
-                        practical_details.append(
-                            f"  - Total repeat rate: {repeat_hrs_per_week:.1f}h/week ({contact_per_practical:.1f}h/group × {repeat_sessions} groups × {rep_rate}x)"
-                        )
-            else:
-                # All are standard lecturers
-                total_std = individual_practical_hours[standard_lecturers_practical[0]] * practical_week_count
-                repeat_hrs_per_week = (repeat_sessions * contact_per_practical * rep_rate)
-                repeats_per_lecturer = repeat_sessions / n_teachers if n_teachers > 0 else 0
-                # First time delivery section - each lecturer gets one first session per week
-                first_time_sessions = min(n_groups, n_teachers)
+            # Practicals breakdown
+            practical_total_weekly = sum(individual_practical_hours.values())
+            practical_total_hrs = practical_total_weekly * practical_week_count
+
+            # Show "Practicals:" as a section header
+            practical_details.append(
+                f"<strong>Practicals:</strong> {n_groups} group(s) over {practical_week_count} weeks"
+            )
+
+            # First time delivery - each lecturer gets one first session per week
+            first_time_sessions = min(n_groups, n_teachers)
+            practical_details.append(
+                f"- First time delivery: {first_time_sessions} group(s) (one per lecturer)"
+            )
+
+            # Show individual lecturer breakdowns
+            for t in sorted(new_lecturers_practical + existing_with_new_content_practical):
+                weekly_hrs = individual_practical_hours[t]
+                total_hrs = weekly_hrs * practical_week_count
                 practical_details.append(
-                    f"First time delivery: {first_time_sessions} group(s) (one per lecturer) for {practical_week_count} weeks"
+                    f"  - {t}: {contact_per_practical:.1f}h/week lecture @ 5x (new content) + {repeat_sessions/n_teachers:.1f}h repeat share = {weekly_hrs:.1f}h/week = {total_hrs:.1f}h total"
                 )
-                if len(standard_lecturers_practical) == 1:
-                    practical_details.append(
-                        f"  - Standard lecturer: {std_first_per_session:.1f}h/week @ 2.5x (one first session per week)"
-                    )
-                else:
-                    practical_details.append(
-                        f"  - Standard lecturers ({len(standard_lecturers_practical)}): {std_first_per_session:.1f}h/week @ 2.5x each (one first session per week)"
-                    )
-                # Repeated sessions section
-                if repeat_hrs_per_week > 0:
-                    practical_details.append(
-                        f"Repeated sessions: {repeat_sessions} group(s) without first-session slots, repeated weekly at {rep_rate}x"
-                    )
-                    practical_details.append(
-                        f"  - Total repeat rate: {repeat_hrs_per_week:.1f}h/week ({contact_per_practical:.1f}h/group × {repeat_sessions} groups × {rep_rate}x)"
-                    )
+            for t in sorted(standard_lecturers_practical):
+                weekly_hrs = individual_practical_hours[t]
+                total_hrs = weekly_hrs * practical_week_count
+                practical_details.append(
+                    f"  - {t}: {contact_per_practical:.1f}h/week lecture @ 2.5x + {repeat_sessions/n_teachers:.1f}h repeat share = {weekly_hrs:.1f}h/week = {total_hrs:.1f}h total"
+                )
+
+            # Show repeat breakdown if any
+            if repeat_sessions > 0:
+                repeats_per_lecturer = repeat_sessions / n_teachers
+                practical_details.append(
+                    f"- Repeated sessions: {repeat_sessions} group(s) without first-session slots ({repeats_per_lecturer:.1f} group(s)/lecturer @ 1.5x)"
+                )
 
             # Add to breakdown (per-teacher values - use individual hours)
             for t in teachers:
