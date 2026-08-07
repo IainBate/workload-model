@@ -864,11 +864,11 @@ def _format_detailed_section_v2(title: str, detail_text: str) -> str:
         # Format Practicals section with collapsible details
         if practicals_segments:
             for i, info in enumerate(practicals_segments):
-                # Remove duplicate "Practicals:" prefix if present
-                clean_info = re.sub(r'^Practicals:\s*', '', info, flags=re.IGNORECASE)
-                if i == 0:
-                    html_parts.append(f"<p style='margin: 8px 0;'><strong>Practicals:</strong> {clean_info}</p>")
+                # Check if this already has a <strong>Practicals:</strong> tag from workload_calculator
+                if '<strong>Practicals:</strong>' in info:
+                    html_parts.append(f"<p style='margin: 8px 0;'>{info}</p>")
                 else:
+                    clean_info = re.sub(r'^Practicals:\s*', '', info, flags=re.IGNORECASE)
                     html_parts.append(f"<small style='display:block; margin-left:20px;'>{clean_info}</small>")
 
         # Format Assessment section
