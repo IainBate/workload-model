@@ -194,8 +194,9 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
 
         # Sort: modules first (by name), then summary items (Pastoral, Projects)
         module_details_list.sort(key=lambda x: x['module_name'])
+
         teaching_html_parts = []
-        if module_details_list or summary_items:
+        if module_details_list or combined_summary:
             teaching_html_parts.append("<h3>Teaching Activities by Activity</h3>")
             teaching_html_parts.append("""
             <table class="module-table">
@@ -233,8 +234,8 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
                     </tr>
                 """)
 
-            # Then add summary items (Pastoral, Projects, Project Setting)
-            for item in summary_items:
+            # Then add summary items (Pastoral, Projects)
+            for item in combined_summary:
                 status_color, status_label, _ = _determine_status(
                     item['teaching_hours'],
                     nominal_hours * config.CONTRACT_NORMATIVE_DIVISIONS.get("TR_staff", {}).get("teaching", 0.4)
