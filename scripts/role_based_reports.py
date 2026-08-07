@@ -261,11 +261,15 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
                     <tr><td>Protected baseline ({config.PROTECTED_RESEARCH_BASELINE / config.NOMINAL_WORKING_HOURS_PER_YEAR * 100:.0f}% of nominal)</td>
                         <td style="text-align:right"><strong>{config.PROTECTED_RESEARCH_BASELINE * r.fte:.1f}h</strong></td></tr>
             """
+            research_subtotal = config.PROTECTED_RESEARCH_BASELINE * r.fte
             for key, val in sorted(r.research_breakdown.items(), key=lambda x: -x[1]):
                 if key not in ['protected_research_baseline'] and val > 0:
                     display_name = key.replace('_', ' ').title()
                     research_html += f"<tr><td>{display_name}</td><td style='text-align:right'>{val:.1f}h</td></tr>"
-            research_html += "</table></div>"
+                    research_subtotal += val
+            research_html += "</table>"
+            research_html += f"<p style='font-size:0.85em;color:#666;padding-top:10px;text-align:right'>Subtotal: {research_subtotal:.1f}h</p>"
+            research_html += "</div>"
 
         # Admin section
         admin_html = ""
