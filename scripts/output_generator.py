@@ -289,7 +289,7 @@ def generate_boxplots(results: List[WorkloadResult], year_data: YearData, output
 
     # Add expected workload reference lines AFTER bars - category-aware using staff contract type
     # First build a lookup of staff name -> contract category from year_data
-    staff_category_map = {s.canonical_name: s.category for s in year_data.staff.values()}
+    staff_category_map = {s.canonical_name: s.category for s in year_data.staff}
 
     for i, (comp, label, color) in enumerate(zip(summary_components, summary_labels, colors)):
         for j, (name, result) in enumerate(zip(names, results)):
