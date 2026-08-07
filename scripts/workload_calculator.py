@@ -533,8 +533,20 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
     assessment_count = module.assessment_count
 
     if assessment_count > 0:
-        # Calculate base setting cost at standard rate for all assessments
-        base_setting_cost = config.ASSESSMENT_MANUAL_STANDARD * assessment_count
+        # Determine if this module uses automated marking (affects setting rates)
+        is_automated = getattr(module, 'marking_type', 'manual') == 'automated'
+
+        # Select appropriate rates based on marking type
+        if is_automated:
+            base_setting_cost = config.ASSESSMENT_AUTO_STANDARD * assessment_count
+            new_setter_rate = config.ASSESSMENT_AUTO_NEW_SETTER
+            standard_rate = config.ASSESSMENT_AUTO_STANDARD
+            checking_rate = config.ASSESSMENT_AUTO_CHECKING
+        else:
+            base_setting_cost = config.ASSESSMENT_MANUAL_STANDARD * assessment_count
+            new_setter_rate = config.ASSESSMENT_MANUAL_NEW_SETTER
+            standard_rate = config.ASSESSMENT_MANUAL_STANDARD
+            checking_rate = config.ASSESSMENT_MANUAL_CHECKING
 
         # Resit papers take the same time to set as main papers (same effort)
         # The 20% resit student assumption only applies to marking, not setting
@@ -542,16 +554,15 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
         resit_paper_proportion = 1.0  # Resit papers take full setting time
 
         # New lecturers get additional time for first-time setup
-        # Difference: new_setter_same_format (22.5) - standard (15) = 7.5h per assessment
+        # Calculate the extra content dev cost (new_setter - standard)
         std_per_assessment = base_setting_cost / assessment_count if assessment_count > 0 else 0
 
         setting_details_parts = []
         for t in teachers:
             if t not in known_lecturers_for_module:
                 # New setter: standard time + additional content development time
-                # At 22.5h vs 15h per assessment, the difference is 7.5h
                 base_hours = base_setting_cost / len(teachers)
-                content_dev_per_assessment = config.ASSESSMENT_MANUAL_NEW_SETTER - config.ASSESSMENT_MANUAL_STANDARD
+                content_dev_per_assessment = new_setter_rate - standard_rate
                 additional_content_hours = (content_dev_per_assessment * assessment_count) / len(teachers)
                 total_hours = base_hours + additional_content_hours
 
@@ -560,10 +571,17 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
                 # For display: split equally since each paper type requires full setting effort
                 main_paper_hours = (base_setting_cost / 2) / len(teachers)
                 resit_paper_hours = (base_setting_cost / 2) / len(teachers)
-                setting_details_parts.append(
-                    f"New setter ({config.ASSESSMENT_MANUAL_NEW_SETTER}h/assess): "
-                    f"{main_paper_hours:.1f}h main + {resit_paper_hours:.1f}h resit = {total_hours:.1f}h"
-                )
+
+                if is_automated:
+                    setting_details_parts.append(
+                        f"New setter ({new_setter_rate}h/assess, auto): "
+                        f"{main_paper_hours:.1f}h main + {resit_paper_hours:.1f}h resit = {total_hours:.1f}h"
+                    )
+                else:
+                    setting_details_parts.append(
+                        f"New setter ({new_setter_rate}h/assess, manual): "
+                        f"{main_paper_hours:.1f}h main + {resit_paper_hours:.1f}h resit = {total_hours:.1f}h"
+                    )
             else:
                 # Standard setter: just the base cost divided equally
                 base_hours = base_setting_cost / len(teachers)
@@ -573,16 +591,22 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
                 main_paper_hours = (base_setting_cost / 2) / len(teachers)
                 resit_paper_hours = (base_setting_cost / 2) / len(teachers)
 
-                setting_details_parts.append(
-                    f"Standard ({config.ASSESSMENT_MANUAL_STANDARD}h/assess): "
-                    f"{main_paper_hours:.1f}h main + {resit_paper_hours:.1f}h resit = {base_hours:.1f}h"
-                )
+                if is_automated:
+                    setting_details_parts.append(
+                        f"Standard ({standard_rate}h/assess, auto): "
+                        f"{main_paper_hours:.1f}h main + {resit_paper_hours:.1f}h resit = {base_hours:.1f}h"
+                    )
+                else:
+                    setting_details_parts.append(
+                        f"Standard ({standard_rate}h/assess, manual): "
+                        f"{main_paper_hours:.1f}h main + {resit_paper_hours:.1f}h resit = {base_hours:.1f}h"
+                    )
 
         # Use standard cost for display (all teachers share same assessment count)
         # Each assessment includes both main and resit papers = 2 papers
         # For display: show the split as equal portions of total setting time
         num_papers = assessment_count * 2  # Main + resit for each assessment
-        paper_total_per_assessment = config.ASSESSMENT_MANUAL_STANDARD
+        paper_total_per_assessment = standard_rate
         total_setting_cost = num_papers * paper_total_per_assessment / len(teachers)
 
         main_paper_total = (assessment_count * paper_total_per_assessment) / 2 / len(teachers)
@@ -591,10 +615,16 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
         # Display: show both main and resit papers separately in the count
         # Each assessment has 2 papers (main + resit), so total papers = assessments * 2
         num_papers = assessment_count * 2
-        assessment_details.append(
-            f"{num_papers} paper(s) set ({assessment_count} assessment(s)): "
-            f"{paper_total_per_assessment:.1f}h each ({main_paper_total:.1f}h main + {resit_paper_total:.1f}h resit)"
-        )
+        if is_automated:
+            assessment_details.append(
+                f"{num_papers} paper(s) set ({assessment_count} assessment(s), auto): "
+                f"{paper_total_per_assessment:.1f}h each ({main_paper_total:.1f}h main + {resit_paper_total:.1f}h resit)"
+            )
+        else:
+            assessment_details.append(
+                f"{num_papers} paper(s) set ({assessment_count} assessment(s), manual): "
+                f"{paper_total_per_assessment:.1f}h each ({main_paper_total:.1f}h main + {resit_paper_total:.1f}h resit)"
+            )
 
     # Assessment marking (split equally among teachers)
     # Assume 20% of students do resits (additional marking workload)
