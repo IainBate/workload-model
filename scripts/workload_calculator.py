@@ -1137,13 +1137,7 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
 
         # Supervision - add once per staff member (not per module)
         # Get pastoral and project supervision from the allocation object
-        # Apply defaults if not specified: 20 pastoral students, 10 project students
         pastoral_count = supervision.pastoral_students.get(canonical_name, 0)
-        pastoral_assumed = False
-        if pastoral_count == 0:
-            # Default pastoral supervision (tracked as assumption)
-            pastoral_count = 20
-            pastoral_assumed = True
 
         pastoral_hours = pastoral_count * config.SUPERVISION_MULTIPLIERS["pastoral"]
         teaching_hours += pastoral_hours
