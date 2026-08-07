@@ -405,7 +405,12 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
             admin_subtotal = 0.0
             for key, val in sorted(r.admin_breakdown.items(), key=lambda x: -x[1]):
                 if val > 0:
-                    display_name = key.replace('_', ' ').title()
+                    display_names = {
+                        "service_points": "University committee work",
+                        "engagement": "General departmental engagement, e.g. meetings and email",
+                        "personal_development": "Personal Development"
+                    }
+                    display_name = display_names.get(key, key.replace('_', ' ').title())
                     admin_html += f"<tr><td>{display_name}</td><td style='text-align:right'>{val:.1f}h</td></tr>"
                     admin_subtotal += val
             admin_html += "</table>"
