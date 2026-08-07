@@ -715,10 +715,12 @@ def _format_detailed_section_v2(title: str, detail_text: str) -> str:
         if practicals_info:
             html_parts.append("<div style='margin: 8px 0; padding-left: 15px;'>")
             for i, info in enumerate(practicals_info):
+                # Remove duplicate "Practicals:" prefix if present
+                clean_info = re.sub(r'^Practicals:\s*', '', info, flags=re.IGNORECASE)
                 if i == 0:
-                    html_parts.append(f"<p><strong>Practicals:</strong> {info}</p>")
+                    html_parts.append(f"<p><strong>Practicals:</strong> {clean_info}</p>")
                 else:
-                    html_parts.append(f"<small style='display:block; margin-left:20px;'>{info}</small>")
+                    html_parts.append(f"<small style='display:block; margin-left:20px;'>{clean_info}</small>")
             html_parts.append("</div>")
 
         # Format Assessment section
