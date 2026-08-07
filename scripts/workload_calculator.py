@@ -201,7 +201,8 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
     use_video_rate = is_video_module
 
     for t in teachers:
-        is_new_lecturer = t not in known_lecturers_for_module
+        # A lecturer is "new" only if they are NOT in this module's known set AND NOT in the global known set
+        is_new_lecturer = (t not in known_lecturers_for_module) and (t not in known_lecturers_global)
 
         if is_new_lecturer:
             if use_video_rate:
