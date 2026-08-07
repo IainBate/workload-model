@@ -891,19 +891,27 @@ def load_previous_wtw(base_dir: str = None) -> Optional[List[ModuleData]]:
 
 
 # WAW role names → YAML role names mapping
+# Note: Duplicates have been de-duplicated; only one entry per unique role name.
 _WAW_ROLE_MAPPING = {
+    # Director/Leadership roles
     "Director for Students": "Director of Students",
-    "Chair of Equality, Diversity and Inclusion Committee ": "Chair of Equality, Diversity and Inclusion (EDI) Committee",
-    "Chair of Equality, Diversity and Inclusion Committee": "Chair of Equality, Diversity and Inclusion (EDI) Committee",
     "Deputy Head of Department (On-campus teaching)": "Deputy Head of Department (On-campus teaching)",
     "Deputy Head of Department (Online teaching)": "Deputy Head of Department (Online teaching)",
     "Deputy Head (Research) and Chair DRC": "Deputy Head (Research)",
+    # Committee chairs
+    "Chair of Equality, Diversity and Inclusion Committee": "Chair of Equality, Diversity and Inclusion (EDI) Committee",
     "Chair of the Board of Examiners": "Chair of the Board of Examiners",
+    "Chair ECA committee (online)": "Chair ECA committee (online)",
+    "Chair of the Department Education Committee": "Chair of the Department Education Committee",
+    "Chair of the Research Progression Panel": "Progression Panel Chair",
+    "Chair of the Ethics Committee": "Ethics",
+    # Deputy CBoE roles
     "Deputy CBoE (paper checking for on-campus)": "Deputy CBoEs",
     "Deputy CBoE (marking for on-campus) and student prizes": "Deputy CBoEs",
     "Deputy CBoE (academic misconduct for on-campus)": "Deputy CBoEs",
+    # EC Officer
     "EC Officer (on-campus)": "EC Officer (on-campus)",
-    "Chair ECA committee (online)": "Chair ECA committee (online)",
+    # Programme Leaders
     "Undergraduate Programme Leader": "UG PL",
     "Undergraduate Programme Leader: CS/Maths": "Other PLs",
     "Postgraduate Team Leader (Online): Cyber": "Other PLs",
@@ -919,63 +927,25 @@ _WAW_ROLE_MAPPING = {
     "Data and AI Team Leader (Online)": "Other PLs",
     "Infrastructure Team Leader (Online)": "Other PLs",
     "Programme Leader for CPD": "Other PLs",
+    # Coordinators
     "Taught Project Coordinator": "Taught Project Coordinator",
     "GTA Coordinator": "GTA Coordinator",
     "Internationalisation and Visitors Coordinator": "Internationalisation and Visitors Coordinator",
-    "CSCSE SQA Partnership Leader": "CSCSE HAP Partnership Leader",
     "Outreach and Recruitment Coordinator": "Outreach and Extra-Curricular Activities",
     "Academic Ambassador for UG Student Recruitment and Outreach": "Academic Admissions Team",
+    # Admissions roles
     "Director of Admissions & Outreach": "Director of Admissions",
     "Undergraduate Admissions Tutor": "Deputy Director of Admissions (UG Admissions)",
     "Deputy Graduate Chair": "Deputy Graduate Chair",
     "Graduate School Board (PGR Supervisor Representative)": "Graduate School Board (Ordinary member)",
-    "Chair of the Research Progression Panel": "Progression Panel Chair",
+    # Other roles
     "Research Progression Panel member": "Progression Panel",
     "PhD Training Officer": "PhD Training Officer",
     "Internally Distributed Funding panel reviewer": "Internally Distributed Funding panel reviewer",
     "REF lead": "REF Lead",
     "Research Impact (including REF impact submission)": "Impact",
-    "Group Leads": None,  # Not a specific role
-    "Real-Time and Distributed Systems": None,
-    "Human-Centered Interactive Technologies": None,
-    "Software Engineering for Robotics": None,
-    "Automated Software Engineering": None,
-    "Cyber Security and Privacy": None,
-    "High Integrity Systems": None,
-    "Artificial Intelligence": None,
-    "Quantum Information": None,
-    "Vision, Graphics and Learning": None,
-    "Chair of the Department Education Committee": "Chair of the Department Education Committee",
     "Deputy Director of Admissions (POVD etc)": "Deputy Director of Admissions (POVD etc)",
     "Deputy Director of Admissions (UG Admissions)": "Deputy Director of Admissions (UG Admissions)",
-    "Chair of Equality, Diversity and Inclusion Committee": "Chair of Equality, Diversity and Inclusion (EDI) Committee",
-    "Chair of Equality, Diversity and Inclusion Committee ": "Chair of Equality, Diversity and Inclusion (EDI) Committee",
-    "Chair of the Board of Examiners": "Chair of the Board of Examiners",
-    "Chair of the ECA committee": "Chair ECA committee (online)",
-    "Chair of the Department Education Committee": "Chair of the Department Education Committee",
-    "Chair of the Research Progression Panel": "Progression Panel Chair",
-    "Chair of Equality, Diversity and Inclusion (EDI) Committee": "Chair of Equality, Diversity and Inclusion (EDI) Committee",
-    "Chair of Equality, Diversity and Inclusion Committee": "Chair of Equality, Diversity and Inclusion (EDI) Committee",
-    "Chair of Equality, Diversity and Inclusion Committee ": "Chair of Equality, Diversity and Inclusion (EDI) Committee",
-    "Chair of the Board of Examiners": "Chair of the Board of Examiners",
-    "Chair of the Department Education Committee": "Chair of the Department Education Committee",
-    "Chair of the Research Progression Panel": "Progression Panel Chair",
-    "Chair of the ECA committee": "Chair ECA committee (online)",
-    "Chair of the Ethics Committee": "Ethics",
-    "Chair of the Ethics Committee ": "Ethics",
-    "Chair of the Research Progression Panel": "Progression Panel Chair",
-    "Chair of the Department Education Committee": "Chair of the Department Education Committee",
-    "Chair of the Board of Examiners": "Chair of the Board of Examiners",
-    "Chair of Equality, Diversity and Inclusion (EDI) Committee": "Chair of Equality, Diversity and Inclusion (EDI) Committee",
-    "Chair of Equality, Diversity and Inclusion Committee": "Chair of Equality, Diversity and Inclusion (EDI) Committee",
-    "Chair of Equality, Diversity and Inclusion Committee ": "Chair of Equality, Diversity and Inclusion (EDI) Committee",
-    "Chair of the Board of Examiners": "Chair of the Board of Examiners",
-    "Chair of the Department Education Committee": "Chair of the Department Education Committee",
-    "Chair of the Research Progression Panel": "Progression Panel Chair",
-    "Chair of the ECA committee": "Chair ECA committee (online)",
-    "Chair of the Ethics Committee": "Ethics",
-    "Chair of the Ethics Committee ": "Ethics",
-    "Chair of the Research Progression Panel": "Progression Panel Chair",
 }
 
 
