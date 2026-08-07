@@ -236,7 +236,6 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
                         <td>{item['student_count']}</td>
                         <td>{item['multiplier']}</td>
                         <td><strong>{item['teaching_hours']:.1f}h</strong></td>
-                        <td>-</td>
                     </tr>
                 """)
 
