@@ -96,9 +96,31 @@ generate_all_outputs(results, year_data, output_dir="output")
 | Class | Purpose |
 |-------|---------|
 | `YearData` | Container for all data for an academic year (modules, staff, known lecturers) |
-| `ModuleData` | Module information (teachers, credits, contact hours, assessments) |
+| `ModuleData` | Module information (teachers, credits, contact hours, assessments, teaching format, additional activities) |
 | `StaffData` | Staff member details (FTE, roles, supervision loads, research projects) |
 | `WorkloadResult` | Calculated workload for a single staff member |
+
+### ModuleData Fields
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `name` | str | Module name |
+| `codes` | Tuple[str, ...] | Module codes (e.g., COM00015C) |
+| `stage` | int | Stage code (1-3 UG, 4+ MSc, 7 PGR) |
+| `semester` | int | Semester (1 or 2) |
+| `credits` | int | Credit points (e.g., 20) |
+| `cohort` | str | Student cohort name |
+| `lead_name` | str | Module leader/lead lecturer |
+| `teachers` | Tuple[str, ...] | List of teaching staff names |
+| `practicals` | int | Number of practical sessions per week |
+| `contact_hours` | float | Estimated contact hours from credits |
+| `student_count` | int | Number of students (from CS Module Numbers) |
+| `assessment_count` | int | Number of assessments |
+| `marking_type` | str | "automated" or "manual" marking type |
+| `new_content` | bool | True if this is new content for the teacher |
+| `hw_lab_hours` | float | Additional HW/lab work hours (beyond contact) |
+| `drop_in_sessions` | int | Number of drop-in support sessions |
+| `teaching_format` | str | "standard", "video", or other format indicator |
 
 ### Teaching Multipliers
 
