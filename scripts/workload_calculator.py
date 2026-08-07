@@ -1141,10 +1141,7 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
             if min_teaching > 0:
                 teaching_breakdown["minimum_admin_load"] = min_teaching
 
-        # Track assumptions and missing data
-        assumptions = []
-        missing_data = []
-
+        # Track missing data (assumptions are tracked earlier in the function)
         if not staff.fte or staff.fte == 0:
             missing_data.append("FTE not found (defaulting to 1.0)")
             fte_for_calculation = 1.0
