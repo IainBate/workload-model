@@ -133,6 +133,13 @@ CSV Columns:
     - Missing Data: List of missing or unknown data points
 """
 def generate_csv(results: List[WorkloadResult], filepath: str = "Staff workload model.csv"):
+    """
+    Generate CSV output with per-staff workload data.
+
+    Args:
+        results: List of WorkloadResult objects from calculate_workload()
+        filepath: Output file path (default: OUTPUT_DIR/Staff workload model.csv)
+    """
     # If filepath is just a filename, prepend OUTPUT_DIR
     if not os.path.isabs(filepath) and "/" not in filepath and "\\" not in filepath:
         filepath = os.path.join(OUTPUT_DIR, filepath)
