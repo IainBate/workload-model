@@ -982,15 +982,20 @@ _UNSET = object()
 
 def load_all_data(data_dir: str = None,
                   unknown_callback=_UNSET) -> YearData:
-    """
-    Load all data sources and merge into a YearData object.
-    This is the main entry point for data loading.
+    """Load all data sources and merge into a YearData object.
+
+    This is the main entry point for data loading. It reads WTW files, student
+    counts, assessment counts, staff data, and other supplementary files to build
+    a complete dataset for workload calculation.
 
     Args:
         data_dir: Directory containing data files. Defaults to 'data' folder.
         unknown_callback: Callback for unknown names, or _UNSET for auto-detect.
                           Pass None for non-interactive mode (keep names as-is).
                           Pass _UNSET or omit to auto-detect (use interactive prompt).
+
+    Returns:
+        YearData containing all loaded and merged data for the academic year.
     """
     if data_dir is None:
         data_dir = DATA_DIR
