@@ -1126,7 +1126,7 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
                 # Use stage from staff's modules to determine project multiplier
                 for mod in year_data.modules:
                     if canonical_name in [normalize_name(t, year_data.reverse_lookup, unknown_callback=None) or t for t in mod.teachers]:
-                        if mod.stage >= 10:  # MSc and above
+                        if config.is_msc_level(mod.stage):  # MSc level (stage >= 4)
                             proj_mult = config.SUPERVISION_MULTIPLIERS["msc_project"]
                             break
             project_hours = teacher_project_load * proj_mult
