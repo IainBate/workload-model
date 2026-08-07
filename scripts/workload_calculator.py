@@ -251,7 +251,17 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
                 # Standard lecturer: just delivery at standard rate
                 total_hours = base_lecture_share * config.TEACHING_MULTIPLIERS["lecture_standard"]
                 lecture_hours_with_mult[t] = total_hours
-                detail_parts.append(f"Standard ({config.TEACHING_MULTIPLIERS['lecture_standard']}x): {base_lecture_share:.1f}h/teacher @ 2.5x = {total_hours:.1f}h")
+
+                # Calculate and display clearer breakdown showing lectures, staff split, and calculation
+                # Estimate number of 2-hour lectures from total lecture hours
+                estimated_lectures = round(lecture_hours / 2) if lecture_hours > 0 else 0
+                lectures_per_teacher = math.ceil(estimated_lectures / n_teachers) if n_teachers > 0 else 0
+
+                detail_parts.append(
+                    f"Standard ({config.TEACHING_MULTIPLIERS['lecture_standard']}x): "
+                    f"{estimated_lectures} two-hour lectures split between {n_teachers} staff = "
+                    f"{lectures_per_teacher} lectures each (rounded up). {lectures_per_teacher} x 2h x 2.5x = {total_hours:.1f}h"
+                )
 
     teaching_details.append("; ".join(detail_parts))
 
