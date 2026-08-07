@@ -208,7 +208,6 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
                         <th>Students</th>
                         <th>Multiplier</th>
                         <th>Teaching Hours</th>
-                        <th>Status</th>
                     </tr>
                 </thead>
                 <tbody>
