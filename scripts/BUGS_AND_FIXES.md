@@ -1,6 +1,10 @@
-# Bug Report & Fix Guide for Workload Calculator
+# Bug Report & Fix Guide for Workload Calculator (Archived)
 
-This document lists all identified bugs in the workload calculator, along with their expected fixes.
+**Status**: This document contains completed bug fixes from previous development sessions.
+
+This document listed identified bugs and their fixes. All issues listed below have been addressed:
+
+## Completed Fixes (Session Summary)
 
 ---
 
