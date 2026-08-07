@@ -385,9 +385,6 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
             research_html += "</table>"
             research_html += f"<p style='font-size:0.85em;color:#666;padding-top:10px;text-align:right'>Subtotal: {research_subtotal:.1f}h</p>"
 
-            # Add detailed breakdown if available
-            if hasattr(r, 'research_detail') and r.research_detail:
-                research_html += f"<div class='calc-breakdown'>{_format_detailed_section_v2('Research', r.research_detail)}</div>"
 
             research_html += "</div>"
 
