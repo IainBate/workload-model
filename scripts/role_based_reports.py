@@ -728,7 +728,7 @@ def _format_detailed_section_v2(title: str, detail_text: str) -> str:
 
             # Check if this is a standard lecture info line
             # Pattern: "Standard (2.5x): Xh" or "Standard: Xh @ Yx"
-            has_std_pattern = 'standard' in s_lower and ('x:' in s_lower or '@' in s_lower)
+            has_std_pattern = 'standard' in s_lower and re.search(r'\d+x', s_lower) is not None
             if has_std_pattern:
                 standard_info.append(clean_s)
             elif 'assessment setting' in s_lower or ('paper' in s_lower and 'set' in s_lower):
