@@ -295,8 +295,59 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
     print(f"Individual reports saved to {output_dir}")
 
 
+def _split_module_strings(detail: str) -> List[str]:
+    """Split a combined module detail string into individual module entries.
+
+    A detail string may contain multiple modules concatenated, e.g.:
+    'SYS2 (20cr): Standard...; SYS3 (20cr): Standard...'
+
+    Returns list of individual module detail strings.
+    """
+    import re
+
+    # Pattern: Module name (uppercase letters followed by optional digits) followed by
+    # credits in parentheses, starting a new module entry
+    # Look for patterns like "SYS2 (20cr):" that indicate start of new module
+    parts = []
+
+    # Split on semicolons first, but reassemble modules correctly
+    tokens = detail.split('; ')
+
+    current_module = ""
+    for token in tokens:
+        token = token.strip()
+        if not token:
+            continue
+
+        # Check if this token starts a new module (uppercase letters + digits, then space and cr)
+        if re.match(r'^[A-Z]+\d*\s*\(', token):
+            if current_module:
+                parts.append(current_module)
+            current_module = token
+        else:
+            # This is a continuation of the current module's details
+            if current_module:
+                current_module += '; ' + token
+            else:
+                # Edge case: some non-module content at start (like "Also teaches...")
+                parts.append(token)
+
+    if current_module:
+        parts.append(current_module)
+
+    return parts
+
+
 def _parse_module_detail(detail: str) -> Dict[str, Any]:
-    """Parse a module detail string and extract key information."""
+    """Parse a module detail string and extract key information.
+
+    Args:
+        detail: Module detail string like 'SYS2 (20cr): Standard (2.5x): 13.3h; Practicals...'
+
+    Returns:
+        Dictionary with module info: module_name, credits, stage, contact_hours,
+        student_count, multiplier, teaching_hours
+    """
     import re
 
     result = {
@@ -309,30 +360,57 @@ def _parse_module_detail(detail: str) -> Dict[str, Any]:
         'teaching_hours': 0.0
     }
 
-    # Extract module name (e.g., "SOF1")
-    match = re.match(r'^([A-Z]+(?:\d+)?)', detail)
+    # Extract module name (e.g., "SYS2", "QUCO") - must be followed by credits info
+    match = re.match(r'^([A-Z]+(?:\d+)?(?:-[HM])?)', detail)
     if match:
         result['module_name'] = match.group(1)
 
-    # Extract credits info
+    # Extract credits info (e.g., "20cr")
     credit_match = re.search(r'(\d+)\s*cr', detail)
     if credit_match:
         result['credits'] = f"{credit_match.group(1)}cr"
 
-    # Extract stage info
+    # Extract stage from credits field - look for Stage N pattern
     stage_match = re.search(r'Stage\s+(\d+)', detail, re.IGNORECASE)
     if stage_match:
         result['stage'] = f"Stage {stage_match.group(1)}"
 
-    # Try to extract student count
-    student_match = re.search(r'(\d+)\s*students?', detail, re.IGNORECASE)
-    if student_match:
-        result['student_count'] = int(student_match.group(1))
+    # Also try to extract stage number from the context (e.g., "Stage 3" somewhere in text)
+
+    # Extract student count - look for "X scripts" pattern which indicates actual students
+    # Not "X students" which is usually pastoral supervision count
+    script_match = re.search(r'(\d+)\s*scripts?\s+\+', detail)
+    if script_match:
+        result['student_count'] = int(script_match.group(1))
+
+    # Fallback: look for scripts with x multiplier pattern like "51 scripts + 10 resits"
+    if result['student_count'] == 0:
+        script_match2 = re.search(r'(\d+)\s+scripts?\s+x\s+', detail)
+        if script_match2:
+            result['student_count'] = int(script_match2.group(1))
+
+    # Extract contact hours - look for the base lecture teaching hours before multiplier
+    # Pattern: "(2.5x): X.Xh" or "(5x): X.Xh base" indicates contact-based hours
+    contact_hour_match = re.search(r'\((\d+\.?\d*)x\):\s*([\d.]+)\s*h\s*(?:base|\(|;|$)', detail)
+    if contact_hour_match:
+        result['contact_hours'] = float(contact_hour_match.group(2))
+
+    # If no contact hours found, try to get the first teaching hour value
+    if result['contact_hours'] == 0.0:
+        first_hour_match = re.search(r':\s*([\d.]+)\s*h\s*(?:;|$)', detail)
+        if first_hour_match:
+            result['contact_hours'] = float(first_hour_match.group(1))
 
     # Extract teaching hours (the final total for this module)
-    hour_match = re.search(r'([\d.]+)\s*h\s*(?:;|$)', detail)
+    hour_match = re.search(r'([\d.]+)\s*h\s*;?\s*$|total:\s*([\d.]+)\s*h', detail, re.IGNORECASE)
     if hour_match:
-        result['teaching_hours'] = float(hour_match.group(1))
+        result['teaching_hours'] = float(hour_match.group(1) or hour_match.group(2))
+
+    # Fallback: get the highest hour value from the string
+    if result['teaching_hours'] == 0.0:
+        all_hours = re.findall(r'([\d.]+)\s*h\b', detail)
+        if all_hours:
+            result['teaching_hours'] = max(float(h) for h in all_hours)
 
     # Determine multiplier type
     if 'new lecturer' in detail.lower() or 'new content' in detail.lower():
