@@ -249,19 +249,21 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
     # - Refreshing existing material: 100h/module
     # - New material for new lecturer: 600h/module
     # - New material for new lecturer on NEW content: 800h/module
+    # - Existing lecturer with new content: 200h/module (content development only)
     online_content_dev_hours = {}
     online_details = []
 
     if is_online_module and is_new_content_module:
         # Apply online content development rates for new content in online modules
         for t in teachers:
-            if t not in known_lecturers_for_module:
+            is_new_lecturer = t not in known_lecturers_for_module
+            if is_new_lecturer:
                 # New lecturer on NEW content: 800h total for content dev
                 online_hours = config.ONLINE_PROGRAMS["content_development_new_material_new_lecturer_per_module"]  # 800
                 per_teacher_online = online_hours / len(teachers)
             else:
-                # Existing lecturer refreshing online content: 100h/module
-                per_teacher_online = config.ONLINE_PROGRAMS["content_development_refreshing_per_module"] / len(teachers)  # 100
+                # Existing lecturer with new content: 200h/module (refreshing at higher rate than standard)
+                per_teacher_online = config.ONLINE_PROGRAMS.get("content_development_new_content_existing_lecturer_per_module", 200) / len(teachers)
 
             online_content_dev_hours[t] = per_teacher_online
             if per_teacher_online > 0:
