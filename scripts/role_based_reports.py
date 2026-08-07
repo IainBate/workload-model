@@ -241,6 +241,10 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
 
             teaching_html_parts.append("</tbody></table>")
 
+            # Calculate and add subtotal for teaching
+            total_teaching = sum(mod['teaching_hours'] for mod in module_details_list) + sum(item['teaching_hours'] for item in combined_summary)
+            teaching_html_parts.append(f"<p style='font-size:0.85em;color:#666;padding-top:10px;text-align:right'>Subtotal: {total_teaching:.1f}h</p>")
+
         # Add detailed breakdown
         if hasattr(r, 'teaching_detail') and r.teaching_detail:
             teaching_html_parts.append("<h3>Detailed Breakdown</h3>")
