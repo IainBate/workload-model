@@ -784,8 +784,7 @@ def _calculate_admin_workload(staff_member: StaffData, nominal_hours: float) -> 
 # --- Main Calculation ---
 
 def calculate_workload(year_data: YearData, validate_input: bool = True) -> List[WorkloadResult]:
-    """
-    Calculate the complete workload for all staff members.
+    """Calculate the complete workload for all staff members.
 
     This is the main entry point for the workload calculation engine. It processes
     all modules and staff, applying teaching multipliers, research allowances,
