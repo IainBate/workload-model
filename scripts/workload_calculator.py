@@ -507,17 +507,18 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
             total_for_all_teachers = practical_hours_one
             # Combine new lecturers and existing with new content for display
             n_new_or_content = len(new_lecturers_practical) + len(existing_with_new_content_practical)
+            repeat_hrs_per_week = contact_per_practical * rep_rate * practicals_count
             if n_new_or_content > 0:
                 practical_details.append(
                     f"Practicals: {practical_week_count}w - New/new-content lecturers: {new_first_per_session:.1f}h/week @ 5x; "
+                    f"Repeats: {repeat_hrs_per_week:.1f}h/week @ {rep_rate}x ({repeat_display}); "
                     f"Standard lecturers: {std_first_per_session:.1f}h/week @ 2.5x; "
-                    f"{repeat_display}: {contact_per_practical * practicals_count:.1f}h @ {rep_rate}x = {contact_per_practical * rep_rate * practicals_count:.1f}h/week; "
                     f"Total: {total_for_all_teachers:.1f}h/teacher"
                 )
             else:
                 practical_details.append(
                     f"Practicals: {practical_week_count}w - Standard lecturers: {std_first_per_session:.1f}h/week @ 2.5x; "
-                    f"{repeat_display}: {contact_per_practical * practicals_count:.1f}h @ {rep_rate}x = {contact_per_practical * rep_rate * practicals_count:.1f}h/week; "
+                    f"Repeats: {repeat_hrs_per_week:.1f}h/week @ {rep_rate}x ({repeat_display}); "
                     f"Total: {total_for_all_teachers:.1f}h/teacher"
                 )
 
