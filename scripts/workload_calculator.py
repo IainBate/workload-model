@@ -510,12 +510,13 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
 
     if hw_lab_hours > 0:
         # HW lab hours are additional work beyond contact hours
-        # Use standard multiplier (4x) for existing content, new content would use 8x
+        # Use standard multiplier (4x) for existing content, new_hw_lab (8x) for new content
         # For simplicity, split equally among teachers unless specified otherwise
+        hw_multiplier = config.TEACHING_NEW_HW_LAB if is_new_content_module else config.TEACHING_MULTIPLIERS['hw_lab']
         per_teacher_hw = hw_lab_hours / len(teachers)
         for t in teachers:
             individual_hw_lab_hours[t] = per_teacher_hw
-        hw_lab_details.append(f"HW lab: {hw_lab_hours:.1f}h total ({per_teacher_hw:.1f}h/teacher) @ {config.TEACHING_MULTIPLIERS['hw_lab']}x")
+        hw_lab_details.append(f"HW lab: {hw_lab_hours:.1f}h total ({per_teacher_hw:.1f}h/teacher) @ {hw_multiplier}x")
 
     if drop_in_count > 0:
         # Drop-in sessions are additional support hours
