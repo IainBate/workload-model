@@ -147,21 +147,24 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
     is_online_module = "online" in module_name_lower
 
     # Detect video teaching format (by name pattern or module attribute)
-    is_video_module = "video" in module_name_lower or getattr(module, 'teaching_format', '') == "video"
+    is_video_module = getattr(module, 'teaching_format', '') == "video"
 
     # Calculate lecture multiplier per-teacher based on:
     # - Whether THAT teacher is new for THIS module
     # - Whether THIS module has new content (for combined "new lecturer AND new content" 7.5x rate)
     # New lecturers get 5x for content development + delivery
     # New lecturers on NEW content get 7.5x (additional content dev time)
+    # Existing lecturers on new content get 5x (content development only)
     # Existing lecturers get 2.5x for delivery only (content already developed)
     lecture_multipliers = {}
     for t in teachers:
-        if t not in known_lecturers_for_module:
-            if is_new_content_module:
-                lecture_multipliers[t] = config.TEACHING_MULTIPLIERS["lecture_new_content_and_lecturer"]  # 7.5
-            else:
-                lecture_multipliers[t] = config.TEACHING_MULTIPLIERS["lecture_new_content_or_lecturer"]  # 5
+        is_new_lecturer = t not in known_lecturers_for_module
+        if is_new_lecturer and is_new_content_module:
+            lecture_multipliers[t] = config.TEACHING_MULTIPLIERS["lecture_new_content_and_lecturer"]  # 7.5
+        elif is_new_lecturer:
+            lecture_multipliers[t] = config.TEACHING_MULTIPLIERS["lecture_new_content_or_lecturer"]  # 5
+        elif is_new_content_module:
+            lecture_multipliers[t] = config.TEACHING_MULTIPLIERS["lecture_new_content_or_lecturer"]  # 5 for existing lecturer + new content
         else:
             lecture_multipliers[t] = config.TEACHING_MULTIPLIERS["lecture_standard"]  # 2.5
 
