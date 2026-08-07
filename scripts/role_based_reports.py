@@ -871,13 +871,60 @@ def _format_detailed_section_v2(title: str, detail_text: str, staff_name: Option
 
         # Format Practicals section with collapsible details
         if practicals_segments:
-            for i, info in enumerate(practicals_segments):
-                # Check if this already has a <strong>Practicals:</strong> tag from workload_calculator
+            # Parse practicals segments to reorganize and filter
+            practicals_html_parts = []
+
+            # First, identify key lines in the practicals segments
+            first_time_delivery_line = None
+            repeated_sessions_line = None
+            individual_lines = []  # Lines like "- Christopher: 2.0h/week @ 5x ..."
+
+            for info in practicals_segments:
                 if '<strong>Practicals:</strong>' in info:
-                    html_parts.append(f"<p style='margin: 8px 0;'>{info}</p>")
+                    # This is the header line - extract groups and weeks info
+                    clean_info = re.sub(r'^<strong>Practicals:</strong>\s*', '', info, flags=re.IGNORECASE)
+                    practicals_html_parts.append(f"<p style='margin: 8px 0;'><strong>Practicals:</strong> {clean_info}</p>")
+                elif 'First time delivery:' in info:
+                    first_time_delivery_line = info
+                elif 'Repeated sessions:' in info:
+                    repeated_sessions_line = info
                 else:
-                    clean_info = re.sub(r'^Practicals:\s*', '', info, flags=re.IGNORECASE)
-                    html_parts.append(f"<small style='display:block; margin-left:20px;'>{clean_info}</small>")
+                    # This is likely an individual lecturer line (starts with "- " or "  - ")
+                    if info.strip().startswith('-'):
+                        individual_lines.append(info)
+
+            # Reorganize: First time delivery first, then repeat info, then individual calculation
+            if first_time_delivery_line:
+                # Add the weekly calculation to First time delivery line
+                # Parse to extract group count and add multiplier info
+                ft_match = re.search(r'First time delivery:\s*(\d+)\s*group\(s\)\s*\(([^)]+)\)', first_time_delivery_line)
+                if ft_match:
+                    groups = int(ft_match.group(1))
+                    # The line already has (one per lecturer) - just add calculation detail
+                    practicals_html_parts.append(f"<p style='margin: 8px 0;'>{first_time_delivery_line}. {contact_per_practical:.1f}h x 2.5 multiplier per week.</p>")
+                else:
+                    practicals_html_parts.append(f"<p style='margin: 8px 0;'>{first_time_delivery_line}</p>")
+
+            # Add repeated sessions info right after first time delivery
+            if repeated_sessions_line:
+                practicals_html_parts.append(f"<p style='margin: 8px 0;'><small>{repeated_sessions_line}</small></p>")
+
+            # Add individual lecturer calculations (filtered if staff_name provided)
+            for line in individual_lines:
+                # Extract lecturer name from line like "- Christopher Crispin-Bailey: 2.0h/week @ 5x ..."
+                match = re.match(r'^\s*-\s+([^-]+?):\s*(.+)$', line)
+                if match:
+                    lecturer_name = match.group(1).strip()
+                    # If staff_name is provided, only show this lecturer's line
+                    if staff_name and lecturer_name != staff_name:
+                        continue
+                    practicals_html_parts.append(f"<p style='margin: 8px 0;'><small>{line.strip()}</small></p>")
+                else:
+                    practicals_html_parts.append(f"<p style='margin: 8px 0;'><small>{line}</small></p>")
+
+            # Combine all practicals parts
+            for part in practicals_html_parts:
+                html_parts.append(part)
 
         # Format Assessment section
         if assessment_info:
