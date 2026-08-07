@@ -13,8 +13,9 @@ The calculator tracks assumptions made during calculation:
 - Default student counts when actual count is unknown (default: 100)
 - Default contact hours per credit (default: 1.0)
 - Assessment marking type (defaults to manual if not specified)
-- Pastoral supervision defaults (20 students/teacher)
-- Project supervision defaults (10 students/teacher)
+
+Note: Pastoral and project supervision use explicit values from CSV data.
+No defaults are applied - a value of 0 means no supervision.
 
 Use workload_calculator.calculate_workload(year_data, track_assumptions=True)
 to enable detailed assumption tracking.
