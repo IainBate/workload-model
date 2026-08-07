@@ -113,7 +113,6 @@ def print_data_summary(year_data, results=None):
 
 def main():
     parser = argparse.ArgumentParser(description="Workload Model Calculator")
-    parser.add_argument("--year", type=str, default=None, help="Academic year (e.g., 2026-7)")
     parser.add_argument("--output-dir", type=str, default=".", help="Output directory")
     parser.add_argument("--data-dir", type=str, default=None, help="Data directory (default: data/)")
     parser.add_argument("--dry-run", action="store_true", help="Show data summary only")
