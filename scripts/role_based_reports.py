@@ -267,7 +267,8 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
             """
             research_subtotal = config.PROTECTED_RESEARCH_BASELINE * r.fte
             for key, val in sorted(r.research_breakdown.items(), key=lambda x: -x[1]):
-                if key not in ['protected_research_baseline'] and val > 0:
+                # Skip phd_supervision as it's a combined total (show detailed items instead)
+                if key not in ['protected_research_baseline', 'phd_supervision'] and val > 0:
                     display_name = key.replace('_', ' ').title()
                     research_html += f"<tr><td>{display_name}</td><td style='text-align:right'>{val:.1f}h</td></tr>"
                     research_subtotal += val
