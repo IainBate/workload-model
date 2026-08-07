@@ -517,9 +517,10 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
                 total_std = individual_practical_hours[standard_lecturers_practical[0]] * practical_week_count
                 repeat_hrs_per_week = (repeat_sessions * contact_per_practical * rep_rate)
                 repeats_per_lecturer = repeat_sessions / n_teachers if n_teachers > 0 else 0
-                # First time delivery section
+                # First time delivery section - each lecturer gets one first session per week
+                first_time_sessions = min(n_groups, n_teachers)
                 practical_details.append(
-                    f"First time delivery: {n_groups} groups shared by {n_teachers} lecturers for {practical_week_count} weeks"
+                    f"First time delivery: {first_time_sessions} group(s) (one per lecturer) for {practical_week_count} weeks"
                 )
                 if len(standard_lecturers_practical) == 1:
                     practical_details.append(
