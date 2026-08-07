@@ -115,6 +115,22 @@ DEFAULT_CONTACT_HOURS_PER_CREDIT: float = 1.0  # Standard contact hours per cred
 # Project setting allowance - given once per year to each supervisor with non-zero project load
 PROJECT_SETTING_ALLOWANCE: float = 6.0  # Teaching-related, for setting projects for students
 
+# Stage codes (for module level detection)
+STAGE_UG_LEVEL_1: int = 1  # Year 1 undergraduate
+STAGE_UG_LEVEL_2: int = 2  # Year 2 undergraduate
+STAGE_UG_LEVEL_3: int = 3  # Year 3 undergraduate
+STAGE_MSC_LEVEL: int = 4   # Master's level (stage >= 4 typically)
+STAGE_PGR_LEVEL: int = 7   # Postgraduate research level
+
+# Helper function to determine module level from stage code
+def is_ug_level(module_stage: int) -> bool:
+    """Check if module stage is undergraduate level (1-3)."""
+    return STAGE_UG_LEVEL_1 <= module_stage < STAGE_MSC_LEVEL
+
+def is_msc_level(module_stage: int) -> bool:
+    """Check if module stage is Master's level (stage >= 4)."""
+    return module_stage >= STAGE_MSC_LEVEL
+
 
 def get_role_hours(role_name: str, nominal_hours: float) -> float:
     """Calculate hours for a given role based on its percentage of nominal hours."""
