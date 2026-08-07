@@ -282,7 +282,7 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
                 </div>
                 <table class="module-table">
                     <tr><td>Protected baseline ({config.PROTECTED_RESEARCH_BASELINE / config.NOMINAL_WORKING_HOURS_PER_YEAR * 100:.0f}% of nominal)</td>
-                        <td style="text-align:right"><strong>{protected_baseline:.1f}h</strong></td></tr>
+                        <td style="text-align:right">{protected_baseline:.1f}h</td></tr>
             """
 
             research_subtotal = protected_baseline
