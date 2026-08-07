@@ -425,6 +425,32 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
         # Will be added to YAML
         pass
 
+    # --- HW Lab and Drop-in Sessions ---
+    # These are additional teaching activities beyond contact hours
+    hw_lab_hours = getattr(module, 'hw_lab_hours', 0.0)
+    drop_in_count = getattr(module, 'drop_in_sessions', 0)
+
+    individual_hw_lab_hours = {}
+    individual_drop_in_hours = {}
+    hw_lab_details = []
+    drop_in_details = []
+
+    if hw_lab_hours > 0:
+        # HW lab hours are additional work beyond contact hours
+        # Use standard multiplier (4x) for existing content, new content would use 8x
+        # For simplicity, split equally among teachers unless specified otherwise
+        per_teacher_hw = hw_lab_hours / len(teachers)
+        for t in teachers:
+            individual_hw_lab_hours[t] = per_teacher_hw
+        hw_lab_details.append(f"HW lab: {hw_lab_hours:.1f}h total ({per_teacher_hw:.1f}h/teacher) @ {config.TEACHING_MULTIPLIERS['hw_lab']}x")
+
+    if drop_in_count > 0:
+        # Drop-in sessions are additional support hours
+        per_teacher_drop_in = (drop_in_count * config.TEACHING_DROP_IN) / len(teachers)
+        for t in teachers:
+            individual_drop_in_hours[t] = per_teacher_drop_in
+        drop_in_details.append(f"Drop-in: {drop_in_count} sessions x {config.TEACHING_DROP_IN}h = {drop_in_count * config.TEACHING_DROP_IN:.1f}h total ({per_teacher_drop_in:.1f}h/teacher)")
+
     # Assessment setting (per teacher based on whether THEY are new)
     # New lecturers get higher multiplier for first-time assessment setup
     # Standard lecturers get lower multiplier for familiar assessment formats
