@@ -367,73 +367,114 @@ def _parse_module_detail(detail: str) -> Dict[str, Any]:
         'contact_hours': 0.0,
         'student_count': 0,
         'multiplier': '',
-        'teaching_hours': 0.0
+        'teaching_hours': 0.0,
+        'is_summary': False,  # True for non-module items like Pastoral, Projects
+        'summary_label': ''  # Human-readable label for summary items
     }
 
-    # Extract module name (e.g., "SYS2", "QUCO") - must be followed by credits info
-    match = re.match(r'^([A-Z]+(?:\d+)?(?:-[HM])?)', detail)
-    if match:
-        result['module_name'] = match.group(1)
+    # Check if this is a summary item (Pastoral, Projects, Project setting)
+    detail_lower = detail.lower().strip()
 
-    # Extract credits info (e.g., "20cr")
-    credit_match = re.search(r'(\d+)\s*cr', detail)
-    if credit_match:
-        result['credits'] = f"{credit_match.group(1)}cr"
+    if 'pastoral:' in detail_lower:
+        result['is_summary'] = True
+        result['summary_label'] = 'Pastoral Supervision'
+        # Extract student count from "X students" pattern for pastoral
+        student_match = re.search(r'(\d+)\s*students?', detail)
+        if student_match:
+            result['student_count'] = int(student_match.group(1))
+        # Extract hours: "X students x Yh = ZZZ.Zh"
+        hour_match = re.search(r'=\s*([\d.]+)\s*h', detail)
+        if hour_match:
+            result['teaching_hours'] = float(hour_match.group(1))
+        result['multiplier'] = f"{config.SUPERVISION_MULTIPLIERS.get('pastoral', '3')}h per student"
 
-    # Extract stage from credits field - look for Stage N pattern
-    stage_match = re.search(r'Stage\s+(\d+)', detail, re.IGNORECASE)
-    if stage_match:
-        result['stage'] = f"Stage {stage_match.group(1)}"
+    elif 'projects:' in detail_lower or 'project' in detail_lower and 'setting' not in detail_lower:
+        # Projects section (not project setting)
+        result['is_summary'] = True
+        result['summary_label'] = 'Project Supervision'
+        # Extract hours from pattern like "X projects x Yh = ZZZZh"
+        hour_match = re.search(r'=\s*([\d.]+)\s*h', detail)
+        if hour_match:
+            result['teaching_hours'] = float(hour_match.group(1))
+        # Extract project count
+        proj_match = re.search(r'(\d+)\s*projects?', detail)
+        if proj_match:
+            result['student_count'] = int(proj_match.group(1))
+        result['multiplier'] = 'Per student project'
 
-    # Also try to extract stage number from the context (e.g., "Stage 3" somewhere in text)
+    elif 'project setting' in detail_lower:
+        result['is_summary'] = True
+        result['summary_label'] = 'Project Setting'
+        hour_match = re.search(r':\s*([\d.]+)\s*h', detail)
+        if hour_match:
+            result['teaching_hours'] = float(hour_match.group(1))
+        result['multiplier'] = 'Fixed allowance'
 
-    # Extract student count - look for "X scripts" pattern which indicates actual students
-    # Not "X students" which is usually pastoral supervision count
-    script_match = re.search(r'(\d+)\s*scripts?\s+\+', detail)
-    if script_match:
-        result['student_count'] = int(script_match.group(1))
-
-    # Fallback: look for scripts with x multiplier pattern like "51 scripts + 10 resits"
-    if result['student_count'] == 0:
-        script_match2 = re.search(r'(\d+)\s+scripts?\s+x\s+', detail)
-        if script_match2:
-            result['student_count'] = int(script_match2.group(1))
-
-    # Extract contact hours - look for the base lecture teaching hours before multiplier
-    # Pattern: "(2.5x): X.Xh" or "(5x): X.Xh base" indicates contact-based hours
-    contact_hour_match = re.search(r'\((\d+\.?\d*)x\):\s*([\d.]+)\s*h\s*(?:base|\(|;|$)', detail)
-    if contact_hour_match:
-        result['contact_hours'] = float(contact_hour_match.group(2))
-
-    # If no contact hours found, try to get the first teaching hour value
-    if result['contact_hours'] == 0.0:
-        first_hour_match = re.search(r':\s*([\d.]+)\s*h\s*(?:;|$)', detail)
-        if first_hour_match:
-            result['contact_hours'] = float(first_hour_match.group(1))
-
-    # Extract teaching hours (the final total for this module)
-    hour_match = re.search(r'([\d.]+)\s*h\s*;?\s*$|total:\s*([\d.]+)\s*h', detail, re.IGNORECASE)
-    if hour_match:
-        result['teaching_hours'] = float(hour_match.group(1) or hour_match.group(2))
-
-    # Fallback: get the highest hour value from the string
-    if result['teaching_hours'] == 0.0:
-        all_hours = re.findall(r'([\d.]+)\s*h\b', detail)
-        if all_hours:
-            result['teaching_hours'] = max(float(h) for h in all_hours)
-
-    # Determine multiplier type
-    if 'new lecturer' in detail.lower() or 'new content' in detail.lower():
-        if '7.5x' in detail:
-            result['multiplier'] = "New (7.5x)"
-        elif '5x' in detail:
-            result['multiplier'] = "New (5x)"
-        else:
-            result['multiplier'] = "New"
-    elif 'video' in detail.lower():
-        result['multiplier'] = "Video (10x)"
     else:
-        result['multiplier'] = "Standard (2.5x)"
+        # Extract module name (e.g., "SYS2", "QUCO") - must be followed by credits info
+        match = re.match(r'^([A-Z]+(?:\d+)?(?:-[HM])?)', detail)
+        if match:
+            result['module_name'] = match.group(1)
+
+        # Extract credits info (e.g., "20cr")
+        credit_match = re.search(r'(\d+)\s*cr', detail)
+        if credit_match:
+            result['credits'] = f"{credit_match.group(1)}cr"
+
+        # Extract stage from credits field - look for Stage N pattern
+        stage_match = re.search(r'Stage\s+(\d+)', detail, re.IGNORECASE)
+        if stage_match:
+            result['stage'] = f"Stage {stage_match.group(1)}"
+
+        # Also try to extract stage number from the context (e.g., "Stage 3" somewhere in text)
+
+        # Extract student count - look for "X scripts" pattern which indicates actual students
+        # Not "X students" which is usually pastoral supervision count
+        script_match = re.search(r'(\d+)\s*scripts?\s+\+', detail)
+        if script_match:
+            result['student_count'] = int(script_match.group(1))
+
+        # Fallback: look for scripts with x multiplier pattern like "51 scripts + 10 resits"
+        if result['student_count'] == 0:
+            script_match2 = re.search(r'(\d+)\s+scripts?\s+x\s+', detail)
+            if script_match2:
+                result['student_count'] = int(script_match2.group(1))
+
+        # Extract contact hours - look for the base lecture teaching hours before multiplier
+        # Pattern: "(2.5x): X.Xh" or "(5x): X.Xh base" indicates contact-based hours
+        contact_hour_match = re.search(r'\((\d+\.?\d*)x\):\s*([\d.]+)\s*h\s*(?:base|\(|;|$)', detail)
+        if contact_hour_match:
+            result['contact_hours'] = float(contact_hour_match.group(2))
+
+        # If no contact hours found, try to get the first teaching hour value
+        if result['contact_hours'] == 0.0:
+            first_hour_match = re.search(r':\s*([\d.]+)\s*h\s*(?:;|$)', detail)
+            if first_hour_match:
+                result['contact_hours'] = float(first_hour_match.group(1))
+
+        # Extract teaching hours (the final total for this module)
+        hour_match = re.search(r'([\d.]+)\s*h\s*;?\s*$|total:\s*([\d.]+)\s*h', detail, re.IGNORECASE)
+        if hour_match:
+            result['teaching_hours'] = float(hour_match.group(1) or hour_match.group(2))
+
+        # Fallback: get the highest hour value from the string
+        if result['teaching_hours'] == 0.0:
+            all_hours = re.findall(r'([\d.]+)\s*h\b', detail)
+            if all_hours:
+                result['teaching_hours'] = max(float(h) for h in all_hours)
+
+        # Determine multiplier type
+        if 'new lecturer' in detail.lower() or 'new content' in detail.lower():
+            if '7.5x' in detail:
+                result['multiplier'] = "New (7.5x)"
+            elif '5x' in detail:
+                result['multiplier'] = "New (5x)"
+            else:
+                result['multiplier'] = "New"
+        elif 'video' in detail.lower():
+            result['multiplier'] = "Video (10x)"
+        else:
+            result['multiplier'] = "Standard (2.5x)"
 
     return result
 
