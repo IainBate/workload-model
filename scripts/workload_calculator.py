@@ -1173,11 +1173,6 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
 
         # Get project load for this teacher from supervision allocation (already ceiling'd)
         teacher_project_load = supervision.project_loads.get(canonical_name, 0)
-        project_assumed = False
-        if teacher_project_load == 0:
-            # Default project supervision (tracked as assumption)
-            teacher_project_load = 10
-            project_assumed = True
 
         # Project setting allowance - only for staff who actually supervise projects
         if teacher_project_load > 0:
