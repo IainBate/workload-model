@@ -1305,7 +1305,7 @@ def generate_per_staff_reports(results: List[WorkloadResult], year_data: YearDat
                     <li><strong>Research (additional - grants, supervision):</strong> {max(0, r.research_hours - config.PROTECTED_RESEARCH_BASELINE * r.fte):.1f}h</li>
                     <li><strong>Admin:</strong> {r.admin_hours:.1f}h</li>
                     <li><ul style="margin: 5px 0; padding-left: 20px;">
-                        <li>Engagement (email/meetings): {(config.BASELOADS.get('engagement', 100) * r.fte):.1f}h</li>
+                        <li>Engagement (general departmental): {(config.BASELOADS.get('engagement', 100) * r.fte):.1f}h</li>
                         <li>Personal development: {config.BASELOADS['personal_development'] * r.fte:.1f}h</li>
                     </ul></li>
                 </ul>
