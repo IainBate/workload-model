@@ -1379,11 +1379,14 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
         if unique_supervision:
             module_details.extend(unique_supervision)
 
-        def _sum_breakdown_lists(breakdown_dict):
-            """Sum per-module breakdown values from lists to totals."""
+        def _sum_breakdown_dict(breakdown_dict):
+            """Sum per-module breakdown values to totals."""
             result = {}
             for k, v in breakdown_dict.items():
-                if isinstance(v, list):
+                if isinstance(v, dict):
+                    # Dict of per-module breakdowns - sum them
+                    result[k] = sum(v.values())
+                elif isinstance(v, list):
                     result[k] = sum(v)
                 else:
                     # Scalar value (e.g., pastoral_supervision, project_setting)
@@ -1392,11 +1395,15 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
 
         # Build structured teaching breakdown from per-module data
         teaching_breakdown = {}
+        teaching_module_breakdowns = {}
         if canonical_name in staff_teaching:
             staff_data = staff_teaching[canonical_name]
-            # Direct teaching_breakdown at staff level (from aggregation)
+            # Per-module teaching_breakdown for accurate display
+            if "teaching_module_breakdowns" in staff_data and staff_data["teaching_module_breakdowns"]:
+                teaching_module_breakdowns = dict(staff_data["teaching_module_breakdowns"])
+            # Aggregated teaching_breakdown (sum of all modules)
             if "teaching_breakdown" in staff_data and staff_data["teaching_breakdown"]:
-                teaching_breakdown = _sum_breakdown_lists(staff_data["teaching_breakdown"])
+                teaching_breakdown = _sum_breakdown_dict(staff_data["teaching_breakdown"])
             elif len(staff_data.get("details", [])) > 0:
                 # Fallback: parse from details string for backward compatibility
                 pass
