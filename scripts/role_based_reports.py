@@ -746,9 +746,9 @@ def _format_detailed_section_v2(title: str, detail_text: str) -> str:
             html_parts.append(f"<p style='margin: 8px 0;'><strong>Standard Lecture:</strong> {' '.join(std_lines)}</p>")
 
         # Format Practicals section with collapsible details
-        if practicals_info:
+        if practicals_segments:
             html_parts.append("<div style='margin: 8px 0; padding-left: 15px;'>")
-            for i, info in enumerate(practicals_info):
+            for i, info in enumerate(practicals_segments):
                 # Remove duplicate "Practicals:" prefix if present
                 clean_info = re.sub(r'^Practicals:\s*', '', info, flags=re.IGNORECASE)
                 if i == 0:
