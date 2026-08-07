@@ -287,22 +287,49 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
 
             research_subtotal = protected_baseline
 
+            # Build grant detail mapping from research_detail string if available
+            # Format: "Grant Title: X% of Yh = Zh"
+            grant_details = {}
+            if hasattr(r, 'research_detail') and r.research_detail:
+                import re
+                for match in re.finditer(r'Grant\s+([^:]+):\s*([^=]+)=\s*([\d.]+)h', r.research_detail):
+                    grant_name = match.group(1).strip()
+                    formula_part = match.group(2).strip()
+                    hours_val = float(match.group(3))
+                    grant_details[grant_name] = (formula_part, hours_val)
+
             # Add Grants section if any (filter out 0.0h items)
             if grants:
                 research_html += "<tr><td colspan='2' style='padding-top:15px;font-weight:bold;color:#4CAF50;letter-spacing:0.5px'>Grants</td></tr>"
                 for key, val in sorted(grants.items(), key=lambda x: -x[1]):
                     if val > 0:  # Skip zero-value items
-                        display_name = key.replace('_', ' ').title()
-                        research_html += f"<tr><td>{display_name}</td><td style='text-align:right'>{val:.1f}h</td></tr>"
-                        research_subtotal += val
+                        # Try to get display name from grant_titles or research_detail
+                        project_id = key.replace('grant_', '')
+                        if hasattr(r, 'grant_titles') and r.grant_titles:
+                            display_name = r.grant_titles.get(project_id, f"Grant {project_id}")
+                        elif project_id in grant_details:
+                            display_name = project_id  # Will be replaced with full formula below
+                        else:
+                            display_name = f"Grant {project_id}"
 
-            # Add PhD Students section if any (filter out 0.0h items)
-            if phd_items:
-                research_html += "<tr><td colspan='2' style='padding-top:15px;font-weight:bold;color:#4CAF50;letter-spacing:0.5px'>PhD Students</td></tr>"
-                for key, val in sorted(phd_items.items(), key=lambda x: -x[1]):
-                    if val > 0:  # Skip zero-value items
-                        display_name = key.replace('_', ' ').title()
-                        research_html += f"<tr><td>{display_name}</td><td style='text-align:right'>{val:.1f}h</td></tr>"
+                        # Check if we have a formula for this grant
+                        formula_str = None
+                        if display_name in grant_details:
+                            formula_part, _ = grant_details[display_name]
+                            formula_str = f"{formula_part} = {val:.1f}h"
+                            # Use display name from research_detail (the actual title)
+                            for k, v in grant_details.items():
+                                if val == v[1]:
+                                    display_name = k
+                                    break
+
+                        if formula_str:
+                            # Show: "Smart Data Donation Service (SDDS): 10% of 1642h" with right-aligned value
+                            # Extract just the title part before any formula-like content
+                            clean_name = re.sub(r':\s*[\d.]+%.*', '', display_name).strip()
+                            research_html += f"<tr><td>{clean_name}</td><td style='text-align:right'>{val:.1f}h</td></tr>"
+                        else:
+                            research_html += f"<tr><td>{display_name}</td><td style='text-align:right'>{val:.1f}h</td></tr>"
                         research_subtotal += val
 
             # Add other research items (filter out 0.0h items)
