@@ -156,7 +156,7 @@ def generate_csv(results: List[WorkloadResult], filepath: str = "Staff workload 
         filepath: Output file path (default: OUTPUT_DIR/Staff workload model.csv)
     """
     # If filepath is just a filename, prepend OUTPUT_DIR
-    if not os.path.isabs(filepath) and "/" not in filepath and "\\" not in filepath:
+    if not os.path.isabs(filepath):
         filepath = os.path.join(OUTPUT_DIR, filepath)
 
     with open(filepath, "w", newline="", encoding="utf-8") as f:
