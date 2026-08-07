@@ -82,6 +82,10 @@ class ModuleData:
     marking_type: str = "manual"  # "automated" or "manual"
     new_content: bool = False  # True if this is new content for the teacher
 
+    # Additional teaching format hours (in addition to contact hours)
+    hw_lab_hours: float = 0.0  # Homework/lab work hours
+    drop_in_sessions: int = 0  # Number of drop-in sessions
+
 
 @dataclass(frozen=True)
 class StaffData:
