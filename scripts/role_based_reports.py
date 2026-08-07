@@ -153,28 +153,26 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
     for r in results:
         nominal_hours = getattr(r, 'nominal_hours', config.NOMINAL_WORKING_HOURS_PER_YEAR * r.fte)
 
-        # Get module details from teaching_detail
+        # Get module details from module_details (already parsed tuples)
         import re
         module_details_list = []
+        summary_items = []  # Collect Pastoral, Projects for separate display
+
         if hasattr(r, 'module_details') and r.module_details:
             for detail in r.module_details:
-                # Skip non-module items (project_setting, pastoral, projects, etc.)
-                detail_lower = detail.lower().strip()
-                if any(skip_term in detail_lower for skip_term in [
-                    'project setting', 'pastoral:', 'projects:', 'also teaches'
-                ]):
-                    continue
-
                 # Split combined module strings (e.g., SYS2 and SYS3 in one string)
                 module_strings = _split_module_strings(detail)
                 for mod_str in module_strings:
                     mod_info = _parse_module_detail(mod_str)
-                    if mod_info and mod_info['module_name']:
-                        module_details_list.append(mod_info)
+                    if mod_info:
+                        if mod_info['is_summary']:
+                            summary_items.append(mod_info)
+                        elif mod_info['module_name']:
+                            module_details_list.append(mod_info)
 
         # Build teaching section with modules
         teaching_html_parts = []
-        if module_details_list:
+        if module_details_list or summary_items:
             teaching_html_parts.append("<h3>Teaching Activities by Activity</h3>")
             teaching_html_parts.append("""
             <table class="module-table">
@@ -192,6 +190,7 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
                 <tbody>
             """)
 
+            # First add module rows
             for mod in module_details_list:
                 status_color, status_label, _ = _determine_status(
                     mod['teaching_hours'],
@@ -206,6 +205,26 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
                         <td>{mod['student_count']}</td>
                         <td>{mod['multiplier']}</td>
                         <td><strong>{mod['teaching_hours']:.1f}h</strong></td>
+                        <td><span class="status-badge {status_color.replace('#', '').replace('-', '')}"
+                            style="background:{status_color}">{status_label}</span></td>
+                    </tr>
+                """)
+
+            # Then add summary items (Pastoral, Projects, Project Setting)
+            for item in summary_items:
+                status_color, status_label, _ = _determine_status(
+                    item['teaching_hours'],
+                    nominal_hours * config.CONTRACT_NORMATIVE_DIVISIONS.get("TR_staff", {}).get("teaching", 0.4)
+                )
+
+                teaching_html_parts.append(f"""
+                    <tr>
+                        <td><strong>{item['summary_label']}</strong></td>
+                        <td>-/-</td>
+                        <td>-</td>
+                        <td>{item['student_count']}</td>
+                        <td>{item['multiplier']}</td>
+                        <td><strong>{item['teaching_hours']:.1f}h</strong></td>
                         <td><span class="status-badge {status_color.replace('#', '').replace('-', '')}"
                             style="background:{status_color}">{status_label}</span></td>
                     </tr>
