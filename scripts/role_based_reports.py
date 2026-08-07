@@ -582,8 +582,22 @@ def _format_detailed_section_v2(title: str, detail_text: str) -> str:
             current_module = module_match.group(1).upper()
             current_segments = [segment]
         else:
-            # This is a continuation of the current module's details
-            if current_module:
+            # Check if this looks like a summary item (Pastoral, Projects)
+            # These should be separated from module details
+            is_summary_item = re.match(r'^(Pastoral|Projects|Project Setting)\s*:', segment, re.IGNORECASE)
+
+            if is_summary_item:
+                # Save current module and start general section for summary items
+                if current_module and current_segments:
+                    modules[current_module] = current_segments[:]
+                    current_module = None  # Reset to add to general section
+
+                # Add to general section
+                if 'general' not in modules:
+                    modules['general'] = []
+                modules['general'].append(segment)
+            elif current_module:
+                # This is a continuation of the current module's details
                 current_segments.append(segment)
             else:
                 # Before any module defined - add to general section
@@ -591,7 +605,7 @@ def _format_detailed_section_v2(title: str, detail_text: str) -> str:
                     modules['general'] = []
                 modules['general'].append(segment)
 
-    # Save last module
+    # Save last module if exists
     if current_module and current_segments:
         modules[current_module] = current_segments
 
