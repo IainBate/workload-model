@@ -355,14 +355,17 @@ def generate_boxplots(results: List[WorkloadResult], year_data: YearData, output
     staff_category_map = {s.canonical_name: s.category for s in year_data.staff}
 
     for i, (comp, label, color) in enumerate(zip(detailed_components, detailed_labels, detailed_colors)):
-        for j, (name, result) in enumerate(zip(names, results)):
-            category = staff_category_map.get(name, "T and S")
-            # Use same mapping as summary boxplot
+        # Get expected value from first staff member's category
+        if names:
+            first_name = names[0]
+            category = staff_category_map.get(first_name, "T and S")
             comp_key = COMPONENT_TO_CONTRACT_KEY.get(comp, comp.replace("_hours", ""))
             expected_division = config.CONTRACT_NORMATIVE_DIVISIONS.get(category, {}).get(comp_key, 0)
-            expected = result.nominal_hours * expected_division
-            ax2.axvline(x=expected, color=color, alpha=0.5, linestyle="--", linewidth=1.5,
-                        label=f"Expected {label}" if j == 0 else None)
+            # Use the first result's nominal hours as representative
+            expected = results[0].nominal_hours * expected_division
+
+            ax2.axvline(x=expected, color=color, alpha=0.5, linestyle="--", linewidth=2,
+                        label=f"Expected {label}")
 
     total_expected2 = config.NOMINAL_WORKING_HOURS_PER_YEAR
     ax2.axvline(x=total_expected2, color="black", alpha=0.4, linestyle="-.", linewidth=1.5,
