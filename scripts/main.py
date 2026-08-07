@@ -4,7 +4,6 @@ Orchestrates data loading, calculation, and output generation.
 
 Usage:
     python main.py                  # Run with default (latest) WTW file
-    python main.py --year 2026-7    # Run with specific year
     python main.py --output-dir out  # Custom output directory
     python main.py --dry-run         # Show data summary without full calculation
 """
