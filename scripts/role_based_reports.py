@@ -35,8 +35,6 @@ COLOR_WARNING = "FFFFC107"  # Near limit
 # Output directories for each format
 INDIVIDUAL_DIR = OUTPUT_DIR / "Individual Reports"
 DEPARTMENT_DIR = OUTPUT_DIR / "Department Summary"
-HYBRID_DIR = OUTPUT_DIR / "Hybrid Dashboard"
-ROLE_BASED_DIR = OUTPUT_DIR / "Role-Based Reports"
 
 
 def _get_category_hours(result: WorkloadResult, category: str) -> Dict[str, float]:
