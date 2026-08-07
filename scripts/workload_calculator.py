@@ -345,6 +345,10 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
             first_week = 1
             other_weeks = list(range(2, TEACHING_WEEKS_PER_SEMESTER + 1))
 
+        if "SYS2" in module.codes and any("Crispin" in t or "Christopher" in t for t in teachers):
+            print(f"practical_week_count: {practical_week_count}")
+            print(f"other_weeks: {other_weeks}")
+
         n_teachers = len(teachers)
 
         # Identify new vs standard lecturers for practical calculations (use per-module tracking)
