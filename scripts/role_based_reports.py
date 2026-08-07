@@ -158,6 +158,13 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
         module_details_list = []
         if hasattr(r, 'module_details') and r.module_details:
             for detail in r.module_details:
+                # Skip non-module items (project_setting, pastoral, projects, etc.)
+                detail_lower = detail.lower().strip()
+                if any(skip_term in detail_lower for skip_term in [
+                    'project setting', 'pastoral:', 'projects:', 'also teaches'
+                ]):
+                    continue
+
                 # Split combined module strings (e.g., SYS2 and SYS3 in one string)
                 module_strings = _split_module_strings(detail)
                 for mod_str in module_strings:
