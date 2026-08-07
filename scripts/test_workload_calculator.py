@@ -139,6 +139,48 @@ class TestTeachingWorkload:
         teaching_hours = result["New Content Lecturer"]["hours"]
         assert teaching_hours > 200  # Should be higher than 5x case
 
+    def test_existing_lecturer_new_content_calculation(self):
+        """Test existing lecturer on new content gets 5x multiplier (P1-7)."""
+        module = ModuleData(
+            name="TestModule",
+            codes=["TEST004"],
+            credits=20,
+            stage=5,
+            contact_hours=40,
+            practicals=0,
+            practical_contact_hours=0,
+            practical_groups=0,
+            practical_weeks=None,
+            assessment_count=1,
+            student_count=100,
+            teachers=["Existing Lecturer"],
+            lead_name=None,
+        )
+        # Mark as new content
+        module.new_content = True
+
+        teachers = ["Existing Lecturer"]
+        # Existing lecturer IS in known set (this is the key difference from P1-7 test)
+        known_lecturers_global = {"Existing Lecturer", "John Smith"}
+        known_lecturers_per_module = {}
+        supervision = SupervisionAllocation(
+            pastoral_students={},
+            project_loads={}
+        )
+
+        result = _calculate_teaching_workload(
+            module, teachers, known_lecturers_global,
+            known_lecturers_per_module, {}, supervision
+        )
+
+        assert "Existing Lecturer" in result
+        # Existing lecturer with new content should get 5x multiplier (not 7.5x for new lecturer+new, not 2.5x standard)
+        teaching_hours = result["Existing Lecturer"]["hours"]
+        # With 40 contact hours / 1 teacher * 5x = ~200h base + supervision
+        # Should be significantly more than standard (2.5x) but less than new lecturer+new content (7.5x)
+        assert teaching_hours > 150  # More than standard 2.5x (~80-100h)
+        assert teaching_hours < 250  # Less than new lecturer+new content 7.5x
+
     def test_practical_sessions_calculation(self):
         """Test practical session calculations with repetition multiplier."""
         module = ModuleData(
