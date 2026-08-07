@@ -359,6 +359,11 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
         existing_with_new_content_practical = []  # Taught before but on new content
         standard_lecturers_practical = []
 
+        if "SYS2" in module.codes and any("Crispin" in t or "Christopher" in t for t in teachers):
+            print(f"known_lecturers_for_module: {list(known_lecturers_for_module.keys())}")
+            print(f"known_lecturers_global: {list(known_lecturers_global)[:5]}...")
+            print(f"new_lecturers_practical: {new_lecturers_practical}")
+
         for t in teachers:
             if t in known_lecturers_for_module or t in known_lecturers_global:
                 # Existing lecturer - check if this is new content
