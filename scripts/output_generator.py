@@ -89,6 +89,27 @@ from openpyxl.chart.label import DataLabelList
 import config
 from data_loader import WorkloadResult, YearData
 
+# Import role-based report generators
+try:
+    from role_based_reports import (
+        generate_individual_reports,
+        generate_department_summary,
+        generate_hybrid_dashboard,
+        generate_role_based_reports,
+        INDIVIDUAL_DIR,
+        DEPARTMENT_DIR,
+        HYBRID_DIR,
+        ROLE_BASED_DIR
+    )
+except ImportError:
+    # Fallback if role_based_reports.py is not available
+    def _not_implemented(*args, **kwargs):
+        print("Role-based reports module not available")
+    generate_individual_reports = _not_implemented
+    generate_department_summary = _not_implemented
+    generate_hybrid_dashboard = _not_implemented
+    generate_role_based_reports = _not_implemented
+
 
 def _fix_category_references(chart: BarChart) -> None:
     """
