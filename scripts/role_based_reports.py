@@ -170,7 +170,30 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
                         elif mod_info['module_name']:
                             module_details_list.append(mod_info)
 
-        # Build teaching section with modules
+        # Combine summary items: merge Project Setting and Project Supervision into "Projects"
+        # Keep Pastoral as-is
+        combined_summary = []
+        project_hours = 0.0
+        project_students = 0
+        for item in summary_items:
+            if 'Project' in item['summary_label'] or item['summary_label'] == 'Project Setting':
+                project_hours += item['teaching_hours']
+                project_students += item.get('student_count', 0)
+            else:
+                combined_summary.append(item)
+
+        # Add combined Projects row
+        if project_hours > 0:
+            combined_summary.append({
+                'is_summary': True,
+                'summary_label': 'Projects',
+                'teaching_hours': project_hours,
+                'student_count': project_students,
+                'multiplier': f"Setting + {project_students} projects"
+            })
+
+        # Sort: modules first (by name), then summary items (Pastoral, Projects)
+        module_details_list.sort(key=lambda x: x['module_name'])
         teaching_html_parts = []
         if module_details_list or summary_items:
             teaching_html_parts.append("<h3>Teaching Activities by Activity</h3>")
