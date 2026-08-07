@@ -286,13 +286,23 @@ def generate_boxplots(results: List[WorkloadResult], output_dir: str = None):
                         fontsize=8, color="white", fontweight="bold")
         bottom = [b + v for b, v in zip(bottom, values)]
 
-    # Add expected workload reference lines (ART staff split from config)
-    for y_pos, (name, fte) in enumerate(zip(names, [r.fte for r in results])):
-        expected_teaching = config.NOMINAL_WORKING_HOURS_PER_YEAR * fte * config.ART_TEACHING_PERCENTAGE
-        expected_research = config.NOMINAL_WORKING_HOURS_PER_YEAR * fte * config.ART_RESEARCH_PERCENTAGE
-        ax.axvline(x=expected_teaching, color="#4CAF50", alpha=0.3, linestyle="--", linewidth=1)
-        ax.axvline(x=expected_teaching + expected_research, color="#2196F3", alpha=0.3,
-                   linestyle="--", linewidth=1)
+    # Add expected workload reference lines AFTER bars - category-aware using staff contract type
+    # First build a lookup of staff name -> contract category from year_data
+    staff_category_map = {s.canonical_name: s.category for s in year_data.staff.values()}
+
+    for i, (comp, label, color) in enumerate(zip(summary_components, summary_labels, colors)):
+        for j, (name, result) in enumerate(zip(names, results)):
+            # Get staff category, default to "T and S" if not found
+            category = staff_category_map.get(name, "T and S")
+
+            # Map component to key for CONTRACT_NORMATIVE_DIVISIONS
+            comp_key = comp.replace("_hours", "")
+            expected_division = config.CONTRACT_NORMATIVE_DIVISIONS.get(category, {}).get(comp_key, 0)
+            expected = result.nominal_hours * expected_division
+
+            # Draw vertical line at this staff's position for this component
+            ax.axvline(x=expected, color=color, alpha=0.5, linestyle="--", linewidth=1.5,
+                       label=f"Expected {label}" if j == 0 else None)
 
     # Total workload line
     total_expected = config.NOMINAL_WORKING_HOURS_PER_YEAR
