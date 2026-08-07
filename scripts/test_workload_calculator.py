@@ -600,9 +600,63 @@ class TestAssumptionsTracking:
 
     def test_assumptions_list_initialized(self):
         """Test that assumptions list is properly initialized."""
-        # The calculate_workload function should track assumptions
-        # This test verifies the structure exists
-        pass
+        from workload_calculator import Assumption
+
+        # Create a scenario with an assumption (invalid grant FTE)
+        module = ModuleData(
+            name="TestModule",
+            codes=["TEST001"],
+            credits=20,
+            stage=5,
+            contact_hours=40,
+            practicals=0,
+            practical_contact_hours=0,
+            practical_groups=0,
+            practical_weeks=None,
+            assessment_count=1,
+            student_count=100,
+            teachers=["John Smith"],
+            lead_name=None,
+        )
+
+        staff = StaffData(
+            canonical_name="John Smith",
+            fte=1.0,
+            roles=[],
+            phd_supervisions=0,
+            phd_co_supervisions=0,
+            phd_assessor_count=0,
+            research_projects=[
+                {"title": "Grant", "total_income": 10000, "fte": "invalid"}
+            ],
+            saint_modules=[],
+            active=True
+        )
+
+        result = calculate_workload(
+            modules=[module],
+            staff={staff.canonical_name: staff},
+            known_lecturers_global=set(),
+            project_load_data={},
+            pastoral_load_data={},
+            phd_supervision_data={},
+            research_fte_data={"John Smith": {"project_income": 0, "fte": {}}},
+            wtw_staff_roles={},
+            unknown_callback=None,
+        )
+
+        # Verify assumptions are tracked (invalid FTE string should create an assumption)
+        assert "John Smith" in result
+        assumptions = result["John Smith"]["assumptions"]
+        assert len(assumptions) > 0
+
+    def test_data_loader_imports_any(self):
+        """Test that data_loader module imports successfully with Any type."""
+        # This test verifies P0-1: the Any import was added to typing
+        from data_loader import _load_module_mapping
+
+        # Just verify the function exists and can be imported
+        assert callable(_load_module_mapping)
 
 
 if __name__ == "__main__":
