@@ -261,7 +261,7 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
                     <span class="card-total">{r.research_hours:.1f}h</span>
                 </div>
                 <table class="module-table">
-                    <tr><td>Protected baseline ({config.PROTECTED_RESEARCH_BASELINE * 100:.0f}% of nominal)</td>
+                    <tr><td>Protected baseline ({config.PROTECTED_RESEARCH_BASELINE / config.NOMINAL_WORKING_HOURS_PER_YEAR * 100:.0f}% of nominal)</td>
                         <td style="text-align:right"><strong>{config.PROTECTED_RESEARCH_BASELINE * r.fte:.1f}h</strong></td></tr>
             """
             for key, val in sorted(r.research_breakdown.items(), key=lambda x: -x[1]):
