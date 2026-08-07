@@ -338,6 +338,26 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
                             research_html += f"<tr><td>{display_name}</td><td style='text-align:right'>{val:.1f}h</td></tr>"
                         research_subtotal += val
 
+            # Add PhD Students section if any (filter out 0.0h items)
+            if phd_items:
+                research_html += "<tr><td colspan='2' style='padding-top:15px;font-weight:bold;color:#4CAF50;letter-spacing:0.5px'>PhD Students</td></tr>"
+                for key, val in sorted(phd_items.items(), key=lambda x: -x[1]):
+                    if val > 0:  # Skip zero-value items
+                        display_name = key.replace('_', ' ').title()
+                        # Get formula from phd_details mapping
+                        if display_name in phd_details:
+                            detail_text = phd_details[display_name]
+                            research_html += f"<tr><td>{display_name}: {detail_text}</td><td style='text-align:right'>{val:.1f}h</td></tr>"
+                        else:
+                            # Try to find matching formula for this value
+                            for name, text in phd_details.items():
+                                if name.replace(' ', '_').lower() == key.lower() or display_name.lower() in name.lower():
+                                    research_html += f"<tr><td>{display_name}: {text}</td><td style='text-align:right'>{val:.1f}h</td></tr>"
+                                    break
+                            else:
+                                research_html += f"<tr><td>{display_name}</td><td style='text-align:right'>{val:.1f}h</td></tr>"
+                        research_subtotal += val
+
             # Add other research items (filter out 0.0h items)
             if other_research:
                 research_html += "<tr><td colspan='2' style='padding-top:15px;font-weight:bold;color:#4CAF50;letter-spacing:0.5px'>Other Research</td></tr>"
