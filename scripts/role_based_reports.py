@@ -243,14 +243,6 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
                             <td>Standard (2.5x)</td>
                             <td style='text-align:right'><strong>{teaching_without_practicals:.1f}h</strong></td>
                         </tr>
-                        <tr>
-                            <td style='padding-left:20px'>&bull; <strong>Practicals:</strong></td>
-                            <td>-/-</td>
-                            <td>-</td>
-                            <td>-</td>
-                            <td>{practicals:.1f}h total</td>
-                            <td style='text-align:right'><strong>{practicals:.1f}h</strong></td>
-                        </tr>
                     """
                 else:
                     module_rows_html += f"""
