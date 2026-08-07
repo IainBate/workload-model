@@ -839,7 +839,7 @@ def load_wtw_files(base_dir: str = None) -> Tuple[List[ModuleData], str]:
         Tuple of (list of ModuleData, year_label string)
 
     Raises:
-        FileNotFoundError: If no WTW CSV files are found in the data directory.
+        DataLoadError: If no WTW CSV files are found in the data directory.
     """
     if base_dir is None:
         base_dir = DATA_DIR
