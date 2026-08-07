@@ -601,6 +601,7 @@ class TestAssumptionsTracking:
     def test_assumptions_list_initialized(self):
         """Test that assumptions list is properly initialized."""
         from workload_calculator import Assumption
+        from data_loader import YearData
 
         # Create a scenario with an assumption (invalid grant FTE)
         module = ModuleData(
@@ -633,21 +634,23 @@ class TestAssumptionsTracking:
             active=True
         )
 
-        result = calculate_workload(
+        # Create YearData with the module and staff
+        year_data = YearData.create(
+            year_label="2026-7",
             modules=[module],
-            staff={staff.canonical_name: staff},
-            known_lecturers_global=set(),
-            project_load_data={},
-            pastoral_load_data={},
-            phd_supervision_data={},
-            research_fte_data={"John Smith": {"project_income": 0, "fte": {}}},
-            wtw_staff_roles={},
-            unknown_callback=None,
+            student_counts={},
+            assessment_counts={},
+            staff={"John Smith": staff},
+            known_lecturers=set(),
+            known_lecturers_per_module={}
         )
 
+        result = calculate_workload(year_data, validate_input=False)
+
         # Verify assumptions are tracked (invalid FTE string should create an assumption)
-        assert "John Smith" in result
-        assumptions = result["John Smith"]["assumptions"]
+        assert len(result) > 0
+        john_result = result[0]
+        assumptions = getattr(john_result, 'assumptions', [])
         assert len(assumptions) > 0
 
     def test_data_loader_imports_any(self):
