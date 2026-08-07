@@ -81,6 +81,8 @@ class ModuleData:
     source_year: str = ""  # e.g., "2026-7"
     marking_type: str = "manual"  # "automated" or "manual"
     new_content: bool = False  # True if this is new content for the teacher
+    new_assessment: bool = False  # True if this is a wholly new assessment/format
+    checking_only: bool = False  # True if this teacher only checks papers (doesn't set them)
 
     # Additional teaching format hours (in addition to contact hours)
     hw_lab_hours: float = 0.0  # Homework/lab work hours
