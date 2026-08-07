@@ -953,8 +953,7 @@ _WAW_ROLE_MAPPING = {
 
 
 def allocate_supervision(staff_data: Dict[str, StaffData]) -> SupervisionAllocation:
-    """
-    Calculate supervision allocation for all staff members.
+    """Calculate supervision allocation for all staff members.
 
     This is a pure function that reads from staff data and returns an immutable
     SupervisionAllocation. It should be called once per calculation run before
