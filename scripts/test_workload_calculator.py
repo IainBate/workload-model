@@ -176,8 +176,8 @@ class TestTeachingWorkload:
         assert "Existing Lecturer" in result
         # Existing lecturer with new content should get 5x multiplier (not 7.5x for new lecturer+new, not 2.5x standard)
         teaching_hours = result["Existing Lecturer"]["hours"]
-        # With 40 contact hours / 1 teacher * 5x = ~200h base + supervision
-        # Should be significantly more than standard (2.5x) but less than new lecturer+new content (7.5x)
+        # Total includes: teaching (200h @ 5x) + assessment (15h) + marking (60h) + admin (3h) = 278h
+        # Should be significantly more than standard (2.5x ~178h) but less than new lecturer+new content (7.5x ~378h)
         # Teaching hours only (ignoring assessment, marking, admin overhead)
         teaching_only = result["Existing Lecturer"]["teaching_breakdown"]["teaching"]
         assert teaching_hours > 150  # More than standard 2.5x (~178h total)
