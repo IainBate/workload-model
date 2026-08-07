@@ -441,6 +441,15 @@ def _parse_module_detail(detail: str) -> Dict[str, Any]:
             result['teaching_hours'] = float(hour_match.group(1))
         result['multiplier'] = 'Fixed allowance'
 
+    elif detail_lower.startswith('minimum'):
+        # Minimum administrative teaching load - should be a summary item, not a module
+        result['is_summary'] = True
+        result['summary_label'] = 'Minimum Teaching Load'
+        hour_match = re.search(r':\s*([\d.]+)\s*h', detail)
+        if hour_match:
+            result['teaching_hours'] = float(hour_match.group(1))
+        result['multiplier'] = 'Default admin load'
+
     else:
         # Extract module name (e.g., "SYS2", "QUCO") - must be followed by credits info
         match = re.match(r'^([A-Z]+(?:\d+)?(?:-[HM])?)', detail)
