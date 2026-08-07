@@ -1093,13 +1093,54 @@ def generate_per_staff_reports(results: List[WorkloadResult], year_data: YearDat
                             <span class="detail-hours">{practicals_per_module:.1f}h</span>
                             <span class="detail-activity" style="background:#fff3e0;color:#ef6c00;">Teaching</span>
                         </div>""")
+
+                        # Parse practical details from module_details if available
+                        has_practical_details = False
+                        practical_detail_text = detail if 'First time delivery' in detail else ''
+
+                        if practical_detail_text:
+                            items_html_parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+                                <span class="detail-name" style="color:#333;">Practical</span>""")
+
+                            # Parse the practical details
+                            detail_lines = practical_detail_text.split(';')
+
+                            for line in detail_lines:
+                                line = line.strip()
+                                if not line:
+                                    continue
+                                # Check for first time delivery lines
+                                if 'First time delivery:' in line:
+                                    items_html_parts.append(f"""<div style="padding-left:20px;">
+                                        <span class="detail-name" style="color:#1565c0;">{line}</span>
+                                    </div>""")
+                                elif '- Standard lecturers' in line or '- New/new-content lecturer' in line:
+                                    items_html_parts.append(f"""<div style="padding-left:20px;">
+                                        <span class="detail-name" style="color:#1565c0;">{line}</span>
+                                    </div>""")
+                                elif 'Repeated sessions:' in line:
+                                    items_html_parts.append(f"""<div style="padding-left:20px;">
+                                        <span class="detail-name" style="color:#ef6c00;">{line}</span>
+                                    </div>""")
+                                elif '- Total repeat rate:' in line:
+                                    # Extract hours from the total repeat rate
+                                    hrs_match = re.search(r'(\d+\.?\d*)h/week', line)
+                                    if hrs_match:
+                                        total_repeat_hrs = float(hrs_match.group(1))
+                                        items_html_parts.append(f"""<div style="padding-left:20px;">
+                                            <span class="detail-name" style="color:#ef6c00;">{line}</span>
+                                        </div>""")
+
+                            items_html_parts.append("""</div>""")
+
                         # Show calculation detail - use standard rate for display since it's per-teacher
-                        first_session_rate = config.TEACHING_MULTIPLIERS.get('problem_class_seminar_practical', 2.5)
-                        rep_rate = config.REPETITION_MULTIPLIER
-                        items_html_parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
-                            <span class="detail-name" style="color:#333;">Calculation</span>
-                            <span class="detail-hours">{first_session_rate}x first session (standard), {rep_rate}x repeats</span>
-                        </div>""")
+                        if not has_practical_details:
+                            first_session_rate = config.TEACHING_MULTIPLIERS.get('problem_class_seminar_practical', 2.5)
+                            rep_rate = config.REPETITION_MULTIPLIER
+                            items_html_parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+                                <span class="detail-name" style="color:#333;">Calculation</span>
+                                <span class="detail-hours">{first_session_rate}x first session (standard), {rep_rate}x repeats</span>
+                            </div>""")
 
                     # Assessment setting - use structured breakdown data directly
                     if assessment_setting_per_module > 0:
