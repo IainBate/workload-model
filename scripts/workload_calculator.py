@@ -251,7 +251,7 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
                 # Standard lecturer: just delivery at standard rate
                 total_hours = base_lecture_share * config.TEACHING_MULTIPLIERS["lecture_standard"]
                 lecture_hours_with_mult[t] = total_hours
-                detail_parts.append(f"Standard ({config.TEACHING_MULTIPLIERS['lecture_standard']}x): {base_lecture_share:.1f}h @ 2.5x = {total_hours:.1f}h")
+                detail_parts.append(f"Standard ({config.TEACHING_MULTIPLIERS['lecture_standard']}x): {base_lecture_share:.1f}h/teacher @ 2.5x = {total_hours:.1f}h")
 
     teaching_details.append("; ".join(detail_parts))
 
