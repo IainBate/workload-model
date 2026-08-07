@@ -110,8 +110,11 @@ For University of York users:
 - Contact IT about using the university's Google Cloud project
 - They may have pre-configured credentials available
 
-To try automatic upload anyway, run:
-  python main.py --google-sheets --with-credentials
+To try automatic upload, run:
+  python main.py --google-sheets
+
+Note: If authentication fails due to missing credentials,
+the system will fall back to manual import instructions.
 
 """)
 
