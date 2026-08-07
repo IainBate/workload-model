@@ -139,7 +139,8 @@ class WorkloadResult:
     research_detail: str = ""
     admin_detail: str = ""
     nominal_hours: float = 0.0  # FTE-adjusted nominal hours for reference
-    teaching_breakdown: Dict[str, float] = field(default_factory=dict)  # Detailed breakdown of teaching components
+    teaching_breakdown: Dict[str, float] = field(default_factory=dict)  # Detailed breakdown of teaching components (aggregated)
+    teaching_module_breakdowns: Dict[str, Dict[str, float]] = field(default_factory=dict)  # Per-module teaching breakdowns
     research_breakdown: Dict[str, float] = field(default_factory=dict)  # Detailed breakdown of research components
     admin_breakdown: Dict[str, float] = field(default_factory=dict)  # Detailed breakdown of admin components
     grant_titles: Dict[str, str] = field(default_factory=dict)  # Mapping of project IDs to display titles
