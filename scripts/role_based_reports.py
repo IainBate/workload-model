@@ -230,7 +230,8 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
             # Combine all rows
             all_rows_html = module_rows_html + summary_rows_html
 
-            teaching_html = f"""
+            # Build teaching HTML with detailed breakdown if available
+            teaching_html_parts = f"""
             <div class="section-card">
                 <div class="card-header">
                     <span class="card-title">Teaching Activities</span>
@@ -240,8 +241,14 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
                     {all_rows_html}
                 </table>
                 <p style='font-size:0.85em;color:#666;padding-top:10px;text-align:right'>Subtotal: {total_teaching:.1f}h</p>
-            </div>
             """
+
+            # Add detailed breakdown if available
+            if hasattr(r, 'teaching_detail') and r.teaching_detail:
+                teaching_html_parts += f"<div class='calc-breakdown'>{_format_detailed_section_v2('Teaching', r.teaching_detail)}</div>"
+
+            teaching_html_parts += "</div>"
+            teaching_html = teaching_html_parts
         else:
             teaching_html = ""
 
