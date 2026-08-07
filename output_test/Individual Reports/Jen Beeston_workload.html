@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workload Report - Jen Beeston</title>
+    <style>body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 30px; background: #f5f5f5; } .report-container { max-width: 1200px; margin: 0 auto; background: white; padding: 40px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-radius: 8px; } h1 { color: #333; border-bottom: 3px solid #4CAF50; padding-bottom: 15px; margin-top: 0; } h2 { color: #4CAF50; border-left: 4px solid #4CAF50; padding-left: 12px; margin-top: 35px; } h3 { color: #666; margin: 20px 0 10px 0; font-size: 1.1em; } .staff-header { background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); color: white; padding: 25px; border-radius: 8px; margin-bottom: 30px; } .staff-name { font-size: 2em; font-weight: bold; } .staff-meta { display: flex; gap: 40px; margin-top: 10px; font-size: 1.1em; opacity: 0.95; } .meta-item { display: flex; flex-direction: column; align-items: center; min-width: 80px; } .meta-label { font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.8; margin-bottom: 4px; } .meta-value { font-weight: bold; font-size: 1.3em; } .section-card { background: #f9f9f9; border-radius: 8px; padding: 25px; margin-top: 20px; border-left: 5px solid #4CAF50; } .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; } .card-title { font-weight: bold; color: #333; font-size: 1.2em; } .card-total { font-size: 1.4em; font-weight: bold; color: #4CAF50; } .detail-item { padding: 10px 0; border-bottom: 1px solid #eee; display: grid; grid-template-columns: 2fr 1fr 1.5fr; gap: 15px; align-items: center; } .detail-item:last-child { border-bottom: none; } .detail-name { font-weight: 500; color: #555; } .detail-hours { text-align: right; font-family: monospace; font-size: 1.1em; color: #666; } .detail-activity { text-align: center; padding: 4px 12px; background: #e8f5e9; border-radius: 4px; font-size: 0.85em; color: #2e7d32; } .teaching-item .detail-activity { background: #e3f2fd; color: #1565c0; } .research-item .detail-activity { background: #fff3e0; color: #ef6c00; } .admin-item .detail-activity { background: #fce4ec; color: #c2185b; } .calc-breakdown { font-size: 0.9em; color: #777; margin-top: 10px; padding-top: 15px; border-top: 2px dashed #ddd; line-height: 1.6; } .assumptions-box, .missing-data-box { background: #fff3e0; border-radius: 8px; padding: 20px; margin-top: 30px; } .assumptions-box h3, .missing-data-box h3 { color: #ef6c00; border-left-color: #ff9800; margin-top: 0; } .missing-data-box { background: #ffebee; } .missing-data-box h3 { color: #c62828; border-left-color: #e53935; } .footer { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 2px solid #eee; font-size: 0.85em; color: #888; } .total-bar { display: flex; align-items: center; gap: 15px; margin-top: 30px; padding: 20px; background: linear-gradient(90deg, #4CAF50 0%, #2e7d32 100%); border-radius: 8px; } .total-bar .label { color: white; font-size: 1.2em; font-weight: bold; min-width: 150px; } .total-bar .value { color: white; font-size: 2em; font-weight: bold; flex-grow: 1; text-align: right; }</style>
+</head>
+<body>
+    <div class="report-container">
+        <div class="staff-header">
+            <div class="staff-name">Jen Beeston</div>
+            <div class="staff-meta">
+                <div class="meta-item">
+                    <span class="meta-label">FTE</span>
+                    <span class="meta-value">1.00</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Nominal Hours</span>
+                    <span class="meta-value">1642h</span>
+                </div>
+            </div>
+
+            <!-- Total workload in green band at top of staff header -->
+            <div style="margin-top:20px;padding-top:15px;border-top:1px solid rgba(255,255,255,0.3);">
+                <span class="label" style="color:white;font-size:1.2em;font-weight:bold;">Total Workload:</span>
+                <span class="value" style="color:white;font-size:2em;font-weight:bold;">877.0 hours</span>
+            </div>
+        </div>
+
+        <div class="section-card teaching-item">
+                <div class="card-header">
+                    <span class="card-title">Teaching Activities</span>
+                    <span class="card-total">369.8h</span>
+                </div>
+                <div style="margin-bottom:25px;">
+                    <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #2196F3;padding-left:10px;">QUAL Modules (1 module(s))</h4><div class="detail-item teaching-item">
+                            <span class="detail-name">Delivery (Lectures)</span>
+                            <span class="detail-hours">45.0h @ Standard (2.5x)</span>
+                            <span class="detail-activity" style="background:#e3f2fd;color:#1565c0;">Teaching</span>
+                        </div><div class="detail-item teaching-item" style="padding-left:40px;font-size:0.85em;color:#666;">
+                                <span class="detail-name" style="color:#333;">Calculation</span>
+                                <span class="detail-hours">45.0h @ Standard (2.5x)</span>
+                            </div><div class="detail-item teaching-item">
+                            <span class="detail-name">Practical Sessions</span>
+                            <span class="detail-hours">110.0h</span>
+                            <span class="detail-activity" style="background:#fff3e0;color:#ef6c00;">Teaching</span>
+                        </div><div class="detail-item teaching-item" style="padding-left:40px;font-size:0.85em;color:#666;">
+                                <span class="detail-name" style="color:#333;">Practical</span><div style="padding-left:20px;">
+                                        <span class="detail-name" style="color:#1565c0;">First time delivery: 1 groups shared by 2 lecturers for 11 weeks</span>
+                                    </div><div style="padding-left:20px;">
+                                        <span class="detail-name" style="color:#1565c0;">- Standard lecturers (2): 5.0h/week @ 2.5x each (one first session per week)</span>
+                                    </div></div><div class="detail-item teaching-item" style="padding-left:40px;font-size:0.85em;color:#666;">
+                                <span class="detail-name" style="color:#333;">Calculation</span>
+                                <span class="detail-hours">2.5x first session (standard), 1.5x repeats</span>
+                            </div><div class="detail-item teaching-item">
+                            <span class="detail-name">Assessment Setting</span>
+                            <span class="detail-hours">15.0h</span>
+                            <span class="detail-activity" style="background:#e8f5e9;color:#2e7d32;">Teaching</span>
+                        </div><div class="detail-item teaching-item" style="padding-left:40px;font-size:0.85em;color:#666;">
+                            <span class="detail-name" style="color:#333;">Calculation</span>
+                            <span class="detail-hours">15.0h total (main + resit)</span>
+                        </div><div class="detail-item teaching-item">
+                            <span class="detail-name">Assessment Marking</span>
+                            <span class="detail-hours">19.8h</span>
+                            <span class="detail-activity" style="background:#e8f5e9;color:#2e7d32;">Teaching</span>
+                        </div><div class="detail-item teaching-item" style="padding-left:40px;font-size:0.85em;color:#666;">
+                            <span class="detail-name" style="color:#333;">Calculation</span>
+                            <span class="detail-hours">19.8h total (initial + resit)</span>
+                        </div></div></div><div style="margin-bottom:25px;">
+                    <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #2196F3;padding-left:10px;">TECC Modules (1 module(s))</h4><div class="detail-item teaching-item">
+                            <span class="detail-name">Delivery (Lectures)</span>
+                            <span class="detail-hours">45.0h @ Standard (2.5x)</span>
+                            <span class="detail-activity" style="background:#e3f2fd;color:#1565c0;">Teaching</span>
+                        </div><div class="detail-item teaching-item" style="padding-left:40px;font-size:0.85em;color:#666;">
+                                <span class="detail-name" style="color:#333;">Calculation</span>
+                                <span class="detail-hours">45.0h @ Standard (2.5x)</span>
+                            </div><div class="detail-item teaching-item">
+                            <span class="detail-name">Practical Sessions</span>
+                            <span class="detail-hours">110.0h</span>
+                            <span class="detail-activity" style="background:#fff3e0;color:#ef6c00;">Teaching</span>
+                        </div><div class="detail-item teaching-item" style="padding-left:40px;font-size:0.85em;color:#666;">
+                                <span class="detail-name" style="color:#333;">Practical</span><div style="padding-left:20px;">
+                                        <span class="detail-name" style="color:#1565c0;">First time delivery: 2 groups shared by 2 lecturers for 11 weeks</span>
+                                    </div><div style="padding-left:20px;">
+                                        <span class="detail-name" style="color:#1565c0;">- Standard lecturers (2): 5.0h/week @ 2.5x each (one first session per week)</span>
+                                    </div></div><div class="detail-item teaching-item" style="padding-left:40px;font-size:0.85em;color:#666;">
+                                <span class="detail-name" style="color:#333;">Calculation</span>
+                                <span class="detail-hours">2.5x first session (standard), 1.5x repeats</span>
+                            </div><div class="detail-item teaching-item">
+                            <span class="detail-name">Assessment Setting</span>
+                            <span class="detail-hours">15.0h</span>
+                            <span class="detail-activity" style="background:#e8f5e9;color:#2e7d32;">Teaching</span>
+                        </div><div class="detail-item teaching-item" style="padding-left:40px;font-size:0.85em;color:#666;">
+                            <span class="detail-name" style="color:#333;">Calculation</span>
+                            <span class="detail-hours">15.0h total (main + resit)</span>
+                        </div><div class="detail-item teaching-item">
+                            <span class="detail-name">Assessment Marking</span>
+                            <span class="detail-hours">19.8h</span>
+                            <span class="detail-activity" style="background:#e8f5e9;color:#2e7d32;">Teaching</span>
+                        </div><div class="detail-item teaching-item" style="padding-left:40px;font-size:0.85em;color:#666;">
+                            <span class="detail-name" style="color:#333;">Calculation</span>
+                            <span class="detail-hours">19.8h total (initial + resit)</span>
+                        </div></div></div><div style="margin-bottom:25px;">
+                    <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #2196F3;padding-left:10px;">UG Modules (1 module(s))</h4><div class="detail-item teaching-item">
+                            <span class="detail-name">Delivery (Lectures)</span>
+                            <span class="detail-hours">45.0h @ New lecturer (5x)</span>
+                            <span class="detail-activity" style="background:#e3f2fd;color:#1565c0;">Teaching</span>
+                        </div><div class="detail-item teaching-item" style="padding-left:40px;font-size:0.85em;color:#666;">
+                                <span class="detail-name" style="color:#333;">Calculation</span>
+                                <span class="detail-hours">9.0h base @ 2.5x + 36.0h content dev = 45h</span>
+                            </div><div class="detail-item teaching-item">
+                            <span class="detail-name">Practical Sessions</span>
+                            <span class="detail-hours">110.0h</span>
+                            <span class="detail-activity" style="background:#fff3e0;color:#ef6c00;">Teaching</span>
+                        </div><div class="detail-item teaching-item" style="padding-left:40px;font-size:0.85em;color:#666;">
+                                <span class="detail-name" style="color:#333;">Calculation</span>
+                                <span class="detail-hours">2.5x first session (standard), 1.5x repeats</span>
+                            </div><div class="detail-item teaching-item">
+                            <span class="detail-name">Assessment Setting</span>
+                            <span class="detail-hours">15.0h</span>
+                            <span class="detail-activity" style="background:#e8f5e9;color:#2e7d32;">Teaching</span>
+                        </div><div class="detail-item teaching-item" style="padding-left:40px;font-size:0.85em;color:#666;">
+                            <span class="detail-name" style="color:#333;">Calculation</span>
+                            <span class="detail-hours">15.0h total (main + resit)</span>
+                        </div><div class="detail-item teaching-item">
+                            <span class="detail-name">Assessment Marking</span>
+                            <span class="detail-hours">19.8h</span>
+                            <span class="detail-activity" style="background:#e8f5e9;color:#2e7d32;">Teaching</span>
+                        </div><div class="detail-item teaching-item" style="padding-left:40px;font-size:0.85em;color:#666;">
+                            <span class="detail-name" style="color:#333;">Calculation</span>
+                            <span class="detail-hours">19.8h total (initial + resit)</span>
+                        </div></div></div><div style="margin-bottom:25px;">
+                    <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #FF9800;padding-left:10px;">Pastoral Supervision (27.0h)</h4>
+                    <div style="margin-left:20px;">
+                        <div class="detail-item teaching-item">
+                            <span class="detail-name">Students</span>
+                            <span class="detail-hours">9 students x 3h each = 27.0h</span>
+                            <span class="detail-activity" style="background:#fce4ec;color:#c2185b;">Supervision</span>
+                        </div>
+                    </div>
+                </div><div style="margin-bottom:25px;">
+                    <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #FF9800;padding-left:10px;">Project Supervision (144.0h)</h4>
+                    <div style="margin-left:20px;">
+                        <div class="detail-item teaching-item">
+                            <span class="detail-name">Projects</span>
+                            <span class="detail-hours">9 projects x UG = 144.0h</span>
+                            <span class="detail-activity" style="background:#fce4ec;color:#c2185b;">Supervision</span>
+                        </div>
+                    </div>
+                </div><div class="detail-item teaching-item">
+                    <span class="detail-name">Project Setting (fixed)</span>
+                    <span class="detail-hours">6.0h</span>
+                    <span class="detail-activity" style="background:#e8f5e9;color:#2e7d32;">Teaching</span>
+                </div>
+                <p style="font-size:0.85em;color:#666;padding-top:10px;">Subtotal: 369.8h</p>
+            </div>
+        <div class="section-card research-item">
+                <div class="card-header">
+                    <span class="card-title">Research Activities</span>
+                    <span class="card-total">332.2h</span>
+                </div>
+                <div style="margin-bottom:20px;">
+                    <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #4CAF50;padding-left:10px;">PhD Supervision (168.0h)</h4><div class="detail-item research-item">
+                            <span class="detail-name">Co Supervisor</span>
+                            <span class="detail-hours">144.0h</span>
+                        </div><div class="detail-item research-item">
+                            <span class="detail-name">Assessor</span>
+                            <span class="detail-hours">24.0h</span>
+                        </div></div><div style="margin-bottom:20px;">
+                    <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #4CAF50;padding-left:10px;">Research Allowances (164.2h)</h4><div class="detail-item research-item">
+                        <span class="detail-name">Protected research baseline</span>
+                        <span class="detail-hours">164.2h</span>
+                    </div></div>
+                <p style="font-size:0.85em;color:#666;padding-top:10px;">Subtotal: 332.2h</p>
+            </div>
+        <div class="section-card admin-item">
+                <div class="card-header">
+                    <span class="card-title">Admin Activities</span>
+                    <span class="card-total">175.0h</span>
+                </div>
+                <div style="margin-bottom:20px;">
+                    <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #4CAF50;padding-left:10px;">Other (175.0h)</h4><div class="detail-item admin-item">
+                            <span class="detail-name">Engagement</span>
+                            <span class="detail-hours">100.0h</span>
+                        </div><div class="detail-item admin-item">
+                            <span class="detail-name">Personal Development</span>
+                            <span class="detail-hours">75.0h</span>
+                        </div></div>
+                <p style="font-size:0.85em;color:#666;padding-top:10px;">Subtotal: 175.0h</p>
+            </div>
+
+        <h2>Calculation Breakdown</h2>
+        <div class="section-card">
+            <p>The workload calculation follows the model formula:</p>
+            <p style="font-family: monospace; font-size: 1.1em; text-align: center; margin: 20px 0;">
+                Total = Teaching + Research (Protected + Additional) + Admin + General Baseline
+            </p>
+            <div class="calc-breakdown">
+                <h3>Summary Totals</h3>
+                <ul>
+                    <li><strong>Teaching:</strong> 369.8h</li>
+                    <li><strong>Research (protected baseline):</strong> 164.2h</li>
+                    <li><strong>Research (additional - grants, supervision):</strong> 168.0h</li>
+                    <li><strong>Admin:</strong> 175.0h</li>
+                    <li><ul style="margin: 5px 0; padding-left: 20px;">
+                        <li>General departmental engagement, e.g. meetings and email: 100.0h</li>
+                        <li>Personal development: 75.0h</li>
+                    </ul></li>
+                </ul>
+                <p style="margin-top:20px;"><em>Total: 877.0 hours = 369.8 + 164.2 + 168.0 + 175.0</em></p>
+            </div>
+        </div>
+
+        <div class="assumptions-box">
+                <h3>Assumptions Made</h3>
+                <ul><li>Module had 0 students - marking not calculated</li><li>Module had 0 students - marking not calculated</li></ul>
+            </div>
+        
+
+        <div class="footer">
+            <p>Generated on 2026-07-14 for academic year 2026-7</p>
+            <p>This report was automatically generated by the Workload Model calculator.</p>
+        </div>
+    </div>
+</body>
+</html>
