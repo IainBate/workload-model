@@ -472,13 +472,13 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
                 weekly_hrs = individual_practical_hours[t]
                 total_hrs = weekly_hrs * practical_week_count
                 practical_details.append(
-                    f"  - {t}: {contact_per_practical:.1f}h/week lecture @ 5x (new content) + {repeat_sessions/n_teachers:.1f}h repeat share = {weekly_hrs:.1f}h/week = {total_hrs:.1f}h total"
+                    f"  - First delivery: {contact_per_practical:.1f}h/week lecture @ 5x (new content) + {repeat_sessions/n_teachers:.1f}h repeated delivery @ 1.5x = {weekly_hrs:.1f}h/week = {total_hrs:.1f}h total"
                 )
             for t in sorted(standard_lecturers_practical):
                 weekly_hrs = individual_practical_hours[t]
                 total_hrs = weekly_hrs * practical_week_count
                 practical_details.append(
-                    f"  - {t}: {contact_per_practical:.1f}h/week lecture @ 2.5x + {repeat_sessions/n_teachers:.1f}h repeat share = {weekly_hrs:.1f}h/week = {total_hrs:.1f}h total"
+                    f"  - First delivery: {contact_per_practical:.1f}h/week lecture @ 2.5x + {repeat_sessions/n_teachers:.1f}h repeated delivery @ 1.5x = {weekly_hrs:.1f}h/week = {total_hrs:.1f}h total"
                 )
 
             # Show repeat breakdown if any
