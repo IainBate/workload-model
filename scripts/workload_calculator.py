@@ -1219,13 +1219,14 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
                     f"{module.name} ({module.credits}cr): {breakdown['detail_text']}"
                 )
                 # Store per-module teaching_breakdown for accurate display
-                if "teaching_breakdown" not in staff_teaching[teacher]:
-                    staff_teaching[teacher]["teaching_breakdown"] = {}
-                for k, v in breakdown.get("teaching_breakdown", {}).items():
-                    # Use list to store per-module values
-                    if k not in staff_teaching[teacher]["teaching_breakdown"]:
-                        staff_teaching[teacher]["teaching_breakdown"][k] = []
-                    staff_teaching[teacher]["teaching_breakdown"][k].append(v)
+                if "teaching_module_breakdowns" not in staff_teaching[teacher]:
+                    staff_teaching[teacher]["teaching_module_breakdowns"] = {}
+                if module.name not in staff_teaching[teacher]["teaching_module_breakdowns"]:
+                    staff_teaching[teacher]["teaching_module_breakdowns"][module.name] = {}
+                # Copy the teaching_breakdown for this specific module
+                staff_teaching[teacher]["teaching_module_breakdowns"][module.name].update(
+                    breakdown.get("teaching_breakdown", {})
+                )
                 # Aggregate supervision details (to be shown separately)
                 if "supervision_details" not in staff_teaching[teacher]:
                     staff_teaching[teacher]["supervision_details"] = []
