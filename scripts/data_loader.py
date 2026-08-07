@@ -10,7 +10,7 @@ import glob
 import os
 import re
 from dataclasses import dataclass, field
-from typing import List, Dict, Optional, Set, Tuple
+from typing import List, Dict, Optional, Set, Tuple, Any
 from pathlib import Path
 
 # Get project root directory (parent of scripts folder)
