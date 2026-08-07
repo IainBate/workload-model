@@ -551,7 +551,7 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
     # Assessment admin flat rate (split among teachers)
     # Already determined in marking section above, but need to re-select for admin rate
     is_automated = getattr(module, 'marking_type', 'manual') == 'automated'
-    is_msc = module.stage >= 3
+    is_msc = config.is_msc_level(module.stage)
 
     if is_automated:
         admin_flat = config.MARKING_AUTO_ADMIN
