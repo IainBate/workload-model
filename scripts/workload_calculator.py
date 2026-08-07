@@ -990,8 +990,9 @@ def _calculate_research_workload(staff_member: StaffData) -> tuple:
             formula_parts.append(f"{assessor_count} × {config.SUPERVISION_MULTIPLIERS['pgr_assessor']}")
         formula_str = " + ".join(formula_parts) if formula_parts else ""
         # Add explanation of what's included in PhD supervision
-        explanation = "PhD supervision (primary supervisor, co-supervisor & assessor)"
-        details.append(f"{explanation} ({formula_str}): {'; '.join(phd_details)} = {phd_hours:.1f}h")
+        # Note: Individual items (primary_supervisor, co_supervisor, assessor) are already
+        # shown in the breakdown table; this line is just for reference
+        details.append(f"PhD supervision: {'; '.join(phd_details)} = {phd_hours:.1f}h")
 
     # Research grant time (from % FTE for CS.csv)
     grant_titles = {}  # project_id -> title mapping for output display
