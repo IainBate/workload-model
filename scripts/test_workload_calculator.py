@@ -258,6 +258,94 @@ class TestTeachingWorkload:
 
         assert new_hours > std_hours
 
+    def test_assessment_setting_automated_marking(self):
+        """Test assessment setting uses automated rates when marking_type is 'automated' (P1-1)."""
+        module = ModuleData(
+            name="TestModule",
+            codes=["TEST007"],
+            credits=20,
+            stage=5,
+            contact_hours=40,
+            practicals=0,
+            practical_contact_hours=0,
+            practical_groups=0,
+            practical_weeks=None,
+            assessment_count=1,
+            student_count=100,
+            teachers=["John Smith"],
+            lead_name=None,
+        )
+        # Mark as automated marking
+        module.marking_type = "automated"
+
+        result = _calculate_teaching_workload(
+            module, ["John Smith"], {"John Smith"}, {}, {},
+            SupervisionAllocation({}, {})
+        )
+
+        # With automated marking, standard rate is 25h (config.ASSESSMENT_AUTO_STANDARD)
+        # vs manual standard of 15h
+        assessment_hours = result["John Smith"]["teaching_breakdown"].get("assessment_setting", 0)
+        assert assessment_hours == 25.0
+
+    def test_assessment_setting_new_assessment(self):
+        """Test assessment setting uses new_assessment_or_format rate (P1-1)."""
+        module = ModuleData(
+            name="TestModule",
+            codes=["TEST008"],
+            credits=20,
+            stage=5,
+            contact_hours=40,
+            practicals=0,
+            practical_contact_hours=0,
+            practical_groups=0,
+            practical_weeks=None,
+            assessment_count=1,
+            student_count=100,
+            teachers=["John Smith"],
+            lead_name=None,
+        )
+        # Mark as new assessment (entirely new format)
+        module.new_assessment = True
+
+        result = _calculate_teaching_workload(
+            module, ["John Smith"], {"John Smith"}, {}, {},
+            SupervisionAllocation({}, {})
+        )
+
+        # With manual marking and new_assessment, rate is 37.5h (config.ASSESSMENT_MANUAL_NEW_ASSESSMENT)
+        assessment_hours = result["John Smith"]["teaching_breakdown"].get("assessment_setting", 0)
+        assert assessment_hours == 37.5
+
+    def test_assessment_setting_checking_only(self):
+        """Test assessment setting uses checking rate for checking-only papers (P1-1)."""
+        module = ModuleData(
+            name="TestModule",
+            codes=["TEST009"],
+            credits=20,
+            stage=5,
+            contact_hours=40,
+            practicals=0,
+            practical_contact_hours=0,
+            practical_groups=0,
+            practical_weeks=None,
+            assessment_count=1,
+            student_count=100,
+            teachers=["John Smith"],
+            lead_name=None,
+        )
+        # Mark as checking only (doesn't set, just checks)
+        module.checking_only = True
+
+        result = _calculate_teaching_workload(
+            module, ["John Smith"], {"John Smith"}, {}, {},
+            SupervisionAllocation({}, {})
+        )
+
+        # With manual marking and checking_only, rate is 2h (config.ASSESSMENT_MANUAL_CHECKING)
+        assessment_hours = result["John Smith"]["teaching_breakdown"].get("assessment_setting", 0)
+        assert assessment_hours == 2.0
+
     def test_assessment_marking_calculation(self):
         """Test marking hours based on student count and marking type."""
         module = ModuleData(
