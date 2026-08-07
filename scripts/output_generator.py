@@ -245,12 +245,13 @@ Output Files:
     - workload_summary_boxplot.png: Three-component stacked bar chart
     - workload_detailed_boxplot.png: Multi-category breakdown chart
 """
-def generate_boxplots(results: List[WorkloadResult], output_dir: str = None):
+def generate_boxplots(results: List[WorkloadResult], year_data: YearData, output_dir: str = None):
     """
     Generate summary and detailed boxplot PNG charts.
 
     Args:
         results: List of WorkloadResult objects from calculate_workload()
+        year_data: YearData object containing staff category information
         output_dir: Output directory for chart files (default: OUTPUT_DIR)
 
     Output Files:
