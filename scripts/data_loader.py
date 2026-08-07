@@ -199,13 +199,24 @@ def _load_name_lookup(filepath: str = "staff_name_lookup.json") -> Dict[str, Lis
     return data.get("mappings", {})
 
 
-def _build_reverse_lookup(mappings: Dict[str, List[str]]) -> Dict[str, str]:
-    """Build a reverse lookup: alias -> canonical_name."""
+def _build_reverse_lookup(mappings: Dict[str, List[str]]) -> Tuple[Dict[str, str], List[str]]:
+    """Build a reverse lookup: alias -> canonical_name.
+
+    Returns:
+        Tuple of (reverse_lookup, warnings) where warnings are about duplicate aliases.
+    """
     reverse = {}
+    warnings = []
     for canonical, aliases in mappings.items():
         for alias in aliases:
-            reverse[alias.strip().lower()] = canonical
-    return reverse
+            key = alias.strip().lower()
+            if key in reverse and reverse[key] != canonical:
+                warnings.append(
+                    f"Duplicate alias '{alias}' maps to both '{reverse[key]}' and '{canonical}'. "
+                    f"Using '{canonical}'."
+                )
+            reverse[key] = canonical
+    return reverse, warnings
 
 
 # Known non-person entries that should be skipped
