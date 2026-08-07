@@ -928,6 +928,9 @@ def generate_per_staff_reports(results: List[WorkloadResult], year_data: YearDat
                 elif item_name in ["primary_research_allowance", "protected_research_baseline"]:
                     return "Research Allowances"
                 elif item_name in ["phd_supervision", "primary_supervisor", "co_supervisor", "assessor"]:
+                    # Skip phd_supervision as it's a combined total (redundant with individual items)
+                    if item_name == "phd_supervision":
+                        return None  # Mark for exclusion
                     return "PhD Supervision"
                 else:
                     return "Other"
