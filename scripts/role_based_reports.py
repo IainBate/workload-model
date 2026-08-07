@@ -706,10 +706,15 @@ def _format_detailed_section_v2(title: str, detail_text: str) -> str:
             else:
                 other_info.append(clean_s)
 
-        # Format Standard Lecture section
+        # Format Standard Lecture section (combine all standard-related lines)
         if standard_info:
+            std_lines = []
             for info in standard_info:
-                html_parts.append(f"<p style='margin: 8px 0;'><strong>Standard Lecture:</strong> {info}</p>")
+                # Remove "Standard" prefix if present to avoid repetition
+                clean_info = re.sub(r'^Standard\s*(\([^)]+\))?\s*:\s*', '', info, flags=re.IGNORECASE).strip()
+                if clean_info:
+                    std_lines.append(clean_info)
+            html_parts.append(f"<p style='margin: 8px 0;'><strong>Standard Lecture:</strong> {' '.join(std_lines)}</p>")
 
         # Format Practicals section with collapsible details
         if practicals_info:
@@ -726,12 +731,16 @@ def _format_detailed_section_v2(title: str, detail_text: str) -> str:
         # Format Assessment section
         if assessment_info:
             for info in assessment_info:
-                html_parts.append(f"<p style='margin: 8px 0;'><strong>Assessment setting:</strong> {info}</p>")
+                # Remove "Assessment setting:" prefix if already present
+                clean_info = re.sub(r'^Assessment setting:\s*', '', info, flags=re.IGNORECASE)
+                html_parts.append(f"<p style='margin: 8px 0;'><strong>Assessment setting:</strong> {clean_info}</p>")
 
         # Format Marking section
         if marking_info:
             for info in marking_info:
-                html_parts.append(f"<p style='margin: 8px 0;'><strong>Marking:</strong> {info}</p>")
+                # Remove "Marking:" prefix if already present
+                clean_info = re.sub(r'^Marking:\s*', '', info, flags=re.IGNORECASE)
+                html_parts.append(f"<p style='margin: 8px 0;'><strong>Marking:</strong> {clean_info}</p>")
 
         # Format any other info
         for info in other_info:
