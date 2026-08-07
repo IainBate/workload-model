@@ -411,6 +411,9 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
                         f"Practicals: {n_groups} groups shared by {n_teachers} lecturers for {practical_week_count} weeks"
                     )
                     practical_details.append(
+                        f"New/new-content: {new_first_per_session:.1f}h/week @ 5x"
+                    )
+                    practical_details.append(
                         f"Standard: {std_first_per_session:.1f}h/week @ 2.5x"
                     )
                     if repeat_hrs_per_week > 0:
