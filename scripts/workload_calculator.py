@@ -693,12 +693,12 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
         num_papers = assessment_count * 2
         if is_automated:
             assessment_details.append(
-                f"{num_papers} paper(s) set ({assessment_count} assessment(s), auto): "
+                f"Assessment setting: {num_papers} paper(s) set ({assessment_count} assessment(s), auto): "
                 f"{paper_total_per_assessment:.1f}h each ({main_paper_total:.1f}h main + {resit_paper_total:.1f}h resit)"
             )
         else:
             assessment_details.append(
-                f"{num_papers} paper(s) set ({assessment_count} assessment(s), manual): "
+                f"Assessment setting: {num_papers} paper(s) set ({assessment_count} assessment(s), manual): "
                 f"{paper_total_per_assessment:.1f}h each ({main_paper_total:.1f}h main + {resit_paper_total:.1f}h resit)"
             )
 
