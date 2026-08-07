@@ -518,7 +518,7 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
     if module.student_count > 0:
         # Determine marking type and rates
         is_automated = getattr(module, 'marking_type', 'manual') == 'automated'
-        is_msc = module.stage >= 3  # Stage 3+ typically MSc level
+        is_msc = config.is_msc_level(module.stage)
 
         if is_automated:
             per_script = config.MARKING_AUTO_MSC if is_msc else config.MARKING_AUTO_UG
