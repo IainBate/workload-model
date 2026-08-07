@@ -175,12 +175,12 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
         # Build teaching section with modules
         teaching_html_parts = []
         if module_details_list:
-            teaching_html_parts.append("<h3>Teaching Activities by Module</h3>")
+            teaching_html_parts.append("<h3>Teaching Activities by Activity</h3>")
             teaching_html_parts.append("""
             <table class="module-table">
                 <thead>
                     <tr>
-                        <th>Module</th>
+                        <th>Activity</th>
                         <th>Credits/Stage</th>
                         <th>Contact Hours</th>
                         <th>Students</th>
@@ -216,7 +216,7 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
         # Add detailed breakdown
         if hasattr(r, 'teaching_detail') and r.teaching_detail:
             teaching_html_parts.append("<h3>Detailed Breakdown</h3>")
-            teaching_html_parts.append(f"<div class='calc-breakdown'>{_format_detailed_section('Teaching', r.teaching_detail)}</div>")
+            teaching_html_parts.append(f"<div class='calc-breakdown'>{_format_detailed_section_v2('Teaching', r.teaching_detail)}</div>")
 
         teaching_html = ''.join(teaching_html_parts)
 
