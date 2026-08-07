@@ -812,12 +812,18 @@ def _load_part_time(filepath: str = "Part time.csv") -> Dict[str, dict]:
 
 
 def load_wtw_files(base_dir: str = None) -> Tuple[List[ModuleData], str]:
-    """
-    Load the current year's WTW file. Returns (modules, year_label).
-    Auto-detects the latest WTW file.
+    """Load the current year's WTW file and return modules with year label.
+
+    Auto-detects the latest WTW CSV file from the data directory.
 
     Args:
         base_dir: Directory containing WTW files. Defaults to data folder.
+
+    Returns:
+        Tuple of (list of ModuleData, year_label string)
+
+    Raises:
+        FileNotFoundError: If no WTW CSV files are found in the data directory.
     """
     if base_dir is None:
         base_dir = DATA_DIR
