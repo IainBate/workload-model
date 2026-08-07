@@ -940,6 +940,9 @@ def generate_per_staff_reports(results: List[WorkloadResult], year_data: YearDat
             for name, value in breakdown.items():
                 if value > 0:
                     cat = get_category(name)
+                    # Skip items marked as None (e.g., phd_supervision combined total)
+                    if cat is None:
+                        continue
                     if cat not in categories:
                         categories[cat] = []
                     categories[cat].append((name, value))
