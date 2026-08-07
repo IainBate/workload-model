@@ -455,8 +455,10 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
                 first_week_std_delivery = contact_per_practical * config.TEACHING_MULTIPLIERS["problem_class_seminar_practical"] * practicals_count
 
                 # Total for first week (all lecturers combined)
+                # Note: existing lecturers with new content get 5x like new lecturers
+                n_new_or_content = len(new_lecturers_practical) + len(existing_with_new_content_practical)
                 first_week_total = (
-                    len(new_lecturers_practical) * first_week_first_delivery +
+                    n_new_or_content * first_week_first_delivery +
                     len(standard_lecturers_practical) * first_week_std_delivery
                 )
                 first_week_per_teacher = first_week_total / n_teachers
