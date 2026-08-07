@@ -814,7 +814,9 @@ def _format_detailed_section_v2(title: str, detail_text: str) -> str:
                 clean_info = re.sub(r'^Standard\s*(\([^)]+\))?\s*:\s*', '', info, flags=re.IGNORECASE).strip()
                 if clean_info:
                     std_lines.append(clean_info)
-            html_parts.append(f"<p style='margin: 8px 0;'><strong>Standard Lecture:</strong> {' '.join(std_lines)}</p>")
+            # Show calculation: extract base hours and multiplier from the detail text
+            std_text = ' '.join(std_lines)
+            html_parts.append(f"<p style='margin: 8px 0;'><strong>Standard Lecture:</strong> {std_text}</p>")
 
         # Format Practicals section with collapsible details
         if practicals_segments:
