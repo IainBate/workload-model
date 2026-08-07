@@ -1320,7 +1320,7 @@ def generate_all_outputs(results: List[WorkloadResult], year_data: YearData,
     generate_excel_with_formulas(results, year_data, output_dir)
 
     # Generate boxplots
-    generate_boxplots(results, output_dir)
+    generate_boxplots(results, year_data, output_dir)
 
     # Generate per-staff detailed reports
     generate_per_staff_reports(results, year_data, output_dir)
