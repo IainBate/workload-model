@@ -298,11 +298,26 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
                     formula_part = match.group(2).strip()
                     hours_val = float(match.group(3))
                     grant_details[grant_name] = (formula_part, hours_val)
-                # Parse PhD supervision details
-                for match in re.finditer(r'(Primary Supervisor|Co Supervisor|Assessor):\s*([^\n]+)', r.research_detail):
-                    item_name = match.group(1).strip()
-                    detail_text = match.group(2).strip()
-                    phd_details[item_name] = detail_text
+                # Parse PhD supervision details from the combined formula string
+                # Format: "PhD supervision (...) (2 × 80 + ...): 2x full-time PhD student × 80h/FTE; 3x part-time..."
+                phd_formula_match = re.search(r'PhD supervision[^:]+:\s*(.+)', r.research_detail)
+                if phd_formula_match:
+                    formula_text = phd_formula_match.group(1)
+                    # Extract individual formulas
+                    for match in re.finditer(r'(\d+)x\s+(full-time|part-time)?\s*PhD student.*?×\s*(\d+)h/FTE', formula_text):
+                        count = int(match.group(1))
+                        full_time = 'full-time' in match.group(0)
+                        rate = int(match.group(3))
+                        hours = count * rate
+                        if full_time:
+                            phd_details['Primary Supervisor'] = f"{count}x full-time PhD student × {rate}h/FTE"
+                        else:
+                            phd_details['Co Supervisor'] = f"{count}x part-time PhD student × {rate}h/FTE"
+                    # Extract assessor details
+                    for match in re.finditer(r'(\d+)x\s+assessor\s*\((\d+)h each\)', formula_text):
+                        count = int(match.group(1))
+                        rate = int(match.group(2))
+                        phd_details['Assessor'] = f"{count}x assessor ({rate}h each)"
 
             # Add Grants section if any (filter out 0.0h items)
             if grants:
