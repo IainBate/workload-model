@@ -265,7 +265,8 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
     if is_online_module and is_new_content_module:
         # Apply online content development rates for new content in online modules
         for t in teachers:
-            is_new_lecturer = t not in known_lecturers_for_module
+            # A lecturer is "new" only if they are NOT in this module's known set AND NOT in the global known set
+            is_new_lecturer = (t not in known_lecturers_for_module) and (t not in known_lecturers_global)
             if is_new_lecturer:
                 # New lecturer on NEW content: 800h total for content dev
                 online_hours = config.ONLINE_PROGRAMS["content_development_new_material_new_lecturer_per_module"]  # 800
