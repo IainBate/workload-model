@@ -960,6 +960,10 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
         if not staff.active:
             continue
 
+        # Initialize assumptions and missing data early (they're used throughout the loop)
+        assumptions = []
+        missing_data = []
+
         # Nominal hours scaled by FTE for part-time staff (StaffData is now frozen)
         fte_value = staff.fte if staff.fte > 0 else 1.0
         nominal_hours = config.NOMINAL_WORKING_HOURS_PER_YEAR * fte_value
