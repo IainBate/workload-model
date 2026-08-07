@@ -151,7 +151,10 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
     for r in results:
         nominal_hours = getattr(r, 'nominal_hours', config.NOMINAL_WORKING_HOURS_PER_YEAR * r.fte)
 
-        # Get module details from module_details (already parsed tuples)
+        # Check if we have per-module breakdown data (preferred source)
+        has_module_breakdowns = hasattr(r, 'teaching_module_breakdowns') and r.teaching_module_breakdowns
+
+        # Get module details from module_details (already parsed tuples) - used as fallback
         import re
         module_details_list = []
         summary_items = []  # Collect Pastoral, Projects for separate display
@@ -193,62 +196,34 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
         # Sort: modules first (by name), then summary items (Pastoral, Projects)
         module_details_list.sort(key=lambda x: x['module_name'])
 
+        # If we have per-module breakdowns, use those values instead of parsed module_details
+        if has_module_breakdowns:
+            # Build module list from teaching_module_breakdowns
+            module_details_list = []
+            for module_name, breakdown in r.teaching_module_breakdowns.items():
+                # Get total teaching hours from the breakdown
+                mod_teaching = sum(v for k, v in breakdown.items() if k != 'practicals')
+                practicals = breakdown.get('practicals', 0)
+                mod_total = mod_teaching + practicals
+
+                module_details_list.append({
+                    'module_name': module_name,
+                    'credits': '20cr',
+                    'stage': '',
+                    'contact_hours': round(breakdown.get('teaching', 0), 1),
+                    'student_count': 0,  # Not directly available from breakdown
+                    'multiplier': '',  # Will be determined from module_details string if available
+                    'teaching_hours': mod_total,
+                    'practicals': practicals
+                })
+            # Sort by module name
+            module_details_list.sort(key=lambda x: x['module_name'])
+
         # Calculate total teaching hours for display
-        total_teaching = sum(mod['teaching_hours'] for mod in module_details_list) + sum(item['teaching_hours'] for item in combined_summary)
+        total_teaching = sum(mod.get('practicals', 0) + mod.get('teaching_hours', 0) if has_module_breakdowns else mod['teaching_hours'] for mod in module_details_list) + sum(item['teaching_hours'] for item in combined_summary)
 
-        if module_details_list or combined_summary:
-            # Format modules into table rows
-            module_rows_html = ""
-            for mod in module_details_list:
-                module_rows_html += f"""
-                    <tr>
-                        <td><strong>{mod['module_name']}</strong></td>
-                        <td>{mod['credits']}/{mod['stage']}</td>
-                        <td>{mod['contact_hours']}h</td>
-                        <td>{mod['student_count']}</td>
-                        <td>{mod['multiplier']}</td>
-                        <td style='text-align:right'><strong>{mod['teaching_hours']:.1f}h</strong></td>
-                    </tr>
-                """
-
-            # Format summary items (Pastoral, Projects) into table rows
-            summary_rows_html = ""
-            for item in combined_summary:
-                summary_rows_html += f"""
-                    <tr>
-                        <td><strong>{item['summary_label']}</strong></td>
-                        <td>-/-</td>
-                        <td>-</td>
-                        <td>{item['student_count']}</td>
-                        <td>{item['multiplier']}</td>
-                        <td style='text-align:right'><strong>{item['teaching_hours']:.1f}h</strong></td>
-                    </tr>
-                """
-
-            # Combine all rows
-            all_rows_html = module_rows_html + summary_rows_html
-
-            # Build teaching HTML with detailed breakdown if available
-            teaching_html_parts = f"""
-            <div class="section-card">
-                <div class="card-header">
-                    <span class="card-title">Teaching Activities</span>
-                    <span class="card-total">{total_teaching:.1f}h</span>
-                </div>
-                <table class="module-table">
-                    {all_rows_html}
-                </table>
-                <p style='font-size:0.85em;color:#666;padding-top:10px;text-align:right'>Subtotal: {total_teaching:.1f}h</p>
-            """
-
-            # Add detailed breakdown if available
-            if hasattr(r, 'teaching_detail') and r.teaching_detail:
-                teaching_html_parts += f"<div class='calc-breakdown'>{_format_detailed_section_v2('Teaching', r.teaching_detail)}</div>"
-
-            teaching_html_parts += "</div>"
-            teaching_html = teaching_html_parts
-        else:
-            teaching_html = ""
+        # Also calculate teaching hours without practicals for display
+        total_teaching_excl_practicals = sum(mod.get('teaching_hours', 0) for mod in module_details_list) + sum(item['teaching_hours'] for item in combined_summary)
 
         # Research section - grouped by category
         research_html = ""

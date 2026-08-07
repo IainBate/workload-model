@@ -1058,12 +1058,14 @@ def generate_per_staff_reports(results: List[WorkloadResult], year_data: YearDat
                     # Determine if this staff member is new or standard for this module
                     is_new_lecturer = _determine_lecturer_type(r.name, stage, known_lecturers_per_module or {})
 
-                    # Calculate per-module hours from structured breakdown data
-                    n_modules_in_stage = max(len(modules_in_stage), 1)
-                    delivery_per_module = breakdown.get('teaching', 0) / n_modules_in_stage
-                    practicals_per_module = breakdown.get('practicals', 0) / n_modules_in_stage
-                    assessment_setting_per_module = breakdown.get('assessment_setting', 0) / n_modules_in_stage
-                    marking_per_module = breakdown.get('marking', 0) / n_modules_in_stage
+                    # Get per-module hours from structured breakdown data
+                    # Use the module name (stage) to look up the specific breakdown
+                    module_name = stage
+                    module_breakdown = r.teaching_module_breakdowns.get(module_name, {})
+                    delivery_per_module = module_breakdown.get('teaching', 0)
+                    practicals_per_module = module_breakdown.get('practicals', 0)
+                    assessment_setting_per_module = module_breakdown.get('assessment_setting', 0)
+                    marking_per_module = module_breakdown.get('marking', 0)
 
                     # Delivery/lectures - show hours with detailed breakdown
                     if delivery_per_module > 0:
