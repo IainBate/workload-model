@@ -814,21 +814,7 @@ def _format_detailed_section_v2(title: str, detail_text: str) -> str:
                 clean_info = re.sub(r'^Standard\s*(\([^)]+\))?\s*:\s*', '', info, flags=re.IGNORECASE).strip()
                 if clean_info:
                     std_lines.append(clean_info)
-
-            # Reconstruct the calculation explanation in a clearer format
-            # Input: "10.0h @ 2.5x = 25.0h" (per teacher share @ rate = total for all)
-            # Output: "5.3h base × 2.5x = 13.3h per teacher (from 20cr/4 teachers)"
-            std_text = ' '.join(std_lines)
-
-            # Try to extract and reformat the calculation
-            # Pattern: "Xh @ Yx = Zh" where X is per-teacher base, Z is total
-            import re as regex
-            calc_match = regex.search(r'(\d+\.?\d*)\s*h\s*@.*?=\s*(\d+\.?\d*)\s*h', std_text)
-            if calc_match:
-                # Reformat to show base hours first
-                std_text = f"{calc_match.group(1)}h @ {std_text.split('@')[1].split('=')[0]} = {calc_match.group(2)}h"
-
-            html_parts.append(f"<p style='margin: 8px 0;'><strong>Standard Lecture:</strong> {std_text}</p>")
+            html_parts.append(f"<p style='margin: 8px 0;'><strong>Standard Lecture:</strong> {' '.join(std_lines)}</p>")
 
         # Format Practicals section with collapsible details
         if practicals_segments:
