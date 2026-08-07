@@ -895,15 +895,8 @@ def _format_detailed_section_v2(title: str, detail_text: str, staff_name: Option
 
             # Reorganize: First time delivery first, then repeat info, then individual calculation
             if first_time_delivery_line:
-                # Add the weekly calculation to First time delivery line
-                # Parse to extract group count and add multiplier info
-                ft_match = re.search(r'First time delivery:\s*(\d+)\s*group\(s\)\s*\(([^)]+)\)', first_time_delivery_line)
-                if ft_match:
-                    groups = int(ft_match.group(1))
-                    # The line already has (one per lecturer) - just add calculation detail
-                    practicals_html_parts.append(f"<p style='margin: 8px 0;'>{first_time_delivery_line}. {contact_per_practical:.1f}h x 2.5 multiplier per week.</p>")
-                else:
-                    practicals_html_parts.append(f"<p style='margin: 8px 0;'>{first_time_delivery_line}</p>")
+                # The line already contains the calculation details from workload_calculator
+                practicals_html_parts.append(f"<p style='margin: 8px 0;'>{first_time_delivery_line}</p>")
 
             # Add repeated sessions info right after first time delivery
             if repeated_sessions_line:
