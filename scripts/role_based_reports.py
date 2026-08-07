@@ -195,62 +195,55 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
         # Sort: modules first (by name), then summary items (Pastoral, Projects)
         module_details_list.sort(key=lambda x: x['module_name'])
 
-        teaching_html_parts = []
-        if module_details_list or combined_summary:
-            teaching_html_parts.append("<h3>Teaching Activities</h3>")
-            teaching_html_parts.append("""
-            <table class="module-table">
-                <thead>
-                    <tr>
-                        <th>Activity</th>
-                        <th>Credits/Stage</th>
-                        <th>Contact Hours</th>
-                        <th>Students</th>
-                        <th>Multiplier</th>
-                        <th>Teaching Hours</th>
-                    </tr>
-                </thead>
-                <tbody>
-            """)
+        # Calculate total teaching hours for display
+        total_teaching = sum(mod['teaching_hours'] for mod in module_details_list) + sum(item['teaching_hours'] for item in combined_summary)
 
-            # First add module rows (no status for individual modules - only summary items)
+        if module_details_list or combined_summary:
+            # Format modules into table rows
+            module_rows_html = ""
             for mod in module_details_list:
-                teaching_html_parts.append(f"""
+                module_rows_html += f"""
                     <tr>
                         <td><strong>{mod['module_name']}</strong></td>
                         <td>{mod['credits']}/{mod['stage']}</td>
                         <td>{mod['contact_hours']}h</td>
                         <td>{mod['student_count']}</td>
                         <td>{mod['multiplier']}</td>
-                        <td><strong>{mod['teaching_hours']:.1f}h</strong></td>
+                        <td style='text-align:right'><strong>{mod['teaching_hours']:.1f}h</strong></td>
                     </tr>
-                """)
+                """
 
-            # Then add summary items (Pastoral, Projects)
+            # Format summary items (Pastoral, Projects) into table rows
+            summary_rows_html = ""
             for item in combined_summary:
-                teaching_html_parts.append(f"""
+                summary_rows_html += f"""
                     <tr>
                         <td><strong>{item['summary_label']}</strong></td>
                         <td>-/-</td>
                         <td>-</td>
                         <td>{item['student_count']}</td>
                         <td>{item['multiplier']}</td>
-                        <td><strong>{item['teaching_hours']:.1f}h</strong></td>
+                        <td style='text-align:right'><strong>{item['teaching_hours']:.1f}h</strong></td>
                     </tr>
-                """)
+                """
 
-            teaching_html_parts.append("</tbody></table>")
+            # Combine all rows
+            all_rows_html = module_rows_html + summary_rows_html
 
-            # Calculate and add subtotal for teaching
-            total_teaching = sum(mod['teaching_hours'] for mod in module_details_list) + sum(item['teaching_hours'] for item in combined_summary)
-            teaching_html_parts.append(f"<p style='font-size:0.85em;color:#666;padding-top:10px;text-align:right'>Subtotal: {total_teaching:.1f}h</p>")
-
-        # Add detailed breakdown
-        if hasattr(r, 'teaching_detail') and r.teaching_detail:
-            teaching_html_parts.append("<h3>Detailed Breakdown</h3>")
-            teaching_html_parts.append(f"<div class='calc-breakdown'>{_format_detailed_section_v2('Teaching', r.teaching_detail)}</div>")
-
-        teaching_html = ''.join(teaching_html_parts)
+            teaching_html = f"""
+            <div class="section-card">
+                <div class="card-header">
+                    <span class="card-title">Teaching Activities</span>
+                    <span class="card-total">{total_teaching:.1f}h</span>
+                </div>
+                <table class="module-table">
+                    {all_rows_html}
+                </table>
+                <p style='font-size:0.85em;color:#666;padding-top:10px;text-align:right'>Subtotal: {total_teaching:.1f}h</p>
+            </div>
+            """
+        else:
+            teaching_html = ""
 
         # Research section
         research_html = ""
