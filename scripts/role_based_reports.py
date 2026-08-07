@@ -230,11 +230,6 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
 
             # Then add summary items (Pastoral, Projects)
             for item in combined_summary:
-                status_color, status_label, _ = _determine_status(
-                    item['teaching_hours'],
-                    nominal_hours * config.CONTRACT_NORMATIVE_DIVISIONS.get("TR_staff", {}).get("teaching", 0.4)
-                )
-
                 teaching_html_parts.append(f"""
                     <tr>
                         <td><strong>{item['summary_label']}</strong></td>
@@ -243,8 +238,7 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
                         <td>{item['student_count']}</td>
                         <td>{item['multiplier']}</td>
                         <td><strong>{item['teaching_hours']:.1f}h</strong></td>
-                        <td><span class="status-badge {status_color.replace('#', '').replace('-', '')}"
-                            style="background:{status_color}">{status_label}</span></td>
+                        <td>-</td>
                     </tr>
                 """)
 
