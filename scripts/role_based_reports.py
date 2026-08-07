@@ -287,16 +287,22 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
 
             research_subtotal = protected_baseline
 
-            # Build grant detail mapping from research_detail string if available
-            # Format: "Grant Title: X% of Yh = Zh"
+            # Build detail mappings from research_detail string if available
+            # Format: "Grant Title: X% of Yh = Zh" and "Primary Supervisor: N × Mh"
+            import re
             grant_details = {}
+            phd_details = {}
             if hasattr(r, 'research_detail') and r.research_detail:
-                import re
                 for match in re.finditer(r'Grant\s+([^:]+):\s*([^=]+)=\s*([\d.]+)h', r.research_detail):
                     grant_name = match.group(1).strip()
                     formula_part = match.group(2).strip()
                     hours_val = float(match.group(3))
                     grant_details[grant_name] = (formula_part, hours_val)
+                # Parse PhD supervision details
+                for match in re.finditer(r'(Primary Supervisor|Co Supervisor|Assessor):\s*([^\n]+)', r.research_detail):
+                    item_name = match.group(1).strip()
+                    detail_text = match.group(2).strip()
+                    phd_details[item_name] = detail_text
 
             # Add Grants section if any (filter out 0.0h items)
             if grants:
