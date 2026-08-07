@@ -151,7 +151,7 @@ def main():
 
     # Generate outputs
     print("\nGenerating outputs...")
-    output_dir = OUTPUT_DIR if args.output_dir == "." else os.path.join(PROJECT_ROOT, args.output_dir)
+    output_dir = OUTPUT_DIR if args.output_dir == "." else os.path.normpath(os.path.join(PROJECT_ROOT, args.output_dir))
     generate_all_outputs(results, year_data, output_dir)
 
     print(f"\nOutput files in {output_dir}:")
