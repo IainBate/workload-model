@@ -614,11 +614,8 @@ def _format_detailed_section_v2(title: str, detail_text: str) -> str:
 
     for module_name, segs in sorted(modules.items(), key=lambda x: x[0]):
         if module_name == 'general':
-            # General items (not tied to specific module)
-            html_parts.append("<ul>")
-            for s in segs:
-                html_parts.append(f"<li>{s}</li>")
-            html_parts.append("</ul>")
+            # General items are handled specially below (Pastoral/Projects with subheadings)
+            pass
         else:
             # Module-specific breakdown
             html_parts.append(f"<h4 style='margin: 10px 0 5px 0; color: #333;'>{module_name}</h4>")
