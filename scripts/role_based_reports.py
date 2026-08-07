@@ -691,6 +691,10 @@ def _format_detailed_section_v2(title: str, detail_text: str) -> str:
             s_lower = s.lower()
             clean_s = re.sub(r'^[A-Z]+\d*\s*\(\d+cr\):\s*', '', s)
 
+            # Skip if already processed (e.g., "Practicals:" prefix was added elsewhere)
+            if clean_s.startswith('practicals:'):
+                continue
+
             if 'standard' in s_lower and ('x:' in s_lower or 'h @' in s_lower):
                 standard_info.append(clean_s)
             elif 'practical' in s_lower:
@@ -710,12 +714,11 @@ def _format_detailed_section_v2(title: str, detail_text: str) -> str:
         # Format Practicals section with collapsible details
         if practicals_info:
             html_parts.append("<div style='margin: 8px 0; padding-left: 15px;'>")
-            html_parts.append(f"<p><strong>Practicals:</strong> {practicals_info[0]}</p>")
-            if len(practicals_info) > 1:
-                html_parts.append("<ul style='margin: 5px 0; padding-left: 20px; font-size: 0.9em;'>")
-                for info in practicals_info[1:]:
-                    html_parts.append(f"<li>{info}</li>")
-                html_parts.append("</ul>")
+            for i, info in enumerate(practicals_info):
+                if i == 0:
+                    html_parts.append(f"<p><strong>Practicals:</strong> {info}</p>")
+                else:
+                    html_parts.append(f"<small style='display:block; margin-left:20px;'>{info}</small>")
             html_parts.append("</div>")
 
         # Format Assessment section
