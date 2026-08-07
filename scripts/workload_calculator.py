@@ -1378,13 +1378,24 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
         if unique_supervision:
             module_details.extend(unique_supervision)
 
+        def _sum_breakdown_lists(breakdown_dict):
+            """Sum per-module breakdown values from lists to totals."""
+            result = {}
+            for k, v in breakdown_dict.items():
+                if isinstance(v, list):
+                    result[k] = sum(v)
+                else:
+                    # Scalar value (e.g., pastoral_supervision, project_setting)
+                    result[k] = v
+            return result
+
         # Build structured teaching breakdown from per-module data
         teaching_breakdown = {}
         if canonical_name in staff_teaching:
             staff_data = staff_teaching[canonical_name]
             # Direct teaching_breakdown at staff level (from aggregation)
             if "teaching_breakdown" in staff_data and staff_data["teaching_breakdown"]:
-                teaching_breakdown = dict(staff_data["teaching_breakdown"])
+                teaching_breakdown = _sum_breakdown_lists(staff_data["teaching_breakdown"])
             elif len(staff_data.get("details", [])) > 0:
                 # Fallback: parse from details string for backward compatibility
                 pass
