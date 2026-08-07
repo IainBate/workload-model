@@ -158,9 +158,12 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
         module_details_list = []
         if hasattr(r, 'module_details') and r.module_details:
             for detail in r.module_details:
-                mod_info = _parse_module_detail(detail)
-                if mod_info:
-                    module_details_list.append(mod_info)
+                # Split combined module strings (e.g., SYS2 and SYS3 in one string)
+                module_strings = _split_module_strings(detail)
+                for mod_str in module_strings:
+                    mod_info = _parse_module_detail(mod_str)
+                    if mod_info and mod_info['module_name']:
+                        module_details_list.append(mod_info)
 
         # Build teaching section with modules
         teaching_html_parts = []
