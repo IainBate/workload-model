@@ -100,6 +100,20 @@ generate_all_outputs(results, year_data, output_dir="output")
 | `StaffData` | Staff member details (FTE, roles, supervision loads, research projects) |
 | `WorkloadResult` | Calculated workload for a single staff member |
 
+### Teaching Multipliers
+
+The calculator applies different multipliers based on teaching format and content status:
+
+| Format | Standard | New Lecturer | New Content + New Lecturer | Video |
+|--------|----------|--------------|---------------------------|-------|
+| Multiplier | 2.5x | 5x | 7.5x | 10x |
+
+**Additional Teaching Activities:**
+- **Practical sessions**: Repetition multiplier of 1.5x for additional sessions
+- **HW Lab hours**: Additional work beyond contact hours (configurable)
+- **Drop-in sessions**: 1.5h per session for support
+- **Online content development**: 800h/module (new lecturer + new content), 100h/module (refreshing)
+
 ### Workload Calculation Formula
 
 ```
@@ -107,7 +121,7 @@ Total = Teaching + Research (Protected + Additional) + Admin
 ```
 
 Where:
-- **Teaching**: Contact hours × multipliers + assessment setting/marking + supervision
+- **Teaching**: Contact hours × multipliers + assessment setting/marking + supervision + additional activities
 - **Research**: Protected baseline (10% of nominal hours) + grants + PhD supervision
 - **Admin**: Departmental roles as % of nominal hours
 
