@@ -356,7 +356,8 @@ def generate_boxplots(results: List[WorkloadResult], year_data: YearData, output
     for i, (comp, label, color) in enumerate(zip(detailed_components, detailed_labels, detailed_colors)):
         for j, (name, result) in enumerate(zip(names, results)):
             category = staff_category_map.get(name, "T and S")
-            comp_key = comp.replace("_hours", "")
+            # Use same mapping as summary boxplot
+            comp_key = COMPONENT_TO_CONTRACT_KEY.get(comp, comp.replace("_hours", ""))
             expected_division = config.CONTRACT_NORMATIVE_DIVISIONS.get(category, {}).get(comp_key, 0)
             expected = result.nominal_hours * expected_division
             ax2.axvline(x=expected, color=color, alpha=0.5, linestyle="--", linewidth=1.5,
