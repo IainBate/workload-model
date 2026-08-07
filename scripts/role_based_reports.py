@@ -687,27 +687,47 @@ def _format_detailed_section_v2(title: str, detail_text: str) -> str:
         marking_info = []
         other_info = []
 
-        for s in segs:
+        # First pass: identify practicals section and collect all related sub-details
+        has_practicals = False
+        practicals_start_idx = -1
+        for idx, s in enumerate(segs):
+            if 'practical' in s.lower():
+                has_practicals = True
+                practicals_start_idx = idx
+                break
+
+        # If we have a practicals section, everything from that point until the next major category
+        # (Assessment setting or Marking) belongs to practicals
+        practicals_segments = []
+        other_segments = []
+
+        if has_practicals:
+            for idx, s in enumerate(segs):
+                if idx < practicals_start_idx:
+                    # Before practicals - these are standard lecture info
+                    other_segments.append(s)
+                elif idx == practicals_start_idx:
+                    # The practicals line itself - add to practicals
+                    practicals_segments.append(s)
+                else:
+                    # After practicals start - check if it's a new major category
+                    s_lower = s.lower()
+                    is_new_category = 'assessment setting' in s_lower or ('paper' in s_lower and 'set' in s_lower) or ('script' in s_lower and ('x' in s_lower or 'total' in s_lower))
+                    if is_new_category:
+                        other_segments.append(s)
+                    else:
+                        practicals_segments.append(s)
+        else:
+            # No practicals - process normally
+            other_segments = segs[:]
+
+        # Now categorize the segments
+        for s in other_segments:
             s_lower = s.lower()
             clean_s = re.sub(r'^[A-Z]+\d*\s*\(\d+cr\):\s*', '', s)
 
-            # Skip if already processed (e.g., "Practicals:" prefix was added elsewhere)
-            if clean_s.startswith('practicals:'):
-                continue
-
-            # Check if this is a standalone standard lecture info vs practical-related standard
-            # Standalone: "Standard (2.5x): 13.3h" - single module-level total
-            # Practical-related: "Standard: 10.0h/week @ 2.5x..." - embedded in practicals context
-            is_practical_standard = 'practical' in s_lower and ('standard' in s_lower or '@ 2.5x' in s_lower or 'grps @' in s_lower)
-
-            if is_practical_standard:
-                # This is a standard rate within practicals context - add to practicals
-                practicals_info.append(clean_s)
-            elif 'standard' in s_lower and ('x:' in s_lower or 'h @' in s_lower):
-                # Standalone standard lecture info (module-level totals)
+            if 'standard' in s_lower and ('x:' in s_lower or 'h @' in s_lower):
                 standard_info.append(clean_s)
-            elif 'practical' in s_lower:
-                practicals_info.append(clean_s)
             elif 'assessment setting' in s_lower or ('paper' in s_lower and 'set' in s_lower):
                 assessment_info.append(clean_s)
             elif 'script' in s_lower and ('x' in s_lower or 'total' in s_lower):
