@@ -628,19 +628,10 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
 
 
 def _calculate_research_workload(staff_member: StaffData) -> tuple:
-    """
-    Calculate research workload for a staff member.
+    """Calculate research workload for a staff member.
 
-    Returns (total_hours, breakdown_dict, detail_string, grant_titles_dict)
-    where grant_titles_dict maps project_id -> display title for output.
-
-    University now has only 10% protected baseline for all staff.
-    Only IGGI project staff get an additional primary research allowance (20%).
-    ART staff only get the protected baseline (no additional allowance).
-
-    Research workload consists of:
-        - Protected baseline: 10% of nominal hours (164.2h for full-time)
-        - Additional work from PhD supervision, research grants, and project marking
+    University has a 10% protected baseline for all staff. Research grants,
+    PhD supervision, and project marking contribute additional research time.
 
     Args:
         staff_member: StaffData object with supervision counts and grant data
