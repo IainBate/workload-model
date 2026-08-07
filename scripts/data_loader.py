@@ -1232,8 +1232,8 @@ def load_all_data(data_dir: str = None,
                     if simplified_key in pastoral_load_data:
                         pastoral_students = pastoral_load_data[simplified_key]
 
-            # Fall back to project_load.csv Pastoral Load column
-            if proj_data and "pastoral_load" in proj_data:
+            # Fall back to project_load.csv Pastoral Load column only if not already set from pastoral_load_data
+            if proj_data and "pastoral_load" in proj_data and pastoral_students == 0:
                 try:
                     pastoral_students = int(float(proj_data.get("pastoral_load", 0)))
                 except (ValueError, TypeError):
