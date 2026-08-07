@@ -69,11 +69,10 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
                                   known_lecturers_per_module: Dict[str, frozenset],
                                   staff_data: Dict[str, StaffData],
                                   supervision: SupervisionAllocation) -> dict:
-    """
-    Calculate teaching workload for a single module, split by teacher.
+    """Calculate teaching workload for a single module, split by teacher.
 
     Applies multipliers based on lecturer experience (new vs. established) and
-    account for lecture hours, practical sessions with repetition, assessment
+    accounts for lecture hours, practical sessions with repetition, assessment
     setting and marking, and supervision activities.
 
     Args:
