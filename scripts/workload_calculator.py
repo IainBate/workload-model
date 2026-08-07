@@ -527,6 +527,7 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
     # Assessment setting (per teacher based on whether THEY are new)
     # New lecturers get higher multiplier for first-time assessment setup
     # Standard lecturers get lower multiplier for familiar assessment formats
+    # Checking-only papers use a reduced rate
     # Split into main paper and resit paper for display purposes
     assessment_hours = {t: 0.0 for t in teachers}
     assessment_details = []
@@ -536,77 +537,124 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
         # Determine if this module uses automated marking (affects setting rates)
         is_automated = getattr(module, 'marking_type', 'manual') == 'automated'
 
-        # Select appropriate rates based on marking type
+        # Get the appropriate rates based on marking type and teacher role
+        # Check for checking-only status first, then new_assessment, then standard/new-setter
         if is_automated:
             base_setting_cost = config.ASSESSMENT_AUTO_STANDARD * assessment_count
             new_setter_rate = config.ASSESSMENT_AUTO_NEW_SETTER
             standard_rate = config.ASSESSMENT_AUTO_STANDARD
             checking_rate = config.ASSESSMENT_AUTO_CHECKING
+            new_assessment_rate = config.ASSESSMENT_AUTO_NEW_ASSESSMENT
         else:
             base_setting_cost = config.ASSESSMENT_MANUAL_STANDARD * assessment_count
             new_setter_rate = config.ASSESSMENT_MANUAL_NEW_SETTER
             standard_rate = config.ASSESSMENT_MANUAL_STANDARD
             checking_rate = config.ASSESSMENT_MANUAL_CHECKING
+            new_assessment_rate = config.ASSESSMENT_MANUAL_NEW_ASSESSMENT
 
         # Resit papers take the same time to set as main papers (same effort)
         # The 20% resit student assumption only applies to marking, not setting
         # For display: split total setting time equally between main and resit
         resit_paper_proportion = 1.0  # Resit papers take full setting time
 
-        # New lecturers get additional time for first-time setup
-        # Calculate the extra content dev cost (new_setter - standard)
-        std_per_assessment = base_setting_cost / assessment_count if assessment_count > 0 else 0
-
         setting_details_parts = []
         for t in teachers:
-            if t not in known_lecturers_for_module:
+            is_checking_only = getattr(module, 'checking_only', False)
+            is_new_assessment_module = getattr(module, 'new_assessment', False)
+
+            if is_checking_only:
+                # Checking-only papers use the checking rate (4h auto / 2h manual per paper)
+                base_hours = (checking_rate * assessment_count) / len(teachers)
+                assessment_hours[t] = base_hours
+
+                main_paper_hours = (checking_rate * assessment_count / 2) / len(teachers)
+                resit_paper_hours = (checking_rate * assessment_count / 2) / len(teachers)
+
+                if is_automated:
+                    setting_details_parts.append(
+                        f"Checking only ({checking_rate}h/paper, auto): "
+                        f"{main_paper_hours:.1f}h main + {resit_paper_hours:.1f}h resit = {base_hours:.1f}h"
+                    )
+                else:
+                    setting_details_parts.append(
+                        f"Checking only ({checking_rate}h/paper, manual): "
+                        f"{main_paper_hours:.1f}h main + {resit_paper_hours:.1f}h resit = {base_hours:.1f}h"
+                    )
+
+            elif t not in known_lecturers_for_module:
                 # New setter: standard time + additional content development time
-                base_hours = base_setting_cost / len(teachers)
-                content_dev_per_assessment = new_setter_rate - standard_rate
-                additional_content_hours = (content_dev_per_assessment * assessment_count) / len(teachers)
-                total_hours = base_hours + additional_content_hours
+                if is_new_assessment_module:
+                    # New assessment or format uses the higher new_assessment_or_format rate
+                    base_hours = (new_assessment_rate * assessment_count) / len(teachers)
+                    total_hours = base_hours  # All new assessment time is content dev
+                else:
+                    base_hours = base_setting_cost / len(teachers)
+                    content_dev_per_assessment = new_setter_rate - standard_rate
+                    additional_content_hours = (content_dev_per_assessment * assessment_count) / len(teachers)
+                    total_hours = base_hours + additional_content_hours
 
                 assessment_hours[t] = total_hours
                 # Resit papers take same time to set as main papers
                 # For display: split equally since each paper type requires full setting effort
-                main_paper_hours = (base_setting_cost / 2) / len(teachers)
-                resit_paper_hours = (base_setting_cost / 2) / len(teachers)
+                if is_new_assessment_module:
+                    main_paper_hours = (new_assessment_rate * assessment_count / 2) / len(teachers)
+                    resit_paper_hours = (new_assessment_rate * assessment_count / 2) / len(teachers)
+                else:
+                    main_paper_hours = (base_setting_cost / 2) / len(teachers)
+                    resit_paper_hours = (base_setting_cost / 2) / len(teachers)
 
                 if is_automated:
                     setting_details_parts.append(
-                        f"New setter ({new_setter_rate}h/assess, auto): "
+                        f"New setter ({new_assessment_rate if is_new_assessment_module else new_setter_rate}h/assess, auto): "
                         f"{main_paper_hours:.1f}h main + {resit_paper_hours:.1f}h resit = {total_hours:.1f}h"
                     )
                 else:
                     setting_details_parts.append(
-                        f"New setter ({new_setter_rate}h/assess, manual): "
+                        f"New setter ({new_assessment_rate if is_new_assessment_module else new_setter_rate}h/assess, manual): "
                         f"{main_paper_hours:.1f}h main + {resit_paper_hours:.1f}h resit = {total_hours:.1f}h"
                     )
             else:
                 # Standard setter: just the base cost divided equally
-                base_hours = base_setting_cost / len(teachers)
+                if is_new_assessment_module:
+                    base_hours = (new_assessment_rate * assessment_count) / len(teachers)
+                else:
+                    base_hours = base_setting_cost / len(teachers)
+
                 assessment_hours[t] = base_hours
 
                 # Split between main and resit for display (equal portions, both full setting time)
-                main_paper_hours = (base_setting_cost / 2) / len(teachers)
-                resit_paper_hours = (base_setting_cost / 2) / len(teachers)
+                if is_new_assessment_module:
+                    main_paper_hours = (new_assessment_rate * assessment_count / 2) / len(teachers)
+                    resit_paper_hours = (new_assessment_rate * assessment_count / 2) / len(teachers)
+                else:
+                    main_paper_hours = (base_setting_cost / 2) / len(teachers)
+                    resit_paper_hours = (base_setting_cost / 2) / len(teachers)
 
                 if is_automated:
                     setting_details_parts.append(
-                        f"Standard ({standard_rate}h/assess, auto): "
+                        f"Standard ({new_assessment_rate if is_new_assessment_module else standard_rate}h/assess, auto): "
                         f"{main_paper_hours:.1f}h main + {resit_paper_hours:.1f}h resit = {base_hours:.1f}h"
                     )
                 else:
                     setting_details_parts.append(
-                        f"Standard ({standard_rate}h/assess, manual): "
+                        f"Standard ({new_assessment_rate if is_new_assessment_module else standard_rate}h/assess, manual): "
                         f"{main_paper_hours:.1f}h main + {resit_paper_hours:.1f}h resit = {base_hours:.1f}h"
                     )
 
-        # Use standard cost for display (all teachers share same assessment count)
+        # Use appropriate cost for display (all teachers share same assessment count)
         # Each assessment includes both main and resit papers = 2 papers
         # For display: show the split as equal portions of total setting time
         num_papers = assessment_count * 2  # Main + resit for each assessment
-        paper_total_per_assessment = standard_rate
+
+        # Determine the effective rate to use in display (checking, new_assessment, or standard)
+        has_checking_only = any(getattr(module, 'checking_only', False) for _ in teachers)
+        if has_checking_only:
+            paper_total_per_assessment = checking_rate
+        elif getattr(module, 'new_assessment', False):
+            paper_total_per_assessment = new_assessment_rate
+        else:
+            paper_total_per_assessment = standard_rate
+
         total_setting_cost = num_papers * paper_total_per_assessment / len(teachers)
 
         main_paper_total = (assessment_count * paper_total_per_assessment) / 2 / len(teachers)
