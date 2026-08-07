@@ -605,11 +605,20 @@ def _format_detailed_section(title: str, detail_text: str) -> str:
 
 
 def _format_detailed_section_v2(title: str, detail_text: str) -> str:
-    """Format detailed section text for HTML display with subheadings and indented items.
+    """Format detailed section text for HTML display with structured subsections.
 
-    Parses the teaching_detail string and creates a structured layout with:
+    Parses the teaching_detail string and creates a well-structured layout with:
     - Subheadings for each module (SYS2, SYS3, etc.)
-    - Indented bullet points under each module showing breakdown details
+    - Organized subsections within each module
+    - Clear visual hierarchy using labels and line breaks
+
+    Example output structure:
+        <h4>SYS2 Breakdown</h4>
+        <div class='calc-breakdown-sub'>
+            <p><strong>Standard Lecture:</strong> 13.3h @ 2.5x = 33.3h</p>
+            <p><strong>Practicals:</strong> 5 groups shared by 3 lecturers over 11 weeks<br/>
+                <small>New/new-content: 20.0h/week @ 5x; Standard: 10.0h/week @ 2.5x (2 grps @ 1.5x)</small></p>
+        </div>
     """
     import re
 
@@ -617,7 +626,7 @@ def _format_detailed_section_v2(title: str, detail_text: str) -> str:
     segments = [s.strip() for s in detail_text.split(';') if s.strip()]
 
     # Group segments by module
-    modules = {}  # module_name -> list of (segment, is_new_module)
+    modules = {}  # module_name -> list of segments
     current_module = None
     current_segments = []
 
@@ -637,21 +646,19 @@ def _format_detailed_section_v2(title: str, detail_text: str) -> str:
             current_segments = [segment]
         else:
             # Check if this looks like a summary item (Pastoral, Projects)
-            # These should be separated from module details
             is_summary_item = re.match(r'^(\*\*)?(Pastoral|Projects|Project Setting)\b', segment, re.IGNORECASE)
 
             if is_summary_item:
-                # Save current module and start general section for summary items
+                # Save current module and add to general section
                 if current_module and current_segments:
                     modules[current_module] = current_segments[:]
-                    current_module = None  # Reset to add to general section
+                    current_module = None
 
-                # Add to general section
                 if 'general' not in modules:
                     modules['general'] = []
                 modules['general'].append(segment)
             elif current_module:
-                # This is a continuation of the current module's details
+                # Continuation of current module's details
                 current_segments.append(segment)
             else:
                 # Before any module defined - add to general section
@@ -668,24 +675,65 @@ def _format_detailed_section_v2(title: str, detail_text: str) -> str:
 
     for module_name, segs in sorted(modules.items(), key=lambda x: x[0]):
         if module_name == 'general':
-            # General items are handled specially below (Pastoral/Projects with subheadings)
-            pass
-        else:
-            # Module-specific breakdown
-            html_parts.append(f"<h4 style='margin: 10px 0 5px 0; color: #333;'>{module_name}</h4>")
-            html_parts.append("<ul style='margin: 5px 0 10px 20px;'>")
+            continue  # Handled below
 
-            for s in segs:
-                # Clean up the segment - remove module prefix if present
-                clean_seg = re.sub(r'^[A-Z]+\d*\s*\(\d+cr\):\s*', '', s)
-                html_parts.append(f"<li>{clean_seg}</li>")
+        # Module-specific breakdown with structured subsections
+        html_parts.append(f"<h4 style='margin: 15px 0 8px 0; color: #333; border-bottom: 1px solid #eee; padding-bottom: 5px;'>{module_name} Breakdown</h4>")
 
-            html_parts.append("</ul>")
+        # Extract and organize details by category
+        standard_info = []
+        practicals_info = []
+        assessment_info = []
+        marking_info = []
+        other_info = []
 
-    # Check if we have summary items (Pastoral, Projects) that weren't assigned to modules
-    # These appear in the general section - reformat them with subheadings
+        for s in segs:
+            s_lower = s.lower()
+            clean_s = re.sub(r'^[A-Z]+\d*\s*\(\d+cr\):\s*', '', s)
+
+            if 'standard' in s_lower and ('x:' in s_lower or 'h @' in s_lower):
+                standard_info.append(clean_s)
+            elif 'practical' in s_lower:
+                practicals_info.append(clean_s)
+            elif 'assessment setting' in s_lower or ('paper' in s_lower and 'set' in s_lower):
+                assessment_info.append(clean_s)
+            elif 'script' in s_lower and ('x' in s_lower or 'total' in s_lower):
+                marking_info.append(clean_s)
+            else:
+                other_info.append(clean_s)
+
+        # Format Standard Lecture section
+        if standard_info:
+            for info in standard_info:
+                html_parts.append(f"<p style='margin: 8px 0;'><strong>Standard Lecture:</strong> {info}</p>")
+
+        # Format Practicals section with collapsible details
+        if practicals_info:
+            html_parts.append("<div style='margin: 8px 0; padding-left: 15px;'>")
+            html_parts.append(f"<p><strong>Practicals:</strong> {practicals_info[0]}</p>")
+            if len(practicals_info) > 1:
+                html_parts.append("<ul style='margin: 5px 0; padding-left: 20px; font-size: 0.9em;'>")
+                for info in practicals_info[1:]:
+                    html_parts.append(f"<li>{info}</li>")
+                html_parts.append("</ul>")
+            html_parts.append("</div>")
+
+        # Format Assessment section
+        if assessment_info:
+            for info in assessment_info:
+                html_parts.append(f"<p style='margin: 8px 0;'><strong>Assessment setting:</strong> {info}</p>")
+
+        # Format Marking section
+        if marking_info:
+            for info in marking_info:
+                html_parts.append(f"<p style='margin: 8px 0;'><strong>Marking:</strong> {info}</p>")
+
+        # Format any other info
+        for info in other_info:
+            html_parts.append(f"<p style='margin: 8px 0;'>{info}</p>")
+
+    # Handle general items (Pastoral, Projects)
     if 'general' in modules and modules['general']:
-        # Separate Pastoral and Projects entries from other general items
         pastoral_segs = []
         projects_segs = []
         other_general = []
@@ -699,31 +747,25 @@ def _format_detailed_section_v2(title: str, detail_text: str) -> str:
             else:
                 other_general.append(s)
 
-        # Add Pastoral section
+        # Pastoral Supervision section
         if pastoral_segs:
-            html_parts.append("<h4 style='margin: 10px 0 5px 0; color: #333;'>Pastoral Supervision</h4>")
-            html_parts.append("<ul style='margin: 5px 0 10px 20px;'>")
+            html_parts.append("<h4 style='margin: 15px 0 8px 0; color: #333; border-bottom: 1px solid #eee; padding-bottom: 5px;'>Pastoral Supervision</h4>")
             for s in pastoral_segs:
                 clean_seg = re.sub(r'^Pastoral:\s*', '', s, flags=re.IGNORECASE)
-                html_parts.append(f"<li>{clean_seg}</li>")
-            html_parts.append("</ul>")
+                html_parts.append(f"<p style='margin: 8px 0;'><strong>Pastoral:</strong> {clean_seg}</p>")
 
-        # Add Projects section (combine Project Setting and Projects)
+        # Projects section
         if projects_segs:
-            html_parts.append("<h4 style='margin: 10px 0 5px 0; color: #333;'>Projects</h4>")
-            html_parts.append("<ul style='margin: 5px 0 10px 20px;'>")
+            html_parts.append("<h4 style='margin: 15px 0 8px 0; color: #333; border-bottom: 1px solid #eee; padding-bottom: 5px;'>Projects</h4>")
             for s in projects_segs:
                 clean_seg = re.sub(r'^(Project Setting|Projects):\s*', '', s, flags=re.IGNORECASE)
-                html_parts.append(f"<li>{clean_seg}</li>")
-            html_parts.append("</ul>")
+                html_parts.append(f"<p style='margin: 8px 0;'><strong>Projects:</strong> {clean_seg}</p>")
 
-        # Add remaining general items
+        # Other general items
         if other_general:
-            html_parts.append("<h4 style='margin: 10px 0 5px 0; color: #333;'>Other</h4>")
-            html_parts.append("<ul style='margin: 5px 0 10px 20px;'>")
+            html_parts.append("<h4 style='margin: 15px 0 8px 0; color: #333; border-bottom: 1px solid #eee; padding-bottom: 5px;'>Other</h4>")
             for s in other_general:
-                html_parts.append(f"<li>{s}</li>")
-            html_parts.append("</ul>")
+                html_parts.append(f"<p style='margin: 8px 0;'>{s}</p>")
 
     return "".join(html_parts)
 
