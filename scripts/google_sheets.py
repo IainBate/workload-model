@@ -17,6 +17,16 @@ Usage:
     # 2. Create new spreadsheet or open template
     # 3. File > Import > Upload > Select "Staff workload model.csv"
     # 4. Choose "Replace data" or "Insert rows"
+
+Google Sheets API (for automatic upload):
+    To enable automatic Google Sheets uploads, you need:
+    1. Install gspread: pip install gspread
+    2. Create OAuth credentials at https://console.cloud.google.com/
+    3. Save credentials as 'client_secret.json' in your project root
+    4. Run: python main.py --google-sheets
+
+Note: The --with-credentials flag is no longer used. Authentication
+is handled automatically if gspread is installed and credentials exist.
 """
 
 import os
