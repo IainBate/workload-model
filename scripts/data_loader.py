@@ -20,6 +20,22 @@ PROJECT_ROOT = SCRIPTS_DIR.parent
 import config
 
 
+# Custom exceptions for standardized error handling
+class WorkloadModelError(Exception):
+    """Base exception for workload model errors."""
+    pass
+
+
+class DataLoadError(WorkloadModelError):
+    """Raised when data loading fails."""
+    pass
+
+
+class ValidationError(WorkloadModelError):
+    """Raised when data validation fails."""
+    pass
+
+
 @dataclass(frozen=True)
 class SupervisionAllocation:
     """Immutable record of supervision hours allocated to each staff member.
