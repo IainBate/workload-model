@@ -636,6 +636,9 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
         teacher_hw_lab = individual_hw_lab_hours.get(teacher, 0.0)
         teacher_drop_in = individual_drop_in_hours.get(teacher, 0.0)
 
+        # Online content development hours per teacher (for online modules with new content)
+        teacher_online_content_dev = online_content_dev_hours.get(teacher, 0.0)
+
         # Total for this teacher from module activities (shared items divided by num_teachers)
         # Note: practicals are multiplied by weeks to get yearly total
         total_teacher_hours = (
@@ -646,7 +649,8 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
             admin_hours_per_teacher +
             teacher_supervision_hours.get(teacher, 0.0) +
             teacher_hw_lab +
-            teacher_drop_in
+            teacher_drop_in +
+            teacher_online_content_dev
         )
 
         # Calculate base lecture hours for display
