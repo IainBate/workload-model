@@ -256,6 +256,17 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
 
             teaching_html_parts.append("</tbody></table>")
 
+            # Add status legend
+            teaching_html_parts.append("""
+            <p style='font-size: 0.85em; color: #666; margin-top: 10px;'>
+                <strong>Status Legend:</strong> Shows variance from expected teaching time (40% of nominal hours = {expected}h).
+                <span style="background:#e8f5e9; color:#2e7d32; padding:2px 6px; border-radius:12px;">OK</span> within 5-10%,
+                <span style="background:#fff3e0; color:#ef6c00; padding:2px 6px; border-radius:12px;">Warning</span> beyond +/-5%,
+                <span style="background:#ffebee; color:#c62828; padding:2px 6px; border-radius:12px;">Over</span> >+10%,
+                <span style="background:#e8f5e9; color:#1b5e20; padding:2px 6px; border-radius:12px;">Under</span> <-10%.
+            </p>
+            """.format(expected=round(nominal_hours * config.CONTRACT_NORMATIVE_DIVISIONS.get("TR_staff", {}).get("teaching", 0.4), 1)))
+
         # Add detailed breakdown
         if hasattr(r, 'teaching_detail') and r.teaching_detail:
             teaching_html_parts.append("<h3>Detailed Breakdown</h3>")
