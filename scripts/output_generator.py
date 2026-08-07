@@ -241,6 +241,17 @@ Output Files:
     - workload_detailed_boxplot.png: Multi-category breakdown chart
 """
 def generate_boxplots(results: List[WorkloadResult], output_dir: str = None):
+    """
+    Generate summary and detailed boxplot PNG charts.
+
+    Args:
+        results: List of WorkloadResult objects from calculate_workload()
+        output_dir: Output directory for chart files (default: OUTPUT_DIR)
+
+    Output Files:
+        - workload_summary_boxplot.png: Stacked bar chart showing teaching/research/admin
+        - workload_detailed_boxplot.png: Detailed breakdown by category
+    """
     if output_dir is None:
         output_dir = OUTPUT_DIR
 
