@@ -1021,6 +1021,14 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
             staff_teaching[canonical_name]["supervision_details"].append(
                 f"Projects: {teacher_project_load} projects x {proj_level} ({proj_mult}h) = {project_hours:.1f}h"
             )
+            if project_assumed:
+                assumptions.append(Assumption(
+                    category="project_supervision",
+                    description=f"Default project supervision applied (10 students) for {canonical_name}",
+                    staff_name=canonical_name,
+                    default_value=0,
+                    actual_value=teacher_project_load
+                ).description)
 
         # General baseline is handled within _calculate_admin_workload via service_points
         # Protected research baseline (10% of nominal hours) - included in all staff totals
