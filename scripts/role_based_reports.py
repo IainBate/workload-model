@@ -526,6 +526,76 @@ def _format_detailed_section(title: str, detail_text: str) -> str:
     return "<ul>" + "".join(parts) + "</ul>"
 
 
+def _format_detailed_section_v2(title: str, detail_text: str) -> str:
+    """Format detailed section text for HTML display with subheadings and indented items.
+
+    Parses the teaching_detail string and creates a structured layout with:
+    - Subheadings for each module (SYS2, SYS3, etc.)
+    - Indented bullet points under each module showing breakdown details
+    """
+    import re
+
+    # Split by semicolons first to get segments
+    segments = [s.strip() for s in detail_text.split(';') if s.strip()]
+
+    # Group segments by module
+    modules = {}  # module_name -> list of (segment, is_new_module)
+    current_module = None
+    current_segments = []
+
+    # First pass: identify module starts and group segments
+    for segment in segments:
+        # Check if this segment starts a new module definition
+        # Pattern: "SYS2 (20cr):" or "QUCO (20cr):"
+        module_match = re.match(r'^([A-Z]+\d*)\s*\(\d+cr\):\s*', segment, re.IGNORECASE)
+
+        if module_match:
+            # Save previous module if exists
+            if current_module and current_segments:
+                modules[current_module] = current_segments[:]
+
+            # Start new module
+            current_module = module_match.group(1).upper()
+            current_segments = [segment]
+        else:
+            # This is a continuation of the current module's details
+            if current_module:
+                current_segments.append(segment)
+            else:
+                # Before any module defined - add to general section
+                if 'general' not in modules:
+                    modules['general'] = []
+                modules['general'].append(segment)
+
+    # Save last module
+    if current_module and current_segments:
+        modules[current_module] = current_segments
+
+    # Build HTML output
+    html_parts = []
+
+    for module_name, segs in sorted(modules.items(), key=lambda x: x[0]):
+        if module_name == 'general':
+            # General items (not tied to specific module)
+            html_parts.append("<ul>")
+            for s in segs:
+                html_parts.append(f"<li>{s}</li>")
+            html_parts.append("</ul>")
+        else:
+            # Module-specific breakdown
+            html_parts.append(f"<h4 style='margin: 10px 0 5px 0; color: #333;'>{module_name}</h4>")
+            html_parts.append("<ul style='margin: 5px 0 10px 20px;'>")
+
+            for s in segs:
+                # Clean up the segment - remove module prefix if present
+                clean_seg = re.sub(r'^[A-Z]+\d*\s*\(\d+cr\):\s*', '', s)
+                html_parts.append(f"<li>{clean_seg}</li>")
+
+            html_parts.append("</ul>")
+
+    return "".join(html_parts)
+
+
 # =============================================================================
 # OUTPUT FORMAT 2: Department-Focused Summary
 # =============================================================================
