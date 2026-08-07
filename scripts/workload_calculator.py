@@ -325,8 +325,18 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
         n_teachers = len(teachers)
 
         # Identify new vs standard lecturers for practical calculations (use per-module tracking)
+        # Also track existing lecturers with new content who need content dev time
         new_lecturers_practical = [t for t in teachers if t not in known_lecturers_for_module]
-        standard_lecturers_practical = [t for t in teachers if t in known_lecturers_for_module]
+        existing_with_new_content_practical = []  # Taught before but on new content
+        standard_lecturers_practical = []
+
+        for t in teachers:
+            if t in known_lecturers_for_module or t in known_lecturers_global:
+                # Existing lecturer - check if this is new content
+                if is_new_content_module:
+                    existing_with_new_content_practical.append(t)
+                else:
+                    standard_lecturers_practical.append(t)
 
         # Store individual practical hours per teacher
         individual_practical_hours = {}
@@ -336,12 +346,13 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
             # Each week, lecturers deliver first-session sessions.
             # - Standard lecturers: deliver at 2.5x rate (delivery only)
             # - New lecturers: deliver at 5x rate (content development + delivery)
+            # - Existing with new content: deliver at 5x rate (content dev only)
             # - Additional repeat sessions: 1.5x regardless of who delivers
             #
             # Strategy:
             # 1. Each lecturer gets one "first" session slot per week
             # 2. Standard lecturers' first sessions = contact × 2.5x
-            # 3. New lecturers' first sessions = contact × 5x (extra for content dev)
+            # 3. New lecturers and existing with new content: contact × 5x (extra for content dev)
             # 4. Repeat sessions are split among all, at 1.5x each
 
             rep_rate = config.REPETITION_MULTIPLIER  # 1.5
@@ -350,7 +361,7 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
 
             # Calculate weekly hours per teacher
             # Each lecturer gets one first-delivery session slot
-            # New lecturers: 5x multiplier for their first session (content dev + delivery)
+            # New lecturers and existing with new content: 5x multiplier for their first session (content dev)
             # Standard lecturers: 2.5x multiplier for their first session (delivery only)
             #
             # Note: practicals_count represents the number of practical sessions per week.
@@ -358,8 +369,8 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
             # to get total weekly hours for all sessions delivered by a teacher.
 
             for t in teachers:
-                if t in new_lecturers_practical:
-                    # New lecturer: their first session at 5x + share of repeats
+                if t in new_lecturers_practical or t in existing_with_new_content_practical:
+                    # New lecturer or existing with new content: their first session at 5x + share of repeats
                     # Multiply by practicals_count since each teacher delivers that many sessions per week
                     first_session = contact_per_practical * config.TEACHING_MULTIPLIERS["lecture_new_content_or_lecturer"] * practicals_count
                     repeat_share = (repeat_sessions * contact_per_practical * rep_rate * practicals_count) / n_teachers
