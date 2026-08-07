@@ -461,8 +461,10 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
 
             # First time delivery - each lecturer gets one first session per week
             first_time_sessions = min(n_groups, n_teachers)
+            # Calculate weekly hours for standard lecturer (2.5x) as reference
+            first_session_weekly_hrs = contact_per_practical * config.TEACHING_MULTIPLIERS["problem_class_seminar_practical"] * practicals_count
             practical_details.append(
-                f"- First time delivery: {first_time_sessions} group(s) (one per lecturer)"
+                f"- First time delivery: {first_time_sessions} group(s) (one per lecturer). {contact_per_practical:.1f}h x 2.5 multiplier per week."
             )
 
             # Show individual lecturer breakdowns
