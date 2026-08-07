@@ -282,11 +282,15 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
                 </div>
                 <table class="module-table">
             """
+            admin_subtotal = 0.0
             for key, val in sorted(r.admin_breakdown.items(), key=lambda x: -x[1]):
                 if val > 0:
                     display_name = key.replace('_', ' ').title()
                     admin_html += f"<tr><td>{display_name}</td><td style='text-align:right'>{val:.1f}h</td></tr>"
-            admin_html += "</table></div>"
+                    admin_subtotal += val
+            admin_html += "</table>"
+            admin_html += f"<p style='font-size:0.85em;color:#666;padding-top:10px;text-align:right'>Subtotal: {admin_subtotal:.1f}h</p>"
+            admin_html += "</div>"
 
         html = f"""<!DOCTYPE html>
 <html lang="en">
