@@ -147,7 +147,8 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
     is_online_module = "online" in module_name_lower
 
     # Detect video teaching format (by name pattern or module attribute)
-    is_video_module = getattr(module, 'teaching_format', '') == "video"
+    module_name_lower = module.name.lower()
+    is_video_module = getattr(module, 'teaching_format', '') == "video" or "video" in module_name_lower
 
     # Calculate lecture multiplier per-teacher based on:
     # - Whether THAT teacher is new for THIS module
