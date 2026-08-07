@@ -842,8 +842,15 @@ def load_wtw_files(base_dir: str = None) -> Tuple[List[ModuleData], str]:
 def load_previous_wtw(base_dir: str = None) -> Optional[List[ModuleData]]:
     """Load the previous year's WTW file for new lecturer detection.
 
+    Used to identify lecturers who were teaching in the previous academic year,
+    which affects their multiplier assignment (new lecturers get higher multipliers).
+
     Args:
         base_dir: Directory containing WTW files. Defaults to data folder.
+
+    Returns:
+        List of ModuleData from the previous year, or None if fewer than 2
+        WTW files are available.
     """
     if base_dir is None:
         base_dir = DATA_DIR
