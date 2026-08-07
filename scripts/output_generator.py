@@ -813,13 +813,13 @@ def generate_per_staff_reports(results: List[WorkloadResult], year_data: YearDat
         output_dir: Output directory for reports (default: OUTPUT_DIR)
 
     Output Files:
-        - Staff Reports/*.html: Individual HTML report per staff member
+        - Individual Reports/*.html: Individual HTML report per staff member
     """
     if output_dir is None:
         output_dir = OUTPUT_DIR
 
-    # Create a subdirectory for per-staff reports
-    staff_reports_dir = os.path.join(output_dir, "Staff Reports")
+    # Use the Individual Reports directory
+    staff_reports_dir = os.path.join(output_dir, "Individual Reports")
     os.makedirs(staff_reports_dir, exist_ok=True)
 
     css = (
