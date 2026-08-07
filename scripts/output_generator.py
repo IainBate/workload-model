@@ -342,6 +342,18 @@ def generate_boxplots(results: List[WorkloadResult], output_dir: str = None):
                          fontsize=8, color="white", fontweight="bold")
         bottom2 = [b + v for b, v in zip(bottom2, values)]
 
+    # Add expected workload reference lines AFTER bars - category-aware
+    staff_category_map = {s.canonical_name: s.category for s in year_data.staff.values()}
+
+    for i, (comp, label, color) in enumerate(zip(detailed_components, detailed_labels, detailed_colors)):
+        for j, (name, result) in enumerate(zip(names, results)):
+            category = staff_category_map.get(name, "T and S")
+            comp_key = comp.replace("_hours", "")
+            expected_division = config.CONTRACT_NORMATIVE_DIVISIONS.get(category, {}).get(comp_key, 0)
+            expected = result.nominal_hours * expected_division
+            ax2.axvline(x=expected, color=color, alpha=0.5, linestyle="--", linewidth=1.5,
+                        label=f"Expected {label}" if j == 0 else None)
+
     total_expected2 = config.NOMINAL_WORKING_HOURS_PER_YEAR
     ax2.axvline(x=total_expected2, color="black", alpha=0.4, linestyle="-.", linewidth=1.5,
                 label=f"Total Available ({total_expected2}h)")
