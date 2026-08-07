@@ -23,6 +23,7 @@ to enable detailed assumption tracking.
 
 from typing import List, Dict
 from dataclasses import dataclass
+import math
 
 import config
 from data_loader import YearData, ModuleData, StaffData, WorkloadResult, SupervisionAllocation, allocate_supervision, normalize_name
