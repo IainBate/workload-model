@@ -441,8 +441,9 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
                         )
                 else:
                     # All are new lecturers or have new content
+                    repeats_per_lecturer = repeat_sessions / n_teachers if n_teachers > 0 else 0
                     practical_details.append(
-                        f"Practicals: {n_groups} groups shared by {n_teachers} lecturers for {practical_week_count} weeks"
+                        f"Practicals: {n_groups} groups shared by {n_teachers} lecturers for {practical_week_count} weeks. Each gets 1 first-time session + {repeats_per_lecturer:.1f} repeat sessions"
                     )
                     if n_new_or_content == 1:
                         practical_details.append(
@@ -460,8 +461,9 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
                 # All are standard lecturers
                 total_std = individual_practical_hours[standard_lecturers_practical[0]] * practical_week_count
                 repeat_hrs_per_week = (repeat_sessions * contact_per_practical * rep_rate)
+                repeats_per_lecturer = repeat_sessions / n_teachers if n_teachers > 0 else 0
                 practical_details.append(
-                    f"Practicals: {n_groups} groups shared by {n_teachers} lecturers for {practical_week_count} weeks"
+                    f"Practicals: {n_groups} groups shared by {n_teachers} lecturers for {practical_week_count} weeks. Each gets 1 first-time session + {repeats_per_lecturer:.1f} repeat sessions"
                 )
                 if len(standard_lecturers_practical) == 1:
                     practical_details.append(
