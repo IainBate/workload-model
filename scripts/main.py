@@ -32,15 +32,6 @@ except ImportError:
     GOOGLE_SHEETS_AVAILABLE = False
 
 
-def prompt_google_sheets_upload() -> bool:
-    """Ask user if they want to upload results to Google Sheets."""
-    try:
-        response = input("\nUpload results to Google Sheets? (y/n): ").strip().lower()
-        return response == "y"
-    except EOFError:
-        return False
-
-
 def prompt_name_match(user_name: str, canonical_name=None) -> bool:
     """Interactive prompt for unknown staff names."""
     if canonical_name:
