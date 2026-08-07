@@ -322,7 +322,7 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
         n_groups = module.practical_groups
 
         # Debug: print module info for Chris CB SYS2
-        if "SYS2" in module.codes and any("Crispin" in t or "Christopher" in t for t in teachers):
+        if "COM00029I" in module.codes and any("Crispin" in t or "Christopher" in t for t in teachers):
             print(f"\n=== DEBUG SYS2 Practical Calculation ===")
             print(f"Module: {module.name}, Codes: {module.codes}")
             print(f"Teachers: {teachers}")
