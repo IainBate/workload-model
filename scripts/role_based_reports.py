@@ -24,12 +24,13 @@ PROJECT_ROOT = Path(os.path.dirname(SCRIPTS_DIR))
 OUTPUT_DIR = PROJECT_ROOT / "output"
 
 # Color palette for charts and tables
-COLOR_TEACHING = "#4CAF50"
-COLOR_RESEARCH = "#2196F3"
-COLOR_ADMIN = "#FF9800"
-COLOR_OVER = "#F44336"  # Over expected workload
-COLOR_UNDER = "#8BC34A"  # Under expected workload
-COLOR_WARNING = "#FFC107"  # Near limit
+# Color palette for charts and tables (ARGB hex format for openpyxl)
+COLOR_TEACHING = "FF4CAF50"
+COLOR_RESEARCH = "FF2196F3"
+COLOR_ADMIN = "FFFF9800"
+COLOR_OVER = "FFF44336"  # Over expected workload
+COLOR_UNDER = "FF8BC34A"  # Under expected workload
+COLOR_WARNING = "FFFFC107"  # Near limit
 
 # Output directories for each format
 INDIVIDUAL_DIR = OUTPUT_DIR / "Individual Reports"
