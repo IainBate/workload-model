@@ -672,7 +672,7 @@ def _generate_department_excel(staff_data: List[Dict], output_dir: str):
             if s['teaching_status'] == COLOR_OVER:
                 status_cell.fill = PatternFill(start_color="FFEBEE", end_color="FFEBEE", fill_type="solid")
             elif s['teaching_status'] == COLOR_WARNING:
-                status_cell.fill = PatternFill(start_color="#FFF3E0", end_color="#FFF3E0", fill_type="solid")
+                status_cell.fill = PatternFill(start_color="FFF3E0", end_color="FFF3E0", fill_type="solid")
 
             # Research
             cell = ws.cell(row=row_idx, column=8, value=s['research_hours'])
