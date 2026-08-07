@@ -584,7 +584,7 @@ def _format_detailed_section_v2(title: str, detail_text: str) -> str:
         else:
             # Check if this looks like a summary item (Pastoral, Projects)
             # These should be separated from module details
-            is_summary_item = re.match(r'^(Pastoral|Projects|Project Setting)\s*:', segment, re.IGNORECASE)
+            is_summary_item = re.match(r'^(\*\*)?(Pastoral|Projects|Project Setting)\b', segment, re.IGNORECASE)
 
             if is_summary_item:
                 # Save current module and start general section for summary items
