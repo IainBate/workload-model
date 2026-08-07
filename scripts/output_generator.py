@@ -960,7 +960,7 @@ def generate_per_staff_reports(results: List[WorkloadResult], year_data: YearDat
                     # Use display-friendly names for specific items
                     display_names = {
                         "service_points": "University committee work",
-                        "engagement": "Email/Meetings",
+                        "engagement": "General departmental engagement, e.g. meetings and email",
                         "personal_development": "Personal Development",
                         "protected_research_baseline": "Protected research baseline"
                     }
