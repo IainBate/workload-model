@@ -207,13 +207,18 @@ def _create_boxplot(results: List[WorkloadResult], title: str, components: List[
                         f"{val:.0f}", ha="center", va="center", fontsize=7, color="white")
         bottom = [b + v for b, v in zip(bottom, data[i])]
 
-    # Add expected workload lines
+    # Add expected workload lines AFTER bars so they're visible on top
+    # Use TR_staff as default fallback since we don't have category info here
     fte_values = [r.fte for r in results]
     for comp, label, color in zip(components, component_labels, colors):
         # Map component name to key for CONTRACT_NORMATIVE_DIVISIONS
         comp_key = comp.lower().replace(" hours", "").replace(" ", "_")
         expected_division = config.CONTRACT_NORMATIVE_DIVISIONS.get("TR_staff", {}).get(comp_key, 0)
         expected = [r.nominal_hours * expected_division for r in results]
+        # Plot vertical lines at each staff position
+        for j, (name, exp) in enumerate(zip(names, expected)):
+            ax.axvline(x=exp, color=color, alpha=0.4, linestyle="--", linewidth=1.5,
+                       label=f"Expected {label}" if j == 0 else None)
 
     ax.set_xlabel("Hours")
     ax.set_ylabel("Staff")
