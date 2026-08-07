@@ -725,8 +725,7 @@ def _calculate_research_workload(staff_member: StaffData) -> tuple:
 
 
 def _calculate_admin_workload(staff_member: StaffData, nominal_hours: float) -> tuple:
-    """
-    Calculate administration workload from departmental roles and service points.
+    """Calculate administration workload from departmental roles and service points.
 
     Args:
         staff_member: StaffData object with role assignments
