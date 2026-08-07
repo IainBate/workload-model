@@ -94,12 +94,8 @@ try:
     from role_based_reports import (
         generate_individual_reports,
         generate_department_summary,
-        generate_hybrid_dashboard,
-        generate_role_based_reports,
         INDIVIDUAL_DIR,
-        DEPARTMENT_DIR,
-        HYBRID_DIR,
-        ROLE_BASED_DIR
+        DEPARTMENT_DIR
     )
 except ImportError:
     # Fallback if role_based_reports.py is not available
