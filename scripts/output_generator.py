@@ -291,13 +291,20 @@ def generate_boxplots(results: List[WorkloadResult], year_data: YearData, output
     # First build a lookup of staff name -> contract category from year_data
     staff_category_map = {s.canonical_name: s.category for s in year_data.staff}
 
+    # Component name mapping to contract division keys
+    COMPONENT_TO_CONTRACT_KEY = {
+        "teaching_hours": "teaching",
+        "research_hours": "research_and_scholarship",
+        "admin_hours": "citizenship",  # Admin is represented by citizenship in the model
+    }
+
     for i, (comp, label, color) in enumerate(zip(summary_components, summary_labels, colors)):
         for j, (name, result) in enumerate(zip(names, results)):
             # Get staff category, default to "T and S" if not found
             category = staff_category_map.get(name, "T and S")
 
             # Map component to key for CONTRACT_NORMATIVE_DIVISIONS
-            comp_key = comp.replace("_hours", "")
+            comp_key = COMPONENT_TO_CONTRACT_KEY.get(comp, comp.replace("_hours", ""))
             expected_division = config.CONTRACT_NORMATIVE_DIVISIONS.get(category, {}).get(comp_key, 0)
             expected = result.nominal_hours * expected_division
 
