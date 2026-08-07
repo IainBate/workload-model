@@ -617,6 +617,49 @@ def _format_detailed_section_v2(title: str, detail_text: str) -> str:
 
             html_parts.append("</ul>")
 
+    # Check if we have summary items (Pastoral, Projects) that weren't assigned to modules
+    # These appear in the general section - reformat them with subheadings
+    if 'general' in modules and modules['general']:
+        # Separate Pastoral and Projects entries from other general items
+        pastoral_segs = []
+        projects_segs = []
+        other_general = []
+
+        for s in modules['general']:
+            s_lower = s.lower()
+            if 'pastoral:' in s_lower:
+                pastoral_segs.append(s)
+            elif 'projects:' in s_lower or 'project setting' in s_lower:
+                projects_segs.append(s)
+            else:
+                other_general.append(s)
+
+        # Add Pastoral section
+        if pastoral_segs:
+            html_parts.append("<h4 style='margin: 10px 0 5px 0; color: #333;'>Pastoral Supervision</h4>")
+            html_parts.append("<ul style='margin: 5px 0 10px 20px;'>")
+            for s in pastoral_segs:
+                clean_seg = re.sub(r'^Pastoral:\s*', '', s, flags=re.IGNORECASE)
+                html_parts.append(f"<li>{clean_seg}</li>")
+            html_parts.append("</ul>")
+
+        # Add Projects section (combine Project Setting and Projects)
+        if projects_segs:
+            html_parts.append("<h4 style='margin: 10px 0 5px 0; color: #333;'>Projects</h4>")
+            html_parts.append("<ul style='margin: 5px 0 10px 20px;'>")
+            for s in projects_segs:
+                clean_seg = re.sub(r'^(Project Setting|Projects):\s*', '', s, flags=re.IGNORECASE)
+                html_parts.append(f"<li>{clean_seg}</li>")
+            html_parts.append("</ul>")
+
+        # Add remaining general items
+        if other_general:
+            html_parts.append("<h4 style='margin: 10px 0 5px 0; color: #333;'>Other</h4>")
+            html_parts.append("<ul style='margin: 5px 0 10px 20px;'>")
+            for s in other_general:
+                html_parts.append(f"<li>{s}</li>")
+            html_parts.append("</ul>")
+
     return "".join(html_parts)
 
 
