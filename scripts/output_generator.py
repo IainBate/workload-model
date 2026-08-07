@@ -1321,7 +1321,7 @@ def generate_per_staff_reports(results: List[WorkloadResult], year_data: YearDat
 
         # Sanitize filename
         safe_name = "".join(c if c.isalnum() or c in " -_" else "_" for c in r.name)
-        filepath = os.path.join(staff_reports_dir, f"{safe_name}_workload_report.html")
+        filepath = os.path.join(staff_reports_dir, f"{safe_name}_workload.html")
 
         with open(filepath, "w", encoding="utf-8") as f:
             f.write(html)
