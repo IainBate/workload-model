@@ -190,9 +190,21 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
     lecture_hours_with_mult = {}
     detail_parts = []
 
+    # Determine if video format applies (higher multiplier for video content creation)
+    # Video modules get 10x rate for new lecturer delivery + content dev
+    use_video_rate = is_video_module
+
     for t in teachers:
         if t not in known_lecturers_for_module:
-            if is_new_content_module:
+            if use_video_rate:
+                # New lecturer on VIDEO content: 10x total (highest rate for video)
+                delivery_hours = base_lecture_share * config.TEACHING_MULTIPLIERS["lecture_standard"]
+                content_dev_hours = base_lecture_share * (config.TEACHING_MULTIPLIERS["lecture_new_video"] - config.TEACHING_MULTIPLIERS["lecture_standard"])
+                total_hours = delivery_hours + content_dev_hours
+
+                lecture_hours_with_mult[t] = total_hours
+                detail_parts.append(f"New lecturer + video ({config.TEACHING_MULTIPLIERS['lecture_new_video']}x): {base_lecture_share:.1f}h base @ 2.5x = {delivery_hours:.1f}h + {content_dev_hours:.1f}h content dev")
+            elif is_new_content_module:
                 # New lecturer on NEW content: 7.5x total
                 delivery_hours = base_lecture_share * config.TEACHING_MULTIPLIERS["lecture_standard"]
                 content_dev_hours = base_lecture_share * (config.TEACHING_MULTIPLIERS["lecture_new_content_and_lecturer"] - config.TEACHING_MULTIPLIERS["lecture_standard"])
