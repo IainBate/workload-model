@@ -142,6 +142,10 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
     # Check if this is a new content module (for 7.5x rate when teacher is also new)
     is_new_content_module = getattr(module, 'new_content', False)
 
+    # Detect online modules by name pattern for special rates
+    module_name_lower = module.name.lower()
+    is_online_module = "online" in module_name_lower
+
     # Calculate lecture multiplier per-teacher based on:
     # - Whether THAT teacher is new for THIS module
     # - Whether THIS module has new content (for combined "new lecturer AND new content" 7.5x rate)
