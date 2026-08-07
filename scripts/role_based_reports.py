@@ -873,9 +873,6 @@ def _format_detailed_section_v2(title: str, detail_text: str) -> str:
             html_parts.append("<h4 style='margin: 15px 0 8px 0; color: #333; border-bottom: 1px solid #eee; padding-bottom: 5px;'>Projects</h4>")
             for s in projects_segs:
                 clean_seg = re.sub(r'^(Project Setting|Projects):\s*', '', s, flags=re.IGNORECASE)
-                # Remove "X students x Yh = Zh" and "Project setting (fixed): Xh" prefixes
-                clean_seg = re.sub(r'^\d+\s+projects\s+x\s+[A-Z]+\s*\(\d+h\)\s*=\s*\d+\.?\d*h\s*', '', clean_seg, flags=re.IGNORECASE)
-                clean_seg = re.sub(r'^Project setting\s*\([^)]+\):\s*\d+\.?\d*h\s*', '', clean_seg, flags=re.IGNORECASE)
                 html_parts.append(f"<p style='margin: 8px 0;'><strong>Projects:</strong> {clean_seg}</p>")
 
         # Other general items
