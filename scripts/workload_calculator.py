@@ -1453,6 +1453,7 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
             research_detail=research_detail,
             admin_detail=admin_detail,
             teaching_breakdown=teaching_breakdown,
+            teaching_module_breakdowns=teaching_module_breakdowns,
             research_breakdown=research_breakdown,
             admin_breakdown=admin_breakdown,
             nominal_hours=nominal_hours,
