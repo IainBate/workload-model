@@ -404,12 +404,14 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
 
             if new_lecturers_practical or existing_with_new_content_practical:
                 total_new_or_content = individual_practical_hours[new_lecturers_practical[0] if new_lecturers_practical else existing_with_new_content_practical[0]] * practical_week_count
+                # Calculate repeat hours per week for display
+                repeat_hrs_per_week = (repeat_sessions * contact_per_practical * rep_rate)
                 if standard_lecturers_practical:
                     total_std = individual_practical_hours[standard_lecturers_practical[0]] * practical_week_count
                     practical_details.append(
                         f"Practicals: {n_groups} groups shared by {n_teachers} lecturers, "
-                        f"{practical_week_count}w - New/new-content: {new_first_per_session:.1f}h/week @ 5x + repeats; "
-                        f"Standard: {std_first_per_session:.1f}h/week @ 2.5x + repeats ({repeat_sessions} grps @ {rep_rate}x); "
+                        f"{practical_week_count}w - New/new-content: {new_first_per_session:.1f}h/week @ 5x; "
+                        f"Repeats: {repeat_hrs_per_week:.1f}h/week @ {rep_rate}x ({repeat_sessions} grps); "
                         f"{repeat_display}; "
                         f"New/new-content: {total_new_or_content:.1f}h, Standard: {total_std:.1f}h"
                     )
@@ -417,16 +419,19 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
                     # All are new lecturers or have new content
                     practical_details.append(
                         f"Practicals: {n_groups} groups shared by {n_teachers} lecturers, "
-                        f"{practical_week_count}w - New/new-content: {new_first_per_session:.1f}h/week @ 5x + repeats; "
+                        f"{practical_week_count}w - New/new-content: {new_first_per_session:.1f}h/week @ 5x; "
+                        f"Repeats: {repeat_hrs_per_week:.1f}h/week @ {rep_rate}x ({repeat_sessions} grps); "
                         f"{repeat_display}; "
                         f"Total: {total_new_or_content:.1f}h"
                     )
             else:
                 # All are standard lecturers
                 total_std = individual_practical_hours[standard_lecturers_practical[0]] * practical_week_count
+                repeat_hrs_per_week = (repeat_sessions * contact_per_practical * rep_rate)
                 practical_details.append(
                     f"Practicals: {n_groups} groups shared by {n_teachers} lecturers, "
-                    f"{practical_week_count}w - Standard: {std_first_per_session:.1f}h/week @ 2.5x + repeats ({repeat_sessions} grps @ {rep_rate}x); "
+                    f"{practical_week_count}w - Standard: {std_first_per_session:.1f}h/week @ 2.5x; "
+                    f"Repeats: {repeat_hrs_per_week:.1f}h/week @ {rep_rate}x ({repeat_sessions} grps); "
                     f"{repeat_display}; "
                     f"Total: {total_std:.1f}h"
                 )
