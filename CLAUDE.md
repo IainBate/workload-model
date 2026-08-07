@@ -72,6 +72,45 @@ pip install -r requirements.txt  # python-docx, matplotlib, pandas, pyyaml
 - **Role name normalization:** Add WAW→YAML role name mappings in `_WAW_ROLE_MAPPING` in `data_loader.py` when new roles appear.
 - **No guessed data:** When data is genuinely missing, flag it in the output's "Missing Data" or "Assumptions" columns rather than silently defaulting.
 
+## Public API
+
+### Programmatic Usage
+
+```python
+from data_loader import load_all_data
+from workload_calculator import calculate_workload
+from output_generator import generate_all_outputs
+
+# Load data for a specific year
+year_data = load_all_data(data_dir="data")
+
+# Calculate workload
+results = calculate_workload(year_data, validate_input=True)
+
+# Generate all outputs to a directory
+generate_all_outputs(results, year_data, output_dir="output")
+```
+
+### Key Data Classes
+
+| Class | Purpose |
+|-------|---------|
+| `YearData` | Container for all data for an academic year (modules, staff, known lecturers) |
+| `ModuleData` | Module information (teachers, credits, contact hours, assessments) |
+| `StaffData` | Staff member details (FTE, roles, supervision loads, research projects) |
+| `WorkloadResult` | Calculated workload for a single staff member |
+
+### Workload Calculation Formula
+
+```
+Total = Teaching + Research (Protected + Additional) + Admin
+```
+
+Where:
+- **Teaching**: Contact hours × multipliers + assessment setting/marking + supervision
+- **Research**: Protected baseline (10% of nominal hours) + grants + PhD supervision
+- **Admin**: Departmental roles as % of nominal hours
+
 ## Known Limitations
 - H/M variant student numbers are combined; teaching/marking allocations from 2025-6 are not mapped to merged H/M modules.
 - SAINTS modules (AI, LES, Safe AI 1/2) are excluded from teaching calculations but noted for staff who teach them.
