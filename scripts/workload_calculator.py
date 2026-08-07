@@ -415,7 +415,11 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
                     repeat_share = (repeat_sessions * contact_per_practical * rep_rate * practicals_count) / n_teachers
                     individual_practical_hours[t] = first_session + repeat_share
 
-        if "COM00029I" in module.codes and any("Crispin" in t or "Christopher" in t for t in teachers):
+        if ("COM00029I" in module.codes or "COM00018I" in module.codes) and any("Crispin" in t or "Christopher" in t for t in teachers):
+            print(f"=== DEBUG SYS Practical Calculation ===")
+            print(f"Module: {module.name}, Codes: {module.codes}")
+            print(f"Teachers: {teachers}")
+            print(f"practicals_count: {practicals_count}")
             print(f"individual_practical_hours (weekly): {individual_practical_hours}")
             for t, hrs in individual_practical_hours.items():
                 total_hrs = hrs * practical_week_count
