@@ -214,13 +214,8 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
                 <tbody>
             """)
 
-            # First add module rows
+            # First add module rows (no status for individual modules - only summary items)
             for mod in module_details_list:
-                status_color, status_label, _ = _determine_status(
-                    mod['teaching_hours'],
-                    nominal_hours * config.CONTRACT_NORMATIVE_DIVISIONS.get("TR_staff", {}).get("teaching", 0.4)
-                )
-
                 teaching_html_parts.append(f"""
                     <tr>
                         <td><strong>{mod['module_name']}</strong></td>
@@ -229,8 +224,7 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
                         <td>{mod['student_count']}</td>
                         <td>{mod['multiplier']}</td>
                         <td><strong>{mod['teaching_hours']:.1f}h</strong></td>
-                        <td><span class="status-badge {status_color.replace('#', '').replace('-', '')}"
-                            style="background:{status_color}">{status_label}</span></td>
+                        <td>-</td>
                     </tr>
                 """)
 
