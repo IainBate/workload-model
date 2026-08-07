@@ -1099,11 +1099,12 @@ def generate_per_staff_reports(results: List[WorkloadResult], year_data: YearDat
                             <span class="detail-hours">{practicals_per_module:.1f}h</span>
                             <span class="detail-activity" style="background:#fff3e0;color:#ef6c00;">Teaching</span>
                         </div>""")
-                        first_session_rate = config.TEACHING_MULTIPLIERS.get('lecture_new_content_or_lecturer', 5.0)
+                        # Show calculation detail - use standard rate for display since it's per-teacher
+                        first_session_rate = config.TEACHING_MULTIPLIERS.get('problem_class_seminar_practical', 2.5)
                         rep_rate = config.REPETITION_MULTIPLIER
                         items_html_parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
                             <span class="detail-name" style="color:#333;">Calculation</span>
-                            <span class="detail-hours">{first_session_rate}x first session, {rep_rate}x repeats</span>
+                            <span class="detail-hours">{first_session_rate}x first session (standard), {rep_rate}x repeats</span>
                         </div>""")
 
                     # Assessment setting - use structured breakdown data directly
