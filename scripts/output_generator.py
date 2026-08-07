@@ -299,18 +299,19 @@ def generate_boxplots(results: List[WorkloadResult], year_data: YearData, output
     }
 
     for i, (comp, label, color) in enumerate(zip(summary_components, summary_labels, colors)):
-        for j, (name, result) in enumerate(zip(names, results)):
-            # Get staff category, default to "T and S" if not found
-            category = staff_category_map.get(name, "T and S")
-
-            # Map component to key for CONTRACT_NORMATIVE_DIVISIONS
+        # Get expected value from first staff member's category
+        # (all staff in same category have same division percentage)
+        if names:
+            first_name = names[0]
+            category = staff_category_map.get(first_name, "T and S")
             comp_key = COMPONENT_TO_CONTRACT_KEY.get(comp, comp.replace("_hours", ""))
             expected_division = config.CONTRACT_NORMATIVE_DIVISIONS.get(category, {}).get(comp_key, 0)
-            expected = result.nominal_hours * expected_division
+            # Use the first result's nominal hours as representative
+            expected = results[0].nominal_hours * expected_division
 
-            # Draw vertical line at this staff's position for this component
-            ax.axvline(x=expected, color=color, alpha=0.5, linestyle="--", linewidth=1.5,
-                       label=f"Expected {label}" if j == 0 else None)
+            # Draw vertical line for this component's expected value
+            ax.axvline(x=expected, color=color, alpha=0.5, linestyle="--", linewidth=2,
+                       label=f"Expected {label}")
 
     # Total workload line
     total_expected = config.NOMINAL_WORKING_HOURS_PER_YEAR
