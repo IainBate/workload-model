@@ -360,8 +360,8 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
         standard_lecturers_practical = []
 
         if "COM00029I" in module.codes and any("Crispin" in t or "Christopher" in t for t in teachers):
-            print(f"known_lecturers_for_module: {list(known_lecturers_for_module.keys())}")
-            print(f"known_lecturers_global: {list(known_lecturers_global)[:5]}...")
+            print(f"known_lecturers_for_module: {list(known_lecturers_for_module)}")
+            print(f"known_lecturers_global (first 5): {list(known_lecturers_global)[:5]}...")
             print(f"new_lecturers_practical: {new_lecturers_practical}")
 
         for t in teachers:
