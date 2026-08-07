@@ -252,9 +252,28 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
         else:
             teaching_html = ""
 
-        # Research section
+        # Research section - grouped by category
         research_html = ""
         if hasattr(r, 'research_breakdown') and any(v > 0 for v in r.research_breakdown.values()):
+            protected_baseline = config.PROTECTED_RESEARCH_BASELINE * r.fte
+
+            # Categorize research items
+            grants = {}
+            phd_items = {}  # primary_supervisor, co_supervisor, assessor
+            other_research = {}
+
+            for key, val in sorted(r.research_breakdown.items(), key=lambda x: -x[1]):
+                if key == 'protected_research_baseline':
+                    continue  # Handled separately
+                elif key in ['phd_supervision']:
+                    continue  # Combined total, skip (show detailed items instead)
+                elif any(kw in key for kw in ['grant', 'project']):
+                    grants[key] = val
+                elif any(kw in key for kw in ['supervisor', 'assessor']):
+                    phd_items[key] = val
+                else:
+                    other_research[key] = val
+
             research_html = f"""
             <div class="section-card">
                 <div class="card-header">
@@ -263,17 +282,39 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
                 </div>
                 <table class="module-table">
                     <tr><td>Protected baseline ({config.PROTECTED_RESEARCH_BASELINE / config.NOMINAL_WORKING_HOURS_PER_YEAR * 100:.0f}% of nominal)</td>
-                        <td style="text-align:right"><strong>{config.PROTECTED_RESEARCH_BASELINE * r.fte:.1f}h</strong></td></tr>
+                        <td style="text-align:right"><strong>{protected_baseline:.1f}h</strong></td></tr>
             """
-            research_subtotal = config.PROTECTED_RESEARCH_BASELINE * r.fte
-            for key, val in sorted(r.research_breakdown.items(), key=lambda x: -x[1]):
-                # Skip phd_supervision as it's a combined total (show detailed items instead)
-                if key not in ['protected_research_baseline', 'phd_supervision'] and val > 0:
+
+            research_subtotal = protected_baseline
+
+            # Add Grants section if any
+            if grants:
+                for key, val in sorted(grants.items(), key=lambda x: -x[1]):
                     display_name = key.replace('_', ' ').title()
                     research_html += f"<tr><td>{display_name}</td><td style='text-align:right'>{val:.1f}h</td></tr>"
                     research_subtotal += val
+
+            # Add PhD Students section if any
+            if phd_items:
+                for key, val in sorted(phd_items.items(), key=lambda x: -x[1]):
+                    display_name = key.replace('_', ' ').title()
+                    research_html += f"<tr><td>{display_name}</td><td style='text-align:right'>{val:.1f}h</td></tr>"
+                    research_subtotal += val
+
+            # Add other research items
+            if other_research:
+                for key, val in sorted(other_research.items(), key=lambda x: -x[1]):
+                    display_name = key.replace('_', ' ').title()
+                    research_html += f"<tr><td>{display_name}</td><td style='text-align:right'>{val:.1f}h</td></tr>"
+                    research_subtotal += val
+
             research_html += "</table>"
             research_html += f"<p style='font-size:0.85em;color:#666;padding-top:10px;text-align:right'>Subtotal: {research_subtotal:.1f}h</p>"
+
+            # Add detailed breakdown if available
+            if hasattr(r, 'research_detail') and r.research_detail:
+                research_html += f"<div class='calc-breakdown'>{_format_detailed_section_v2('Research', r.research_detail)}</div>"
+
             research_html += "</div>"
 
         # Admin section
