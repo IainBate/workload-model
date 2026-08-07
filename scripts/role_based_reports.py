@@ -905,7 +905,8 @@ def _format_detailed_section_v2(title: str, detail_text: str, staff_name: Option
             # Add individual lecturer calculations (filtered if staff_name provided)
             for line in individual_lines:
                 # Extract lecturer name from line like "- Christopher Crispin-Bailey: 2.0h/week @ 5x ..."
-                match = re.match(r'^\s*-\s+([^-]+?):\s*(.+)$', line)
+                # Match everything after the dash up to the first ": " as the name
+                match = re.match(r'^\s*-\s+(.+?):\s*(.+)$', line)
                 if match:
                     lecturer_name = match.group(1).strip()
                     # If staff_name is provided, only show this lecturer's line
