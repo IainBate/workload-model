@@ -225,6 +225,84 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
         # Also calculate teaching hours without practicals for display
         total_teaching_excl_practicals = sum(mod.get('teaching_hours', 0) for mod in module_details_list) + sum(item['teaching_hours'] for item in combined_summary)
 
+        if module_details_list or combined_summary:
+            # Format modules into table rows - include practicals as a separate row per module
+            module_rows_html = ""
+            for mod in module_details_list:
+                practicals = mod.get('practicals', 0)
+                teaching_without_practicals = mod.get('teaching_hours', 0) - practicals if has_module_breakdowns else mod['contact_hours']
+
+                # If we have breakdown data, format with practicals shown separately
+                if has_module_breakdowns and practicals > 0:
+                    module_rows_html += f"""
+                        <tr>
+                            <td><strong>{mod['module_name']}</strong></td>
+                            <td>{mod['credits']}/{mod['stage']}</td>
+                            <td>{teaching_without_practicals:.1f}h</td>
+                            <td>{mod.get('student_count', 0)}</td>
+                            <td>Standard (2.5x)</td>
+                            <td style='text-align:right'><strong>{teaching_without_practicals:.1f}h</strong></td>
+                        </tr>
+                        <tr>
+                            <td style='padding-left:20px'>&bull; Practicals</td>
+                            <td>-/-</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>{practicals:.1f}h total</td>
+                            <td style='text-align:right'><strong>{practicals:.1f}h</strong></td>
+                        </tr>
+                    """
+                else:
+                    module_rows_html += f"""
+                        <tr>
+                            <td><strong>{mod['module_name']}</strong></td>
+                            <td>{mod['credits']}/{mod['stage']}</td>
+                            <td>{teaching_without_practicals:.1f}h</td>
+                            <td>{mod.get('student_count', 0)}</td>
+                            <td>{mod.get('multiplier', 'Standard (2.5x)')}</td>
+                            <td style='text-align:right'><strong>{mod['teaching_hours']:.1f}h</strong></td>
+                        </tr>
+                    """
+
+            # Format summary items (Pastoral, Projects) into table rows
+            summary_rows_html = ""
+            for item in combined_summary:
+                summary_rows_html += f"""
+                    <tr>
+                        <td><strong>{item['summary_label']}</strong></td>
+                        <td>-/-</td>
+                        <td>-</td>
+                        <td>{item['student_count']}</td>
+                        <td>{item['multiplier']}</td>
+                        <td style='text-align:right'><strong>{item['teaching_hours']:.1f}h</strong></td>
+                    </tr>
+                """
+
+            # Combine all rows
+            all_rows_html = module_rows_html + summary_rows_html
+
+            # Build teaching HTML with detailed breakdown if available
+            teaching_html_parts = f"""
+            <div class="section-card">
+                <div class="card-header">
+                    <span class="card-title">Teaching Activities</span>
+                    <span class="card-total">{total_teaching:.1f}h</span>
+                </div>
+                <table class="module-table">
+                    {all_rows_html}
+                </table>
+                <p style='font-size:0.85em;color:#666;padding-top:10px;text-align:right'>Subtotal: {total_teaching:.1f}h</p>
+            """
+
+            # Add detailed breakdown if available
+            if hasattr(r, 'teaching_detail') and r.teaching_detail:
+                teaching_html_parts += f"<div class='calc-breakdown'>{_format_detailed_section_v2('Teaching', r.teaching_detail)}</div>"
+
+            teaching_html_parts += "</div>"
+            teaching_html = teaching_html_parts
+        else:
+            teaching_html = ""
+
         # Research section - grouped by category
         research_html = ""
         if hasattr(r, 'research_breakdown') and any(v > 0 for v in r.research_breakdown.values()):
