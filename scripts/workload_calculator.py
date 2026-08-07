@@ -780,7 +780,7 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
         resit_hours = resit_scripts * per_script
 
         marking_details.append(
-            f"{initial_scripts} scripts + {resit_scripts} resits x {per_script:.3f}h = "
+            f"{initial_scripts} scripts + {resit_scripts} resits (assuming 20% of students resit) x {per_script:.3f}h = "
             f"{total_scripts * per_script:.1f}h total ({initial_hours:.1f}h initial + {resit_hours:.1f}h resit), "
             f"{marking_hours_per_teacher:.1f}h per teacher"
         )
