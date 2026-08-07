@@ -447,20 +447,25 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
                 else:
                     # All are new lecturers or have new content
                     repeats_per_lecturer = repeat_sessions / n_teachers if n_teachers > 0 else 0
+                    # First time delivery section
                     practical_details.append(
-                        f"Practicals: {n_groups} groups shared by {n_teachers} lecturers for {practical_week_count} weeks. Each gets 1 first-time session + {repeats_per_lecturer:.1f} repeat sessions"
+                        f"First time delivery: {n_groups} groups shared by {n_teachers} lecturers for {practical_week_count} weeks"
                     )
                     if n_new_or_content == 1:
                         practical_details.append(
-                            f"New/new-content lecturer: {new_first_per_session:.1f}h/week @ 5x"
+                            f"  - New/new-content lecturer: {new_first_per_session:.1f}h/week @ 5x (one first session per week)"
                         )
                     else:
                         practical_details.append(
-                            f"New/new-content lecturers ({n_new_or_content}): {new_first_per_session:.1f}h/week @ 5x each"
+                            f"  - New/new-content lecturers ({n_new_or_content}): {new_first_per_session:.1f}h/week @ 5x each (one first session per week)"
                         )
+                    # Repeated sessions section
                     if repeat_hrs_per_week > 0:
                         practical_details.append(
-                            f"Repeats: {repeat_hrs_per_week:.1f}h/week @ {rep_rate}x ({repeat_sessions} grps)"
+                            f"Repeated sessions: {repeat_sessions} group(s) without first-session slots, repeated weekly at {rep_rate}x"
+                        )
+                        practical_details.append(
+                            f"  - Total repeat rate: {repeat_hrs_per_week:.1f}h/week ({contact_per_practical:.1f}h/group × {repeat_sessions} groups × {rep_rate}x)"
                         )
             else:
                 # All are standard lecturers
