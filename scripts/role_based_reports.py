@@ -287,26 +287,29 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
 
             research_subtotal = protected_baseline
 
-            # Add Grants section if any
+            # Add Grants section if any (filter out 0.0h items)
             if grants:
                 for key, val in sorted(grants.items(), key=lambda x: -x[1]):
-                    display_name = key.replace('_', ' ').title()
-                    research_html += f"<tr><td>{display_name}</td><td style='text-align:right'>{val:.1f}h</td></tr>"
-                    research_subtotal += val
+                    if val > 0:  # Skip zero-value items
+                        display_name = key.replace('_', ' ').title()
+                        research_html += f"<tr><td>{display_name}</td><td style='text-align:right'>{val:.1f}h</td></tr>"
+                        research_subtotal += val
 
-            # Add PhD Students section if any
+            # Add PhD Students section if any (filter out 0.0h items)
             if phd_items:
                 for key, val in sorted(phd_items.items(), key=lambda x: -x[1]):
-                    display_name = key.replace('_', ' ').title()
-                    research_html += f"<tr><td>{display_name}</td><td style='text-align:right'>{val:.1f}h</td></tr>"
-                    research_subtotal += val
+                    if val > 0:  # Skip zero-value items
+                        display_name = key.replace('_', ' ').title()
+                        research_html += f"<tr><td>{display_name}</td><td style='text-align:right'>{val:.1f}h</td></tr>"
+                        research_subtotal += val
 
-            # Add other research items
+            # Add other research items (filter out 0.0h items)
             if other_research:
                 for key, val in sorted(other_research.items(), key=lambda x: -x[1]):
-                    display_name = key.replace('_', ' ').title()
-                    research_html += f"<tr><td>{display_name}</td><td style='text-align:right'>{val:.1f}h</td></tr>"
-                    research_subtotal += val
+                    if val > 0:  # Skip zero-value items
+                        display_name = key.replace('_', ' ').title()
+                        research_html += f"<tr><td>{display_name}</td><td style='text-align:right'>{val:.1f}h</td></tr>"
+                        research_subtotal += val
 
             research_html += "</table>"
             research_html += f"<p style='font-size:0.85em;color:#666;padding-top:10px;text-align:right'>Subtotal: {research_subtotal:.1f}h</p>"
