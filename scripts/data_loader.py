@@ -1224,6 +1224,7 @@ def load_all_data(data_dir: str = None,
                 pastoral_students = pastoral_load_data[raw_name.upper()]
             elif canonical.upper() in pastoral_load_data:
                 pastoral_students = pastoral_load_data[canonical.upper()]
+            else:
                 # Fallback: try without middle initial (e.g., "DAWN WOOD" instead of "DAWN H WOOD")
                 canonical_parts = canonical.upper().split()
                 if len(canonical_parts) > 1:
@@ -1232,11 +1233,11 @@ def load_all_data(data_dir: str = None,
                         pastoral_students = pastoral_load_data[simplified_key]
 
             # Fall back to project_load.csv Pastoral Load column
-                if proj_data and "pastoral_load" in proj_data:
-                    try:
-                        pastoral_students = int(float(proj_data.get("pastoral_load", 0)))
-                    except (ValueError, TypeError):
-                        pastoral_students = 0
+            if proj_data and "pastoral_load" in proj_data:
+                try:
+                    pastoral_students = int(float(proj_data.get("pastoral_load", 0)))
+                except (ValueError, TypeError):
+                    pastoral_students = 0
 
             staff[canonical] = StaffData(
                 canonical_name=canonical,
