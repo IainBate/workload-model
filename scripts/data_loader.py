@@ -1013,7 +1013,11 @@ def load_all_data(data_dir: str = None,
 
     # Load name lookup and build reverse lookup (DATA_DIR is used internally)
     mappings = _load_name_lookup()
-    reverse_lookup = _build_reverse_lookup(mappings)
+    reverse_lookup, name_warnings = _build_reverse_lookup(mappings)
+
+    # Print any warnings about duplicate aliases
+    for warning in name_warnings:
+        print(f"Warning: {warning}")
 
     # Load module mapping to identify new modules for new_content detection
     module_mapping = _load_module_mapping()
