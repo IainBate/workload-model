@@ -151,7 +151,17 @@ def main():
 
     # Generate outputs
     print("\nGenerating outputs...")
-    output_dir = OUTPUT_DIR if args.output_dir == "." else os.path.normpath(os.path.join(PROJECT_ROOT, args.output_dir))
+    if args.output_dir == ".":
+        output_dir = OUTPUT_DIR
+    else:
+        # For relative paths (not starting with /), join with PROJECT_ROOT
+        # and resolve to absolute path without the ../ simplification issue
+        if os.path.isabs(args.output_dir):
+            output_dir = args.output_dir
+        else:
+            # Relative path - join and use realpath to get actual directory
+            joined = os.path.join(PROJECT_ROOT, args.output_dir)
+            output_dir = os.path.abspath(joined)
     generate_all_outputs(results, year_data, output_dir)
 
     print(f"\nOutput files in {output_dir}:")
