@@ -957,23 +957,47 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
 
         # Supervision - add once per staff member (not per module)
         # Get pastoral and project supervision from the allocation object
+        # Apply defaults if not specified: 20 pastoral students, 10 project students
         pastoral_count = supervision.pastoral_students.get(canonical_name, 0)
-        if pastoral_count > 0:
-            pastoral_hours = pastoral_count * config.SUPERVISION_MULTIPLIERS["pastoral"]
-            teaching_hours += pastoral_hours
-            staff_teaching[canonical_name]["hours"] += pastoral_hours
-            if "teaching_breakdown" not in staff_teaching[canonical_name]:
-                staff_teaching[canonical_name]["teaching_breakdown"] = {}
-            staff_teaching[canonical_name]["teaching_breakdown"]["pastoral_supervision"] = pastoral_hours
-            # Add supervision detail for HTML display
-            if "supervision_details" not in staff_teaching[canonical_name]:
-                staff_teaching[canonical_name]["supervision_details"] = []
+        pastoral_assumed = False
+        if pastoral_count == 0:
+            # Default pastoral supervision (tracked as assumption)
+            pastoral_count = 20
+            pastoral_assumed = True
+
+        pastoral_hours = pastoral_count * config.SUPERVISION_MULTIPLIERS["pastoral"]
+        teaching_hours += pastoral_hours
+        staff_teaching[canonical_name]["hours"] += pastoral_hours
+        if "teaching_breakdown" not in staff_teaching[canonical_name]:
+            staff_teaching[canonical_name]["teaching_breakdown"] = {}
+        staff_teaching[canonical_name]["teaching_breakdown"]["pastoral_supervision"] = pastoral_hours
+
+        # Add supervision detail for HTML display
+        if "supervision_details" not in staff_teaching[canonical_name]:
+            staff_teaching[canonical_name]["supervision_details"] = []
+        if pastoral_assumed:
+            staff_teaching[canonical_name]["supervision_details"].append(
+                f"Pastoral: {pastoral_count} students (default) x {config.SUPERVISION_MULTIPLIERS['pastoral']}h = {pastoral_hours:.1f}h"
+            )
+            assumptions.append(Assumption(
+                category="pastoral_supervision",
+                description=f"Default pastoral supervision applied (20 students) for {canonical_name}",
+                staff_name=canonical_name,
+                default_value=0,
+                actual_value=pastoral_count
+            ).description)
+        else:
             staff_teaching[canonical_name]["supervision_details"].append(
                 f"Pastoral: {pastoral_count} students x {config.SUPERVISION_MULTIPLIERS['pastoral']}h = {pastoral_hours:.1f}h"
             )
 
         # Get project load for this teacher from supervision allocation (already ceiling'd)
         teacher_project_load = supervision.project_loads.get(canonical_name, 0)
+        project_assumed = False
+        if teacher_project_load == 0:
+            # Default project supervision (tracked as assumption)
+            teacher_project_load = 10
+            project_assumed = True
 
         if teacher_project_load > 0:
             proj_mult = config.SUPERVISION_MULTIPLIERS["ug_project"]
