@@ -701,10 +701,19 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
         # where base = lecture_hours / num_teachers
         # Display shows the actual per-teacher calculation
         module_detail_parts = []
-        if lecture_multipliers[teacher] == config.TEACHING_MULTIPLIERS["lecture_new_content_or_lecturer"]:
-            # For new lecturer, show: base_share × 5x = total (delivery + content dev)
-            base_share = lecture_hours / len(teachers) if teachers else 0
-            module_detail_parts.append(f"New lecturer ({config.TEACHING_MULTIPLIERS['lecture_new_content_or_lecturer']}x): {base_share:.1f}h base @ 2.5x + content dev = {teacher_lecture_hours_with_mult:.0f}h")
+        if teacher in new_lecturers:
+            # New lecturer: show 5x or 7.5x depending on content
+            if lecture_multipliers[teacher] == config.TEACHING_MULTIPLIERS["lecture_new_content_and_lecturer"]:
+                # New lecturer + new content: 7.5x
+                base_share = lecture_hours / len(teachers) if teachers else 0
+                module_detail_parts.append(f"New lecturer + new content ({config.TEACHING_MULTIPLIERS['lecture_new_content_and_lecturer']}x): {base_share:.1f}h base @ 2.5x + content dev = {teacher_lecture_hours_with_mult:.0f}h")
+            else:
+                # New lecturer (existing content): 5x
+                base_share = lecture_hours / len(teachers) if teachers else 0
+                module_detail_parts.append(f"New lecturer ({config.TEACHING_MULTIPLIERS['lecture_new_content_or_lecturer']}x): {base_share:.1f}h base @ 2.5x + content dev = {teacher_lecture_hours_with_mult:.0f}h")
+        elif teacher in existing_with_new_content:
+            # Existing lecturer with new content: 5x
+            module_detail_parts.append(f"Existing lecturer + new content ({config.TEACHING_MULTIPLIERS['lecture_new_content_or_lecturer']}x): {teacher_lecture_hours_with_mult:.0f}h")
         else:
             module_detail_parts.append(f"Standard ({config.TEACHING_MULTIPLIERS['lecture_standard']}x): {teacher_lecture_hours_with_mult:.1f}h")
 
