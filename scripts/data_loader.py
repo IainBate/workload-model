@@ -85,6 +85,8 @@ class ModuleData:
     # Additional teaching format hours (in addition to contact hours)
     hw_lab_hours: float = 0.0  # Homework/lab work hours
     drop_in_sessions: int = 0  # Number of drop-in sessions
+    teaching_format: str = "standard"  # "standard", "video", or other format indicators
+
 
 
 @dataclass(frozen=True)
