@@ -591,6 +591,17 @@ Output File:
 """
 def generate_html_report(results: List[WorkloadResult], year_data: YearData,
                          output_dir: str = "."):
+    """
+    Generate an HTML report with workload data and embedded charts.
+
+    Args:
+        results: List of WorkloadResult objects from calculate_workload()
+        year_data: YearData object containing academic year metadata
+        output_dir: Output directory for HTML file and referenced images
+
+    Output File:
+        - workload_report.html: Complete HTML report with embedded charts
+    """
     summary_path = os.path.join(output_dir, "workload_summary_boxplot.png")
     detailed_path = os.path.join(output_dir, "workload_detailed_boxplot.png")
 
