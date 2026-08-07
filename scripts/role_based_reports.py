@@ -223,7 +223,6 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
                         <td>{mod['student_count']}</td>
                         <td>{mod['multiplier']}</td>
                         <td><strong>{mod['teaching_hours']:.1f}h</strong></td>
-                        <td>-</td>
                     </tr>
                 """)
 
