@@ -1135,23 +1135,6 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
                         staff_teaching[canonical_name]["teaching_breakdown"] = {}
                     staff_teaching[canonical_name]["teaching_breakdown"]["minimum_admin_load"] = min_teaching
 
-        # Project setting allowance - only for staff who actually supervise projects
-        if teacher_project_load > 0:
-            project_setting_hours = config.PROJECT_SETTING_ALLOWANCE
-            teaching_hours += project_setting_hours
-            if canonical_name not in staff_teaching:
-                staff_teaching[canonical_name] = {"hours": 0.0, "details": [], "teaching_breakdown": {}}
-            else:
-                # Ensure teaching_breakdown exists
-                if "teaching_breakdown" not in staff_teaching[canonical_name]:
-                    staff_teaching[canonical_name]["teaching_breakdown"] = {}
-                # Add project setting to details for display
-                staff_teaching[canonical_name]["details"].append(
-                    f"Project setting (fixed): {project_setting_hours}h"
-                )
-            staff_teaching[canonical_name]["hours"] += project_setting_hours
-            staff_teaching[canonical_name]["teaching_breakdown"]["project_setting"] = project_setting_hours
-
         # Supervision - add once per staff member (not per module)
         # Get pastoral and project supervision from the allocation object
         # Apply defaults if not specified: 20 pastoral students, 10 project students
@@ -1195,6 +1178,23 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
             # Default project supervision (tracked as assumption)
             teacher_project_load = 10
             project_assumed = True
+
+        # Project setting allowance - only for staff who actually supervise projects
+        if teacher_project_load > 0:
+            project_setting_hours = config.PROJECT_SETTING_ALLOWANCE
+            teaching_hours += project_setting_hours
+            if canonical_name not in staff_teaching:
+                staff_teaching[canonical_name] = {"hours": 0.0, "details": [], "teaching_breakdown": {}}
+            else:
+                # Ensure teaching_breakdown exists
+                if "teaching_breakdown" not in staff_teaching[canonical_name]:
+                    staff_teaching[canonical_name]["teaching_breakdown"] = {}
+                # Add project setting to details for display
+                staff_teaching[canonical_name]["details"].append(
+                    f"Project setting (fixed): {project_setting_hours}h"
+                )
+            staff_teaching[canonical_name]["hours"] += project_setting_hours
+            staff_teaching[canonical_name]["teaching_breakdown"]["project_setting"] = project_setting_hours
 
         if teacher_project_load > 0:
             proj_mult = config.SUPERVISION_MULTIPLIERS["ug_project"]
