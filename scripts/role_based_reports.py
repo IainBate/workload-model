@@ -717,7 +717,7 @@ def _format_detailed_section(title: str, detail_text: str) -> str:
     return "<ul>" + "".join(parts) + "</ul>"
 
 
-def _format_detailed_section_v2(title: str, detail_text: str) -> str:
+def _format_detailed_section_v2(title: str, detail_text: str, staff_name: Optional[str] = None) -> str:
     """Format detailed section text for HTML display with structured subsections.
 
     Parses the teaching_detail string and creates a well-structured layout with:
@@ -725,12 +725,20 @@ def _format_detailed_section_v2(title: str, detail_text: str) -> str:
     - Organized subsections within each module
     - Clear visual hierarchy using labels and line breaks
 
+    Args:
+        title: Section title
+        detail_text: Semicolon-separated detail text to parse
+        staff_name: Optional staff name to filter practical details for individual reports.
+                   If provided, only shows calculations for this specific lecturer.
+
     Example output structure:
         <h4>SYS2 Breakdown</h4>
         <div class='calc-breakdown-sub'>
             <p><strong>Standard Lecture:</strong> 13.3h @ 2.5x = 33.3h</p>
-            <p><strong>Practicals:</strong> 5 groups shared by 3 lecturers over 11 weeks<br/>
-                <small>New/new-content: 20.0h/week @ 5x; Standard: 10.0h/week @ 2.5x (2 grps @ 1.5x)</small></p>
+            <p><strong>Practicals:</strong> 5 groups over 11 weeks<br/>
+                <small>- First time delivery: 3 group(s) (one per lecturer). 2.0h x 2.5 multiplier per week.<br/>
+                   - Repeated sessions: 2 group(s) without first-session slots (0.7 group(s)/lecturer @ 1.5x)<br/>
+                   - Christopher Crispin-Bailey: 28.0h/week = 308.0h total</small></p>
         </div>
     """
     import re
