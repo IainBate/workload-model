@@ -13,21 +13,6 @@ The output generator uses structured breakdown data from workload calculations
 instead of parsing free-form detail strings.
 """
 
-"""
-Output generation for the workload calculator.
-Produces:
-1. Staff workload model CSV (summary + detail columns)
-2. Summary stacked bar chart (PNG and embedded in Excel)
-3. Detailed stacked bar chart (PNG and embedded in Excel)
-4. HTML report with embedded images
-5. Excel (.xlsx) file with formulas and proper formatting
-
-Uses openpyxl for Excel generation.
-
-The output generator uses structured breakdown data from workload calculations
-instead of parsing free-form detail strings.
-"""
-
 import csv
 import os
 import re
