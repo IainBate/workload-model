@@ -695,7 +695,16 @@ def _format_detailed_section_v2(title: str, detail_text: str) -> str:
             if clean_s.startswith('practicals:'):
                 continue
 
-            if 'standard' in s_lower and ('x:' in s_lower or 'h @' in s_lower):
+            # Check if this is a standalone standard lecture info vs practical-related standard
+            # Standalone: "Standard (2.5x): 13.3h" - single module-level total
+            # Practical-related: "Standard: 10.0h/week @ 2.5x..." - embedded in practicals context
+            is_practical_standard = 'practical' in s_lower and ('standard' in s_lower or '@ 2.5x' in s_lower or 'grps @' in s_lower)
+
+            if is_practical_standard:
+                # This is a standard rate within practicals context - add to practicals
+                practicals_info.append(clean_s)
+            elif 'standard' in s_lower and ('x:' in s_lower or 'h @' in s_lower):
+                # Standalone standard lecture info (module-level totals)
                 standard_info.append(clean_s)
             elif 'practical' in s_lower:
                 practicals_info.append(clean_s)
