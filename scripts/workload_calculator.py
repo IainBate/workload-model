@@ -445,11 +445,6 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
             # Combine new lecturers and existing with new content for display
             n_new_or_content = len(new_lecturers_practical) + len(existing_with_new_content_practical)
 
-            # Display individual practical hours per teacher type
-            # Note: first_session values are weekly hours (include practicals_count)
-            # Combine new lecturers and existing with new content for display
-            n_new_or_content = len(new_lecturers_practical) + len(existing_with_new_content_practical)
-
             # Practicals breakdown
             practical_total_weekly = sum(individual_practical_hours.values())
             practical_total_hrs = practical_total_weekly * practical_week_count
