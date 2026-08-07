@@ -103,8 +103,6 @@ except ImportError:
         print("Role-based reports module not available")
     generate_individual_reports = _not_implemented
     generate_department_summary = _not_implemented
-    generate_hybrid_dashboard = _not_implemented
-    generate_role_based_reports = _not_implemented
 
 
 def _fix_category_references(chart: BarChart) -> None:
