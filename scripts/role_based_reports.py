@@ -197,7 +197,7 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
 
         teaching_html_parts = []
         if module_details_list or combined_summary:
-            teaching_html_parts.append("<h3>Teaching Activities by Activity</h3>")
+            teaching_html_parts.append("<h3>Teaching Activities</h3>")
             teaching_html_parts.append("""
             <table class="module-table">
                 <thead>
