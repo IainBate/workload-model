@@ -398,25 +398,28 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
 
             # Display individual practical hours per teacher type
             # Note: first_session values are weekly hours (include practicals_count)
-            if new_lecturers_practical and standard_lecturers_practical:
-                total_new = individual_practical_hours[new_lecturers_practical[0]] * practical_week_count
-                total_std = individual_practical_hours[standard_lecturers_practical[0]] * practical_week_count
-                practical_details.append(
-                    f"Practicals: {n_groups} groups shared by {n_teachers} lecturers, "
-                    f"{practical_week_count}w - New: {new_first_per_session:.1f}h/week @ 5x + repeats; "
-                    f"Standard: {std_first_per_session:.1f}h/week @ 2.5x + repeats ({repeat_sessions} grps @ {rep_rate}x); "
-                    f"{repeat_display}; "
-                    f"New: {total_new:.1f}h, Standard: {total_std:.1f}h"
-                )
-            elif new_lecturers_practical:
-                # All are new lecturers
-                total_new = individual_practical_hours[new_lecturers_practical[0]] * practical_week_count
-                practical_details.append(
-                    f"Practicals: {n_groups} groups shared by {n_teachers} lecturers, "
-                    f"{practical_week_count}w - New: {new_first_per_session:.1f}h/week @ 5x + repeats; "
-                    f"{repeat_display}; "
-                    f"Total: {total_new:.1f}h"
-                )
+            # Combine new lecturers and existing with new content for display
+            n_new_or_content = len(new_lecturers_practical) + len(existing_with_new_content_practical)
+
+            if new_lecturers_practical or existing_with_new_content_practical:
+                total_new_or_content = individual_practical_hours[new_lecturers_practical[0] if new_lecturers_practical else existing_with_new_content_practical[0]] * practical_week_count
+                if standard_lecturers_practical:
+                    total_std = individual_practical_hours[standard_lecturers_practical[0]] * practical_week_count
+                    practical_details.append(
+                        f"Practicals: {n_groups} groups shared by {n_teachers} lecturers, "
+                        f"{practical_week_count}w - New/new-content: {new_first_per_session:.1f}h/week @ 5x + repeats; "
+                        f"Standard: {std_first_per_session:.1f}h/week @ 2.5x + repeats ({repeat_sessions} grps @ {rep_rate}x); "
+                        f"{repeat_display}; "
+                        f"New/new-content: {total_new_or_content:.1f}h, Standard: {total_std:.1f}h"
+                    )
+                else:
+                    # All are new lecturers or have new content
+                    practical_details.append(
+                        f"Practicals: {n_groups} groups shared by {n_teachers} lecturers, "
+                        f"{practical_week_count}w - New/new-content: {new_first_per_session:.1f}h/week @ 5x + repeats; "
+                        f"{repeat_display}; "
+                        f"Total: {total_new_or_content:.1f}h"
+                    )
             else:
                 # All are standard lecturers
                 total_std = individual_practical_hours[standard_lecturers_practical[0]] * practical_week_count
