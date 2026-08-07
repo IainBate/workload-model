@@ -286,9 +286,9 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
                 <p style='font-size:0.85em;color:#666;padding-top:10px;text-align:right'>Subtotal: {total_teaching:.1f}h</p>
             """
 
-            # Add detailed breakdown if available
+            # Add detailed breakdown if available (pass staff_name for filtering practicals)
             if hasattr(r, 'teaching_detail') and r.teaching_detail:
-                teaching_html_parts += f"<div class='calc-breakdown'>{_format_detailed_section_v2('Teaching', r.teaching_detail)}</div>"
+                teaching_html_parts += f"<div class='calc-breakdown'>{_format_detailed_section_v2('Teaching', r.teaching_detail, r.name)}</div>"
 
             teaching_html_parts += "</div>"
             teaching_html = teaching_html_parts
