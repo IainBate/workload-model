@@ -873,7 +873,7 @@ def _format_detailed_section_v2(title: str, detail_text: str) -> str:
             html_parts.append("<h4 style='margin: 15px 0 8px 0; color: #333; border-bottom: 1px solid #eee; padding-bottom: 5px;'>Projects</h4>")
             for s in projects_segs:
                 clean_seg = re.sub(r'^(Project Setting|Projects):\s*', '', s, flags=re.IGNORECASE)
-                html_parts.append(f"<p style='margin: 8px 0;'><strong>Projects:</strong> {clean_seg}</p>")
+                html_parts.append(f"<p style='margin: 8px 0;'>{clean_seg}</p>")
 
         # Other general items
         if other_general:
