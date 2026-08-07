@@ -1338,6 +1338,10 @@ def generate_all_outputs(results: List[WorkloadResult], year_data: YearData,
     - Summary and detailed boxplot PNG charts
     - Excel workbook with formulas
     - HTML report with embedded charts
+    - Individual reports (detailed module-by-module breakdown)
+    - Department summary (heatmap and balance view for HoD)
+    - Hybrid dashboard (all-in-one with drill-down)
+    - Role-based reports (separate files per audience)
 
     Args:
         results: List of WorkloadResult objects from calculate_workload()
@@ -1361,3 +1365,13 @@ def generate_all_outputs(results: List[WorkloadResult], year_data: YearData,
 
     # Generate HTML report
     generate_html_report(results, year_data, output_dir)
+
+    # Generate role-based reports (four different formats)
+    print("\n" + "=" * 60)
+    print("Generating Role-Based Reports")
+    print("=" * 60)
+
+    generate_individual_reports(results, year_data, INDIVIDUAL_DIR)
+    generate_department_summary(results, year_data, DEPARTMENT_DIR)
+    generate_hybrid_dashboard(results, year_data, HYBRID_DIR)
+    generate_role_based_reports(results, year_data, ROLE_BASED_DIR)
