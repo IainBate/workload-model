@@ -846,7 +846,7 @@ def load_wtw_files(base_dir: str = None) -> Tuple[List[ModuleData], str]:
 
     wtw_files = sorted(glob.glob(os.path.join(base_dir, "WTW *.csv")))
     if not wtw_files:
-        raise FileNotFoundError("No WTW CSV files found in the data directory.")
+        raise DataLoadError("No WTW CSV files found in the data directory.")
 
     # Use the latest file (highest year number)
     latest = wtw_files[-1]
