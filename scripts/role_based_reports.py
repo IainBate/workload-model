@@ -244,7 +244,7 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
                             <td style='text-align:right'><strong>{teaching_without_practicals:.1f}h</strong></td>
                         </tr>
                         <tr>
-                            <td style='padding-left:20px'>&bull; Practicals</td>
+                            <td style='padding-left:20px'>&bull; <strong>Practicals:</strong></td>
                             <td>-/-</td>
                             <td>-</td>
                             <td>-</td>
