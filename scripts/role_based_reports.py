@@ -902,19 +902,11 @@ def _format_detailed_section_v2(title: str, detail_text: str, staff_name: Option
             if repeated_sessions_line:
                 practicals_html_parts.append(f"<p style='margin: 8px 0;'><small>{repeated_sessions_line}</small></p>")
 
-            # Add individual lecturer calculations (filtered if staff_name provided)
+            # Add individual lecturer calculations
+            # Note: Lines now use generic labels like "First delivery:" and "Repeated delivery:"
+            # instead of staff names, so we show all calculation lines (they're the same format for all)
             for line in individual_lines:
-                # Extract lecturer name from line like "- Christopher Crispin-Bailey: 2.0h/week @ 5x ..."
-                # Match everything after the dash up to the first ": " as the name
-                match = re.match(r'^\s*-\s+(.+?):\s*(.+)$', line)
-                if match:
-                    lecturer_name = match.group(1).strip()
-                    # If staff_name is provided, only show this lecturer's line
-                    if staff_name and lecturer_name != staff_name:
-                        continue
-                    practicals_html_parts.append(f"<p style='margin: 8px 0;'><small>{line.strip()}</small></p>")
-                else:
-                    practicals_html_parts.append(f"<p style='margin: 8px 0;'><small>{line}</small></p>")
+                practicals_html_parts.append(f"<p style='margin: 8px 0;'><small>{line.strip()}</small></p>")
 
             # Combine all practicals parts
             for part in practicals_html_parts:
