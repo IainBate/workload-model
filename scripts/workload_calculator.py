@@ -213,6 +213,32 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
 
     teaching_details.append("; ".join(detail_parts))
 
+    # --- Online Content Development (for online modules with new content) ---
+    # Per the spec, online modules have separate content development rates:
+    # - Refreshing existing material: 100h/module
+    # - New material for new lecturer: 600h/module
+    # - New material for new lecturer on NEW content: 800h/module
+    online_content_dev_hours = {}
+    online_details = []
+
+    if is_online_module and is_new_content_module:
+        # Apply online content development rates for new content in online modules
+        for t in teachers:
+            if t not in known_lecturers_for_module:
+                # New lecturer on NEW content: 800h total for content dev
+                online_hours = config.ONLINE_PROGRAMS["content_development_new_material_new_lecturer_per_module"]  # 800
+                per_teacher_online = online_hours / len(teachers)
+            else:
+                # Existing lecturer refreshing online content: 100h/module
+                per_teacher_online = config.ONLINE_PROGRAMS["content_development_refreshing_per_module"] / len(teachers)  # 100
+
+            online_content_dev_hours[t] = per_teacher_online
+            if per_teacher_online > 0:
+                online_details.append(f"Online content dev: {per_teacher_online:.1f}h/teacher")
+
+    if online_details:
+        teaching_details.append("; ".join(online_details))
+
     # --- Practical Sessions with Repetition Multiplier ---
     # Per the spec: "For each repetition of an identical class (e.g. 2nd and 3rd version)
     # have a multiplier of 1.5 times contact duration."
