@@ -518,15 +518,33 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
             repeat_hrs_per_week = contact_per_practical * rep_rate * practicals_count
             if n_new_or_content > 0:
                 practical_details.append(
-                    f"Practicals: {practical_week_count}w - New/new-content lecturers: {new_first_per_session:.1f}h/week @ 5x; "
-                    f"Repeats: {repeat_hrs_per_week:.1f}h/week @ {rep_rate}x ({repeat_display}); "
-                    f"Standard lecturers: {std_first_per_session:.1f}h/week @ 2.5x; "
+                    f"Practicals: {practical_week_count} weeks"
+                )
+                practical_details.append(
+                    f"New/new-content lecturers: {new_first_per_session:.1f}h/week @ 5x"
+                )
+                if repeat_hrs_per_week > 0:
+                    practical_details.append(
+                        f"Repeats: {repeat_hrs_per_week:.1f}h/week @ {rep_rate}x"
+                    )
+                practical_details.append(
+                    f"Standard lecturers: {std_first_per_session:.1f}h/week @ 2.5x"
+                )
+                practical_details.append(
                     f"Total: {total_for_all_teachers:.1f}h/teacher"
                 )
             else:
                 practical_details.append(
-                    f"Practicals: {practical_week_count}w - Standard lecturers: {std_first_per_session:.1f}h/week @ 2.5x; "
-                    f"Repeats: {repeat_hrs_per_week:.1f}h/week @ {rep_rate}x ({repeat_display}); "
+                    f"Practicals: {practical_week_count} weeks"
+                )
+                practical_details.append(
+                    f"Standard lecturers: {std_first_per_session:.1f}h/week @ 2.5x"
+                )
+                if repeat_hrs_per_week > 0:
+                    practical_details.append(
+                        f"Repeats: {repeat_hrs_per_week:.1f}h/week @ {rep_rate}x"
+                    )
+                practical_details.append(
                     f"Total: {total_for_all_teachers:.1f}h/teacher"
                 )
 
