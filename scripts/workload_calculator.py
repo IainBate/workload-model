@@ -327,7 +327,9 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
 
         # Identify new vs standard lecturers for practical calculations (use per-module tracking)
         # Also track existing lecturers with new content who need content dev time
-        new_lecturers_practical = [t for t in teachers if t not in known_lecturers_for_module]
+        # A lecturer is "new" only if they are NOT in this module's known set AND NOT in the global known set
+        new_lecturers_practical = [t for t in teachers
+                                   if t not in known_lecturers_for_module and t not in known_lecturers_global]
         existing_with_new_content_practical = []  # Taught before but on new content
         standard_lecturers_practical = []
 
