@@ -158,7 +158,8 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
     # Existing lecturers get 2.5x for delivery only (content already developed)
     lecture_multipliers = {}
     for t in teachers:
-        is_new_lecturer = t not in known_lecturers_for_module
+        # A lecturer is "new" only if they are NOT in this module's known set AND NOT in the global known set
+        is_new_lecturer = (t not in known_lecturers_for_module) and (t not in known_lecturers_global)
         if is_new_lecturer and is_new_content_module:
             lecture_multipliers[t] = config.TEACHING_MULTIPLIERS["lecture_new_content_and_lecturer"]  # 7.5
         elif is_new_lecturer:
@@ -169,8 +170,9 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
             lecture_multipliers[t] = config.TEACHING_MULTIPLIERS["lecture_standard"]  # 2.5
 
     # Build teaching details string showing multiplier type for each teacher
-    new_lecturers = [t for t in teachers if t not in known_lecturers_for_module]
-    standard_lecturers = [t for t in teachers if t in known_lecturers_for_module]
+    # A lecturer is "new to this module" if not in known_lecturers_for_module (for reporting purposes)
+    new_lecturers_per_module = [t for t in teachers if t not in known_lecturers_for_module]
+    standard_lecturers_per_module = [t for t in teachers if t in known_lecturers_for_module]
 
     # Calculate lecture hours using the new approach:
     # 1. All lecturers get an equal "base" share at standard rate (2.5x)
