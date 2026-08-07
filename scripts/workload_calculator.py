@@ -1149,18 +1149,7 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
         # Add supervision detail for HTML display
         if "supervision_details" not in staff_teaching[canonical_name]:
             staff_teaching[canonical_name]["supervision_details"] = []
-        if pastoral_assumed:
-            staff_teaching[canonical_name]["supervision_details"].append(
-                f"Pastoral: {pastoral_count} students (default) x {config.SUPERVISION_MULTIPLIERS['pastoral']}h = {pastoral_hours:.1f}h"
-            )
-            assumptions.append(Assumption(
-                category="pastoral_supervision",
-                description=f"Default pastoral supervision applied (20 students) for {canonical_name}",
-                staff_name=canonical_name,
-                default_value=0,
-                actual_value=pastoral_count
-            ).description)
-        else:
+        if pastoral_count > 0:
             staff_teaching[canonical_name]["supervision_details"].append(
                 f"Pastoral: {pastoral_count} students x {config.SUPERVISION_MULTIPLIERS['pastoral']}h = {pastoral_hours:.1f}h"
             )
