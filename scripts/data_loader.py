@@ -4,6 +4,7 @@ Handles CSV ingestion, staff name normalization, module mapping, and data mergin
 """
 
 import csv
+import functools
 import json
 import math
 import glob
