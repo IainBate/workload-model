@@ -63,6 +63,407 @@ class Assumption:
 from config import TEACHING_WEEKS_PER_SEMESTER
 
 
+# --- Helper Functions for Teaching Workload Calculation ---
+
+def _calculate_lecture_hours_and_multipliers(module: ModuleData,
+                                              teachers: List[str],
+                                              known_lecturers_global: set,
+                                              known_lecturers_per_module: Dict[str, frozenset]) -> dict:
+    """Calculate lecture hours and determine multipliers per teacher.
+
+    Returns a dict with:
+        - lecture_hours: Total lecture hours for the module
+        - individual_lecture_hours: Dict mapping teachers to their lecture hours
+        - lecture_multipliers: Dict mapping teachers to their multiplier
+        - lecturer_types: List of (teacher, type) tuples for reporting
+    """
+    result = {
+        'lecture_hours': 0.0,
+        'individual_lecture_hours': {},
+        'lecture_multipliers': {},
+        'lecturer_types': [],
+    }
+
+    contact_weeks = TEACHING_WEEKS_PER_SEMESTER
+
+    # Calculate weeks of teaching (typical semester is ~22 weeks)
+    contact_hours = module.contact_hours
+    practicals_count = module.practicals
+
+    if practicals_count > 0 and module.practical_contact_hours > 0:
+        total_practical_duration = module.practical_contact_hours * practicals_count
+        lecture_hours = max(0, contact_hours - total_practical_duration)
+    else:
+        lecture_hours = contact_hours
+        total_practical_duration = 0.0
+
+    result['lecture_hours'] = lecture_hours
+
+    # Determine which teachers from last year taught THIS specific module
+    module_code = module.codes[0] if module.codes else None
+    known_teachers_this_module = known_lecturers_per_module.get(module_code)
+
+    if known_teachers_this_module is None:
+        known_teachers_this_module = known_lecturers_per_module.get(module.name)
+
+    if known_teachers_this_module is not None:
+        known_lecturers_for_module = known_teachers_this_module
+    else:
+        known_lecturers_for_module = known_lecturers_global
+
+    # Check if this is a new content module (for 7.5x rate when teacher is also new)
+    is_new_content_module = getattr(module, 'new_content', False)
+
+    # Detect online modules by name pattern for special rates
+    module_name_lower = module.name.lower()
+    is_online_module = "online" in module_name_lower
+
+    # Detect video teaching format (by name pattern or module attribute)
+    module_name_lower = module.name.lower()
+    is_video_module = getattr(module, 'teaching_format', '') == "video" or "video" in module_name_lower
+
+    # Calculate lecture multiplier per-teacher based on experience and content status
+    new_lecturers = []
+    existing_with_new_content = []
+    standard_lecturers = []
+
+    for t in teachers:
+        is_new_lecturer = t not in known_lecturers_for_module
+        is_video_format = getattr(module, 'teaching_format', '') == "video" or "video" in module_name_lower
+
+        if is_video_format:
+            multiplier = config.TEACHING_MULTIPLIERS.get('video', 10.0)
+            lecturer_type = "Video"
+            result['lecturer_types'].append((t, "video"))
+        elif is_new_lecturer and is_new_content_module:
+            # New lecturer + new content gets 7.5x
+            multiplier = config.TEACHING_MULTIPLIERS.get('new_lecturer_new_content', 7.5)
+            lecturer_type = "New lecturer + new content"
+            result['lecturer_types'].append((t, "new_lecturer_new_content"))
+        elif is_new_lecturer:
+            # New lecturer (not new content) gets 5x
+            multiplier = config.TEACHING_MULTIPLIERS.get('new_lecturer', 5.0)
+            lecturer_type = "New lecturer"
+            result['lecturer_types'].append((t, "new_lecturer"))
+        else:
+            if is_new_content_module:
+                # Existing lecturer on new content gets 5x (content dev only)
+                multiplier = config.TEACHING_MULTIPLIERS.get('existing_lecturer_new_content', 5.0)
+                lecturer_type = "Existing + new content"
+                result['lecturer_types'].append((t, "existing_lecturer_new_content"))
+            else:
+                # Standard existing lecturer gets 2.5x
+                multiplier = config.TEACHING_MULTIPLIERS.get('standard', 2.5)
+                lecturer_type = "Standard"
+                result['lecturer_types'].append((t, "standard"))
+
+        # Calculate per-teacher lecture hours (split equally among teachers)
+        per_teacher_lecture_hours = lecture_hours / len(teachers) if teachers else 0.0
+
+        result['individual_lecture_hours'][t] = per_teacher_lecture_hours
+        result['lecture_multipliers'][t] = multiplier
+
+    return result
+
+
+def _calculate_practical_hours_and_breakdown(module: ModuleData, teachers: List[str]) -> dict:
+    """Calculate practical session hours with repetition multipliers.
+
+    Returns a dict with structured breakdown suitable for output display.
+    """
+    result = {
+        'total_practical_hours': 0.0,
+        'individual_practical_hours': {},
+        'practicals_breakdown': None,  # Structured breakdown dict or None
+        'practical_details': [],  # List of detail strings for HTML display
+    }
+
+    contact_weeks = TEACHING_WEEKS_PER_SEMESTER
+    practicals_count = module.practicals
+
+    if practicals_count > 0:
+        # Get parallel groups configuration (if available)
+        parallel_groups = getattr(module, 'parallel_groups', None)
+
+        if parallel_groups and len(parallel_groups) > 1:
+            # Multiple parallel groups - each group has its own session count
+            first_session_rate = config.TEACHING_PROBLEM_CLASS
+
+            for i, group in enumerate(parallel_groups):
+                group_sessions = getattr(group, 'sessions', practicals_count)
+
+                if group_sessions > 0:
+                    weekly_hrs = getattr(group, 'hours_per_week', config.TEACHING_PROBLEM_CLASS)
+
+                    # First session rate applies to the first session per week
+                    # For simplicity: apply standard rate to all sessions in parallel groups
+                    total_group_hours = weekly_hrs * group_sessions * contact_weeks
+
+                    # Repetition multiplier for additional sessions
+                    if group_sessions > 1:
+                        repeat_rate = config.REPETITION_MULTIPLIER
+                        first_session_weekly = weekly_hrs
+                        repeat_session_hours = (group_sessions - 1) * weekly_hrs * repeat_rate
+                        total_repeat_hrs = repeat_session_hours * contact_weeks
+
+                        # Calculate per-teacher hours
+                        for t in teachers:
+                            if t not in result['individual_practical_hours']:
+                                result['individual_practical_hours'][t] = 0.0
+                            result['individual_practical_hours'][t] += total_repeat_hrs / len(teachers)
+
+                        # Store structured breakdown
+                        result['practicals_breakdown'] = {
+                            "first_session_hours": round(first_session_weekly, 2),
+                            "repeat_hours": round(total_repeat_hrs / contact_weeks if contact_weeks > 0 else 0, 2),
+                            "week_count": group_sessions,
+                            "first_session_rate": first_session_rate,
+                            "repeat_rate": repeat_rate,
+                            "total": round(total_group_hours / len(teachers) if teachers else 0, 2)
+                        }
+
+                        result['practical_details'].append(
+                            f"First time delivery: {group_sessions} sessions/week @ {weekly_hrs}h each; "
+                            f"- Standard lecturers: {first_session_rate}x first session (standard), {repeat_rate}x repeats"
+                        )
+                    else:
+                        # Single session - no repetition
+                        for t in teachers:
+                            if t not in result['individual_practical_hours']:
+                                result['individual_practical_hours'][t] = 0.0
+                            result['individual_practical_hours'][t] += total_group_hours / len(teachers)
+
+                        result['practicals_breakdown'] = {
+                            "first_session_hours": round(weekly_hrs, 2),
+                            "repeat_hours": 0,
+                            "week_count": group_sessions,
+                            "first_session_rate": first_session_rate,
+                            "repeat_rate": config.REPETITION_MULTIPLIER,
+                            "total": round(total_group_hours / len(teachers) if teachers else 0, 2)
+                        }
+        else:
+            # No parallel groups - all teachers get same rate
+            std_first_session_weekly = getattr(module, 'practical_hours_per_week', config.TEACHING_PROBLEM_CLASS)
+            repeat_rate = config.REPETITION_MULTIPLIER
+
+            practical_week_count = practicals_count
+
+            if practical_week_count > 1:
+                first_session_rate = std_first_session_weekly
+                repeat_session_hours = (practical_week_count - 1) * std_first_session_weekly * repeat_rate
+                teacher_repeat_hrs = repeat_session_hours
+
+                # Structured practicals breakdown per teacher
+                result['practicals_breakdown'] = {
+                    "first_session_hours": round(std_first_session_weekly, 2),
+                    "repeat_hours": round(teacher_repeat_hrs, 2),
+                    "week_count": practical_week_count,
+                    "first_session_rate": first_session_rate,
+                    "repeat_rate": repeat_rate,
+                    "total": round(std_first_session_weekly * contact_weeks + teacher_repeat_hrs, 2),
+                }
+
+                result['practical_details'].append(
+                    f"First time delivery: {practical_week_count} sessions/week @ {std_first_session_weekly}h each; "
+                    f"- Standard lecturers: {first_session_rate}x first session (standard), {repeat_rate}x repeats"
+                )
+            else:
+                teacher_first_session_hrs = std_first_session_weekly
+
+                result['practicals_breakdown'] = {
+                    "first_session_hours": round(teacher_first_session_hrs, 2),
+                    "repeat_hours": 0,
+                    "week_count": practical_week_count,
+                    "first_session_rate": std_first_session_weekly,
+                    "repeat_rate": repeat_rate,
+                    "total": round(std_first_session_weekly * contact_weeks, 2),
+                }
+    else:
+        # No practicals - empty structured breakdown
+        result['practicals_breakdown'] = {}
+
+    # Calculate total practical hours across all teachers
+    if result['individual_practical_hours']:
+        result['total_practical_hours'] = sum(result['individual_practical_hours'].values())
+
+    return result
+
+
+def _calculate_assessment_setting_hours(module: ModuleData, teachers: List[str],
+                                         known_lecturers_global: set,
+                                         known_lecturers_per_module: Dict[str, frozenset]) -> dict:
+    """Calculate assessment setting hours per teacher.
+
+    Returns a dict with:
+        - total_hours: Total assessment setting time
+        - individual_hours: Dict mapping teachers to their hours
+        - details: List of detail strings for HTML display
+    """
+    result = {
+        'total_hours': 0.0,
+        'individual_hours': {},
+        'details': [],
+    }
+
+    assessment_count = module.assessment_count
+
+    if assessment_count == 0:
+        return result
+
+    # Determine if this module uses automated marking (affects setting rates)
+    is_automated = getattr(module, 'marking_type', 'manual') == 'automated'
+
+    # Get the appropriate rates based on marking type and teacher role
+    if is_automated:
+        base_setting_cost = config.ASSESSMENT_AUTO_STANDARD * assessment_count
+        new_setter_rate = config.ASSESSMENT_AUTO_NEW_SETTER
+        standard_rate = config.ASSESSMENT_AUTO_STANDARD
+        checking_rate = config.ASSESSMENT_AUTO_CHECKING
+        new_assessment_rate = config.ASSESSMENT_AUTO_NEW_ASSESSMENT
+    else:
+        base_setting_cost = config.ASSESSMENT_MANUAL_STANDARD * assessment_count
+        new_setter_rate = config.ASSESSMENT_MANUAL_NEW_SETTER
+        standard_rate = config.ASSESSMENT_MANUAL_STANDARD
+        checking_rate = config.ASSESSMENT_MANUAL_CHECKING
+        new_assessment_rate = config.ASSESSMENT_MANUAL_NEW_ASSESSMENT
+
+    module_code = module.codes[0] if module.codes else None
+    known_teachers_this_module = known_lecturers_per_module.get(module_code)
+
+    if known_teachers_this_module is None:
+        known_teachers_this_module = known_lecturers_per_module.get(module.name)
+
+    if known_teachers_this_module is not None:
+        known_lecturers_for_module = known_teachers_this_module
+    else:
+        known_lecturers_for_module = known_lecturers_global
+
+    setting_details_parts = []
+
+    for t in teachers:
+        is_checking_only = getattr(module, 'checking_only', False)
+        is_new_assessment_module = getattr(module, 'new_assessment', False)
+
+        if is_checking_only:
+            base_hours = (checking_rate * assessment_count) / len(teachers)
+            result['individual_hours'][t] = base_hours
+            result['total_hours'] += base_hours
+
+            main_paper_hours = (checking_rate * assessment_count / 2) / len(teachers)
+            resit_paper_hours = (checking_rate * assessment_count / 2) / len(teachers)
+
+            rate_type = checking_rate
+        elif t not in known_lecturers_for_module:
+            # New setter: standard time + additional content development time
+            if is_new_assessment_module:
+                base_hours = (new_assessment_rate * assessment_count) / len(teachers)
+                total_hours = base_hours  # All new assessment time is content dev
+            else:
+                base_hours = base_setting_cost / len(teachers)
+                content_dev_per_assessment = new_setter_rate - standard_rate
+                additional_content_hours = (content_dev_per_assessment * assessment_count) / len(teachers)
+                total_hours = base_hours + additional_content_hours
+
+            result['individual_hours'][t] = total_hours
+            result['total_hours'] += total_hours
+
+            if is_new_assessment_module:
+                main_paper_hours = (new_assessment_rate * assessment_count / 2) / len(teachers)
+                resit_paper_hours = (new_assessment_rate * assessment_count / 2) / len(teachers)
+                rate_type = new_assessment_rate
+            else:
+                main_paper_hours = (base_setting_cost / 2) / len(teachers)
+                resit_paper_hours = (base_setting_cost / 2) / len(teachers)
+                rate_type = standard_rate
+        else:
+            # Standard setter: just the base cost divided equally
+            if is_new_assessment_module:
+                base_hours = (new_assessment_rate * assessment_count) / len(teachers)
+            else:
+                base_hours = base_setting_cost / len(teachers)
+
+            result['individual_hours'][t] = base_hours
+            result['total_hours'] += base_hours
+
+            if is_new_assessment_module:
+                main_paper_hours = (new_assessment_rate * assessment_count / 2) / len(teachers)
+                resit_paper_hours = (new_assessment_rate * assessment_count / 2) / len(teachers)
+                rate_type = new_assessment_rate
+            else:
+                main_paper_hours = (base_setting_cost / 2) / len(teachers)
+                resit_paper_hours = (base_setting_cost / 2) / len(teachers)
+                rate_type = standard_rate
+
+        # Build detail string
+        if is_automated:
+            setting_details_parts.append(
+                f"{'New setter' if t not in known_lecturers_for_module else 'Standard'} "
+                f"({rate_type}h/assess, auto): "
+                f"{main_paper_hours:.1f}h main + {resit_paper_hours:.1f}h resit = {result['individual_hours'][t]:.1f}h"
+            )
+        else:
+            setting_details_parts.append(
+                f"{'New setter' if t not in known_lecturers_for_module else 'Standard'} "
+                f"({rate_type}h/assess, manual): "
+                f"{main_paper_hours:.1f}h main + {resit_paper_hours:.1f}h resit = {result['individual_hours'][t]:.1f}h"
+            )
+
+    result['details'] = setting_details_parts
+    return result
+
+
+def _calculate_assessment_marking_hours(module: ModuleData, teachers: List[str]) -> dict:
+    """Calculate assessment marking hours per teacher.
+
+    Returns a dict with:
+        - total_hours: Total marking time
+        - individual_hours: Dict mapping teachers to their hours
+        - details: Detail string for HTML display
+    """
+    result = {
+        'total_hours': 0.0,
+        'individual_hours': {},
+        'details': '',
+    }
+
+    student_count = module.student_count
+
+    if student_count == 0:
+        return result
+
+    # Determine marking type and rates
+    is_automated = getattr(module, 'marking_type', 'manual') == 'automated'
+
+    if is_automated:
+        # Automated marking takes less time
+        first_mark_hrs = config.MARKING_FIRST_MARK_AUTO * student_count
+        resit_hrs = config.MARKING_REBIT_AUTO * student_count
+        total_marking_hours = first_mark_hrs + resit_hrs
+    else:
+        # Manual marking: MSc 0.5h/script, UG 0.33h/script
+        # Determine stage for appropriate rate
+        stage = getattr(module, 'stage', 1)
+        if config.is_msc_level(stage):
+            first_mark_hrs = config.MARKING_FIRST_MARK_MSC * student_count
+            resit_hrs = config.MARKING_REBIT_MSC * student_count
+        else:
+            first_mark_hrs = config.MARKING_FIRST_MARK_U * student_count
+            resit_hrs = config.MARKING_REBIT_U * student_count
+
+        total_marking_hours = first_mark_hrs + resit_hrs
+
+    # Split equally among teachers
+    per_teacher_hours = total_marking_hours / len(teachers) if teachers else 0.0
+
+    for t in teachers:
+        result['individual_hours'][t] = per_teacher_hours
+        result['total_hours'] += per_teacher_hours
+
+    result['details'] = f"{'Automated' if is_automated else 'Manual'}: {per_teacher_hours:.1f}h total (initial + resit)"
+
+    return result
+
+
 # --- Teaching Workload ---
 
 
