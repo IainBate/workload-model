@@ -473,7 +473,7 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
                 )
                 # Only show indented Total line (no First delivery or Repeated delivery intermediate lines)
                 practical_details.append(
-                    f"<p style='margin: 4px 0 0 3em;'>Total: {weekly_hrs:.1f}h/week = {total_hrs:.1f}h total</p>"
+                    f"  Total: {weekly_hrs:.1f}h/week = {total_hrs:.1f}h total"
                 )
             elif standard_lecturers_practical:
                 # Only standard lecturers - show single breakdown
@@ -489,7 +489,7 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
                 )
                 # Only show indented Total line (no First delivery or Repeated delivery intermediate lines)
                 practical_details.append(
-                    f"<p style='margin: 4px 0 0 3em;'>Total: {weekly_hrs:.1f}h/week = {total_hrs:.1f}h total</p>"
+                    f"  Total: {weekly_hrs:.1f}h/week = {total_hrs:.1f}h total"
                 )
 
             # Add to breakdown (per-teacher values - use individual hours)
