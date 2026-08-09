@@ -527,6 +527,60 @@ Each report is a self-contained HTML file with embedded CSS and no external depe
 
 When reviewing individual reports (for output or calculation verification), check:
 
+### Layout and Indentation Structure
+
+The report should follow a strict hierarchical indentation pattern:
+
+```
+Level 0: Section cards (Teaching, Research, Admin)
+   └─ Level 1: Category headers (h4 elements) with blue/orange left border
+       └─ Level 2: Detail items for each activity type
+           └─ Level 3: Calculation details (smaller font, indented 40px)
+```
+
+**Visual Layout Tree**:
+
+```
+Teaching Activities (card)
+├── Module Category (h4, blue left border #2196F3)
+│   ├── Delivery (Lectures) [teaching-activity badge]
+│   │   └── Calculation (40px indent, smaller font)
+│   ├── Practical Sessions [teaching-activity badge]
+│   │   └── Calculation (40px indent, smaller font)
+│   ├── Assessment Setting [teaching-activity badge]
+│   │   └── Calculation (40px indent, smaller font)
+│   └── Assessment Marking [teaching-activity badge]
+│       └── Calculation (40px indent, smaller font)
+├── Pastoral Supervision (h4, orange left border #FF9800)
+│   └── Students detail item [admin-activity badge]
+├── Project Supervision (h4, orange left border #FF9800)
+│   └── Projects detail item [admin-activity badge]
+└── Project Setting (fixed) [teaching-activity badge]
+
+Research Activities (card)
+├── PhD Supervision (h4, green left border #4CAF50)
+│   ├── Primary Supervisor [research-activity badge]
+│   ├── Co-supervisor [research-activity badge]
+│   └── Assessor [research-activity badge]
+├── Research Allowances (h4, green left border #4CAF50)
+│   └── Protected research baseline [research-activity badge]
+└── Research Grants (h4, green left border #4CAF50)
+    └── Grant Scheme [research-activity badge]
+
+Admin Activities (card)
+└── Other (h4, green left border #4CAF50)
+    ├── Departmental role 1 [admin-activity badge]
+    ├── Engagement [admin-activity badge]
+    └── Personal Development [admin-activity badge]
+```
+
+**Indentation Rules**:
+| Element | Left Margin | Font Size | Notes |
+|---------|-------------|-----------|-------|
+| Detail items (top-level) | 0px | 1em | Main activity rows |
+| Calculation details | 40px | 0.85em | Sub-calculation notes in smaller font |
+| Supervision detail groups | 20px | 1em | Container for supervision items |
+
 1. **Header Section**
    - [ ] Staff name matches expected value
    - [ ] FTE is correctly displayed (e.g., 1.00, 0.8, etc.)
@@ -534,22 +588,23 @@ When reviewing individual reports (for output or calculation verification), chec
    - [ ] Total workload appears in the green header band
 
 2. **Teaching Section**
-   - [ ] All module categories are listed with correct counts
-   - [ ] Delivery hours use correct multipliers (2.5x standard, 5x new lecturer)
+   - [ ] Module categories are at correct nesting level (no indent)
+   - [ ] Delivery details indented correctly with calculation sub-details (40px)
    - [ ] Practical sessions show repetition multiplier (1.5x) for repeats
    - [ ] Assessment setting: 7.5h per assessment type (main + resit = 15h total)
    - [ ] Marking hours per script: MSc 0.5h, UG 0.33h (or half if automated)
-   - [ ] Pastoral supervision: 3h per student
-   - [ ] Project supervision: UG 16h, MSc 48h per project
+   - [ ] Pastoral Supervision: orange border (#FF9800), admin badge
+   - [ ] Project Supervision: orange border (#FF9800), admin badge
 
 3. **Research Section**
-   - [ ] Protected baseline = FTE × 164.2h (10% of nominal)
-   - [ ] Primary supervisor = 80h/FTE
-   - [ ] Co-supervisor = 48h/FTE
-   - [ ] Assessor = 8h/student
+   - [ ] PhD Supervision: green border (#4CAF50), research badge
+   - [ ] Primary Supervisor at correct level (no indent from h4)
+   - [ ] Co-supervisor and Assessor nested under PhD Supervision
+   - [ ] Research Allowances: protected baseline = 164.2h/FTE
+   - [ ] Research Grants (if present): correct amount based on FTE
 
 4. **Admin Section**
-   - [ ] Departmental roles at correct percentages
+   - [ ] Departmental roles at correct nesting level
    - [ ] Engagement = 100h (university-wide)
    - [ ] Personal Development = 75h (mandated)
 
