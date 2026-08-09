@@ -814,7 +814,7 @@ def generate_html_report(results: List[WorkloadResult], year_data: YearData,
         a_pct = (avg_admin / total_cat_avg * 100) if total_cat_avg > 0 else 0
 
         # Get normative comparison for this category
-        normative_split = get_normative_split(cat)
+        normative_split = config.get_normative_split(cat)
         normative_html = ""
         if normative_split:
             norm_teaching = normative_split.get("teaching_hours", 0) * 100
