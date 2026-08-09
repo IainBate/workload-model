@@ -1112,13 +1112,13 @@ def load_all_data(data_dir: str = None,
     if data_dir is None:
         data_dir = DATA_DIR
 
+    # Load name lookup first (needed for callback creation in non-interactive mode)
+    mappings = _load_name_lookup()
+    reverse_lookup, name_warnings = _build_reverse_lookup(mappings)
+
     if unknown_callback is _UNSET:
         # Create callback with mappings for alias suggestions
         unknown_callback = functools.partial(_prompt_name_match, mappings=mappings)
-
-    # Load name lookup and build reverse lookup (DATA_DIR is used internally)
-    mappings = _load_name_lookup()
-    reverse_lookup, name_warnings = _build_reverse_lookup(mappings)
 
     # Print any warnings about duplicate aliases
     for warning in name_warnings:
