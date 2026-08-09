@@ -715,11 +715,21 @@ When reviewing individual reports (for output or calculation verification), chec
 2. **Teaching Section**
    - [ ] Module categories are at correct nesting level (no indent)
    - [ ] Delivery details indented correctly with calculation sub-details (40px)
-   - [ ] Practical sessions show repetition multiplier (1.5x) for repeats
    - [ ] Assessment setting: 7.5h per assessment type (main + resit = 15h total)
    - [ ] Marking hours per script: MSc 0.5h, UG 0.33h (or half if automated)
    - [ ] Pastoral Supervision: orange border (#FF9800), admin badge
    - [ ] Project Supervision: orange border (#FF9800), admin badge
+
+3. **Practical Sessions** (if applicable)
+   - [ ] Number of weeks specified (e.g., "11 weeks" or "8 weeks")
+   - [ ] Week(s) listed if not every week (e.g., "Weeks: 1,2,3,4,9,10,11,12")
+   - [ ] Number of practicals per week shown
+   - [ ] Groups count shown
+   - [ ] First-time delivery at correct multiplier (5x new lecturer / 2.5x standard)
+   - [ ] Repeat sessions at 1.5x repetition rate
+   - [ ] Total hours calculation is correct
+
+4. **Research Section**
 
 3. **Research Section**
    - [ ] PhD Supervision: green border (#4CAF50), research badge
