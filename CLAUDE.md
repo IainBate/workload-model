@@ -6,7 +6,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ### Core Principle: Command-Query Separation
 ```
-data_loader.py    →   workload_calculator.py   →   output_generator.py / role_based_reports.py
+data_loader.py    →   workload_calculator.py   →   output_generator.py
 (extract)         →   (transform; business logic) →  (render; formatting only)
 ```
 
@@ -20,17 +20,15 @@ Output files must be pure rendering — they format already-computed numbers, ne
 |------|---------|
 | `data_loader.py` | CSV ingestion, staff name normalization, module mapping, data merging. Produces structured dataclasses (`YearData`, `ModuleData`, `StaffData`, `WorkloadResult`). |
 | `workload_calculator.py` | **Business logic only** — applies multipliers from config to calculate workload hours. Returns `WorkloadResult` with pre-computed breakdowns. |
-| `output_generator.py` | Pure rendering — formats pre-computed numbers into CSV, Excel, PNG charts, and HTML. No calculation. |
-| `role_based_reports.py` | Alternative rendering for different audiences (individual staff reports, department summaries). No calculation. |
+| `output_generator.py` | Pure rendering — formats pre-computed numbers into CSV, Excel, PNG charts, HTML reports (per-staff and department). No calculation. |
 
 ### Known Violations to Fix
 
 **The following contain regex/string parsing that should be removed once Phase 3 is complete:**
 
 - **output_generator.py**: Lines ~1084, ~1102, ~1205, ~1210, ~1314, ~1354, ~1359 — regex-parses free-text detail strings and re-reads config constants for display labels
-- **role_based_reports.py**: Lines ~79, ~644, ~653, ~702-785 — multiple functions use `re.match`/`re.search` to extract numbers from detail strings
 
-**As of this writing (Phase 1), the fix is tracked in Phase 3 of WORKLOAD_ARCHITECTURE_REFACTOR_PLAN.md.**
+**Phase 2 (completed):** `role_based_reports.py` has been removed. Its functionality (`generate_individual_reports`, `generate_department_summary`) was consolidated into `output_generator.py` (`generate_per_staff_reports`, and department summary via `generate_html_report`). The baseline outputs were updated to reflect this consolidation.
 
 ### Key Data Structures
 
