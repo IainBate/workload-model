@@ -2,6 +2,93 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## Architecture Map: Where Things Live and Where Calculations Happen
+
+### Core Principle: Command-Query Separation
+```
+data_loader.py    →   workload_calculator.py   →   output_generator.py / role_based_reports.py
+(extract)         →   (transform; business logic) →  (render; formatting only)
+```
+
+**The golden rule:** `workload_calculator.py` is the **ONLY** place where business/rate logic should run. Its output (`WorkloadResult`, including breakdown fields) is the single source of truth for every number shown anywhere downstream.
+
+Output files must be pure rendering — they format already-computed numbers, never recompute or re-derive them. If a number isn't available on `WorkloadResult` or its breakdown dicts, add a field to `workload_calculator.py` and populate it there — **never compute it in an output/report file**, and **never parse it back out of a display string**.
+
+### File Roles
+
+| File | Purpose |
+|------|---------|
+| `data_loader.py` | CSV ingestion, staff name normalization, module mapping, data merging. Produces structured dataclasses (`YearData`, `ModuleData`, `StaffData`, `WorkloadResult`). |
+| `workload_calculator.py` | **Business logic only** — applies multipliers from config to calculate workload hours. Returns `WorkloadResult` with pre-computed breakdowns. |
+| `output_generator.py` | Pure rendering — formats pre-computed numbers into CSV, Excel, PNG charts, and HTML. No calculation. |
+| `role_based_reports.py` | Alternative rendering for different audiences (individual staff reports, department summaries). No calculation. |
+
+### Known Violations to Fix
+
+**The following contain regex/string parsing that should be removed once Phase 3 is complete:**
+
+- **output_generator.py**: Lines ~1084, ~1102, ~1205, ~1210, ~1314, ~1354, ~1359 — regex-parses free-text detail strings and re-reads config constants for display labels
+- **role_based_reports.py**: Lines ~79, ~644, ~653, ~702-785 — multiple functions use `re.match`/`re.search` to extract numbers from detail strings
+
+**As of this writing (Phase 1), the fix is tracked in Phase 3 of WORKLOAD_ARCHITECTURE_REFACTOR_PLAN.md.**
+
+### Key Data Structures
+
+#### WorkloadResult
+The immutable DTO passed from calculator to output. Contains all pre-computed numbers:
+
+| Field | Type | Purpose |
+|-------|------|---------|
+| `name`, `fte` | str, float | Staff identity and contract type |
+| `total_hours`, `teaching_hours`, `research_hours`, `admin_hours` | float | Category totals |
+| `category` | str | Contract category (e.g., "T and S", "ART") for normative comparison |
+| `assumptions`, `missing_data` | tuple[str] | Tracking metadata |
+| `nominal_hours` | float | FTE-adjusted nominal hours reference |
+| **teaching_breakdown** | Dict[str, float] | Aggregated teaching components (delivery, practicals, marking, etc.) |
+| **teaching_module_breakdowns** | Dict[str, Dict[str, float]] | Per-module teaching breakdowns |
+| **research_breakdown** | Dict[str, float] | Research components (baseline, grants, PhD supervision) |
+| **admin_breakdown** | Dict[str, float] | Admin components (departmental roles) |
+| `teaching_detail`, `research_detail`, `admin_detail` | str | Human-readable strings for display only |
+
+**Note:** The breakdown dicts (`teaching_breakdown`, `research_breakdown`, `admin_breakdown`) contain structured numeric data. **Read directly from these, never parse numbers out of the detail strings.**
+
+### Authoritative Calculation Map
+
+| Concept | Authoritative Function/File | Field on WorkloadResult |
+|---------|----------------------------|------------------------|
+| Contact hours with multiplier | `_calculate_teaching_workload()` in `workload_calculator.py` | `teaching_breakdown['delivery']`, `teaching_module_breakdowns[module]['delivery']` |
+| Practical first-session rate | `_calculate_teaching_workload()` — reads `config.TEACHING_PROBLEM_CLASS` | See Phase 3 for structured field |
+| Practical repeat sessions hours | `_calculate_teaching_workload()` — calculates with `config.REPETITION_MULTIPLIER` | See Phase 3 for structured field |
+| Assessment setting hours | `_calculate_teaching_workload()` — reads from `ASSESSMENT_*` constants | `teaching_breakdown['assessment_setting']`, `teaching_module_breakdowns[module]['assessment_setting']` |
+| Marking hours per script | `_calculate_teaching_workload()` — reads `MARKING_*` constants | `teaching_breakdown['marking']`, `teaching_module_breakdowns[module]['marking']` |
+| Pastoral supervision hours | `_calculate_teaching_workload()` — `SUPERVISION_PASTORAL * student_count` | `teaching_breakdown['pastoral_supervision']`, `supervision_details` tuple |
+| Project supervision hours | `_calculate_teaching_workload()` — UG/MSc rates × project count | `teaching_breakdown['project_supervision']` |
+| Protected research baseline | `calculate_workload()` — 10% of nominal hours | `research_breakdown['protected_research_baseline']` |
+| Research grant allocation | `_calculate_research_grants()` in `workload_calculator.py` | `research_breakdown['grant_X']` per grant |
+| PhD supervision (primary) | `_calculate_research_workload()` — 80h/FTE | `research_breakdown['primary_supervisor']` |
+| Admin role percentage | `_calculate_admin_workload()` in `workload_calculator.py` | `admin_breakdown[role_name]` |
+
+**Consumer rule:** If you need a number for display that isn't already on `WorkloadResult` or its breakdown dicts, add a field to the breakdown in `workload_calculator.py` and populate it there — never compute it in an output/report file, and never parse it back out of a display string.
+
+### Dead Code Flagged for Phase 2 Decision
+
+| Function | Location | Status |
+|----------|----------|--------|
+| `generate_hybrid_dashboard()` | `role_based_reports.py` line ~1518 | Not referenced by any caller |
+| `_generate_finance_report()` | `role_based_reports.py` line ~1892 | Not referenced by any caller |
+
+These are candidates for removal in Phase 2, pending user decision.
+
+### Function Size Hotspots (Refactor Targets)
+
+| Function | Approximate Lines | Refactor Phase |
+|----------|-------------------|----------------|
+| `_calculate_teaching_workload()` | ~880 lines | Phase 5 |
+| `generate_per_staff_reports()` / `format_teaching_section()` | ~574 lines | Phase 5 (output_generator.py) |
+| `load_all_data()` | ~350 lines | Not in scope |
+
+**Do not add more logic to these functions.** They are refactor targets for Phase 5.
+
 ## Project Overview
 This project provides an automated system for calculating academic staff workloads based on a specified model. It processes module data from CSV files and applies a set of predefined multipliers to determine "calculation points" (workload units) that are shared among the teaching team for each module.
 
