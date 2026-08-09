@@ -1127,7 +1127,7 @@ def load_all_data(data_dir: str = None,
     # Build staff roster from all data sources
     staff = {}
 
-    # Collect all names from all sources
+    # Collect all names from all sources (as a set to deduplicate)
     all_names = set()
     for m in modules:
         all_names.add(m.lead_name)
@@ -1145,6 +1145,9 @@ def load_all_data(data_dir: str = None,
         all_names.add(name)
     for name in part_time_data:
         all_names.add(name)
+
+    # Sort names for deterministic processing order
+    sorted_names = sorted(all_names)
 
     # Process each name
     saint_module_map = {
