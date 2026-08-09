@@ -1232,7 +1232,14 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
                 module_name = stage
                 module_breakdown = getattr(r, 'teaching_module_breakdowns', {}).get(module_name, {})
                 delivery_per_module = module_breakdown.get('teaching', 0)
-                practicals_per_module = module_breakdown.get('practicals', 0)
+
+                # Handle structured practicals breakdown (dict) or flat value (int/float)
+                _practicals_raw = module_breakdown.get('practicals', 0)
+                if isinstance(_practicals_raw, dict):
+                    practicals_per_module = _practicals_raw.get('total', 0)
+                else:
+                    practicals_per_module = _practicals_raw
+
                 assessment_setting_per_module = module_breakdown.get('assessment_setting', 0)
                 marking_per_module = module_breakdown.get('marking', 0)
 
