@@ -315,19 +315,16 @@ def generate_boxplots(results: List[WorkloadResult], year_data: YearData, output
     }
 
     for i, (comp, label, color) in enumerate(zip(summary_components, summary_labels, colors)):
-        # Get expected value from first staff member's category
-        # (all staff in same category have same division percentage)
+        # Draw expected workload line for each staff member based on their category
         if names:
-            first_name = names[0]
-            category = staff_category_map.get(first_name, "T and S")
-            comp_key = COMPONENT_TO_CONTRACT_KEY.get(comp, comp.replace("_hours", ""))
-            expected_division = config.CONTRACT_NORMATIVE_DIVISIONS.get(category, {}).get(comp_key, 0)
-            # Use the first result's nominal hours as representative
-            expected = results[0].nominal_hours * expected_division
+            for j, name in enumerate(names):
+                category = staff_category_map.get(name, "T and S")
+                comp_key = COMPONENT_TO_CONTRACT_KEY.get(comp, comp.replace("_hours", ""))
+                expected_division = config.CONTRACT_NORMATIVE_DIVISIONS.get(category, {}).get(comp_key, 0)
+                expected = results[j].nominal_hours * expected_division
 
-            # Draw vertical line for this component's expected value
-            ax.axvline(x=expected, color=color, alpha=0.5, linestyle="--", linewidth=2,
-                       label=f"Expected {label}")
+                # Draw vertical line for this component's expected value
+                ax.axvline(x=expected, color=color, alpha=0.3, linestyle="--", linewidth=1.5)
 
     # Total workload line
     total_expected = config.NOMINAL_WORKING_HOURS_PER_YEAR
@@ -921,11 +918,11 @@ def generate_html_report(results: List[WorkloadResult], year_data: YearData,
         normative_split = config.get_normative_split(r["category"])
         normative_indicator = ""
 
-        if normative_split and r.total_hours > 0:
-            total_pct = (r.total_hours / config.NOMINAL_WORKING_HOURS_PER_YEAR) * 100
-            t_cmp = (r.teaching / r.total_hours * 100) - (normative_split.get("teaching_hours", 0) * 100)
-            r_cmp = (r.research / r.total_hours * 100) - (normative_split.get("research_hours", 0) * 100)
-            a_cmp = (r.admin / r.total_hours * 100) - (normative_split.get("admin_hours", 0) * 100)
+        if normative_split and r["total"] > 0:
+            total_pct = (r["total"] / config.NOMINAL_WORKING_HOURS_PER_YEAR) * 100
+            t_cmp = (r["teaching"] / r["total"] * 100) - (normative_split.get("teaching_hours", 0) * 100)
+            r_cmp = (r["research"] / r["total"] * 100) - (normative_split.get("research_hours", 0) * 100)
+            a_cmp = (r["admin"] / r["total"] * 100) - (normative_split.get("admin_hours", 0) * 100)
 
             # Determine status based on deviation from normative split
             max_deviation = max(abs(t_cmp), abs(r_cmp), abs(a_cmp))
