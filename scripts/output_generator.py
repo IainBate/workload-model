@@ -1565,8 +1565,6 @@ def generate_all_outputs(results: List[WorkloadResult], year_data: YearData,
     - HTML report with embedded charts
     - Individual reports (detailed module-by-module breakdown)
     - Department summary (heatmap and balance view for HoD)
-    - Hybrid dashboard (all-in-one with drill-down)
-    - Role-based reports (separate files per audience)
 
     Args:
         results: List of WorkloadResult objects from calculate_workload()
