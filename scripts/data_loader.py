@@ -1358,32 +1358,34 @@ def load_all_data(data_dir: str = None,
 
 def _deduplicate_staff(staff: Dict[str, StaffData], mappings: Dict[str, List[str]]) -> Dict[str, StaffData]:
     """Second-pass deduplication: merge staff entries that share the same lookup mapping. E.g., 'Chris Crispin-Bailey' and 'Christopher Crispin-Bailey' should be merged."""
-    # Build reverse: alias -> canonical
+    # Build reverse: alias -> canonical (sort for determinism)
     alias_to_canonical = {}
-    for canonical, aliases in mappings.items():
+    for canonical in sorted(mappings.keys()):
+        aliases = mappings[canonical]
         for alias in aliases:
             alias_to_canonical[alias.strip().lower()] = canonical
 
     # Group staff by their resolved canonical name
     groups = {}
-    for name, data in staff.items():
+    for name, data in sorted(staff.items()):
         # Find which canonical name this maps to
         resolved = alias_to_canonical.get(name.lower(), name)
         groups.setdefault(resolved, []).append((name, data))
 
     # Merge each group - create new StaffData entries since they are frozen
     merged = {}
-    for canonical, entries in groups.items():
+    for canonical in sorted(groups.keys()):
+        entries = groups[canonical]
         if len(entries) == 1:
             merged[canonical] = entries[0][1]
         else:
-            # Collect all values from duplicate entries
+            # Collect all values from duplicate entries (sorted for determinism)
             all_aliases = set()
             all_roles = set()
             all_research_projects = []
             all_saint_modules = []
 
-            for _, data in entries:
+            for _, data in sorted(entries):
                 all_aliases.update(data.aliases)
                 all_roles.update(data.roles)
                 all_research_projects.extend(data.research_projects)
@@ -1392,7 +1394,8 @@ def _deduplicate_staff(staff: Dict[str, StaffData], mappings: Dict[str, List[str
             # Take the max values for numeric fields
             merged_fte = max((e[1].fte for e in entries if e[1].fte), default=0.0)
             merged_category = next((e[1].category for e in entries if e[1].category), "")
-            merged_notes = "; ".join(set(e[1].notes for e in entries if e[1].notes))
+            # Sort notes to ensure deterministic output
+            merged_notes = "; ".join(sorted(set(e[1].notes for e in entries if e[1].notes)))
             merged_employment_start = max((e[1].employment_start for e in entries), default=0)
             merged_active = any(e[1].active for e in entries)
 
@@ -1401,12 +1404,12 @@ def _deduplicate_staff(staff: Dict[str, StaffData], mappings: Dict[str, List[str
             merged_phd_co_supervisions = max((e[1].phd_co_supervisions for e in entries), default=0)
             merged_phd_assessor_count = max((e[1].phd_assessor_count for e in entries), default=0)
 
-            # Get first non-zero values for other fields
-            proj_data = next((e[1] for e in entries if e[1].project_load > 0), entries[0][1])
+            # Get first non-zero values for other fields (sorted entries ensures determinism)
+            proj_data = next((e[1] for e in sorted(entries) if e[1].project_load > 0), entries[0][1])
 
             merged[canonical] = StaffData(
                 canonical_name=canonical,
-                aliases=tuple(all_aliases),
+                aliases=tuple(sorted(all_aliases)),
                 fte=merged_fte,
                 employment_start=merged_employment_start,
                 active=merged_active,
@@ -1424,12 +1427,12 @@ def _deduplicate_staff(staff: Dict[str, StaffData], mappings: Dict[str, List[str
                 initial_fractional_project_load=proj_data.initial_fractional_project_load,
                 initial_fractional_pastoral_load=proj_data.initial_fractional_pastoral_load,
                 notes=merged_notes,
-                roles=tuple(all_roles),
+                roles=tuple(sorted(all_roles)),
                 phd_supervisions=merged_phd_supervisions,
                 phd_co_supervisions=merged_phd_co_supervisions,
                 phd_assessor_count=merged_phd_assessor_count,
                 research_projects=tuple(all_research_projects),
-                saint_modules=tuple(all_saint_modules),
+                saint_modules=tuple(sorted(set(all_saint_modules))),
                 unallocated_students=0,
                 pastoral_students=0,
             )
