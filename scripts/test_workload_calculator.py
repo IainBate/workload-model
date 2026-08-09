@@ -14,7 +14,7 @@ from pathlib import Path
 SCRIPTS_DIR = Path(__file__).parent
 sys.path.insert(0, str(SCRIPTS_DIR))
 
-from data_loader import StaffData, ModuleData, SupervisionAllocation
+from data_loader import StaffData, ModuleData, SupervisionAllocation, YearData
 from workload_calculator import (
     _calculate_teaching_workload,
     _calculate_research_workload,
