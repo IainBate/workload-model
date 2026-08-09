@@ -147,6 +147,8 @@ class WorkloadResult:
     grant_titles: Dict[str, str] = field(default_factory=dict)  # Mapping of project IDs to display titles
     module_details: Tuple[str, ...] = ()  # Details of modules taught (immutable tuple)
     supervision_details: Tuple[str, ...] = ()  # Supervision details (to be shown separately)
+    pastoral_breakdown: Dict[str, float] = field(default_factory=dict)  # Structured pastoral supervision breakdown
+    project_breakdown: Dict[str, float] = field(default_factory=dict)  # Structured project supervision breakdown
 
 
 
