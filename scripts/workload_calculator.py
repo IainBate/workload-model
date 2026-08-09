@@ -469,7 +469,7 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
                     f"- First time delivery: {first_time_sessions} group(s) (one per lecturer). {contact_per_practical:.1f}h x 2.5 multiplier per week."
                 )
                 practical_details.append(
-                    f"- Repeated sessions: {repeat_sessions} group(s) without first-session slots ({repeat_sessions/n_teachers:.1f} group(s)/lecturer @ 1.5x)"
+                    f"Repeated sessions: {repeat_sessions} group(s) without first-session slots ({repeat_sessions/n_teachers:.1f} group(s)/lecturer @ 1.5x)"
                 )
                 # Only show indented Total line (no First delivery or Repeated delivery intermediate lines)
                 practical_details.append(
@@ -485,7 +485,7 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
                     f"- First time delivery: {first_time_sessions} group(s) (one per lecturer). {contact_per_practical:.1f}h x 2.5 multiplier per week."
                 )
                 practical_details.append(
-                    f"- Repeated sessions: {repeat_sessions} group(s) without first-session slots ({repeat_sessions/n_teachers:.1f} group(s)/lecturer @ 1.5x)"
+                    f"Repeated sessions: {repeat_sessions} group(s) without first-session slots ({repeat_sessions/n_teachers:.1f} group(s)/lecturer @ 1.5x)"
                 )
                 # Only show indented Total line (no First delivery or Repeated delivery intermediate lines)
                 practical_details.append(
