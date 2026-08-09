@@ -158,6 +158,7 @@ pip install -r requirements.txt  # python-docx, matplotlib, pandas, pyyaml
 - **Module mapping updates:** Update `module_mapping.json` when modules are renamed, dropped, or merged between academic years.
 - **Role name normalization:** Add WAW→YAML role name mappings in `_WAW_ROLE_MAPPING` in `data_loader.py` when new roles appear.
 - **No guessed data:** When data is genuinely missing, flag it in the output's "Missing Data" or "Assumptions" columns rather than silently defaulting.
+- **Deterministic ordering**: When converting sets/lists to tuples for storage (e.g., saint_modules), use `tuple(sorted(set(...)))` instead of just `set()` or unsorted `list()`. This ensures hash-stable outputs that pass baseline comparison.
 
 ## Public API
 
