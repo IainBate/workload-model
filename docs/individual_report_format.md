@@ -741,7 +741,7 @@ When reviewing individual reports (for output or calculation verification), chec
    - [ ] Engagement = 100h (university-wide)
    - [ ] Personal Development = 75h (mandated)
 
-7. **Calculation Breakdown**
+6. **Calculation Breakdown**
    - [ ] Formula: Total = Teaching + Research (Protected + Additional) + Admin
    - [ ] Research split into protected baseline and additional
    - [ ] Grand total matches sum of components
