@@ -918,7 +918,7 @@ def generate_html_report(results: List[WorkloadResult], year_data: YearData,
 
     for r in sorted_results:
         # Get normative comparison for this staff member's category
-        normative_split = get_normative_split(r["category"])
+        normative_split = config.get_normative_split(r["category"])
         normative_indicator = ""
 
         if normative_split and r.total_hours > 0:
