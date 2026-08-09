@@ -68,14 +68,14 @@ The immutable DTO passed from calculator to output. Contains all pre-computed nu
 
 **Consumer rule:** If you need a number for display that isn't already on `WorkloadResult` or its breakdown dicts, add a field to the breakdown in `workload_calculator.py` and populate it there — never compute it in an output/report file, and never parse it back out of a display string.
 
-### Dead Code Flagged for Phase 2 Decision
+### Dead Code Removed in Phase 2
 
 | Function | Location | Status |
 |----------|----------|--------|
-| `generate_hybrid_dashboard()` | `role_based_reports.py` line ~1518 | Not referenced by any caller |
-| `_generate_finance_report()` | `role_based_reports.py` line ~1892 | Not referenced by any caller |
+| `generate_hybrid_dashboard()` | `role_based_reports.py` line ~1518 | **Removed** (Phase 2) |
+| `_generate_finance_report()` | `role_based_reports.py` line ~1892 | **Removed** (Phase 2) |
 
-These are candidates for removal in Phase 2, pending user decision.
+**Note:** `role_based_reports.py` was removed in Phase 2. Its functionality has been rationalized into `output_generator.py`.
 
 ### Function Size Hotspots (Refactor Targets)
 
