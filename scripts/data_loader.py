@@ -1275,13 +1275,13 @@ def load_all_data(data_dir: str = None,
                 return val
         # Match via canonical name
         for key, val in data_source.items():
-            norm_key = normalize_name(key, reverse_lookup, unknown_callback)
+            norm_key = normalize_name(key, reverse_lookup, unknown_callback, mappings)
             if norm_key == canonical:
                 return val
         return None
 
     for raw_name in sorted_names:
-        canonical = normalize_name(raw_name, reverse_lookup, unknown_callback)
+        canonical = normalize_name(raw_name, reverse_lookup, unknown_callback, mappings)
         if not canonical:
             continue
 
