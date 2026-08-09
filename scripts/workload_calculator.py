@@ -1432,8 +1432,13 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
             result = {}
             for k, v in breakdown_dict.items():
                 if isinstance(v, dict):
-                    # Dict of per-module breakdowns - sum them
-                    result[k] = sum(v.values())
+                    # Check if this is a structured breakdown (like pastoral_breakdown or project_breakdown)
+                    # These have 'total' as the main numeric field and should not be summed
+                    if 'total' in v:
+                        result[k] = v  # Keep structured breakdown as-is
+                    else:
+                        # Dict of per-module breakdowns - sum them
+                        result[k] = sum(v.values())
                 elif isinstance(v, list):
                     result[k] = sum(v)
                 else:
