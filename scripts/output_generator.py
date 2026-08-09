@@ -1416,11 +1416,17 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
 
     total_for_display = r.total_hours
 
+    # Get structured supervision breakdowns (Phase 3b enrichment)
+    pastoral_breakdown = getattr(r, 'pastoral_breakdown', {}) or {}
+    project_breakdown = getattr(r, 'project_breakdown', {}) or {}
+
     teaching_section = format_detail_section(
         "Teaching Activities", r.teaching_hours, teaching_breakdown, "teaching-item",
         is_teaching=True,
         supervision_details=getattr(r, 'supervision_details', ()) or [],
-        known_lecturers_per_module=year_data.known_lecturers_per_module
+        known_lecturers_per_module=year_data.known_lecturers_per_module,
+        pastoral_breakdown=pastoral_breakdown,
+        project_breakdown=project_breakdown
     )
     research_section = format_detail_section(
         "Research Activities", r.research_hours, research_breakdown, "research-item"
