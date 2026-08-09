@@ -873,5 +873,152 @@ class TestAssumptionsTracking:
         assert callable(_load_module_mapping)
 
 
+# --- Tests for Prompt 0: Category field and normative split mapping ---
+
+class TestCategoryField:
+    """Tests for WorkloadResult.category field (Prompt 0)."""
+
+    def test_workload_result_has_category_field(self):
+        """Verify WorkloadResult has a category field."""
+        from data_loader import WorkloadResult
+
+        result = WorkloadResult(
+            name="Test Staff",
+            fte=1.0,
+            total_hours=2000,
+            teaching_hours=800,
+            research_hours=600,
+            admin_hours=400,
+            category="T and S",
+            assumptions=(),
+            missing_data=()
+        )
+
+        assert result.category == "T and S"
+
+    def test_category_set_from_staff_data(self):
+        """Verify calculate_workload sets category from StaffData."""
+        module = ModuleData(
+            name="TestModule",
+            codes=["TEST001"],
+            credits=20,
+            stage=5,
+            contact_hours=40,
+            practicals=0,
+            practical_contact_hours=0,
+            practical_groups=0,
+            practical_weeks=None,
+            assessment_count=1,
+            student_count=100,
+            teachers=["John Smith"],
+            lead_name=None,
+        )
+
+        # Test with ART category
+        staff_art = StaffData(
+            canonical_name="John Smith",
+            fte=1.0,
+            category="ART",
+            roles=[],
+            phd_supervisions=0,
+            phd_co_supervisions=0,
+            phd_assessor_count=0,
+            research_projects=[],
+            saint_modules=[],
+            active=True
+        )
+
+        year_data = YearData.create(
+            year_label="2026-7",
+            modules=[module],
+            student_counts={},
+            assessment_counts={},
+            staff={"John Smith": staff_art},
+            known_lecturers=set(),
+            known_lecturers_per_module={}
+        )
+
+        results = calculate_workload(year_data, validate_input=False)
+        assert len(results) == 1
+        assert results[0].category == "ART"
+
+    def test_category_defaults_to_staff_data_value(self):
+        """Verify category defaults to StaffData.category when not explicitly set."""
+        staff_ts = StaffData(
+            canonical_name="Jane Doe",
+            fte=1.0,
+            category="T and S",
+            roles=[],
+            phd_supervisions=0,
+            phd_co_supervisions=0,
+            phd_assessor_count=0,
+            research_projects=[],
+            saint_modules=[],
+            active=True
+        )
+
+        year_data = YearData.create(
+            year_label="2026-7",
+            modules=[module],
+            student_counts={},
+            assessment_counts={},
+            staff={"Jane Doe": staff_ts},
+            known_lecturers=set(),
+            known_lecturers_per_module={}
+        )
+
+        results = calculate_workload(year_data, validate_input=False)
+        assert len(results) == 1
+        assert results[0].category == "T and S"
+
+
+class TestNormativeSplitMapping:
+    """Tests for normative split mapping functions (Prompt 0)."""
+
+    def test_normative_key_for_category_art(self):
+        """Verify ART maps to TR_staff key."""
+        from config import normative_key_for_category
+
+        assert normative_key_for_category("ART") == "TR_staff"
+
+    def test_normative_key_for_category_t_and_s(self):
+        """Verify T and S maps to TS_staff_lecturer_and_above key."""
+        from config import normative_key_for_category
+
+        assert normative_key_for_category("T and S") == "TS_staff_lecturer_and_above"
+
+    def test_normative_key_for_category_unknown_returns_none(self):
+        """Verify unknown category returns None, not a default."""
+        from config import normative_key_for_category
+
+        assert normative_key_for_category("Unknown Category") is None
+        assert normative_key_for_category("") is None
+
+    def test_get_normative_split_art(self):
+        """Verify get_normative_split returns correct split for ART."""
+        from config import get_normative_split
+
+        split = get_normative_split("ART")
+        assert split is not None
+        assert "teaching_hours" in split
+        assert "research_hours" in split
+        # ART should have teaching=0.40, research_and_scholarship=0.40, citizenship=0.20
+
+    def test_get_normative_split_t_and_s(self):
+        """Verify get_normative_split returns correct split for T and S."""
+        from config import get_normative_split
+
+        split = get_normative_split("T and S")
+        assert split is not None
+        # TS staff should have teaching=0.65, scholarship=0.15, citizenship=0.20
+        assert "teaching_hours" in split
+
+    def test_get_normative_split_unknown_returns_none(self):
+        """Verify get_normative_split returns None for unknown category."""
+        from config import get_normative_split
+
+        assert get_normative_split("Unknown Category") is None
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
