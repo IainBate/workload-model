@@ -630,12 +630,13 @@ def generate_excel_with_formulas(results: List[WorkloadResult], year_data: YearD
 
 
 """
-Generate an HTML report with embedded boxplots and summary table.
+Generate an HTML department dashboard report with workload data and embedded charts.
 
 Creates a self-contained HTML document showing:
-1. Summary chart (teaching, research, administration stacked bars)
-2. Detailed breakdown chart
-3. Staff workload summary table
+1. Department summary block (headcount, FTE totals, category splits)
+2. Needs attention section (staff >10% off nominal or with assumptions/missing data)
+3. Staff table linked to individual reports with normative comparison indicators
+4. Summary and detailed breakdown charts
 
 Args:
     results: List of WorkloadResult objects from calculate_workload()
@@ -643,41 +644,112 @@ Args:
     output_dir: Output directory for HTML file and referenced images
 
 Output File:
-    - workload_report.html: Complete HTML report with embedded charts
+    - workload_report.html: Complete HTML department dashboard
 """
 def generate_html_report(results: List[WorkloadResult], year_data: YearData,
                          output_dir: str = "."):
     """
-    Generate an HTML report with workload data and embedded charts.
-
-    Args:
-        results: List of WorkloadResult objects from calculate_workload()
-        year_data: YearData object containing academic year metadata
-        output_dir: Output directory for HTML file and referenced images
-
-    Output File:
-        - workload_report.html: Complete HTML report with embedded charts
+    Generate an HTML department dashboard report with workload data and embedded charts.
     """
     summary_path = os.path.join(output_dir, "workload_summary_boxplot.png")
     detailed_path = os.path.join(output_dir, "workload_detailed_boxplot.png")
 
-    # CSS with doubled braces to escape f-string interpolation
+    # Calculate department summary statistics
+    total_fte = sum(r.fte for r in results)
+    total_hours = sum(r.total_hours for r in results)
+    avg_hours = total_hours / len(results) if results else 0
+
+    # Group by category and calculate averages
+    category_stats: Dict[str, Dict[str, Any]] = {}
+    for r in results:
+        cat = r.category or "Unknown"
+        if cat not in category_stats:
+            category_stats[cat] = {"count": 0, "fte_sum": 0.0, "hours_sum": 0.0}
+        category_stats[cat]["count"] += 1
+        category_stats[cat]["fte_sum"] += r.fte
+        category_stats[cat]["hours_sum"] += r.total_hours
+
+    # Calculate needs attention staff (off-target >10% or has assumptions/missing data)
+    needs_attention = []
+    for r in results:
+        off_target = False
+        if r.nominal_hours and r.total_hours:
+            variance = abs(r.total_hours - r.nominal_hours) / r.nominal_hours
+            if variance > 0.10:
+                off_target = True
+
+        has_issues = bool(r.assumptions_made or r.missing_data)
+
+        if off_target or has_issues:
+            target = r.nominal_hours or 0
+            deviation = ((r.total_hours - target) / target * 100) if target else 0
+            needs_attention.append({
+                "name": r.name,
+                "category": r.category or "Unknown",
+                "fte": r.fte,
+                "total": r.total_hours,
+                "target": target,
+                "deviation_pct": deviation,
+                "issues": ("Assumptions" if r.assumptions_made else "") +
+                          (", " if (r.assumptions_made and r.missing_data) else "") +
+                          ("Missing Data" if r.missing_data else "")
+            })
+
+    # Build individual report links
+    staff_report_dir = os.path.join(output_dir, "Individual Reports")
+    os.makedirs(staff_report_dir, exist_ok=True)
+
+    # HTML CSS with enhanced styling for department dashboard
     css = (
         "body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 20px; background: #f5f5f5; } "
-        "h1 { color: #333; border-bottom: 2px solid #4CAF50; padding-bottom: 10px; } "
-        "h2 { color: #555; margin-top: 30px; } "
-        ".summary-table { border-collapse: collapse; width: 100%; background: white; box-shadow: 0 1px 3px rgba(0,0,0,0.1); } "
-        ".summary-table th { background: #4CAF50; color: white; padding: 12px 8px; text-align: left; font-size: 12px; } "
-        ".summary-table td { padding: 10px 8px; border-bottom: 1px solid #eee; font-size: 12px; max-width: 300px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } "
-        ".summary-table tr:hover { background: #f9f9f9; } "
-        ".chart-container { background: white; padding: 24px; margin: 15px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border-radius: 8px; } "
+        ".dashboard-container { max-width: 1400px; margin: 0 auto; } "
+        "h1 { color: #333; border-bottom: 3px solid #4CAF50; padding-bottom: 15px; margin-top: 0; } "
+        "h2 { color: #4CAF50; border-left: 5px solid #4CAF50; padding-left: 15px; margin-top: 40px; font-size: 1.4em; } "
+        ".summary-block { background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); color: white; padding: 30px; border-radius: 8px; margin-bottom: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); } "
+        ".summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 25px; margin-top: 20px; } "
+        ".summary-item { text-align: center; } "
+        ".summary-label { font-size: 0.8em; opacity: 0.9; text-transform: uppercase; letter-spacing: 0.5px; } "
+        ".summary-value { font-size: 2em; font-weight: bold; margin-top: 5px; } "
+        ".summary-subtext { font-size: 0.85em; opacity: 0.85; margin-top: 3px; } "
+        ".category-splits { background: white; padding: 25px; border-radius: 8px; margin-bottom: 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); } "
+        ".category-row { display: flex; align-items: center; justify-content: space-between; padding: 15px 0; border-bottom: 1px solid #eee; } "
+        ".category-row:last-child { border-bottom: none; } "
+        ".category-name { font-weight: 600; color: #333; width: 120px; } "
+        ".bar-container { flex-grow: 1; margin: 0 20px; height: 24px; background: #e0e0e0; border-radius: 4px; overflow: hidden; position: relative; } "
+        ".teaching-bar { background: #4CAF50; height: 100%; float: left; } "
+        ".research-bar { background: #2196F3; height: 100%; float: left; } "
+        ".admin-bar { background: #FF9800; height: 100%; float: left; } "
+        ".bar-labels { position: absolute; width: 100%; text-align: center; font-size: 0.75em; line-height: 24px; color: white; font-weight: bold; text-shadow: 0 1px 2px rgba(0,0,0,0.3); } "
+        ".category-count { font-size: 0.9em; color: #666; width: 80px; text-align: right; } "
+        ".needs-attention { background: #fff3e0; border-left: 5px solid #FF9800; padding: 20px; border-radius: 8px; margin-bottom: 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); } "
+        ".needs-attention h2 { color: #ef6c00; border-left-color: #FF9800; margin-top: 0; } "
+        ".attention-list { list-style: none; padding: 0; margin: 15px 0; } "
+        ".attention-item { background: white; padding: 12px 15px; border-radius: 6px; margin-bottom: 8px; display: flex; align-items: center; gap: 12px; } "
+        ".attention-name { font-weight: 600; color: #333; min-width: 140px; } "
+        ".attention-details { flex-grow: 1; font-size: 0.9em; color: #666; } "
+        ".deviation-badge { padding: 2px 8px; border-radius: 12px; font-size: 0.75em; font-weight: bold; white-space: nowrap; } "
+        ".deviation-high { background: #ffebee; color: #c62828; } "
+        ".deviation-moderate { background: #fff3e0; color: #ef6c00; } "
+        ".issues-tag { padding: 2px 8px; border-radius: 4px; font-size: 0.75em; background: #ffe0b2; color: #e65100; white-space: nowrap; } "
+        ".staff-table-container { background: white; padding: 24px; border-radius: 8px; margin-bottom: 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow-x: auto; } "
+        ".staff-table { width: 100%; border-collapse: collapse; font-size: 13px; } "
+        ".staff-table th { background: #4CAF50; color: white; padding: 12px 8px; text-align: left; position: sticky; top: 0; z-index: 10; } "
+        ".staff-table td { padding: 10px 8px; border-bottom: 1px solid #eee; } "
+        ".staff-table tr:hover { background: #f5f9f5; } "
+        ".staff-name-link { color: #1565c0; text-decoration: none; font-weight: 600; } "
+        ".staff-name-link:hover { text-decoration: underline; } "
+        ".normative-indicator { display: inline-block; padding: 3px 10px; border-radius: 4px; font-size: 0.75em; font-weight: bold; margin-left: 8px; white-space: nowrap; } "
+        ".normative-ok { background: #e8f5e9; color: #2e7d32; } "
+        ".normative-warning { background: #fff3e0; color: #ef6c00; } "
+        ".normative-over { background: #ffebee; color: #c62828; } "
+        ".chart-container { background: white; padding: 24px; margin: 15px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-radius: 8px; } "
         ".chart-container img { max-width: 100%; height: auto; display: block; margin: 0 auto; } "
         ".legend { display: flex; gap: 24px; margin: 16px 0; font-size: 13px; flex-wrap: wrap; } "
         ".legend-item { display: flex; align-items: center; gap: 8px; } "
         ".legend-color { width: 18px; height: 18px; border-radius: 3px; } "
-        ".footer { margin-top: 30px; padding: 16px; background: #fff3e0; border-left: 4px solid #FF9800; font-size: 13px; color: #666; } "
-        ".total-row { font-weight: bold; background: #f0f0f0 !important; } "
-        "@media print { body { background: white; } .chart-container img { max-width: 100%; } }"
+        ".footer { margin-top: 30px; padding: 20px; background: #e8f5e9; border-left: 4px solid #4CAF50; font-size: 13px; color: #666; border-radius: 8px; } "
+        ".footer p { margin: 8px 0; } "
+        "@media print { body { background: white; } .staff-table-container { overflow: visible; } }"
     )
 
     html = f"""<!DOCTYPE html>
@@ -685,61 +757,225 @@ def generate_html_report(results: List[WorkloadResult], year_data: YearData,
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Workload Model Report</title>
+    <title>Workload Model - Department Dashboard</title>
     <style>{css}</style>
 </head>
 <body>
-    <h1>Workload Model Report</h1>
-    <p>Generated for academic year <strong>{year_data.year_label}</strong></p>
+    <div class="dashboard-container">
+        <h1>Department Workload Dashboard</h1>
+        <p style="color: #666; margin-bottom: 30px;">Generated for academic year <strong>{year_data.year_label}</strong></p>
 
-    <h2>Summary Chart</h2>
-    <div class="legend">
-        <div class="legend-item"><div class="legend-color" style="background:#4CAF50"></div>Teaching</div>
-        <div class="legend-item"><div class="legend-color" style="background:#2196F3"></div>Research</div>
-        <div class="legend-item"><div class="legend-color" style="background:#FF9800"></div>Administration</div>
-    </div>
-    <div class="chart-container">
-        <img src="workload_summary_boxplot.png" alt="Workload Summary Chart" style="max-width: 1200px;">
-    </div>
+        <!-- Department Summary Block -->
+        <div class="summary-block">
+            <h2 style="color: white; border-left-color: transparent; font-size: 1.4em; margin-top: 0;">Department Summary</h2>
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <span class="summary-label">Total Staff</span>
+                    <span class="summary-value">{len(results)}</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Total FTE</span>
+                    <span class="summary-value">{total_fte:.2f}</span>
+                    <span class="summary-subtext">Full-time equivalents</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Total Hours</span>
+                    <span class="summary-value">{total_hours:,.0f}h</span>
+                    <span class="summary-subtext">Annual workload</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Average Hours</span>
+                    <span class="summary-value">{avg_hours:,.0f}h</span>
+                    <span class="summary-subtext">Per staff member</span>
+                </div>
+                <div class="summary-item">
+                    <span class="summary-label">Nominal Total</span>
+                    <span class="summary-value">{total_fte * NOMINAL_WORKING_HOURS_PER_YEAR:,.0f}h</span>
+                    <span class="summary-subtext">At 100% FTE</span>
+                </div>
+            </div>
+        </div>
 
-    <h2>Detailed Breakdown</h2>
-    <div class="chart-container">
-        <img src="workload_detailed_boxplot.png" alt="Workload Detailed Chart" style="max-width: 1200px;">
-    </div>
-
-    <h2>Staff Workload Table</h2>
-    <table class="summary-table">
-        <thead>
-            <tr>
-                <th>Name</th><th>FTE</th><th>Total</th>
-                <th>Teaching</th><th>Research</th><th>Admin</th>
-                <th>Teaching Detail</th><th>Research Detail</th><th>Admin Detail</th>
-            </tr>
-        </thead>
-        <tbody>
+        <!-- Category Splits -->
+        <div class="category-splits">
+            <h2>Workload Split by Contract Category</h2>
 """
 
+    # Generate category split rows
+    for cat, stats in sorted(category_stats.items()):
+        avg_teaching = (sum(r.teaching_hours for r in results if r.category == cat) / stats["count"]) if stats["count"] > 0 else 0
+        avg_research = (sum(r.research_hours for r in results if r.category == cat) / stats["count"]) if stats["count"] > 0 else 0
+        avg_admin = (sum(r.admin_hours for r in results if r.category == cat) / stats["count"]) if stats["count"] > 0 else 0
+        total_cat_avg = avg_teaching + avg_research + avg_admin
+
+        # Calculate percentages
+        t_pct = (avg_teaching / total_cat_avg * 100) if total_cat_avg > 0 else 0
+        r_pct = (avg_research / total_cat_avg * 100) if total_cat_avg > 0 else 0
+        a_pct = (avg_admin / total_cat_avg * 100) if total_cat_avg > 0 else 0
+
+        # Get normative comparison for this category
+        normative_split = get_normative_split(cat)
+        normative_html = ""
+        if normative_split:
+            norm_teaching = normative_split.get("teaching_hours", 0) * 100
+            norm_research = normative_split.get("research_hours", 0) * 100
+            norm_admin = normative_split.get("admin_hours", 0) * 100
+            normative_html = (
+                f'<div style="margin-top:5px;font-size:0.8em;color:#666">'
+                f'Expected: T{norm_teaching:.0f}% / R{norm_research:.0f}% / A{norm_admin:.0f}%'
+                f'</div>'
+            )
+
+        html += f"""
+            <div class="category-row">
+                <span class="category-name">{cat}</span>
+                <div class="bar-container">
+                    <div class="teaching-bar" style="width: {t_pct:.1f}%"></div>
+                    <div class="research-bar" style="width: {r_pct:.1f}%"></div>
+                    <div class="admin-bar" style="width: {a_pct:.1f}%"></div>
+                    <div class="bar-labels">{t_pct:.0f}% / {r_pct:.0f}% / {a_pct:.0f}%</div>
+                </div>
+                <span class="category-count">{stats["count"]} staff</span>
+            </div>
+            {normative_html}
+"""
+
+    html += """
+        </div>
+
+        <!-- Needs Attention Section -->
+"""
+
+    if needs_attention:
+        html += f"""
+        <div class="needs-attention">
+            <h2>Needs Attention</h2>
+            <p style="margin-top: 0; color: #666;">Staff with >10% variance from nominal hours or with assumptions/missing data:</p>
+            <ul class="attention-list">
+"""
+
+        for item in sorted(needs_attention, key=lambda x: abs(x["deviation_pct"]), reverse=True):
+            deviation_class = "deviation-high" if abs(item["deviation_pct"]) > 20 else "deviation-moderate"
+            deviation_sign = "+" if item["deviation_pct"] >= 0 else ""
+            html += f"""
+                <li class="attention-item">
+                    <span class="attention-name">{item["name"]}</span>
+                    <span class="attention-details">
+                        Total: {item["total"]:,.1f}h (Target: {item["target"]:,.1f}h)
+                        <span class="deviation-badge {deviation_class}">
+                            {deviation_sign}{item["deviation_pct"]:.1f}%
+                        </span>
+                    </span>
+                    {f'<span class="issues-tag">{item["issues"]}</span>' if item["issues"] else ''}
+                </li>
+"""
+        html += """
+            </ul>
+        </div>
+"""
+
+    # Generate individual staff report files and build table HTML
+    staff_reports_generated = []
     for r in results:
-        html += f"""            <tr>
-                <td>{r.name}</td>
-                <td>{r.fte:.2f}</td>
-                <td>{r.total_hours:.1f}</td>
-                <td>{r.teaching_hours:.1f}</td>
-                <td>{r.research_hours:.1f}</td>
-                <td>{r.admin_hours:.1f}</td>
-                <td title="{r.teaching_detail.replace('"', '&quot;')}">{r.teaching_detail[:80]}...</td>
-                <td title="{r.research_detail.replace('"', '&quot;')}">{r.research_detail[:80]}...</td>
-                <td title="{r.admin_detail.replace('"', '&quot;')}">{r.admin_detail[:80]}...</td>
-            </tr>
+        # Create individual report filename from name (sanitize)
+        safe_name = "".join(c if c.isalnum() or c in " -_" else "_" for c in r.name)
+        report_filename = f"{safe_name}_workload.html"
+        staff_report_path = os.path.join(staff_report_dir, report_filename)
+
+        # Generate individual HTML for this staff member
+        individual_html = generate_individual_staff_report(r, year_data)
+        with open(staff_report_path, "w", encoding="utf-8") as f:
+            f.write(individual_html)
+
+        staff_reports_generated.append({
+            "name": r.name,
+            "filename": report_filename,
+            "category": r.category or "Unknown",
+            "fte": r.fte,
+            "total": r.total_hours,
+            "teaching": r.teaching_hours,
+            "research": r.research_hours,
+            "admin": r.admin_hours
+        })
+
+    html += """
+        <!-- Staff Workload Table -->
+        <div class="staff-table-container">
+            <h2>Staff Workload Details</h2>
+            <table class="staff-table">
+                <thead>
+                    <tr>
+                        <th>Name</th><th>Category</th><th>FTE</th><th>Total</th>
+                        <th>Teaching</th><th>Research</th><th>Admin</th>
+                        <th>Normative Comparison</th>
+                    </tr>
+                </thead>
+                <tbody>
 """
 
-    html += """        </tbody>
-    </table>
+    # Sort by category then name for better organization
+    sorted_results = sorted(staff_reports_generated, key=lambda x: (x["category"], x["name"]))
 
-    <div class="footer">
-        <strong>Note:</strong> This report was generated automatically from the Workload Model calculator.
-        Assumptions and missing data are noted in the CSV output.
-        The model is based on the Workload ModelFull Description (Iain Bate, June 2026).
+    for r in sorted_results:
+        # Get normative comparison for this staff member's category
+        normative_split = get_normative_split(r["category"])
+        normative_indicator = ""
+
+        if normative_split and r.total_hours > 0:
+            total_pct = (r.total_hours / NOMINAL_WORKING_HOURS_PER_YEAR) * 100
+            t_cmp = (r.teaching / r.total_hours * 100) - (normative_split.get("teaching_hours", 0) * 100)
+            r_cmp = (r.research / r.total_hours * 100) - (normative_split.get("research_hours", 0) * 100)
+            a_cmp = (r.admin / r.total_hours * 100) - (normative_split.get("admin_hours", 0) * 100)
+
+            # Determine status based on deviation from normative split
+            max_deviation = max(abs(t_cmp), abs(r_cmp), abs(a_cmp))
+            if max_deviation <= 5:
+                normative_indicator = '<span class="normative-indicator normative-ok">On target</span>'
+            elif max_deviation <= 10:
+                normative_indicator = f'<span class="normative-indicator normative-warning">{t_cmp:+.0f}/{r_cmp:+.0f}/{a_cmp:+.0f}% diff</span>'
+            else:
+                normative_indicator = f'<span class="normative-indicator normative-over">{t_cmp:+.0f}/{r_cmp:+.0f}/{a_cmp:+.0f}% diff</span>'
+
+        html += f"""
+                    <tr>
+                        <td><a href="Individual Reports/{r["filename"]}" class="staff-name-link" target="_blank">{r["name"]}</a></td>
+                        <td>{r["category"]}</td>
+                        <td>{r["fte"]:.2f}</td>
+                        <td><strong>{r["total"]:.1f}h</strong></td>
+                        <td>{r["teaching"]:.1f}h</td>
+                        <td>{r["research"]:.1f}h</td>
+                        <td>{r["admin"]:.1f}h</td>
+                        <td>{normative_indicator}</td>
+                    </tr>
+"""
+
+    html += """
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Charts Section -->
+        <div class="chart-container">
+            <h2>Workload Summary</h2>
+            <div class="legend">
+                <div class="legend-item"><div class="legend-color" style="background:#4CAF50"></div>Teaching</div>
+                <div class="legend-item"><div class="legend-color" style="background:#2196F3"></div>Research</div>
+                <div class="legend-item"><div class="legend-color" style="background:#FF9800"></div>Administration</div>
+            </div>
+            <img src="workload_summary_boxplot.png" alt="Workload Summary Chart" style="max-width: 1200px;">
+        </div>
+
+        <div class="chart-container">
+            <h2>Detailed Breakdown</h2>
+            <img src="workload_detailed_boxplot.png" alt="Workload Detailed Chart" style="max-width: 1200px;">
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p><strong>Note:</strong> This dashboard was generated automatically from the Workload Model calculator.</p>
+            <p>Click on staff names to view detailed individual reports. Staff in "Needs Attention" have >10% variance from nominal hours or noted assumptions/missing data.</p>
+            <p>The model is based on the Workload ModelFull Description (Iain Bate, June 2026).</p>
+        </div>
     </div>
 </body>
 </html>
