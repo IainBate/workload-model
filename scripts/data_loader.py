@@ -1331,12 +1331,17 @@ def load_all_data(data_dir: str = None,
     # Convert per-module teacher sets to frozensets
     frozen_per_module = {code: frozenset(teachers) for code, teachers in known_lecturers_per_module.items()}
 
+    # Sort modules by name for deterministic output
+    sorted_modules = sorted(modules, key=lambda m: m.name)
+    # Sort staff by canonical name for deterministic output
+    sorted_staff = dict(sorted(staff.items()))
+
     return YearData(
         year_label=year_label,
-        modules=modules_tuple,
+        modules=tuple(sorted_modules),
         student_counts=dict(merged_student_counts),
         assessment_counts=dict(assessment_counts),
-        staff=tuple(staff.values()),
+        staff=tuple(sorted_staff.values()),
         known_lecturers=frozenset(known_lecturers),
         known_lecturers_per_module=frozen_per_module,
         reverse_lookup=reverse_lookup,
