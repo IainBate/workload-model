@@ -898,6 +898,7 @@ def _format_detailed_section_v2(title: str, detail_text: str, staff_name: Option
                     # Note: we check info (original) not stripped for indent detection
                     if info.startswith('    '):
                         # Continuation line with 4-space indent (Repeated delivery or Total)
+                        print(f"DEBUG: Found continuation line (4 spaces): {repr(info)}")
                         if calculation_breakdown:
                             calculation_breakdown.append((2, info.strip()))
                         else:
@@ -905,6 +906,7 @@ def _format_detailed_section_v2(title: str, detail_text: str, staff_name: Option
                             individual_lines.append([(0, info.strip())])
                     elif info.strip().startswith('-'):
                         # New lecturer type calculation line (starts with "- ")
+                        print(f"DEBUG: Found new calculation line: {repr(info)}")
                         if calculation_breakdown:
                             individual_lines.append(calculation_breakdown[:])
                         calculation_breakdown = [(0, info.strip())]
