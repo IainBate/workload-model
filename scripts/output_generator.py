@@ -1032,6 +1032,502 @@ def _determine_lecturer_type(
     return True  # Module not found in previous year data -> assume new
 
 
+def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData) -> str:
+    """
+    Create HTML content for an individual staff workload report.
+
+    Args:
+        r: WorkloadResult object with calculated workload data
+        year_data: YearData object containing module and staff metadata
+
+    Returns:
+        HTML string for the individual report (without DOCTYPE/html/head tags)
+    """
+    css = (
+        "body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 30px; background: #f5f5f5; } "
+        ".report-container { max-width: 1200px; margin: 0 auto; background: white; padding: 40px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-radius: 8px; } "
+        "h1 { color: #333; border-bottom: 3px solid #4CAF50; padding-bottom: 15px; margin-top: 0; } "
+        "h2 { color: #4CAF50; border-left: 4px solid #4CAF50; padding-left: 12px; margin-top: 35px; } "
+        "h3 { color: #666; margin: 20px 0 10px 0; font-size: 1.1em; } "
+        ".staff-header { background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); color: white; padding: 25px; border-radius: 8px; margin-bottom: 30px; } "
+        ".staff-name { font-size: 2em; font-weight: bold; } "
+        ".staff-meta { display: flex; gap: 40px; margin-top: 10px; font-size: 1.1em; opacity: 0.95; flex-wrap: wrap; } "
+        ".meta-item { display: flex; flex-direction: column; align-items: center; min-width: 80px; } "
+        ".meta-label { font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.8; margin-bottom: 4px; } "
+        ".meta-value { font-weight: bold; font-size: 1.3em; } "
+        ".section-card { background: #f9f9f9; border-radius: 8px; padding: 25px; margin-top: 20px; border-left: 5px solid #4CAF50; } "
+        ".card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; } "
+        ".card-title { font-weight: bold; color: #333; font-size: 1.2em; } "
+        ".card-total { font-size: 1.4em; font-weight: bold; color: #4CAF50; } "
+        ".detail-item { padding: 10px 0; border-bottom: 1px solid #eee; display: grid; grid-template-columns: 2fr 1fr 1.5fr; gap: 15px; align-items: center; } "
+        ".detail-item:last-child { border-bottom: none; } "
+        ".detail-name { font-weight: 500; color: #555; } "
+        ".detail-hours { text-align: right; font-family: monospace; font-size: 1.1em; color: #666; } "
+        ".detail-activity { text-align: center; padding: 4px 12px; border-radius: 4px; font-size: 0.85em; font-weight: bold; } "
+        ".teaching-activity { background: #e3f2fd; color: #1565c0; } "
+        ".research-activity { background: #fff3e0; color: #ef6c00; } "
+        ".admin-activity { background: #fce4ec; color: #c2185b; } "
+        ".calc-breakdown { font-size: 0.9em; color: #777; margin-top: 10px; padding-top: 15px; border-top: 2px dashed #ddd; line-height: 1.6; } "
+        ".assumptions-box, .missing-data-box { background: #fff3e0; border-radius: 8px; padding: 20px; margin-top: 30px; } "
+        ".assumptions-box h3, .missing-data-box h3 { color: #ef6c00; border-left-color: #ff9800; margin-top: 0; } "
+        ".missing-data-box { background: #ffebee; } "
+        ".missing-data-box h3 { color: #c62828; border-left-color: #e53935; } "
+        ".footer { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 2px solid #eee; font-size: 0.85em; color: #888; } "
+    )
+
+    # Get module details if available
+    module_details = getattr(r, 'module_details', []) or []
+
+    # Build a map of module names and count modules with various teaching components
+    module_teaching_map = {}
+    module_count = 0
+    modules_with_practicals = []
+    modules_with_supervision = []
+
+    for detail in module_details:
+        if '(' in detail and ')' in detail:
+            parts = detail.split(' (')
+            if len(parts) >= 2:
+                module_name = parts[0].strip()
+                module_info = '(' + parts[1] if ')' in parts[1] else detail
+                module_count += 1
+
+                if 'practical' in detail.lower():
+                    modules_with_practicals.append(module_name)
+
+                if any(term in detail for term in ['Pastoral:', 'Projects:', 'Supervision:']):
+                    modules_with_supervision.append(module_name)
+
+                module_teaching_map[module_name] = {
+                    'info': module_info,
+                    'has_practicals': 'practical' in detail.lower(),
+                    'has_supervision': any(term in detail for term in ['Pastoral:', 'Projects:', 'Supervision:'])
+                }
+                if 'per teacher' in detail.lower():
+                    teacher_match = re.search(r'([\d.]+)\s*/\s*teacher', detail, re.IGNORECASE)
+                    if teacher_match:
+                        num_teachers = int(round(float(teacher_match.group(1))))
+                        module_teaching_map[module_name]['num_teachers'] = num_teachers
+
+    def format_detail_section(title: str, hours: float, breakdown: Dict[str, float], css_class: str,
+                              is_teaching: bool = False, supervision_details: Tuple[str, ...] = (),
+                              known_lecturers_per_module: Optional[Dict[str, frozenset]] = None) -> str:
+        """Format a detail section for the workload report HTML."""
+        if not breakdown or all(v == 0 for v in breakdown.values()):
+            return f"""<div class="section-card {css_class}">
+                <div class="card-header">
+                    <span class="card-title">{title}</span>
+                    <span class="card-total">{hours:.1f}h</span>
+                </div>
+                <p>No activities recorded for this category.</p>
+            </div>"""
+
+        if is_teaching:
+            return format_teaching_section(title, hours, breakdown, css_class, supervision_details,
+                                            known_lecturers_per_module)
+
+        def get_category(item_name: str) -> Optional[str]:
+            if item_name.startswith("grant_"):
+                return "Research Grants"
+            elif item_name in ["primary_research_allowance", "protected_research_baseline"]:
+                return "Research Allowances"
+            elif item_name in ["phd_supervision", "primary_supervisor", "co_supervisor", "assessor"]:
+                if item_name == "phd_supervision":
+                    return None
+                return "PhD Supervision"
+            else:
+                return "Other"
+
+        categories = {}
+        for name, value in breakdown.items():
+            if value > 0:
+                cat = get_category(name)
+                if cat is None:
+                    continue
+                if cat not in categories:
+                    categories[cat] = []
+                categories[cat].append((name, value))
+
+        items_html_parts = []
+
+        for category_name, items in sorted(categories.items()):
+            cat_total = sum(v for _, v in items)
+            items_html_parts.append(f"""<div style="margin-bottom:20px;">
+                <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #4CAF50;padding-left:10px;">{category_name} ({cat_total:.1f}h)</h4>""")
+
+            if len(items) == 1:
+                item_name, item_value = items[0]
+                display_names = {
+                    "service_points": "University committee work",
+                    "engagement": "General departmental engagement, e.g. meetings and email",
+                    "personal_development": "Personal Development",
+                    "protected_research_baseline": "Protected research baseline"
+                }
+                display_name = display_names.get(item_name, item_name.replace('_', ' ').title())
+                items_html_parts.append(f"""<div class="detail-item {css_class}">
+                    <span class="detail-name">{display_name}</span>
+                    <span class="detail-hours">{item_value:.1f}h</span>
+                    <span class="detail-activity {css_class.replace('-item', '-') + 'activity'}"></span>
+                </div>""")
+            else:
+                for item_name, item_value in sorted(items, key=lambda x: -x[1]):
+                    display_name = item_name.replace('_', ' ').title()
+                    if item_name.startswith("grant_"):
+                        project_id = item_name.replace('grant_', '')
+                        if hasattr(r, 'grant_titles') and r.grant_titles:
+                            display_name = r.grant_titles.get(project_id, f"Grant {project_id}")
+                        else:
+                            display_name = f"Grant {project_id}"
+                    items_html_parts.append(f"""<div class="detail-item {css_class}">
+                        <span class="detail-name">{display_name}</span>
+                        <span class="detail-hours">{item_value:.1f}h</span>
+                        <span class="detail-activity {css_class.replace('-item', '-') + 'activity'}"></span>
+                    </div>""")
+
+            items_html_parts.append("</div>")
+
+        items_html = ''.join(items_html_parts)
+
+        return f"""<div class="section-card {css_class}">
+            <div class="card-header">
+                <span class="card-title">{title}</span>
+                <span class="card-total">{hours:.1f}h</span>
+            </div>
+            {items_html}
+            <p style="font-size:0.85em;color:#666;padding-top:10px;">Subtotal: {hours:.1f}h</p>
+        </div>"""
+
+    def format_teaching_section(title: str, hours: float, breakdown: Dict[str, float], css_class: str,
+                                supervision_details: Tuple[str, ...] = (),
+                                known_lecturers_per_module: Optional[Dict[str, frozenset]] = None) -> str:
+        """Format teaching section with hierarchical structure."""
+        import re
+
+        items_html_parts = []
+
+        module_info_list = []
+        for detail in module_details or []:
+            match = re.search(r'([A-Z]+(?:\d+)?)\s+\(([^)]+)\)', detail)
+            if match:
+                stage_or_name = match.group(1)
+                code_or_info = match.group(2)
+
+                info_match = re.search(r'\)\s*(.+)$', detail)
+                info = info_match.group(1) if info_match else ""
+
+                module_info_list.append({
+                    'stage': stage_or_name,
+                    'code': code_or_info,
+                    'info': info.strip(),
+                    'detail': detail
+                })
+
+        stages = {}
+        for mod in module_info_list:
+            stage = mod['stage']
+            if stage not in stages:
+                stages[stage] = []
+            stages[stage].append(mod)
+
+        code_to_detail = {mod['stage']: mod for mod in module_info_list}
+
+        for stage in sorted(stages.keys()):
+            modules_in_stage = stages[stage]
+
+            items_html_parts.append(f"""<div style="margin-bottom:25px;">
+                <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #2196F3;padding-left:10px;">{stage} Modules ({len(modules_in_stage)} module(s))</h4>""")
+
+            for mod in modules_in_stage:
+                code = mod['code']
+                info = mod['info']
+
+                detail = mod['detail']
+
+                is_new_lecturer = _determine_lecturer_type(r.name, stage, known_lecturers_per_module or {})
+
+                module_name = stage
+                module_breakdown = getattr(r, 'teaching_module_breakdowns', {}).get(module_name, {})
+                delivery_per_module = module_breakdown.get('teaching', 0)
+                practicals_per_module = module_breakdown.get('practicals', 0)
+                assessment_setting_per_module = module_breakdown.get('assessment_setting', 0)
+                marking_per_module = module_breakdown.get('marking', 0)
+
+                if delivery_per_module > 0:
+                    lecturer_type = "New lecturer (5x)" if is_new_lecturer else "Standard (2.5x)"
+                    items_html_parts.append(f"""<div class="detail-item {css_class}">
+                        <span class="detail-name">Delivery (Lectures)</span>
+                        <span class="detail-hours">{delivery_per_module:.1f}h @ {lecturer_type}</span>
+                        <span class="detail-activity teaching-activity"></span>
+                    </div>""")
+                    if is_new_lecturer:
+                        delivery_base = delivery_per_module / 5.0
+                        content_dev = delivery_per_module - delivery_base
+                        items_html_parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+                            <span class="detail-name" style="color:#333;">Calculation</span>
+                            <span class="detail-hours">{delivery_base:.1f}h base @ 2.5x + {content_dev:.1f}h content dev = {delivery_per_module:.0f}h</span>
+                        </div>""")
+                    else:
+                        items_html_parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+                            <span class="detail-name" style="color:#333;">Calculation</span>
+                            <span class="detail-hours">{delivery_per_module:.1f}h @ Standard (2.5x)</span>
+                        </div>""")
+
+                if practicals_per_module > 0:
+                    items_html_parts.append(f"""<div class="detail-item {css_class}">
+                        <span class="detail-name">Practical Sessions</span>
+                        <span class="detail-hours">{practicals_per_module:.1f}h</span>
+                        <span class="detail-activity teaching-activity"></span>
+                    </div>""")
+
+                    has_practical_details = False
+                    practical_detail_text = detail if 'First time delivery' in detail else ''
+
+                    if practical_detail_text:
+                        items_html_parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+                            <span class="detail-name" style="color:#333;">Practical</span>""")
+
+                        detail_lines = practical_detail_text.split(';')
+
+                        for line in detail_lines:
+                            line = line.strip()
+                            if not line:
+                                continue
+                            if 'First time delivery:' in line:
+                                items_html_parts.append(f"""<div style="padding-left:20px;">
+                                    <span class="detail-name" style="color:#1565c0;">{line}</span>
+                                </div>""")
+                            elif '- Standard lecturers' in line or '- New/new-content lecturer' in line:
+                                items_html_parts.append(f"""<div style="padding-left:20px;">
+                                    <span class="detail-name" style="color:#1565c0;">{line}</span>
+                                </div>""")
+                            elif 'Repeated sessions:' in line:
+                                items_html_parts.append(f"""<div style="padding-left:20px;">
+                                    <span class="detail-name" style="color:#ef6c00;">{line}</span>
+                                </div>""")
+                            elif '- Total repeat rate:' in line:
+                                hrs_match = re.search(r'(\d+\.?\d*)h/week', line)
+                                if hrs_match:
+                                    total_repeat_hrs = float(hrs_match.group(1))
+                                    items_html_parts.append(f"""<div style="padding-left:20px;">
+                                        <span class="detail-name" style="color:#ef6c00;">{line}</span>
+                                    </div>""")
+
+                        items_html_parts.append("""</div>""")
+
+                    if not has_practical_details:
+                        first_session_rate = config.TEACHING_MULTIPLIERS.get('problem_class_seminar_practical', 2.5)
+                        rep_rate = config.REPETITION_MULTIPLIER
+                        items_html_parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+                            <span class="detail-name" style="color:#333;">Calculation</span>
+                            <span class="detail-hours">{first_session_rate}x first session (standard), {rep_rate}x repeats</span>
+                        </div>""")
+
+                if assessment_setting_per_module > 0:
+                    items_html_parts.append(f"""<div class="detail-item {css_class}">
+                        <span class="detail-name">Assessment Setting</span>
+                        <span class="detail-hours">{assessment_setting_per_module:.1f}h</span>
+                        <span class="detail-activity teaching-activity"></span>
+                    </div>""")
+                    items_html_parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+                        <span class="detail-name" style="color:#333;">Calculation</span>
+                        <span class="detail-hours">{assessment_setting_per_module:.1f}h total (main + resit)</span>
+                    </div>""")
+
+                if marking_per_module > 0:
+                    items_html_parts.append(f"""<div class="detail-item {css_class}">
+                        <span class="detail-name">Assessment Marking</span>
+                        <span class="detail-hours">{marking_per_module:.1f}h</span>
+                        <span class="detail-activity teaching-activity"></span>
+                    </div>""")
+                    items_html_parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+                        <span class="detail-name" style="color:#333;">Calculation</span>
+                        <span class="detail-hours">{marking_per_module:.1f}h total (initial + resit)</span>
+                    </div>""")
+
+                items_html_parts.append("</div>")
+
+            items_html_parts.append("</div>")
+
+        supervision_details_list = supervision_details or []
+        if supervision_details_list:
+            past_hours_total = 0.0
+            proj_hours_total = 0.0
+            past_students_total = 0
+            proj_projects_total = 0
+
+            for detail in supervision_details_list:
+                past_match = re.search(r'(?:.*?:\s*)?Pastoral:\s*(\d+(?:\.\d+)?)\s+students\s*x\s*(\d+(?:\.\d+)?)h\s*=\s*(\d+(?:\.\d+)?)h', detail)
+                if past_match:
+                    past_students_total += int(float(past_match.group(1)))
+                    past_hours_total += float(past_match.group(3))
+
+                proj_match = re.search(r'(?:.*?:\s*)?Projects:\s*(\d+(?:\.\d+)?)\s+projects\s+x\s+(UG|MSc)\s*\((\d+(?:\.\d+)?)h\)\s*=\s*(\d+(?:\.\d+)?)h', detail)
+                if proj_match:
+                    proj_projects_total += int(float(proj_match.group(1)))
+                    proj_hours_total += float(proj_match.group(4))
+
+            items_html_parts.append(f"""<div style="margin-bottom:25px;">
+                <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #FF9800;padding-left:10px;">Pastoral Supervision ({past_hours_total:.1f}h)</h4>
+                <div style="margin-left:20px;">
+                    <div class="detail-item {css_class}">
+                        <span class="detail-name">Students</span>
+                        <span class="detail-hours">{past_students_total} students x {config.SUPERVISION_MULTIPLIERS['pastoral']}h each = {past_hours_total:.1f}h</span>
+                        <span class="detail-activity admin-activity"></span>
+                    </div>
+                </div>
+            </div>""")
+
+            items_html_parts.append(f"""<div style="margin-bottom:25px;">
+                <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #FF9800;padding-left:10px;">Project Supervision ({proj_hours_total:.1f}h)</h4>
+                <div style="margin-left:20px;">
+                    <div class="detail-item {css_class}">
+                        <span class="detail-name">Projects</span>
+                        <span class="detail-hours">{proj_projects_total} projects x UG = {proj_hours_total:.1f}h</span>
+                        <span class="detail-activity admin-activity"></span>
+                    </div>
+                </div>
+            </div>""")
+
+        project_setting = breakdown.get('project_setting', 0)
+        if project_setting > 0:
+            items_html_parts.append(f"""<div class="detail-item {css_class}">
+                <span class="detail-name">Project Setting (fixed)</span>
+                <span class="detail-hours">{project_setting:.1f}h</span>
+                <span class="detail-activity teaching-activity"></span>
+            </div>""")
+
+        min_teaching = breakdown.get('minimum_admin_load', 0)
+        if min_teaching > 0:
+            items_html_parts.append(f"""<div class="detail-item {css_class}">
+                <span class="detail-name">Minimum Admin Teaching Load</span>
+                <span class="detail-hours">{min_teaching:.1f}h</span>
+                <span class="detail-activity teaching-activity"></span>
+            </div>""")
+
+        items_html = ''.join(items_html_parts)
+
+        return f"""<div class="section-card {css_class}">
+            <div class="card-header">
+                <span class="card-title">{title}</span>
+                <span class="card-total">{hours:.1f}h</span>
+            </div>
+            {items_html}
+            <p style="font-size:0.85em;color:#666;padding-top:10px;">Subtotal: {hours:.1f}h</p>
+        </div>"""
+
+    # Calculate breakdown totals
+    teaching_breakdown = getattr(r, 'teaching_breakdown', {}) or {}
+    research_breakdown = getattr(r, 'research_breakdown', {}) or {}
+    admin_breakdown = getattr(r, 'admin_breakdown', {}) or {}
+
+    # Calculate nominal hours if not set
+    nominal_hours = r.nominal_hours or config.NOMINAL_WORKING_HOURS_PER_YEAR * r.fte
+
+    total_for_display = r.total_hours
+
+    teaching_section = format_detail_section(
+        "Teaching Activities", r.teaching_hours, teaching_breakdown, "teaching-item",
+        is_teaching=True,
+        supervision_details=getattr(r, 'supervision_details', ()) or [],
+        known_lecturers_per_module=year_data.known_lecturers_per_module
+    )
+    research_section = format_detail_section(
+        "Research Activities", r.research_hours, research_breakdown, "research-item"
+    )
+    admin_section = format_detail_section(
+        "Admin Activities", r.admin_hours, admin_breakdown, "admin-item"
+    )
+
+    subtotal = r.teaching_hours + r.research_hours + r.admin_hours
+
+    # Format assumptions
+    if hasattr(r, 'assumptions') and r.assumptions:
+        assumptions_items = ''.join(f'<li>{a}</li>' for a in r.assumptions)
+        assumptions_section = f"""<div class="assumptions-box">
+            <h3>Assumptions Made</h3>
+            <ul>{assumptions_items}</ul>
+        </div>"""
+    else:
+        assumptions_section = ""
+
+    # Format missing data
+    if hasattr(r, 'missing_data') and r.missing_data:
+        missing_items = ''.join(f'<li>{m}</li>' for m in r.missing_data)
+        missing_data_section = f"""<div class="missing-data-box">
+            <h3>Missing Data</h3>
+            <ul>{missing_items}</ul>
+            <p>Data marked as missing may affect the accuracy of this report.</p>
+        </div>"""
+    else:
+        missing_data_section = ""
+
+    # Generate HTML using f-string
+    html = f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workload Report - {r.name}</title>
+    <style>{css}</style>
+</head>
+<body>
+    <div class="report-container">
+        <div class="staff-header">
+            <div class="staff-name">{r.name}</div>
+            <div class="staff-meta" style='flex-wrap:wrap;gap:20px'>
+                <div class="meta-item">
+                    <span class="meta-label">FTE</span>
+                    <span class="meta-value">{r.fte:.2f}</span>
+                </div>
+                <div class="meta-item">
+                    <span class="meta-label">Nominal Hours</span>
+                    <span class="meta-value">{nominal_hours:.0f}h</span>
+                </div>
+            </div>
+
+            <!-- Total workload in green band at top of staff header -->
+            <div style="margin-top:20px;padding-top:15px;border-top:1px solid rgba(255,255,255,0.3);">
+                <span class="label" style="color:white;font-size:1.2em;font-weight:bold;">Total Workload:</span>
+                <span class="value" style="color:white;font-size:2em;font-weight:bold;">{total_for_display:.1f} hours</span>
+            </div>
+        </div>
+
+        {teaching_section}
+        {research_section}
+        {admin_section}
+
+        <h2>Calculation Breakdown</h2>
+        <div class="section-card">
+            <p>The workload calculation follows the model formula:</p>
+            <p style="font-family: monospace; font-size: 1.1em; text-align: center; margin: 20px 0;">
+                Total = Teaching + Research (Protected + Additional) + Admin
+            </p>
+            <div class="calc-breakdown">
+                <h3>Summary Totals</h3>
+                <ul>
+                    <li><strong>Teaching:</strong> {r.teaching_hours:.1f}h</li>
+                    <li><strong>Research (protected baseline):</strong> {config.PROTECTED_RESEARCH_BASELINE * r.fte:.1f}h</li>
+                    <li><strong>Research (additional - grants, supervision):</strong> {max(0, r.research_hours - config.PROTECTED_RESEARCH_BASELINE * r.fte):.1f}h</li>
+                    <li><strong>Admin:</strong> {r.admin_hours:.1f}h</li>
+                </ul>
+                <p style="margin-top:20px;"><em>Total: {total_for_display:.1f} hours = {r.teaching_hours:.1f} + {config.PROTECTED_RESEARCH_BASELINE * r.fte:.1f} + {max(0, r.research_hours - config.PROTECTED_RESEARCH_BASELINE * r.fte):.1f} + {r.admin_hours:.1f}</em></p>
+            </div>
+        </div>
+
+        {assumptions_section}
+        {missing_data_section}
+
+        <div class="footer">
+            <p>Generated on 2026-07-14 for academic year {year_data.year_label}</p>
+            <p><em>This report was automatically generated by the Workload Model calculator.</em></p>
+        </div>
+    </div>
+</body>
+</html>"""
+
+    return html
+
+
 def generate_per_staff_reports(results: List[WorkloadResult], year_data: YearData,
                                 output_dir: str = None):
     """
@@ -1058,41 +1554,6 @@ def generate_per_staff_reports(results: List[WorkloadResult], year_data: YearDat
     # Use the Individual Reports directory
     staff_reports_dir = os.path.join(output_dir, "Individual Reports")
     os.makedirs(staff_reports_dir, exist_ok=True)
-
-    css = (
-        "body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; margin: 30px; background: #f5f5f5; } "
-        ".report-container { max-width: 1200px; margin: 0 auto; background: white; padding: 40px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); border-radius: 8px; } "
-        "h1 { color: #333; border-bottom: 3px solid #4CAF50; padding-bottom: 15px; margin-top: 0; } "
-        "h2 { color: #4CAF50; border-left: 4px solid #4CAF50; padding-left: 12px; margin-top: 35px; } "
-        "h3 { color: #666; margin: 20px 0 10px 0; font-size: 1.1em; } "
-        ".staff-header { background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%); color: white; padding: 25px; border-radius: 8px; margin-bottom: 30px; } "
-        ".staff-name { font-size: 2em; font-weight: bold; } "
-        ".staff-meta { display: flex; gap: 40px; margin-top: 10px; font-size: 1.1em; opacity: 0.95; } "
-        ".meta-item { display: flex; flex-direction: column; align-items: center; min-width: 80px; } "
-        ".meta-label { font-size: 0.75em; text-transform: uppercase; letter-spacing: 0.5px; opacity: 0.8; margin-bottom: 4px; } "
-        ".meta-value { font-weight: bold; font-size: 1.3em; } "
-        ".section-card { background: #f9f9f9; border-radius: 8px; padding: 25px; margin-top: 20px; border-left: 5px solid #4CAF50; } "
-        ".card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; } "
-        ".card-title { font-weight: bold; color: #333; font-size: 1.2em; } "
-        ".card-total { font-size: 1.4em; font-weight: bold; color: #4CAF50; } "
-        ".detail-item { padding: 10px 0; border-bottom: 1px solid #eee; display: grid; grid-template-columns: 2fr 1fr 1.5fr; gap: 15px; align-items: center; } "
-        ".detail-item:last-child { border-bottom: none; } "
-        ".detail-name { font-weight: 500; color: #555; } "
-        ".detail-hours { text-align: right; font-family: monospace; font-size: 1.1em; color: #666; } "
-        ".detail-activity { text-align: center; padding: 4px 12px; background: #e8f5e9; border-radius: 4px; font-size: 0.85em; color: #2e7d32; } "
-        ".teaching-item .detail-activity { background: #e3f2fd; color: #1565c0; } "
-        ".research-item .detail-activity { background: #fff3e0; color: #ef6c00; } "
-        ".admin-item .detail-activity { background: #fce4ec; color: #c2185b; } "
-        ".calc-breakdown { font-size: 0.9em; color: #777; margin-top: 10px; padding-top: 15px; border-top: 2px dashed #ddd; line-height: 1.6; } "
-        ".assumptions-box, .missing-data-box { background: #fff3e0; border-radius: 8px; padding: 20px; margin-top: 30px; } "
-        ".assumptions-box h3, .missing-data-box h3 { color: #ef6c00; border-left-color: #ff9800; margin-top: 0; } "
-        ".missing-data-box { background: #ffebee; } "
-        ".missing-data-box h3 { color: #c62828; border-left-color: #e53935; } "
-        ".footer { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 2px solid #eee; font-size: 0.85em; color: #888; } "
-        ".total-bar { display: flex; align-items: center; gap: 15px; margin-top: 30px; padding: 20px; background: linear-gradient(90deg, #4CAF50 0%, #2e7d32 100%); border-radius: 8px; } "
-        ".total-bar .label { color: white; font-size: 1.2em; font-weight: bold; min-width: 150px; } "
-        ".total-bar .value { color: white; font-size: 2em; font-weight: bold; flex-grow: 1; text-align: right; }"
-    )
 
     for r in results:
         # Get module details if available
