@@ -457,6 +457,113 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
             admin_html += f"<p style='font-size:0.85em;color:#666;padding-top:10px;text-align:right'>Subtotal: {admin_subtotal:.1f}h</p>"
             admin_html += "</div>"
 
+        # Calculate delta (over/under nominal hours)
+        delta = r.total_hours - nominal_hours
+        delta_color = "#4CAF50" if delta <= 0 else "#F44336"
+        delta_sign = "" if delta <= 0 else "+"
+
+        # Get normative split for this category
+        normative_split = config.get_normative_split(r.category)
+        if normative_split:
+            expected_teaching_pct = normative_split.get("teaching_hours", 0) * 100
+            expected_research_pct = normative_split.get("research_hours", 0) * 100
+            expected_admin_pct = normative_split.get("admin_hours", 0) * 100
+        else:
+            # Default split if category not found (50/30/20)
+            expected_teaching_pct = 50.0
+            expected_research_pct = 30.0
+            expected_admin_pct = 20.0
+
+        # Calculate actual percentages
+        total_for_percentages = r.teaching_hours + r.research_hours + r.admin_hours
+        if total_for_percentages > 0:
+            actual_teaching_pct = (r.teaching_hours / total_for_percentages) * 100
+            actual_research_pct = (r.research_hours / total_for_percentages) * 100
+            actual_admin_pct = (r.admin_hours / total_for_percentages) * 100
+        else:
+            actual_teaching_pct = actual_research_pct = actual_admin_pct = 0
+
+        # Build normative comparison HTML
+        normative_html = f"""
+        <div class="section-card">
+            <div class="card-header">
+                <span class="card-title">Normative Split Comparison</span>
+                <span class="card-total">{r.category or "Unknown"}</span>
+            </div>
+            <table class="module-table">
+                <tr>
+                    <th>Category</th>
+                    <th style="text-align:right">Expected (%)</th>
+                    <th style="text-align:right">Actual (%)</th>
+                    <th style="text-align:right">Difference</th>
+                </tr>
+                <tr>
+                    <td>Teaching</td>
+                    <td style="text-align:right">{expected_teaching_pct:.1f}%</td>
+                    <td style="text-align:right">{actual_teaching_pct:.1f}%</td>
+                    <td style="text-align:right;color:{'#4CAF50' if abs(actual_teaching_pct - expected_teaching_pct) <= 5 else '#F44336'}">{actual_teaching_pct - expected_teaching_pct:+.1f}%</td>
+                </tr>
+                <tr>
+                    <td>Research</td>
+                    <td style="text-align:right">{expected_research_pct:.1f}%</td>
+                    <td style="text-align:right">{actual_research_pct:.1f}%</td>
+                    <td style="text-align:right;color:{'#4CAF50' if abs(actual_research_pct - expected_research_pct) <= 5 else '#F44336'}">{actual_research_pct - expected_research_pct:+.1f}%</td>
+                </tr>
+                <tr>
+                    <td>Admin</td>
+                    <td style="text-align:right">{expected_admin_pct:.1f}%</td>
+                    <td style="text-align:right">{actual_admin_pct:.1f}%</td>
+                    <td style="text-align:right;color:{'#4CAF50' if abs(actual_admin_pct - expected_admin_pct) <= 5 else '#F44336'}">{actual_admin_pct - expected_admin_pct:+.1f}%</td>
+                </tr>
+            </table>
+        </div>
+        """
+
+        # Build assumptions and missing data sections
+        assumptions_html = ""
+        if r.assumptions:
+                    assumptions_html = f"""
+        <div class="section-card">
+            <div class="card-header">
+                <span class="card-title">Assumptions Made</span>
+            </div>
+            <ul style='font-size:0.9em;color:#666;padding-left:20px;margin-top:15px'>
+                {''.join(f'<li>{a}</li>' for a in r.assumptions)}
+            </ul>
+        </div>
+                        """
+        else:
+            assumptions_html = f"""
+        <div class="section-card" style='background:#e8f5e9;border-left-color:#4CAF50'>
+            <div class="card-header">
+                <span class="card-title">Assumptions</span>
+                <span class="status-badge status-ok" style='font-size:1em'>No assumptions needed</span>
+            </div>
+        </div>
+                        """
+
+        missing_data_html = ""
+        if r.missing_data:
+                    missing_data_html = f"""
+        <div class="section-card">
+            <div class="card-header">
+                <span class="card-title">Missing Data</span>
+            </div>
+            <ul style='font-size:0.9em;color:#666;padding-left:20px;margin-top:15px'>
+                {''.join(f'<li>{m}</li>' for m in r.missing_data)}
+            </ul>
+        </div>
+                        """
+        else:
+            missing_data_html = f"""
+        <div class="section-card" style='background:#e8f5e9;border-left-color:#4CAF50'>
+            <div class="card-header">
+                <span class="card-title">Data Quality</span>
+                <span class="status-badge status-ok" style='font-size:1em'>Complete data</span>
+            </div>
+        </div>
+                        """
+
         html = f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -466,34 +573,46 @@ def generate_individual_reports(results: List[WorkloadResult], year_data: YearDa
     <style>{css}</style>
 </head>
 <body>
-    <div class="report-container">
-        <div class="staff-header">
-            <div class="staff-name">{r.name}</div>
-            <div class="staff-meta">
-                <div class="meta-item">
-                    <span class="meta-label">FTE</span>
-                    <span class="meta-value">{r.fte:.2f}</span>
-                </div>
-                <div class="meta-item">
-                    <span class="meta-label">Nominal Hours</span>
-                    <span class="meta-value">{nominal_hours:.0f}h</span>
-                </div>
-                <div class="meta-item">
-                    <span class="meta-label">Total Workload</span>
-                    <span class="meta-value" style="font-size:1.5em">{r.total_hours:.1f}h</span>
-                </div>
+    <!-- Headline Summary -->
+    <div class="staff-header">
+        <div class="staff-name">{r.name}</div>
+        <div class="staff-meta" style='flex-wrap:wrap;gap:20px'>
+            <div class="meta-item">
+                <span class="meta-label">FTE</span>
+                <span class="meta-value">{r.fte:.2f}</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Category</span>
+                <span class="meta-value" style='font-size:1em'>{r.category or "N/A"}</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label">Nominal Hours</span>
+                <span class="meta-value">{nominal_hours:.0f}h</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label" style='color:{delta_color}'>Total Workload</span>
+                <span class="meta-value" style="font-size:1.5em;color:{delta_color}">{r.total_hours:.1f}h</span>
+            </div>
+            <div class="meta-item">
+                <span class="meta-label" style='color:{delta_color}'>Delta</span>
+                <span class="meta-value" style="font-size:1.3em;color:{delta_color}">{delta_sign}{delta:.1f}h</span>
             </div>
         </div>
+    </div>
+
+    {normative_html}
 
         {teaching_html}
 
         {research_html}
         {admin_html}
 
-        <div class="footer">
-            <p>Generated for academic year {year_data.year_label}</p>
-            <p><em>This report shows module-by-module breakdown for validation.</em></p>
-        </div>
+        {assumptions_html}
+        {missing_data_html}
+
+    <div class="footer">
+        <p>Generated for academic year {year_data.year_label}</p>
+        <p><em>This report shows module-by-module breakdown for validation.</em></p>
     </div>
 </body>
 </html>"""
