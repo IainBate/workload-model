@@ -468,7 +468,7 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
                 weekly_hrs = individual_practical_hours[t]
                 total_hrs = weekly_hrs * practical_week_count
                 new_lecturer_repeat_hrs = (repeat_sessions / n_teachers) * config.REPETITION_MULTIPLIER
-                # Clean summary: just show the final calculation result
+                # Clean summary: just show the final calculation result with indented Total line
                 practical_details.append(
                     f"  - First delivery: {contact_per_practical:.1f}h/week lecture @ 5x (new content)"
                 )
@@ -484,7 +484,7 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
                 weekly_hrs = individual_practical_hours[t]
                 total_hrs = weekly_hrs * practical_week_count
                 standard_repeat_hrs = (repeat_sessions / n_teachers) * config.REPETITION_MULTIPLIER
-                # Clean summary: just show the final calculation result
+                # Clean summary: just show the final calculation result with indented Total line
                 practical_details.append(
                     f"  - First delivery: {contact_per_practical:.1f}h/week lecture @ 2.5x"
                 )
