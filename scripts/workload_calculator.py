@@ -1403,6 +1403,7 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
             teaching_hours=teaching_hours,
             research_hours=research_total,
             admin_hours=admin_hours,
+            category=staff.category,
             assumptions=tuple(assumptions),  # Convert to tuple for frozen dataclass
             missing_data=tuple(missing_data),  # Convert to tuple for frozen dataclass
             teaching_detail=teaching_detail_str,
