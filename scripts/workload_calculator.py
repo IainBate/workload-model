@@ -466,14 +466,14 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
                 total_hrs = weekly_hrs * practical_week_count
                 new_lecturer_repeat_hrs = (repeat_sessions / n_teachers) * config.REPETITION_MULTIPLIER
                 practical_details.append(
-                    f"<small>- First time delivery: {first_time_sessions} group(s) (one per lecturer). {contact_per_practical:.1f}h x 2.5 multiplier per week.</small>"
+                    f"- First time delivery: {first_time_sessions} group(s) (one per lecturer). {contact_per_practical:.1f}h x 2.5 multiplier per week."
                 )
                 practical_details.append(
-                    f"<small>- Repeated sessions: {repeat_sessions} group(s) without first-session slots ({repeat_sessions/n_teachers:.1f} group(s)/lecturer @ 1.5x)</small>"
+                    f"- Repeated sessions: {repeat_sessions} group(s) without first-session slots ({repeat_sessions/n_teachers:.1f} group(s)/lecturer @ 1.5x)"
                 )
                 # Only show indented Total line (no First delivery or Repeated delivery intermediate lines)
                 practical_details.append(
-                    f"<p style='margin: 4px 0 0 3em;'><small>Total: {weekly_hrs:.1f}h/week = {total_hrs:.1f}h total</small></p>"
+                    f"<p style='margin: 4px 0 0 3em;'>Total: {weekly_hrs:.1f}h/week = {total_hrs:.1f}h total</p>"
                 )
             elif standard_lecturers_practical:
                 # Only standard lecturers - show single breakdown
@@ -482,14 +482,14 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
                 total_hrs = weekly_hrs * practical_week_count
                 standard_repeat_hrs = (repeat_sessions / n_teachers) * config.REPETITION_MULTIPLIER
                 practical_details.append(
-                    f"<small>- First time delivery: {first_time_sessions} group(s) (one per lecturer). {contact_per_practical:.1f}h x 2.5 multiplier per week.</small>"
+                    f"- First time delivery: {first_time_sessions} group(s) (one per lecturer). {contact_per_practical:.1f}h x 2.5 multiplier per week."
                 )
                 practical_details.append(
-                    f"<small>- Repeated sessions: {repeat_sessions} group(s) without first-session slots ({repeat_sessions/n_teachers:.1f} group(s)/lecturer @ 1.5x)</small>"
+                    f"- Repeated sessions: {repeat_sessions} group(s) without first-session slots ({repeat_sessions/n_teachers:.1f} group(s)/lecturer @ 1.5x)"
                 )
                 # Only show indented Total line (no First delivery or Repeated delivery intermediate lines)
                 practical_details.append(
-                    f"<p style='margin: 4px 0 0 3em;'><small>Total: {weekly_hrs:.1f}h/week = {total_hrs:.1f}h total</small></p>"
+                    f"<p style='margin: 4px 0 0 3em;'>Total: {weekly_hrs:.1f}h/week = {total_hrs:.1f}h total</p>"
                 )
 
             # Add to breakdown (per-teacher values - use individual hours)
