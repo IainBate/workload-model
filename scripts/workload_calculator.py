@@ -1362,10 +1362,21 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
             if "teaching_breakdown" not in staff_teaching[canonical_name]:
                 staff_teaching[canonical_name]["teaching_breakdown"] = {}
             staff_teaching[canonical_name]["teaching_breakdown"]["project_supervision"] = project_hours
+
+            # Store structured project breakdown (similar to practicals pattern from Phase 3a)
+            if "project_breakdown" not in staff_teaching[canonical_name]["teaching_breakdown"]:
+                staff_teaching[canonical_name]["teaching_breakdown"]["project_breakdown"] = {}
+            proj_level = "UG" if proj_mult == config.SUPERVISION_MULTIPLIERS["ug_project"] else "MSc"
+            staff_teaching[canonical_name]["teaching_breakdown"]["project_breakdown"].update({
+                "project_count": teacher_project_load,
+                "level": proj_level,
+                "rate": proj_mult,
+                "total": round(project_hours, 2)
+            })
+
             # Add supervision detail for HTML display
             if "supervision_details" not in staff_teaching[canonical_name]:
                 staff_teaching[canonical_name]["supervision_details"] = []
-            proj_level = "UG" if proj_mult == config.SUPERVISION_MULTIPLIERS["ug_project"] else "MSc"
             staff_teaching[canonical_name]["supervision_details"].append(
                 f"Projects: {teacher_project_load} projects x {proj_level} ({proj_mult}h) = {project_hours:.1f}h"
             )
