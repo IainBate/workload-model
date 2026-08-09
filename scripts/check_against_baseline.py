@@ -198,9 +198,18 @@ def check_baseline(data_dir: str = None, verbose: bool = False) -> int:
             print("Please run generate_baseline.py first to create the baseline.")
             return 1
 
-        # Get list of baseline files
-        baseline_files = sorted(baseline_dir.iterdir())
-        baseline_names = {f.name for f in baseline_files if f.is_file()}
+        # Get list of baseline files (including subdirectories)
+        def get_all_baseline_files(directory: Path) -> dict[str, Path]:
+            """Get all files in directory and subdirectories as relative path mapping."""
+            files = {}
+            for f in sorted(directory.rglob('*')):
+                if f.is_file():
+                    rel_path = f.relative_to(directory)
+                    files[str(rel_path)] = f
+            return files
+
+        baseline_files = get_all_baseline_files(baseline_dir)
+        baseline_names = set(baseline_files.keys())
 
         if not baseline_names:
             print(f"\nERROR: Baseline directory is empty!")
@@ -227,30 +236,38 @@ def check_baseline(data_dir: str = None, verbose: bool = False) -> int:
         output_dir = Path(temp_dir)
         generate_all_outputs(results, year_data, output_dir=str(output_dir))
 
+        # Get all generated files in temp directory
+        output_files = get_all_baseline_files(output_dir)
+
         # Compare files
         print("\nComparing against baseline...")
         total_compared = 0
         matches = 0
         diffs = []
 
-        for f in sorted(output_dir.iterdir()):
-            if not f.is_file():
+        # Check each output file against baseline
+        for rel_path, output_path in sorted(output_files.items()):
+            if not output_path.is_file():
                 continue
 
             total_compared += 1
-            baseline_path = baseline_dir / f.name
+            baseline_path = baseline_dir / rel_path
 
             if not baseline_path.exists():
-                diffs.append((f.name, "NEW FILE - exists in output but not baseline"))
+                diffs.append((rel_path, "NEW FILE - exists in output but not baseline"))
                 continue
 
-            is_same, differences = compare_files(baseline_path, f, verbose)
+            is_same, differences = compare_files(baseline_path, output_path, verbose)
             if is_same:
                 matches += 1
                 if verbose:
-                    print(f"  MATCH: {f.name}")
+                    print(f"  MATCH: {rel_path}")
             else:
-                diffs.append((f.name, differences))
+                diffs.append((rel_path, differences))
+
+        # Check for files in baseline that are not in output (shouldn't happen normally)
+        for rel_path in baseline_names - output_files.keys():
+            diffs.append((rel_path, "MISSING FILE - exists in baseline but not in current output"))
 
         # Report results
         print(f"\n{'=' * 60}")
