@@ -321,17 +321,6 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
         contact_per_practical = module.practical_contact_hours if module.practical_contact_hours > 0 else (contact_hours / max(practicals_count, 1))
         n_groups = module.practical_groups
 
-        # Debug: print module info for Chris CB SYS2
-        if "COM00029I" in module.codes and any("Crispin" in t or "Christopher" in t for t in teachers):
-            print(f"\n=== DEBUG SYS2 Practical Calculation ===")
-            print(f"Module: {module.name}, Codes: {module.codes}")
-            print(f"Teachers: {teachers}")
-            print(f"practicals_count: {practicals_count}")
-            print(f"practical_contact_hours: {module.practical_contact_hours}")
-            print(f"contact_per_practical: {contact_per_practical:.2f}")
-            print(f"n_groups: {n_groups}")
-            print(f"practical_weeks from module: {module.practical_weeks}")
-
         # Determine weeks with practicals
         if module.practical_weeks is not None and len(module.practical_weeks) > 0:
             # Use specified weeks from CSV notes
