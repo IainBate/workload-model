@@ -729,7 +729,7 @@ When reviewing individual reports (for output or calculation verification), chec
    - [ ] Repeat sessions at 1.5x repetition rate
    - [ ] Total hours calculation is correct
 
-5. **Research Section**
+4. **Research Section**
    - [ ] PhD Supervision: green border (#4CAF50), research badge
    - [ ] Primary Supervisor at correct level (no indent from h4)
    - [ ] Co-supervisor and Assessor nested under PhD Supervision
