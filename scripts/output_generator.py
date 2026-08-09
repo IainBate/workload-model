@@ -1094,8 +1094,11 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
                         module_teaching_map[module_name]['num_teachers'] = num_teachers
 
     def format_detail_section(title: str, hours: float, breakdown: Dict[str, float], css_class: str,
-                              is_teaching: bool = False, supervision_details: Tuple[str, ...] = (),
-                              known_lecturers_per_module: Optional[Dict[str, frozenset]] = None) -> str:
+                              is_teaching: bool = False,
+                              supervision_details: Tuple[str, ...] = (),
+                              known_lecturers_per_module: Optional[Dict[str, frozenset]] = None,
+                              pastoral_breakdown: Dict[str, float] = {},
+                              project_breakdown: Dict[str, float] = {}) -> str:
         """Format a detail section for the workload report HTML."""
         if not breakdown or all(v == 0 for v in breakdown.values()):
             return f"""<div class="section-card {css_class}">
@@ -1108,7 +1111,7 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
 
         if is_teaching:
             return format_teaching_section(title, hours, breakdown, css_class, supervision_details,
-                                            known_lecturers_per_module)
+                                            known_lecturers_per_module, pastoral_breakdown, project_breakdown)
 
         def get_category(item_name: str) -> Optional[str]:
             if item_name.startswith("grant_"):
