@@ -925,26 +925,34 @@ def _format_detailed_section_v2(title: str, detail_text: str, staff_name: Option
                 individual_lines.append(calculation_breakdown[:])
 
             # Reorganize: First time delivery first, then repeat info, then individual calculations
+            # The "Total" line may be in a breakdown with indent level > 0 (for proper 3em margin)
+            # or in individual_lines without indentation tracking
+
             if first_time_delivery_line:
                 # Parse the line to extract just the "First delivery:" part without the full calculation
                 first_delivery_text = re.sub(r'^\s*-\s*', '', first_time_delivery_line.strip())
-                practicals_html_parts.append(f"<p style='margin: 8px 0;'>{first_delivery_text}</p>")
+                practicals_html_parts.append(f"<p style='margin: 8px 0;'><small>{first_delivery_text}</small></p>")
 
             # Add repeated sessions info right after first time delivery
             if repeated_sessions_line:
                 practicals_html_parts.append(f"<p style='margin: 8px 0;'><small>{repeated_sessions_line}</small></p>")
 
-            # Add individual lecturer calculations with proper line breaks
+            # Find and add Total line with proper 3em margin (if not already in individual_lines)
+            total_line_found = False
             for breakdown in individual_lines:
-                # Each breakdown is a list of (indent_level, text) tuples
                 if breakdown:
                     for indent, text in breakdown:
-                        if indent == 0:
-                            # Main calculation line - use <strong>
-                            practicals_html_parts.append(f"<p style='margin: 8px 0;'><small>{text}</small></p>")
-                        else:
-                            # Continuation lines (Repeated delivery, Total) - smaller indent
+                        if 'Total:' in text:
+                            total_line_found = True
+                            # Apply 3em margin regardless of stored indent
                             practicals_html_parts.append(f"<p style='margin: 4px 0 0 3em;'><small>{text}</small></p>")
+
+            # Add remaining individual lecturer calculations (excluding Total which we handled above)
+            if not total_line_found:
+                for breakdown in individual_lines:
+                    for indent, text in breakdown:
+                        if 'Total:' not in text:
+                            practicals_html_parts.append(f"<p style='margin: 8px 0;'><small>{text}</small></p>")
 
             # Combine all practicals parts
             for part in practicals_html_parts:
