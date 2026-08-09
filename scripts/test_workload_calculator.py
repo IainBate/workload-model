@@ -944,6 +944,23 @@ class TestCategoryField:
 
     def test_category_defaults_to_staff_data_value(self):
         """Verify category defaults to StaffData.category when not explicitly set."""
+        # Create a module for testing
+        test_module = ModuleData(
+            name="TestModule",
+            codes=["TEST001"],
+            credits=20,
+            stage=5,
+            contact_hours=40,
+            practicals=0,
+            practical_contact_hours=0,
+            practical_groups=0,
+            practical_weeks=None,
+            assessment_count=1,
+            student_count=100,
+            teachers=["Jane Doe"],
+            lead_name=None,
+        )
+
         staff_ts = StaffData(
             canonical_name="Jane Doe",
             fte=1.0,
@@ -959,7 +976,7 @@ class TestCategoryField:
 
         year_data = YearData.create(
             year_label="2026-7",
-            modules=[module],
+            modules=[test_module],
             student_counts={},
             assessment_counts={},
             staff={"Jane Doe": staff_ts},
