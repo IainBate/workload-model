@@ -1277,8 +1277,11 @@ def load_all_data(data_dir: str = None,
         if m.general_checker:
             wtw_staff.add(m.general_checker)
 
+    # Sort staff by canonical name for deterministic processing order
+    sorted_staff_items = sorted(staff.items())
+
     filtered_staff = {}
-    for name, data in staff.items():
+    for name, data in sorted_staff_items:
         # Check if this staff member appears in WTW (by name or alias)
         in_wtw = False
         for wtw_name in wtw_staff:
