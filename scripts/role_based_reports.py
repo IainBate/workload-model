@@ -894,20 +894,20 @@ def _format_detailed_section_v2(title: str, detail_text: str, staff_name: Option
                     repeated_sessions_line = info
                 else:
                     # This is likely a calculation breakdown line
-                    # Check if it starts with "- " (new lecturer type header) or "  " (continuation)
-                    stripped = info.strip()
-                    if stripped.startswith('-'):
-                        # New lecturer type calculation line - save previous and start new
+                    # Check format: "- First delivery:", "  Repeated delivery:", "  Total:"
+                    # Note: we check info (original) not stripped for indent detection
+                    if info.startswith('    '):
+                        # Continuation line with 4-space indent (Repeated delivery or Total)
+                        if calculation_breakdown:
+                            calculation_breakdown.append((2, info.strip()))
+                        else:
+                            # No prior "- " line, add directly as individual line
+                            individual_lines.append([(0, info.strip())])
+                    elif info.strip().startswith('-'):
+                        # New lecturer type calculation line (starts with "- ")
                         if calculation_breakdown:
                             individual_lines.append(calculation_breakdown[:])
-                        calculation_breakdown = [(0, stripped)]
-                    elif stripped.startswith('  '):
-                        # Continuation line (Repeated delivery or Total)
-                        if calculation_breakdown:
-                            calculation_breakdown.append((2, stripped))
-                        else:
-                            # No prior "- " line, add directly
-                            individual_lines.append([(0, stripped)])
+                        calculation_breakdown = [(0, info.strip())]
 
             # Save the last calculation breakdown
             if calculation_breakdown:
