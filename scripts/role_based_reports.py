@@ -937,15 +937,14 @@ def _format_detailed_section_v2(title: str, detail_text: str, staff_name: Option
             if repeated_sessions_line:
                 practicals_html_parts.append(f"<p style='margin: 8px 0;'><small>{repeated_sessions_line}</small></p>")
 
-            # Find and add Total line with proper 3em margin (if not already in individual_lines)
+            # Find and add Total line (same margin as other lines)
             total_line_found = False
             for breakdown in individual_lines:
                 if breakdown:
                     for indent, text in breakdown:
                         if 'Total:' in text:
                             total_line_found = True
-                            # Apply 3em margin regardless of stored indent
-                            practicals_html_parts.append(f"<p style='margin: 4px 0 0 3em;'><small>{text}</small></p>")
+                            practicals_html_parts.append(f"<p style='margin: 8px 0;'><small>{text}</small></p>")
 
             # Add remaining individual lecturer calculations (excluding Total which we handled above)
             if not total_line_found:
