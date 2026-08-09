@@ -1260,7 +1260,7 @@ def load_all_data(data_dir: str = None,
                 phd_co_supervisions=phd_info["co_supervisor"] if phd_info else 0,
                 phd_assessor_count=phd_info["tap_member"] if phd_info else 0,
                 research_projects=tuple(fte_info) if fte_info else (),
-                saint_modules=tuple(set(saint_modules)),
+                saint_modules=tuple(sorted(set(saint_modules))),
                 pastoral_students=pastoral_students,
             )
 
