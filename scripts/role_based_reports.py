@@ -839,13 +839,8 @@ def _format_detailed_section_v2(title: str, detail_text: str, staff_name: Option
                     else:
                         practicals_segments.append(s)
 
+
             # Debug: print what ended up where
-            if 'SYS2' in str(segs) or 'SYS3' in str(segs):
-                print(f"DEBUG: For segments, practicals_segments = {len(practicals_segments)}, other_segments = {len(other_segments)}")
-                for p in practicals_segments:
-                    print(f"  PRACTICALS: {repr(p[:60])}")
-                for o in other_segments:
-                    print(f"  OTHER: {repr(o[:60])}")
         else:
             # No practicals - process normally
             other_segments = segs[:]
@@ -907,7 +902,6 @@ def _format_detailed_section_v2(title: str, detail_text: str, staff_name: Option
                     if 'Repeated delivery:' in info or 'Total:' in info:
                         # Continuation line - these may have CSS-based indentation (3em margin)
                         # rather than leading whitespace
-                        print(f"DEBUG: Found continuation line: {repr(info)}")
                         if calculation_breakdown:
                             calculation_breakdown.append((2, info.strip()))
                         else:
@@ -915,7 +909,6 @@ def _format_detailed_section_v2(title: str, detail_text: str, staff_name: Option
                             individual_lines.append([(0, info.strip())])
                     elif info.startswith('    '):
                         # Continuation line with 4-space indent (Repeated delivery or Total)
-                        print(f"DEBUG: Found continuation line (4 spaces): {repr(info)}")
                         if calculation_breakdown:
                             calculation_breakdown.append((2, info.strip()))
                         else:
@@ -923,7 +916,6 @@ def _format_detailed_section_v2(title: str, detail_text: str, staff_name: Option
                             individual_lines.append([(0, info.strip())])
                     elif info.strip().startswith('-'):
                         # New lecturer type calculation line (starts with "- ")
-                        print(f"DEBUG: Found new calculation line: {repr(info)}")
                         if calculation_breakdown:
                             individual_lines.append(calculation_breakdown[:])
                         calculation_breakdown = [(0, info.strip())]
