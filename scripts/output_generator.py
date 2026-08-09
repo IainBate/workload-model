@@ -922,7 +922,7 @@ def generate_html_report(results: List[WorkloadResult], year_data: YearData,
         normative_indicator = ""
 
         if normative_split and r.total_hours > 0:
-            total_pct = (r.total_hours / NOMINAL_WORKING_HOURS_PER_YEAR) * 100
+            total_pct = (r.total_hours / config.NOMINAL_WORKING_HOURS_PER_YEAR) * 100
             t_cmp = (r.teaching / r.total_hours * 100) - (normative_split.get("teaching_hours", 0) * 100)
             r_cmp = (r.research / r.total_hours * 100) - (normative_split.get("research_hours", 0) * 100)
             a_cmp = (r.admin / r.total_hours * 100) - (normative_split.get("admin_hours", 0) * 100)
