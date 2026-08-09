@@ -1460,6 +1460,20 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
             if min_teaching > 0:
                 teaching_breakdown["minimum_admin_load"] = min_teaching
 
+        # Extract structured supervision breakdowns (pastoral and project)
+        pastoral_breakdown = {}
+        project_breakdown = {}
+        if canonical_name in staff_teaching:
+            staff_data = staff_teaching[canonical_name]
+            if "teaching_breakdown" in staff_data:
+                teaching_data = staff_data["teaching_breakdown"]
+                # Extract structured pastoral breakdown
+                if "pastoral_breakdown" in teaching_data:
+                    pastoral_breakdown = dict(teaching_data["pastoral_breakdown"])
+                # Extract structured project breakdown
+                if "project_breakdown" in teaching_data:
+                    project_breakdown = dict(teaching_data["project_breakdown"])
+
         # Track missing data (assumptions are tracked earlier in the function)
         if not staff.fte or staff.fte == 0:
             missing_data.append("FTE not found (defaulting to 1.0)")
