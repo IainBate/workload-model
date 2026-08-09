@@ -1186,7 +1186,9 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
 
     def format_teaching_section(title: str, hours: float, breakdown: Dict[str, float], css_class: str,
                                 supervision_details: Tuple[str, ...] = (),
-                                known_lecturers_per_module: Optional[Dict[str, frozenset]] = None) -> str:
+                                known_lecturers_per_module: Optional[Dict[str, frozenset]] = None,
+                                pastoral_breakdown: Dict[str, float] = {},
+                                project_breakdown: Dict[str, float] = {}) -> str:
         """Format teaching section with hierarchical structure."""
         import re
 
