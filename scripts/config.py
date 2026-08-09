@@ -132,7 +132,67 @@ def is_msc_level(module_stage: int) -> bool:
     return module_stage >= STAGE_MSC_LEVEL
 
 
-def get_role_hours(role_name: str, nominal_hours: float) -> float:
-    """Calculate hours for a given role based on its percentage of nominal hours."""
-    percentage = ROLES_PERCENTAGE.get(role_name, 0.0)
-    return nominal_hours * percentage
+# --- Category mapping for normative split comparison ---
+
+def normative_key_for_category(category: str) -> Optional[str]:
+    """
+    Translate a real-world category string to a CONTRACT_NORMATIVE_DIVISIONS key.
+
+    Args:
+        category: The staff member's contract category (e.g., "T and S", "ART")
+
+    Returns:
+        The corresponding key for CONTRACT_NORMATIVE_DIVISIONS, or None if no mapping
+        exists. Callers should treat None as "no normative comparison available".
+    """
+    # Map real-world category strings to the keys in CONTRACT_NORMATIVE_DIVISIONS
+    # Based on data analysis: categories seen are "T and S" and "ART"
+    category_map = {
+        "ART": "TR_staff",           # ART staff use TR_staff split (40/40/20)
+        "T and S": "TS_staff_lecturer_and_above",  # T and S staff use TS_lecturer_and_above split
+    }
+
+    return category_map.get(category)
+
+
+def get_normative_split(category: str) -> Optional[Dict[str, float]]:
+    """
+    Get the expected workload split for a given category.
+
+    Args:
+        category: The staff member's contract category
+
+    Returns:
+        A dict with teaching_hours, research_hours, admin_hours (as percentages of
+        nominal hours), or None if no mapping exists for this category.
+    """
+    key = normative_key_for_category(category)
+    if key is None:
+        return None
+
+    division = CONTRACT_NORMATIVE_DIVISIONS.get(key)
+    if division is None:
+        return None
+
+    # Return a dict with the expected hours (as percentages of nominal hours)
+    # Note: The keys in CONTRACT_NORMATIVE_DIVISIONS may vary (e.g., "citizenship"
+    # vs "admin"), so we normalize them here
+    split = {}
+
+    # Map various key names to standard categories
+    if "teaching" in division:
+        split["teaching_hours"] = division["teaching"]
+
+    # Research-related keys
+    for research_key in ["research_and_scholarship", "scholarship"]:
+        if research_key in division:
+            split["research_hours"] = division[research_key]
+            break
+
+    # Admin/citizenship-related keys
+    for admin_key in ["citizenship"]:
+        if admin_key in division:
+            split["admin_hours"] = division[admin_key]
+            break
+
+    return split
