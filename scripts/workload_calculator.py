@@ -1308,7 +1308,16 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
         staff_teaching[canonical_name]["hours"] += pastoral_hours
         if "teaching_breakdown" not in staff_teaching[canonical_name]:
             staff_teaching[canonical_name]["teaching_breakdown"] = {}
+
+        # Store structured pastoral breakdown (similar to practicals pattern from Phase 3a)
         staff_teaching[canonical_name]["teaching_breakdown"]["pastoral_supervision"] = pastoral_hours
+        if "pastoral_breakdown" not in staff_teaching[canonical_name]["teaching_breakdown"]:
+            staff_teaching[canonical_name]["teaching_breakdown"]["pastoral_breakdown"] = {}
+        staff_teaching[canonical_name]["teaching_breakdown"]["pastoral_breakdown"].update({
+            "student_count": pastoral_count,
+            "rate": config.SUPERVISION_MULTIPLIERS["pastoral"],
+            "total": round(pastoral_hours, 2)
+        })
 
         # Add supervision detail for HTML display
         if "supervision_details" not in staff_teaching[canonical_name]:
