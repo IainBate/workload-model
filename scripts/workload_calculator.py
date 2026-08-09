@@ -458,25 +458,22 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
             first_time_sessions = min(n_groups, n_teachers)
             # Calculate weekly hours for standard lecturer (2.5x) as reference
             first_session_weekly_hrs = contact_per_practical * config.TEACHING_MULTIPLIERS["problem_class_seminar_practical"] * practicals_count
-            practical_details.append(
-                f"- First time delivery: {first_time_sessions} group(s) (one per lecturer). {contact_per_practical:.1f}h x 2.5 multiplier per week."
-            )
 
-            # Show individual lecturer breakdowns - combine into clean summary
+            # Show individual lecturer breakdown - single clean summary with indented Total line
             if new_lecturers_practical or existing_with_new_content_practical:
                 t = sorted(new_lecturers_practical + existing_with_new_content_practical)[0]  # Just use first one
                 weekly_hrs = individual_practical_hours[t]
                 total_hrs = weekly_hrs * practical_week_count
                 new_lecturer_repeat_hrs = (repeat_sessions / n_teachers) * config.REPETITION_MULTIPLIER
-                # Clean summary: just show the final calculation result with indented Total line
                 practical_details.append(
-                    f"  - First delivery: {contact_per_practical:.1f}h/week lecture @ 5x (new content)"
+                    f"<small>- First time delivery: {first_time_sessions} group(s) (one per lecturer). {contact_per_practical:.1f}h x 2.5 multiplier per week.</small>"
                 )
                 practical_details.append(
-                    f"    Repeated delivery: {repeat_sessions/n_teachers:.1f}h/week @ 1.5x = {new_lecturer_repeat_hrs:.1f}h/week"
+                    f"<small>- Repeated sessions: {repeat_sessions} group(s) without first-session slots ({repeat_sessions/n_teachers:.1f} group(s)/lecturer @ 1.5x)</small>"
                 )
+                # Only show indented Total line (no First delivery or Repeated delivery intermediate lines)
                 practical_details.append(
-                    f"    Total: {weekly_hrs:.1f}h/week = {total_hrs:.1f}h total"
+                    f"<p style='margin: 4px 0 0 3em;'><small>Total: {weekly_hrs:.1f}h/week = {total_hrs:.1f}h total</small></p>"
                 )
             elif standard_lecturers_practical:
                 # Only standard lecturers - show single breakdown
@@ -484,22 +481,15 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
                 weekly_hrs = individual_practical_hours[t]
                 total_hrs = weekly_hrs * practical_week_count
                 standard_repeat_hrs = (repeat_sessions / n_teachers) * config.REPETITION_MULTIPLIER
-                # Clean summary: just show the final calculation result with indented Total line
                 practical_details.append(
-                    f"  - First delivery: {contact_per_practical:.1f}h/week lecture @ 2.5x"
+                    f"<small>- First time delivery: {first_time_sessions} group(s) (one per lecturer). {contact_per_practical:.1f}h x 2.5 multiplier per week.</small>"
                 )
                 practical_details.append(
-                    f"    Repeated delivery: {repeat_sessions/n_teachers:.1f}h/week @ 1.5x = {standard_repeat_hrs:.1f}h/week"
+                    f"<small>- Repeated sessions: {repeat_sessions} group(s) without first-session slots ({repeat_sessions/n_teachers:.1f} group(s)/lecturer @ 1.5x)</small>"
                 )
+                # Only show indented Total line (no First delivery or Repeated delivery intermediate lines)
                 practical_details.append(
-                    f"    Total: {weekly_hrs:.1f}h/week = {total_hrs:.1f}h total"
-                )
-
-            # Show repeat breakdown if any
-            if repeat_sessions > 0:
-                repeats_per_lecturer = repeat_sessions / n_teachers
-                practical_details.append(
-                    f"- Repeated sessions: {repeat_sessions} group(s) without first-session slots ({repeats_per_lecturer:.1f} group(s)/lecturer @ 1.5x)"
+                    f"<p style='margin: 4px 0 0 3em;'><small>Total: {weekly_hrs:.1f}h/week = {total_hrs:.1f}h total</small></p>"
                 )
 
             # Add to breakdown (per-teacher values - use individual hours)
