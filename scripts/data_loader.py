@@ -1193,7 +1193,8 @@ def load_all_data(data_dir: str = None,
 
         # Assign roles from WAW (apply name mapping to resolve WAW→YAML differences)
         staff_roles = []
-        for role, members in waw_roles.items():
+        for role in sorted(waw_roles.keys()):
+            members = waw_roles[role]
             yaml_role = _WAW_ROLE_MAPPING.get(role, role)
             if yaml_role is None:
                 continue  # Skip non-role entries like "Group Leads"
