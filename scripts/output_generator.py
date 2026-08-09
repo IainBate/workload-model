@@ -678,7 +678,7 @@ def generate_html_report(results: List[WorkloadResult], year_data: YearData,
             if variance > 0.10:
                 off_target = True
 
-        has_issues = bool(r.assumptions_made or r.missing_data)
+        has_issues = bool(r.assumptions or r.missing_data)
 
         if off_target or has_issues:
             target = r.nominal_hours or 0
@@ -690,8 +690,8 @@ def generate_html_report(results: List[WorkloadResult], year_data: YearData,
                 "total": r.total_hours,
                 "target": target,
                 "deviation_pct": deviation,
-                "issues": ("Assumptions" if r.assumptions_made else "") +
-                          (", " if (r.assumptions_made and r.missing_data) else "") +
+                "issues": ("Assumptions" if r.assumptions else "") +
+                          (", " if (r.assumptions and r.missing_data) else "") +
                           ("Missing Data" if r.missing_data else "")
             })
 
