@@ -1176,7 +1176,7 @@ def load_all_data(data_dir: str = None,
                 return val
         return None
 
-    for raw_name in all_names:
+    for raw_name in sorted_names:
         canonical = normalize_name(raw_name, reverse_lookup, unknown_callback)
         if not canonical:
             continue
