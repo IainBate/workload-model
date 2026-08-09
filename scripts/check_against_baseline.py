@@ -31,9 +31,35 @@ PROJECT_ROOT = SCRIPTS_DIR.parent
 # Add project root to path for imports
 sys.path.insert(0, str(SCRIPTS_DIR))
 
-from data_loader import load_all_data
-from workload_calculator import calculate_workload
-from output_generator import generate_all_outputs
+# Create a temp directory for outputs and patch paths BEFORE importing modules
+TEMP_OUTPUT_DIR = None  # Will be set in check_baseline()
+
+
+def patch_module_paths(output_dir: Path):
+    """
+    Patch module-level path constants to point to the specified output directory.
+
+    This monkey-patches the OUTPUT_DIR, INDIVIDUAL_DIR, and DEPARTMENT_DIR
+    constants in both output_generator.py and role_based_reports.py modules
+    so they write to the temp output directory instead of the default.
+    """
+    (output_dir / "Individual Reports").mkdir(parents=True, exist_ok=True)
+    (output_dir / "Department Summary").mkdir(parents=True, exist_ok=True)
+
+    def patch_module(module_name):
+        """Patch a module's path constants."""
+        import importlib
+        try:
+            mod = importlib.import_module(module_name)
+            mod.OUTPUT_DIR = output_dir
+            mod.INDIVIDUAL_DIR = output_dir / "Individual Reports"
+            mod.DEPARTMENT_DIR = output_dir / "Department Summary"
+        except ImportError:
+            pass
+
+    # Patch role_based_reports first (it's imported by output_generator)
+    patch_module('role_based_reports')
+    patch_module('output_generator')
 
 
 def normalize_csv_content(content: str) -> str:
@@ -189,6 +215,9 @@ def check_baseline(data_dir: str = None, verbose: bool = False) -> int:
     baseline_dir = project_root / "baseline"
     temp_dir = tempfile.mkdtemp(prefix="workload_check_")
 
+    global TEMP_OUTPUT_DIR
+    TEMP_OUTPUT_DIR = Path(temp_dir)
+
     try:
         print(f"Baseline directory: {baseline_dir}")
         print(f"Temp output directory: {temp_dir}")
@@ -211,6 +240,9 @@ def check_baseline(data_dir: str = None, verbose: bool = False) -> int:
         baseline_files = get_all_baseline_files(baseline_dir)
         baseline_names = set(baseline_files.keys())
 
+        # Remove input_summary.txt from comparison - it's only in baseline for reference
+        baseline_names.discard("input_summary.txt")
+
         if not baseline_names:
             print(f"\nERROR: Baseline directory is empty!")
             return 1
@@ -226,6 +258,15 @@ def check_baseline(data_dir: str = None, verbose: bool = False) -> int:
                 data_dir = project_root / data_dir
 
         print(f"\nLoading data from: {data_dir}")
+
+        # Patch paths BEFORE importing modules
+        patch_module_paths(Path(temp_dir))
+
+        # Now import and run
+        from data_loader import load_all_data
+        from workload_calculator import calculate_workload
+        from output_generator import generate_all_outputs
+
         year_data = load_all_data(data_dir=str(data_dir), unknown_callback=None)
         print(f"  Modules: {len(year_data.modules)}, Staff: {len(year_data.staff)}")
 

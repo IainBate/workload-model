@@ -22,12 +22,7 @@ PROJECT_ROOT = SCRIPTS_DIR.parent
 # Add project root to path for imports
 sys.path.insert(0, str(SCRIPTS_DIR))
 
-from data_loader import load_all_data
-from workload_calculator import calculate_workload
-from output_generator import generate_all_outputs
-
-
-# Override OUTPUT_DIR before importing output_generator and role_based_reports
+# Override OUTPUT_DIR before importing any modules that use it
 # This ensures all generated files go to baseline/ instead of output/
 BASELINE_DIR = PROJECT_ROOT / "baseline"
 
@@ -42,19 +37,27 @@ def patch_module_paths():
     This monkey-patches the OUTPUT_DIR, INDIVIDUAL_DIR, and DEPARTMENT_DIR
     constants in both output_generator.py and role_based_reports.py modules
     so they write to baseline/ instead of output/.
+
+    Must be called BEFORE importing any modules that use these paths.
     """
-    import output_generator
-    import role_based_reports
+    # Create the directories if they don't exist
+    (BASELINE_DIR / "Individual Reports").mkdir(parents=True, exist_ok=True)
+    (BASELINE_DIR / "Department Summary").mkdir(parents=True, exist_ok=True)
 
-    # Patch output_generator paths
-    output_generator.OUTPUT_DIR = BASELINE_DIR
-    output_generator.INDIVIDUAL_DIR = BASELINE_DIR / "Individual Reports"
-    output_generator.DEPARTMENT_DIR = BASELINE_DIR / "Department Summary"
+    def patch_module(module_name):
+        """Patch a module's path constants."""
+        import importlib
+        try:
+            mod = importlib.import_module(module_name)
+            mod.OUTPUT_DIR = BASELINE_DIR
+            mod.INDIVIDUAL_DIR = BASELINE_DIR / "Individual Reports"
+            mod.DEPARTMENT_DIR = BASELINE_DIR / "Department Summary"
+        except ImportError:
+            pass
 
-    # Patch role_based_reports paths
-    role_based_reports.OUTPUT_DIR = BASELINE_DIR
-    role_based_reports.INDIVIDUAL_DIR = BASELINE_DIR / "Individual Reports"
-    role_based_reports.DEPARTMENT_DIR = BASELINE_DIR / "Department Summary"
+    # Patch role_based_reports first (it's imported by output_generator)
+    patch_module('role_based_reports')
+    patch_module('output_generator')
 
 
 def get_project_root():
@@ -69,6 +72,14 @@ def generate_baseline(data_dir: str = None):
     Args:
         data_dir: Optional custom data directory. If None, uses 'data/' subdir.
     """
+    # Patch paths BEFORE importing modules that use them
+    patch_module_paths()
+
+    # Now import the rest of the modules after paths are patched
+    from data_loader import load_all_data
+    from workload_calculator import calculate_workload
+    from output_generator import generate_all_outputs
+
     # Set up paths
     project_root = get_project_root()
 
@@ -76,9 +87,6 @@ def generate_baseline(data_dir: str = None):
     baseline_dir = project_root / "baseline"
 
     print(f"Baseline directory: {baseline_dir}")
-
-    # Create baseline directory if it doesn't exist
-    baseline_dir.mkdir(exist_ok=True)
 
     # Data directory
     if data_dir is None:
@@ -101,13 +109,10 @@ def generate_baseline(data_dir: str = None):
     results = calculate_workload(year_data)
     print(f"  Results generated for {len(results)} staff members")
 
-    # Patch module paths to write to baseline directory
-    patch_module_paths()
-
     # Generate all outputs to baseline directory
     print("\nGenerating outputs...")
 
-    # Generate to baseline directory (now patched to use BASELINE_DIR)
+    # Generate to baseline directory (paths already patched)
     generate_all_outputs(results, year_data, output_dir=str(baseline_dir))
 
     print(f"\nBaseline outputs saved to: {baseline_dir}")
@@ -116,6 +121,9 @@ def generate_baseline(data_dir: str = None):
         if f.is_file():
             size = f.stat().st_size
             print(f"  - {f.name} ({size:,} bytes)")
+        elif f.is_dir():
+            file_count = sum(1 for _ in f.iterdir() if _.is_file())
+            print(f"  - {f.name}/ ({file_count} files)")
 
     # Also save a copy of the input data summary for reference
     summary_file = baseline_dir / "input_summary.txt"
