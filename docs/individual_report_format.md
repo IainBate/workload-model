@@ -736,12 +736,12 @@ When reviewing individual reports (for output or calculation verification), chec
    - [ ] Research Allowances: protected baseline = 164.2h/FTE
    - [ ] Research Grants (if present): correct amount based on FTE
 
-4. **Admin Section**
+6. **Admin Section**
    - [ ] Departmental roles at correct nesting level
    - [ ] Engagement = 100h (university-wide)
    - [ ] Personal Development = 75h (mandated)
 
-5. **Calculation Breakdown**
+7. **Calculation Breakdown**
    - [ ] Formula: Total = Teaching + Research + Admin
    - [ ] Research split into protected baseline and additional
    - [ ] Grand total matches sum of components
