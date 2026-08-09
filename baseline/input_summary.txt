@@ -6,45 +6,45 @@ Modules: 39
 Staff: 55
 
 Modules:
-  - SOF1 (COM00015C) [20cr, Stage 1] - Dawn, Kofi, Poonam
-  - THE1 (COM00013C) [20cr, Stage 1] - Simon F, Nick, Sia
-  - HCIN (COM00018C) [20cr, Stage 1] - Jacob, Paul, Katrina
-  - SOF2 (COM00016C) [20cr, Stage 1] - Kofi, Dawn, Fang
-  - SYS1 (COM00011C) [20cr, Stage 1] - Mike F, Andy P, Pedro
-  - THE2 (COM00014C) [20cr, Stage 1] - Alvaro, Detlef, Sam B
-  - ENG1 (COM00019I) [20cr, Stage 2] - Kostas, Robbert, Tommy
-  - SYS2 (COM00029I) [20cr, Stage 2] - Andy P, Mike F, Chris CB
-  - THE3 (COM00027I) [20cr, Stage 2] - Detlef, Simon F, Fang
-  - IMLO (COM00026I) [20cr, Stage 2] - James W, Claudio, Pourya
-  - DATA (COM00028I) [20cr, Stage 2] - Xinwei, Pourya
-  - SYS3 (COM00018I) [20cr, Stage 2] - Pengcheng, Chris CB, Da
+  - ARIA (COM00072H) [20cr, Stage 3] - Tommy, Peter
   - AURO (COM00052H) [20cr, Stage 3] - Pedro, Alvaro, Soumya
+  - CBDA (COM00068H) [20cr, Stage 3] - Mike OD, Roberto
   - CTAP (COM00048H) [20cr, Stage 3] - Sia, Roberto, Carlo
+  - DATA (COM00028I) [20cr, Stage 2] - Xinwei, Pourya
+  - DEEP (COM00049H) [20cr, Stage 3] - Will, James S
+  - EHAC (COM00064H) [20cr, Stage 3] - Roberto, Yuchen
+  - ELLA (COM00071H) [20cr, Stage 3] - Robbert, Antonio, Soumya
+  - EMBS (COM00003H) [20cr, Stage 3] - Xiaotian, Ian G
+  - ENG1 (COM00019I) [20cr, Stage 2] - Kostas, Robbert, Tommy
+  - ENG2 (COM00055H) [20cr, Stage 3] - Antonio, Dimitris, Kostas
+  - FOAM (<new for one year>) [20cr, Stage 3] - Tommy, Peter
+  - GODS (COM00063H) [20cr, Stage 3] - Paul, Mike OD
+  - GPIG (COM00138M) [40cr, Stage 3] - Xinwei, Radu
+  - HCIN (COM00018C) [20cr, Stage 1] - Jacob, Paul, Katrina
   - HINT (COM00040H) [20cr, Stage 3] - Claire, Rob A
   - HIPC (COM00036H) [20cr, Stage 3] - Steven W, Xiaotian
   - IDEV (COM00060H) [20cr, Stage 3] - Joe, Alena
-  - ROCS (COM00066H) [20cr, Stage 3] - Yan, Will
+  - IMLO (COM00026I) [20cr, Stage 2] - James W, Claudio, Pourya
+  - LLMA (COM00070H) [20cr, Stage 3] - James S, Frank
   - LPTC (LAW00062H) [20cr, Stage 3] - Law School, Colin
   - NETS (COM00056H) [20cr, Stage 3] - Yuchen, Vasileios
-  - QUAL (COM00058H) [20cr, Stage 3] - Jen, Jo I
-  - Projects (n/a) [40cr, Stage 3] - Jacob
-  - GPIG (COM00138M) [40cr, Stage 3] - Xinwei, Radu
-  - SAIL (COM00050H) [20cr, Stage 3] - Peter, Felix
-  - EHAC (COM00064H) [20cr, Stage 3] - Roberto, Yuchen
-  - EMBS (COM00003H) [20cr, Stage 3] - Xiaotian, Ian G
-  - PRAD (COM00195M) [20cr, Stage 3] - Carlo, Joe
-  - TECC (COM00054H) [20cr, Stage 3] - Katrina, Jen
-  - DEEP (COM00049H) [20cr, Stage 3] - Will, James S
-  - PLEI (COM00065H) [20cr, Stage 3] - Alena, Jo I
-  - QUCO (COM00042H) [20cr, Stage 3] - Sam B, Stefano
-  - ENG2 (COM00055H) [20cr, Stage 3] - Antonio, Dimitris, Kostas
-  - CBDA (COM00068H) [20cr, Stage 3] - Mike OD, Roberto
-  - GODS (COM00063H) [20cr, Stage 3] - Paul, Mike OD
-  - LLMA (COM00070H) [20cr, Stage 3] - James S, Frank
   - NLPG (COM00069H) [20cr, Stage 3] - Dimitar, Adrian
-  - ELLA (COM00071H) [20cr, Stage 3] - Robbert, Antonio, Soumya
-  - FOAM (<new for one year>) [20cr, Stage 3] - Tommy, Peter
-  - ARIA (COM00072H) [20cr, Stage 3] - Tommy, Peter
+  - PLEI (COM00065H) [20cr, Stage 3] - Alena, Jo I
+  - PRAD (COM00195M) [20cr, Stage 3] - Carlo, Joe
+  - Projects (n/a) [40cr, Stage 3] - Jacob
+  - QUAL (COM00058H) [20cr, Stage 3] - Jen, Jo I
+  - QUCO (COM00042H) [20cr, Stage 3] - Sam B, Stefano
+  - ROCS (COM00066H) [20cr, Stage 3] - Yan, Will
+  - SAIL (COM00050H) [20cr, Stage 3] - Peter, Felix
+  - SOF1 (COM00015C) [20cr, Stage 1] - Dawn, Kofi, Poonam
+  - SOF2 (COM00016C) [20cr, Stage 1] - Kofi, Dawn, Fang
+  - SYS1 (COM00011C) [20cr, Stage 1] - Mike F, Andy P, Pedro
+  - SYS2 (COM00029I) [20cr, Stage 2] - Andy P, Mike F, Chris CB
+  - SYS3 (COM00018I) [20cr, Stage 2] - Pengcheng, Chris CB, Da
+  - TECC (COM00054H) [20cr, Stage 3] - Katrina, Jen
+  - THE1 (COM00013C) [20cr, Stage 1] - Simon F, Nick, Sia
+  - THE2 (COM00014C) [20cr, Stage 1] - Alvaro, Detlef, Sam B
+  - THE3 (COM00027I) [20cr, Stage 2] - Detlef, Simon F, Fang
 
 Staff:
   - Adrian Bors [FTE: 1.0, Roles: Internationalisation and Visitors Coordinator]
@@ -84,7 +84,7 @@ Staff:
   - Pengcheng Liu [FTE: 1.0, Roles: Graduate School Board (GSB) Chair]
   - Peter Nightingale [FTE: 1.0, Roles: UG PL]
   - Poonam Yadav [FTE: 1.0, Roles: Progression Panel]
-  - Pourya Shamsolmoali [FTE: 1.0, Roles: Other PLs, Graduate School Board (Ordinary member)]
+  - Pourya Shamsolmoali [FTE: 1.0, Roles: Graduate School Board (Ordinary member), Other PLs]
   - Radu Calinescu [FTE: 1.0, Roles: none]
   - Rob Alexander [FTE: 1.0, Roles: StAMP committee members]
   - Robbert Jongeling [FTE: 1.0, Roles: none]
@@ -96,7 +96,7 @@ Staff:
   - Stefano Pirandola [FTE: 1.0, Roles: Progression Panel Chair]
   - Steven Wright [FTE: 1.0, Roles: Chair of the Board of Examiners]
   - Steven Xiaotian Dai [FTE: 1.0, Roles: Student Disability Representative]
-  - Tommy Yuan [FTE: 1.0, Roles: Deputy CBoEs, StAMP committee members]
+  - Tommy Yuan [FTE: 1.0, Roles: CSCSE SQA Partnership Leader, Deputy CBoEs]
   - Vasileios Vasilakis [FTE: 1.0, Roles: Deputy CBoEs]
   - William Smith [FTE: 1.0, Roles: Director of Admissions, Internally Distributed Funding panel reviewer]
   - Xinwei Fang [FTE: 1.0, Roles: Other PLs]

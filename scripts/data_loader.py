@@ -132,6 +132,7 @@ class WorkloadResult:
     teaching_hours: float
     research_hours: float
     admin_hours: float
+    category: str  # Contract type category (from StaffData)
     assumptions: Tuple[str, ...]  # Immutable tuple for assumptions
     missing_data: Tuple[str, ...]  # Immutable tuple for missing data
 
