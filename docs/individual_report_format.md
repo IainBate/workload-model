@@ -742,11 +742,11 @@ When reviewing individual reports (for output or calculation verification), chec
    - [ ] Personal Development = 75h (mandated)
 
 7. **Calculation Breakdown**
-   - [ ] Formula: Total = Teaching + Research + Admin
+   - [ ] Formula: Total = Teaching + Research (Protected + Additional) + Admin
    - [ ] Research split into protected baseline and additional
    - [ ] Grand total matches sum of components
    - [ ] Subtotals match section card totals
 
-6. **Assumptions/Missing Data**
+8. **Assumptions/Missing Data**
    - [ ] All assumptions are documented
    - [ ] Missing data is flagged appropriately
