@@ -7,7 +7,7 @@ This is the runtime source of truth for all workload parameters.
 
 import yaml
 from pathlib import Path
-from typing import Any
+from typing import Any, Dict, Optional
 
 # Get project root directory (parent of scripts folder)
 SCRIPTS_DIR = Path(__file__).resolve().parent
