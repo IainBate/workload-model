@@ -292,16 +292,100 @@ def normalize_name(name: str, reverse_lookup: Dict[str, str],
     return name.strip() if name.strip() else None
 
 
-def _prompt_name_match(user_name: str, canonical_name: Optional[str]) -> bool:
+def _find_alias_candidates(user_name: str, mappings: Dict[str, List[str]]) -> List[str]:
+    """
+    Find potential canonical names that a user's name might match.
+
+    Args:
+        user_name: The raw name entered by user
+        mappings: The staff name lookup mappings (canonical -> aliases)
+
+    Returns:
+        List of potential matching canonical names, sorted by relevance
+    """
+    if not user_name:
+        return []
+
+    user_key = user_name.lower().strip()
+    candidates = []
+
+    for canonical, aliases in mappings.items():
+        canon_key = canonical.lower()
+        alias_keys = [a.lower() for a in aliases]
+
+        # Exact match (shouldn't happen here but check anyway)
+        if user_key == canon_key or user_key in alias_keys:
+            return [canonical]
+
+        # Check if user_name is a partial match to the canonical name
+        # e.g., "Chris" matches "Christopher Crispin-Bailey"
+        if len(user_name) >= 2:
+            # Starts with same first letter and shares significant prefix
+            if canon_key.startswith(user_key):
+                candidates.append((canonical, 'prefix', len(user_key)))
+
+            # Contains user_name as a component (e.g., "Smith" in "William Smith")
+            elif ' ' in canon_key and user_key in canon_key:
+                candidates.append((canonical, 'substring', len(user_key)))
+
+        # Check if user_name's first letter matches the canonical's first letter
+        # and the remaining length is similar (handles abbreviations like "Chris CB")
+        if len(user_name) <= 3:
+            if canon_key.startswith(user_key):
+                candidates.append((canonical, 'initial', len(user_key)))
+
+        # Check for common patterns:姓 + first name initial
+        # e.g., "W Smith" might match "William Smith"
+        user_parts = user_key.split()
+        canon_parts = canon_key.split()
+        if len(user_parts) >= 1 and len(canon_parts) >= 1:
+            if user_parts[0] == canon_parts[0][:len(user_parts[0])]:
+                # First name partial match
+                candidates.append((canonical, 'first_name_partial', len(user_parts[0])))
+
+    # Sort by relevance: exact matches first, then longer prefix matches
+    def sort_key(item):
+        canonical, match_type, match_len = item
+        # Higher score for longer matches and exact/prefix matches
+        type_score = {'prefix': 3, 'first_name_partial': 2, 'substring': 1, 'initial': 0}.get(match_type, 0)
+        return (-type_score, -match_len, canonical)
+
+    candidates.sort(key=sort_key)
+    return [c[0] for c in candidates]
+
+
+def _prompt_name_match(user_name: str, canonical_name: Optional[str],
+                       mappings: Dict[str, List[str]] = None) -> bool:
     """
     Callback for unknown names. Returns True if the user confirms a match.
+
+    Args:
+        user_name: The raw name from the data
+        canonical_name: If provided, ask if user_name refers to this name
+        mappings: Optional mappings dict to suggest candidates
+
+    Returns:
+        True if user confirms match or wants to keep as-is, False to skip
     """
     if canonical_name:
         response = input(f"Does '{user_name}' refer to '{canonical_name}'? (y/n): ").strip().lower()
         return response == "y"
-    else:
-        response = input(f"Unknown name: '{user_name}'. Use this as-is? (y/n): ").strip().lower()
-        return response == "y"
+
+    # No suggested canonical name - show candidates and ask user
+    print(f"\nUnknown name: '{user_name}'")
+
+    if mappings:
+        candidates = _find_alias_candidates(user_name, mappings)
+        if candidates:
+            print("Possible matches:")
+            for i, candidate in enumerate(candidates[:5], 1):  # Show top 5
+                print(f"  {i}. {candidate}")
+            response = input("Select number to use this match, or 'n' for new/other: ").strip().lower()
+            if response.isdigit() and 1 <= int(response) <= len(candidates):
+                return True  # User selected a candidate
+
+    response = input("Use this as-is? (y/n): ").strip().lower()
+    return response == "y"
 
 
 # --- WTW CSV Loading ---
