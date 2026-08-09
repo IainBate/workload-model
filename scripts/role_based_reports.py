@@ -833,7 +833,7 @@ def _format_detailed_section_v2(title: str, detail_text: str, staff_name: Option
                 else:
                     # After practicals start - check if it's a new major category
                     s_lower = s.lower()
-                    is_new_category = 'assessment setting' in s_lower or ('paper' in s_lower and 'set' in s_lower) or ('script' in s_lower and ('x' in s_lower or 'total' in s_lower))
+                    is_new_category = 'assessment setting' in s_lower or ('paper' in s_lower and 'set' in s_lower) or ('script' in s_lower and 'x' in s_lower and 'total' not in s_lower)
                     if is_new_category:
                         other_segments.append(s)
                     else:
