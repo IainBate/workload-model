@@ -918,11 +918,76 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
         # Calculate total practical hours for this teacher (per-week × weeks)
         teacher_practical_total = individual_practical_hours.get(teacher, practical_hours_one) * practical_week_count
 
+        # Build structured practicals breakdown with detailed component data
+        # This provides first_session_hours, repeat_hours, rates, and week_count as real data
+        # rather than just an aggregated total
+        if practicals_count > 0:
+            # Get the individual's weekly practical hours before multiplying by weeks
+            teacher_weekly_practical_hrs = individual_practical_hours.get(teacher, practical_hours_one)
+            teacher_repeat_hrs = individual_practical_hours.get(f"{teacher}_repeat", 0)
+
+            # Calculate first session and repeat hours for this teacher
+            # For parallel groups case: each teacher gets one first-session slot + share of repeats
+            # For non-parallel groups: all teachers get the same weekly rate
+
+            # Determine rates used
+            first_session_rate = config.TEACHING_MULTIPLIERS["problem_class_seminar_practical"]  # 2.5x standard
+            repeat_rate = config.REPETITION_MULTIPLIER  # 1.5x
+
+            # Calculate weekly hours for a standard first session (for reference)
+            std_first_session_weekly = contact_per_practical * first_session_rate * practicals_count
+
+            # If we have per-teacher tracking (parallel groups case), use those values
+            if teacher in individual_practical_hours and len(individual_practical_hours) > 0:
+                # Calculate breakdown from the actual calculation
+                if n_groups > n_teachers:
+                    # Parallel groups: first session + share of repeats
+                    # For new lecturers, their first session is at 5x rate
+                    if teacher in new_lecturers_practical or teacher in existing_with_new_content_practical:
+                        first_session_rate = config.TEACHING_MULTIPLIERS["lecture_new_content_or_lecturer"]  # 5x
+
+                    # First session hours (one per week)
+                    first_session_hours = contact_per_practical * first_session_rate * practicals_count
+                    # Repeat share (split among teachers)
+                    repeat_share = repeat_sessions * contact_per_practical * repeat_rate * practicals_count / n_teachers
+                    teacher_first_session_hrs = first_session_hours
+                    teacher_repeat_hrs = repeat_share
+                else:
+                    # No parallel groups - all teachers get same rate
+                    teacher_first_session_hrs = std_first_session_weekly
+                    teacher_repeat_hrs = repeat_session_hours if 'repeat_session_hours' in locals() else 0
+
+                # Structured practicals breakdown per teacher
+                teacher_practicals_structured = {
+                    "first_session_hours": round(teacher_first_session_hrs, 2),
+                    "repeat_hours": round(teacher_repeat_hrs, 2),
+                    "week_count": practical_week_count,
+                    "first_session_rate": first_session_rate,
+                    "repeat_rate": repeat_rate,
+                    "total": round(teacher_practical_total, 2),
+                }
+            else:
+                # Fallback for non-parallel groups where everyone gets same rate
+                teacher_first_session_hrs = std_first_session_weekly
+                teacher_repeat_hrs = repeat_session_hours if 'repeat_session_hours' in locals() else 0
+
+                teacher_practicals_structured = {
+                    "first_session_hours": round(teacher_first_session_hrs, 2),
+                    "repeat_hours": round(teacher_repeat_hrs, 2),
+                    "week_count": practical_week_count,
+                    "first_session_rate": first_session_rate,
+                    "repeat_rate": repeat_rate,
+                    "total": round(teacher_practical_total, 2),
+                }
+        else:
+            # No practicals - empty structured breakdown
+            teacher_practicals_structured = {}
+
         result[teacher] = {
             "hours": total_teacher_hours,
             "teaching_breakdown": {
                 "teaching": teacher_lecture_hours_with_mult,
-                "practicals": teacher_practical_total,  # Total practical hours (weekly × weeks)
+                "practicals": teacher_practical_total,  # Total practical hours (weekly × weeks) - kept for compatibility
                 "assessment_setting": teacher_assessment_hours,
                 "marking": marking_hours_per_teacher,
                 "admin": admin_hours_per_teacher,
@@ -931,6 +996,8 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
                 "drop_in": teacher_drop_in,
                 "online_content_dev": teacher_online_content_dev,
             },
+            # Structured practicals breakdown with detailed component data
+            "practicals_breakdown": teacher_practicals_structured,
             "detail_text": "; ".join(module_detail_parts),
             "supervision_details": [d for d in supervision_details if teacher in d],
         }
