@@ -1099,7 +1099,8 @@ def load_all_data(data_dir: str = None,
         data_dir = DATA_DIR
 
     if unknown_callback is _UNSET:
-        unknown_callback = _prompt_name_match
+        # Create callback with mappings for alias suggestions
+        unknown_callback = functools.partial(_prompt_name_match, mappings=mappings)
 
     # Load name lookup and build reverse lookup (DATA_DIR is used internally)
     mappings = _load_name_lookup()
