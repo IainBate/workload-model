@@ -438,9 +438,11 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
 
         practical_hours_total = practical_hours_one * n_teachers
 
-        # Store per-teacher practical hours (same for all when no parallel groups)
-        for t in teachers:
-            individual_practical_hours[t] = practical_hours_one
+        # Store per-teacher practical hours
+        # Only overwrite when we're not in parallel groups case (where individual hours already calculated)
+        if n_groups == 0:
+            for t in teachers:
+                individual_practical_hours[t] = practical_hours_one
 
     # Add repetition_multiplier back if removed
     if "repetition_multiplier" not in config.TEACHING_MULTIPLIERS:
