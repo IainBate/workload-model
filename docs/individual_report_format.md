@@ -86,20 +86,57 @@ Each report is a self-contained HTML file with embedded CSS and no external depe
             {Module Category Name} ({count} module(s))
         </h4>
         
-        {/* Detail items for each teaching component */}
+        {/* Delivery (Lectures) - top level */}
         <div class="detail-item teaching-item">
             <span class="detail-name">Delivery (Lectures)</span>
             <span class="detail-hours">{hours} @ {multiplier_info}</span>
             <span class="detail-activity teaching-activity"></span>
         </div>
         
-        {/* Calculation details in smaller font */}
+        {/* Calculation details at 40px indent */}
         <div class="detail-item teaching-item" style="padding-left:40px;font-size:0.85em;color:#666;">
             <span class="detail-name" style="color:#333;">Calculation</span>
             <span class="detail-hours">{calculation_details}</span>
         </div>
         
-        {/* Additional detail items for practicals, assessment, marking */}
+        {/* Practical Sessions - top level */}
+        <div class="detail-item teaching-item">
+            <span class="detail-name">Practical Sessions</span>
+            <span class="detail-hours">{hours}h</span>
+            <span class="detail-activity teaching-activity"></span>
+        </div>
+        
+        {/* Practical calculation - 40px indent, with sub-levels for first-time and repeats */}
+        <div class="detail-item teaching-item" style="padding-left:40px;font-size:0.85em;color:#666;">
+            <span class="detail-name" style="color:#333;">Calculation</span>
+            <span class="detail-hours">{calculation_details}</span>
+        </div>
+        
+        {/* Practical first-time delivery - 80px indent */}
+        <div class="detail-item teaching-item" style="padding-left:80px;font-size:0.85em;color:#666;">
+            <span class="detail-name" style="color:#333;">First-time delivery</span>
+            <span class="detail-hours">{hours} @ {multiplier}</span>
+        </div>
+        
+        {/* Practical repeat sessions - 80px indent */}
+        <div class="detail-item teaching-item" style="padding-left:80px;font-size:0.85em;color:#666;">
+            <span class="detail-name" style="color:#333;">Repeat sessions</span>
+            <span class="detail-hours">{hours} @ {multiplier}</span>
+        </div>
+        
+        {/* Assessment Setting - top level */}
+        <div class="detail-item teaching-item">
+            <span class="detail-name">Assessment Setting</span>
+            <span class="detail-hours">{hours}h</span>
+            <span class="detail-activity teaching-activity"></span>
+        </div>
+        
+        {/* Assessment marking - top level */}
+        <div class="detail-item teaching-item">
+            <span class="detail-name">Assessment Marking</span>
+            <span class="detail-hours">{hours}h</span>
+            <span class="detail-activity teaching-activity"></span>
+        </div>
     </div>
 
     {/* Pastoral Supervision - separate section if present */}
@@ -145,6 +182,60 @@ Each report is a self-contained HTML file with embedded CSS and no external depe
 **Activity Badge Colors**:
 - Teaching activities: `#e3f2fd` background, `#1565c0` text
 - Admin activities (for supervision): `#fce4ec` background, `#c2185b` text
+
+---
+
+### Indentation Levels for Teaching Components
+
+| Level | Indent | Element Type | Description |
+|-------|--------|--------------|-------------|
+| 0px | Top-level | Module category (h4), Delivery, Practical Sessions, Assessment Setting/Marking | Main activity rows in the module section |
+| 40px | First sub-level | Calculation details, Total hours calculation | Shows how total was computed |
+| 80px | Second sub-level | First-time delivery, Repeat sessions, Multiplier breakdown | Detailed calculation components |
+
+---
+
+### Practical Sessions Structure
+
+Practical sessions have a specific nested structure:
+
+```
+Teaching Activities (card)
+└── Module Category (h4, blue border #2196F3)
+    ├── Delivery (Lectures) [teaching-activity badge]
+    │   └── Calculation (40px indent)
+    │       ├── Number of weeks: {weeks}
+    │       ├── Number of lectures per week: {lectures_per_week}
+    │       ├── Multiplier: {2.5x standard / 5x new lecturer}
+    │       ├── New content content dev: {hours}h
+    │       └── Total: {total_hours}
+    ├── Practical Sessions [teaching-activity badge]
+    │   └── Calculation (40px indent)
+    │       ├── Number of weeks: {weeks} - Week(s): {week_list}
+    │       ├── Number of practicals per week: {practicals_count}
+    │       ├── Groups: {n_groups}
+    │       ├── First-time delivery (80px indent)
+    │       │   └── {hours} @ 5x (new lecturer) / 2.5x (standard)
+    │       └── Repeat sessions (80px indent)
+    │           └── {hours} @ 1.5x repetition rate
+    ├── Assessment Setting [teaching-activity badge]
+    │   └── Calculation (40px indent): {hours}h total (main + resit)
+    └── Assessment Marking [teaching-activity badge]
+        └── Calculation (40px indent): {hours}h total (initial + resit)
+```
+
+**Practical Hours Calculation Breakdown**:
+
+1. **First-time delivery**: Performed by the first lecturer to deliver a practical in a given week
+   - New lecturer: `contact × 5x` (content development + delivery)
+   - Standard lecturer: `contact × 2.5x` (delivery only)
+
+2. **Repeat sessions**: Performed by additional lecturers sharing the same group
+   - All repeat sessions use `1.5x` repetition multiplier
+
+3. **Weeks specification**: If practicals don't run every week, list the specific weeks:
+   - Format: `8 weeks - Week(s): 1,2,3,4,9,10,11,12`
+   - Otherwise show: `11 weeks` (default)
 
 ---
 
