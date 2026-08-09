@@ -462,14 +462,13 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
                 f"- First time delivery: {first_time_sessions} group(s) (one per lecturer). {contact_per_practical:.1f}h x 2.5 multiplier per week."
             )
 
-            # Show individual lecturer breakdowns
-            # Combine all lecturers into ONE generic line (all get same calculation for simplicity)
+            # Show individual lecturer breakdowns - combine into clean summary
             if new_lecturers_practical or existing_with_new_content_practical:
                 t = sorted(new_lecturers_practical + existing_with_new_content_practical)[0]  # Just use first one
                 weekly_hrs = individual_practical_hours[t]
                 total_hrs = weekly_hrs * practical_week_count
-                new_lecturer_first_delivery_hrs = contact_per_practical * config.TEACHING_MULTIPLIERS["lecture_new_content_or_lecturer"]
                 new_lecturer_repeat_hrs = (repeat_sessions / n_teachers) * config.REPETITION_MULTIPLIER
+                # Clean summary: just show the final calculation result
                 practical_details.append(
                     f"  - First delivery: {contact_per_practical:.1f}h/week lecture @ 5x (new content)"
                 )
@@ -484,8 +483,8 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
                 t = sorted(standard_lecturers_practical)[0]  # Just use first one for values
                 weekly_hrs = individual_practical_hours[t]
                 total_hrs = weekly_hrs * practical_week_count
-                standard_first_delivery_hrs = contact_per_practical * config.TEACHING_MULTIPLIERS["problem_class_seminar_practical"]
                 standard_repeat_hrs = (repeat_sessions / n_teachers) * config.REPETITION_MULTIPLIER
+                # Clean summary: just show the final calculation result
                 practical_details.append(
                     f"  - First delivery: {contact_per_practical:.1f}h/week lecture @ 2.5x"
                 )
