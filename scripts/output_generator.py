@@ -164,7 +164,7 @@ def generate_csv(results: List[WorkloadResult], filepath: str = "Staff workload 
         # Header
         writer.writerow([
             "Name", "FTE", "Total Hours",
-            "Teaching Hours", "Research Hours", "Admin Hours",
+            "Teaching Hours", "Research Hours", "Admin Hours", "Category",
             "Teaching Detail", "Research Detail", "Admin Detail",
             "Assumptions", "Missing Data",
         ])
@@ -177,6 +177,7 @@ def generate_csv(results: List[WorkloadResult], filepath: str = "Staff workload 
                 f"{r.teaching_hours:.1f}",
                 f"{r.research_hours:.1f}",
                 f"{r.admin_hours:.1f}",
+                r.category,
                 r.teaching_detail,
                 r.research_detail,
                 r.admin_detail,
@@ -1411,9 +1412,13 @@ def generate_all_outputs(results: List[WorkloadResult], year_data: YearData,
     generate_html_report(results, year_data, output_dir)
 
     # Generate role-based reports (individual and department summary only)
+    # Use output_dir passed to this function instead of module-level constants
+    individual_output = os.path.join(output_dir, "Individual Reports")
+    department_output = os.path.join(output_dir, "Department Summary")
+
     print("\n" + "=" * 60)
     print("Generating Role-Based Reports")
     print("=" * 60)
 
-    generate_individual_reports(results, year_data, INDIVIDUAL_DIR)
-    generate_department_summary(results, year_data, DEPARTMENT_DIR)
+    generate_individual_reports(results, year_data, individual_output)
+    generate_department_summary(results, year_data, department_output)
