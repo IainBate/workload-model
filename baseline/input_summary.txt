@@ -1,0 +1,104 @@
+Workload Model Baseline Generation Summary
+==================================================
+
+Year: 2026-7
+Modules: 39
+Staff: 55
+
+Modules:
+  - SOF1 (COM00015C) [20cr, Stage 1] - Dawn, Kofi, Poonam
+  - THE1 (COM00013C) [20cr, Stage 1] - Simon F, Nick, Sia
+  - HCIN (COM00018C) [20cr, Stage 1] - Jacob, Paul, Katrina
+  - SOF2 (COM00016C) [20cr, Stage 1] - Kofi, Dawn, Fang
+  - SYS1 (COM00011C) [20cr, Stage 1] - Mike F, Andy P, Pedro
+  - THE2 (COM00014C) [20cr, Stage 1] - Alvaro, Detlef, Sam B
+  - ENG1 (COM00019I) [20cr, Stage 2] - Kostas, Robbert, Tommy
+  - SYS2 (COM00029I) [20cr, Stage 2] - Andy P, Mike F, Chris CB
+  - THE3 (COM00027I) [20cr, Stage 2] - Detlef, Simon F, Fang
+  - IMLO (COM00026I) [20cr, Stage 2] - James W, Claudio, Pourya
+  - DATA (COM00028I) [20cr, Stage 2] - Xinwei, Pourya
+  - SYS3 (COM00018I) [20cr, Stage 2] - Pengcheng, Chris CB, Da
+  - AURO (COM00052H) [20cr, Stage 3] - Pedro, Alvaro, Soumya
+  - CTAP (COM00048H) [20cr, Stage 3] - Sia, Roberto, Carlo
+  - HINT (COM00040H) [20cr, Stage 3] - Claire, Rob A
+  - HIPC (COM00036H) [20cr, Stage 3] - Steven W, Xiaotian
+  - IDEV (COM00060H) [20cr, Stage 3] - Joe, Alena
+  - ROCS (COM00066H) [20cr, Stage 3] - Yan, Will
+  - LPTC (LAW00062H) [20cr, Stage 3] - Law School, Colin
+  - NETS (COM00056H) [20cr, Stage 3] - Yuchen, Vasileios
+  - QUAL (COM00058H) [20cr, Stage 3] - Jen, Jo I
+  - Projects (n/a) [40cr, Stage 3] - Jacob
+  - GPIG (COM00138M) [40cr, Stage 3] - Xinwei, Radu
+  - SAIL (COM00050H) [20cr, Stage 3] - Peter, Felix
+  - EHAC (COM00064H) [20cr, Stage 3] - Roberto, Yuchen
+  - EMBS (COM00003H) [20cr, Stage 3] - Xiaotian, Ian G
+  - PRAD (COM00195M) [20cr, Stage 3] - Carlo, Joe
+  - TECC (COM00054H) [20cr, Stage 3] - Katrina, Jen
+  - DEEP (COM00049H) [20cr, Stage 3] - Will, James S
+  - PLEI (COM00065H) [20cr, Stage 3] - Alena, Jo I
+  - QUCO (COM00042H) [20cr, Stage 3] - Sam B, Stefano
+  - ENG2 (COM00055H) [20cr, Stage 3] - Antonio, Dimitris, Kostas
+  - CBDA (COM00068H) [20cr, Stage 3] - Mike OD, Roberto
+  - GODS (COM00063H) [20cr, Stage 3] - Paul, Mike OD
+  - LLMA (COM00070H) [20cr, Stage 3] - James S, Frank
+  - NLPG (COM00069H) [20cr, Stage 3] - Dimitar, Adrian
+  - ELLA (COM00071H) [20cr, Stage 3] - Robbert, Antonio, Soumya
+  - FOAM (<new for one year>) [20cr, Stage 3] - Tommy, Peter
+  - ARIA (COM00072H) [20cr, Stage 3] - Tommy, Peter
+
+Staff:
+  - Adrian Bors [FTE: 1.0, Roles: Internationalisation and Visitors Coordinator]
+  - Alena Denisova [FTE: 1.0, Roles: Ethics Committee Chair]
+  - Alvaro Miyazawa [FTE: 1.0, Roles: Deputy CBoEs]
+  - Andrew Pomfret [FTE: 1.0, Roles: Academic Admissions Team]
+  - Antonio Garcia-Dominguez [FTE: 1.0, Roles: none]
+  - Carlo Ottaviani [FTE: 1.0, Roles: Progression Panel]
+  - Christopher Crispin-Bailey [FTE: 1.0, Roles: GTA Coordinator, Union]
+  - Claire Ingram [FTE: 1.0, Roles: Outreach and Extra-Curricular Activities]
+  - Claudio Guarnera [FTE: 1.0, Roles: none]
+  - Colin Paterson [FTE: 1.0, Roles: none]
+  - Da Li [FTE: 1.0, Roles: none]
+  - Dawn H Wood [FTE: 1.0, Roles: none]
+  - Detlef Plump [FTE: 1.0, Roles: EC Officer (on-campus), Other PLs]
+  - Dimitar Kazakov [FTE: 1.0, Roles: Ethics Committee members]
+  - Dimitris Kolovos [FTE: 1.0, Roles: none]
+  - Fang Yan [FTE: 1.0, Roles: none]
+  - Felix Ulrich-Oltean [FTE: 1.0, Roles: none]
+  - Frank Soboczenski [FTE: 1.0, Roles: Academic Admissions Team]
+  - Iain Bate [FTE: 1.0, Roles: Head of Department]
+  - Ian Gray [FTE: 1.0, Roles: Deputy Head of Department (On-campus teaching)]
+  - Jacob Rigby [FTE: 1.0, Roles: Taught Project Coordinator]
+  - James Stovold [FTE: 1.0, Roles: Academic Admissions Team]
+  - James Walker [FTE: 1.0, Roles: none]
+  - Jen Beeston [FTE: 1.0, Roles: Chair of the Department Education Committee]
+  - Jo Iacovides [FTE: 1.0, Roles: Progression Panel]
+  - Joe Cutting [FTE: 1.0, Roles: ECR rep]
+  - Katrina Attwood [FTE: 1.0, Roles: Director of Students]
+  - Kofi Appiah [FTE: 1.0, Roles: Deputy Director of Admissions (UG Admissions)]
+  - Kostas Barmpis [FTE: 1.0, Roles: PGR Training Officer]
+  - Mike Freeman [FTE: 1.0, Roles: Academic Admissions Team]
+  - Mike O'Dea [FTE: 1.0, Roles: Other PLs]
+  - Nick Pears [FTE: 1.0, Roles: Deputy Head (Research)]
+  - Paul Cairns [FTE: 1.0, Roles: Other PLs, REF Lead]
+  - Pedro Ribeiro [FTE: 1.0, Roles: Progression Panel]
+  - Pengcheng Liu [FTE: 1.0, Roles: Graduate School Board (GSB) Chair]
+  - Peter Nightingale [FTE: 1.0, Roles: UG PL]
+  - Poonam Yadav [FTE: 1.0, Roles: Progression Panel]
+  - Pourya Shamsolmoali [FTE: 1.0, Roles: Other PLs, Graduate School Board (Ordinary member)]
+  - Radu Calinescu [FTE: 1.0, Roles: none]
+  - Rob Alexander [FTE: 1.0, Roles: StAMP committee members]
+  - Robbert Jongeling [FTE: 1.0, Roles: none]
+  - Roberto Metere [FTE: 1.0, Roles: StAMP committee members]
+  - Sam Braunstein [FTE: 1.0, Roles: none]
+  - Siamak Shahandashti [FTE: 1.0, Roles: Deputy Graduate Chair]
+  - Simon Foster [FTE: 1.0, Roles: none]
+  - Soumya Banerjee [FTE: 1.0, Roles: none]
+  - Stefano Pirandola [FTE: 1.0, Roles: Progression Panel Chair]
+  - Steven Wright [FTE: 1.0, Roles: Chair of the Board of Examiners]
+  - Steven Xiaotian Dai [FTE: 1.0, Roles: Student Disability Representative]
+  - Tommy Yuan [FTE: 1.0, Roles: Deputy CBoEs, StAMP committee members]
+  - Vasileios Vasilakis [FTE: 1.0, Roles: Deputy CBoEs]
+  - William Smith [FTE: 1.0, Roles: Director of Admissions, Internally Distributed Funding panel reviewer]
+  - Xinwei Fang [FTE: 1.0, Roles: Other PLs]
+  - Yan Jia [FTE: 1.0, Roles: none]
+  - Yuchen Zhao [FTE: 1.0, Roles: Other PLs]

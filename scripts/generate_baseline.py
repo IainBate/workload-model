@@ -22,9 +22,34 @@ PROJECT_ROOT = SCRIPTS_DIR.parent
 # Add project root to path for imports
 sys.path.insert(0, str(SCRIPTS_DIR))
 
-from data_loader import load_all_data, normalize_name
-from workload_calculator import calculate_workload
-from output_generator import OUTPUT_DIR, generate_all_outputs
+# Override OUTPUT_DIR before importing output_generator and role_based_reports
+# This ensures all generated files go to baseline/ instead of output/
+BASELINE_DIR = PROJECT_ROOT / "baseline"
+
+# Set environment variable that modules can check
+os.environ['WORKLOAD_BASELINE_MODE'] = '1'
+
+
+def patch_module_paths():
+    """
+    Patch module-level path constants to point to baseline directory.
+
+    This monkey-patches the OUTPUT_DIR, INDIVIDUAL_DIR, and DEPARTMENT_DIR
+    constants in both output_generator.py and role_based_reports.py modules
+    so they write to baseline/ instead of output/.
+    """
+    import output_generator
+    import role_based_reports
+
+    # Patch output_generator paths
+    output_generator.OUTPUT_DIR = BASELINE_DIR
+    output_generator.INDIVIDUAL_DIR = BASELINE_DIR / "Individual Reports"
+    output_generator.DEPARTMENT_DIR = BASELINE_DIR / "Department Summary"
+
+    # Patch role_based_reports paths
+    role_based_reports.OUTPUT_DIR = BASELINE_DIR
+    role_based_reports.INDIVIDUAL_DIR = BASELINE_DIR / "Individual Reports"
+    role_based_reports.DEPARTMENT_DIR = BASELINE_DIR / "Department Summary"
 
 
 def get_project_root():
@@ -71,13 +96,13 @@ def generate_baseline(data_dir: str = None):
     results = calculate_workload(year_data)
     print(f"  Results generated for {len(results)} staff members")
 
+    # Patch module paths to write to baseline directory
+    patch_module_paths()
+
     # Generate all outputs to baseline directory
     print("\nGenerating outputs...")
 
-    # Override OUTPUT_DIR to point to baseline
-    original_output_dir = OUTPUT_DIR
-
-    # Generate to baseline directory
+    # Generate to baseline directory (now patched to use BASELINE_DIR)
     generate_all_outputs(results, year_data, output_dir=str(baseline_dir))
 
     print(f"\nBaseline outputs saved to: {baseline_dir}")
