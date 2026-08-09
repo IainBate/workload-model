@@ -670,7 +670,41 @@ Admin Activities (card)
 |---------|-------------|-----------|-------|
 | Detail items (top-level) | 0px | 1em | Main activity rows |
 | Calculation details | 40px | 0.85em | Sub-calculation notes in smaller font |
+| First-time delivery / Repeat sessions | 80px | 0.85em | Practical session breakdown components |
 | Supervision detail groups | 20px | 1em | Container for supervision items |
+
+### 7. **Practical Sessions Calculation Details**
+
+Each practical sessions entry must include these nested calculation details:
+
+```
+Teaching Activities (card)
+└── Module Category (h4, blue border #2196F3)
+    └── Practical Sessions [teaching-activity badge]
+        └── Calculation (40px indent, smaller font 0.85em)
+            ├── Number of weeks: X weeks
+            ├── Week(s): 1,2,3,4,9,10,11,12 (or "every week" if full coverage)
+            ├── Number of practicals per week: Y
+            ├── Groups: N groups
+            ├── First-time delivery (80px indent)
+            │   └── {hours} @ {multiplier - e.g., 5x new lecturer / 2.5x standard}
+            └── Repeat sessions (80px indent)
+                └── {hours} @ 1.5x repetition rate
+```
+
+**Practicals Calculation Elements to Verify**:
+- [ ] **Number of weeks**: Shows how many weeks practicals run (default 11, or specific count if reduced)
+- [ ] **Week(s) specification**: Lists which weeks practicals occur (e.g., "1,2,3,4,9,10,11,12" or "every week")
+- [ ] **Number of practicals per week**: Shows the base practical count
+- [ ] **Groups**: Number of student groups being taught
+- [ ] **First-time delivery**: Shows hours at new lecturer (5x) or standard (2.5x) rate
+- [ ] **Repeat sessions**: Shows hours at 1.5x repetition multiplier
+
+---
+
+### 8. **Validation Checklist**
+
+When reviewing individual reports (for output or calculation verification), check:
 
 1. **Header Section**
    - [ ] Staff name matches expected value
