@@ -879,6 +879,10 @@ def _format_detailed_section_v2(title: str, detail_text: str, staff_name: Option
             repeated_sessions_line = None
             individual_lines = []  # Lines like "- Christopher: 2.0h/week @ 5x ..."
 
+            # Track calculation breakdown lines for the current lecturer type
+            # Format from workload_calculator: first line starts with "- ", continuation lines start with "  "
+            calculation_breakdown = []  # List of (indent_level, text) tuples
+
             for info in practicals_segments:
                 if '<strong>Practicals:</strong>' in info:
                     # This is the header line - extract groups and weeks info
@@ -889,24 +893,47 @@ def _format_detailed_section_v2(title: str, detail_text: str, staff_name: Option
                 elif 'Repeated sessions:' in info:
                     repeated_sessions_line = info
                 else:
-                    # This is likely an individual lecturer line (starts with "- " or "  - ")
-                    if info.strip().startswith('-'):
-                        individual_lines.append(info)
+                    # This is likely a calculation breakdown line
+                    # Check if it starts with "- " (new lecturer type header) or "  " (continuation)
+                    stripped = info.strip()
+                    if stripped.startswith('-'):
+                        # New lecturer type calculation line - save previous and start new
+                        if calculation_breakdown:
+                            individual_lines.append(calculation_breakdown[:])
+                        calculation_breakdown = [(0, stripped)]
+                    elif stripped.startswith('  '):
+                        # Continuation line (Repeated delivery or Total)
+                        if calculation_breakdown:
+                            calculation_breakdown.append((2, stripped))
+                        else:
+                            # No prior "- " line, add directly
+                            individual_lines.append([(0, stripped)])
 
-            # Reorganize: First time delivery first, then repeat info, then individual calculation
+            # Save the last calculation breakdown
+            if calculation_breakdown:
+                individual_lines.append(calculation_breakdown[:])
+
+            # Reorganize: First time delivery first, then repeat info, then individual calculations
             if first_time_delivery_line:
-                # The line already contains the calculation details from workload_calculator
-                practicals_html_parts.append(f"<p style='margin: 8px 0;'>{first_time_delivery_line}</p>")
+                # Parse the line to extract just the "First delivery:" part without the full calculation
+                first_delivery_text = re.sub(r'^\s*-\s*', '', first_time_delivery_line.strip())
+                practicals_html_parts.append(f"<p style='margin: 8px 0;'>{first_delivery_text}</p>")
 
             # Add repeated sessions info right after first time delivery
             if repeated_sessions_line:
                 practicals_html_parts.append(f"<p style='margin: 8px 0;'><small>{repeated_sessions_line}</small></p>")
 
-            # Add individual lecturer calculations
-            # Note: Lines now use generic labels like "First delivery:" and "Repeated delivery:"
-            # instead of staff names, so we show all calculation lines (they're the same format for all)
-            for line in individual_lines:
-                practicals_html_parts.append(f"<p style='margin: 8px 0;'><small>{line.strip()}</small></p>")
+            # Add individual lecturer calculations with proper line breaks
+            for breakdown in individual_lines:
+                # Each breakdown is a list of (indent_level, text) tuples
+                if breakdown:
+                    for indent, text in breakdown:
+                        if indent == 0:
+                            # Main calculation line - use <strong>
+                            practicals_html_parts.append(f"<p style='margin: 8px 0;'><small>{text}</small></p>")
+                        else:
+                            # Continuation lines (Repeated delivery, Total) - smaller indent
+                            practicals_html_parts.append(f"<p style='margin: 4px 0 0 3em;'><small>{text}</small></p>")
 
             # Combine all practicals parts
             for part in practicals_html_parts:
