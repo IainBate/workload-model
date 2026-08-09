@@ -395,91 +395,50 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
                     repeat_share = (repeat_sessions * contact_per_practical * rep_rate * practicals_count) / n_teachers
                     individual_practical_hours[t] = first_session + repeat_share
 
-        if ("COM00029I" in module.codes or "COM00018I" in module.codes) and any("Crispin" in t or "Christopher" in t for t in teachers):
-            print(f"=== DEBUG SYS Practical Calculation ===")
-            print(f"Module: {module.name}, Codes: {module.codes}")
-            print(f"Teachers: {teachers}")
-            print(f"practicals_count: {practicals_count}")
-            print(f"individual_practical_hours (weekly): {individual_practical_hours}")
-            for t, hrs in individual_practical_hours.items():
-                total_hrs = hrs * practical_week_count
-                print(f"  {t}: {hrs:.1f}h/week x {practical_week_count}w = {total_hrs:.1f}h")
 
-            # Total hours across all teachers (for tracking total workload)
-            practical_hours_total = sum(individual_practical_hours.values())
+        # Store per-teacher practical hours (same for all when no parallel groups)
+        if n_groups == 0 and practical_week_count > 0:
+            # No parallel groups - single session type shared by all teachers
+            # Each week: one session delivered once at 2.5x (first delivery) or 1.5x (repeat)
 
-            # Build display details - each week pattern
-            repeat_count = len(other_weeks) if module.practical_weeks and len(module.practical_weeks) > 1 else TEACHING_WEEKS_PER_SEMESTER - 1
-            if repeat_count > 0:
-                weeks_str = ", ".join(str(w) for w in other_weeks[:5]) + ("..." if repeat_count > 5 else "")
-                repeat_display = f"{repeat_count}w @ {rep_rate}x (weeks {weeks_str})"
-            else:
-                repeat_display = "no repeats"
+            rep_rate = config.REPETITION_MULTIPLIER
 
-            # Calculate per-teacher breakdown details
-            new_first_per_session = contact_per_practical * config.TEACHING_MULTIPLIERS["lecture_new_content_or_lecturer"] * practicals_count
-            std_first_per_session = contact_per_practical * config.TEACHING_MULTIPLIERS["problem_class_seminar_practical"] * practicals_count
+            # First delivery (week 1) at higher rate, repeats at lower rate
+            #
+            # For new lecturers: first session = 5x (content dev + delivery)
+            # For standard lecturers: first session = 2.5x (delivery only)
+            # All lecturers share the same session, so we calculate total then divide
 
-            # Display individual practical hours per teacher type
-            # Note: first_session values are weekly hours (include practicals_count)
-            # Combine new lecturers and existing with new content for display
+            # First week's session - split by lecturer type
+            # Multiply by practicals_count since each teacher delivers that many sessions per week
+            first_week_first_delivery = contact_per_practical * config.TEACHING_MULTIPLIERS["lecture_new_content_or_lecturer"] * practicals_count
+            first_week_std_delivery = contact_per_practical * config.TEACHING_MULTIPLIERS["problem_class_seminar_practical"] * practicals_count
+
+            # Total for first week (all lecturers combined)
             n_new_or_content = len(new_lecturers_practical) + len(existing_with_new_content_practical)
-
-            # Practicals breakdown
-            practical_total_weekly = sum(individual_practical_hours.values())
-            practical_total_hrs = practical_total_weekly * practical_week_count
-
-            # Show "Practicals:" as a section header
-            practical_details.append(
-                f"<strong>Practicals:</strong> {n_groups} group(s) over {practical_week_count} weeks"
+            first_week_total = (
+                n_new_or_content * first_week_first_delivery +
+                len(standard_lecturers_practical) * first_week_std_delivery
             )
+            first_week_per_teacher = first_week_total / n_teachers
 
-            # First time delivery - each lecturer gets one first session per week
-            first_time_sessions = min(n_groups, n_teachers)
-            # Calculate weekly hours for standard lecturer (2.5x) as reference
-            first_session_weekly_hrs = contact_per_practical * config.TEACHING_MULTIPLIERS["problem_class_seminar_practical"] * practicals_count
+            # Other weeks - all at repetition rate (1.5x)
+            other_weeks_count = max(0, practical_week_count - 1)
+            if other_weeks_count > 0:
+                repeat_session_hours = contact_per_practical * rep_rate * practicals_count
+                other_weeks_total = other_weeks_count * repeat_session_hours * n_teachers
+                other_weeks_per_teacher = other_weeks_total / n_teachers
 
-            # Show individual lecturer breakdown - single clean summary with indented Total line
-            if new_lecturers_practical or existing_with_new_content_practical:
-                t = sorted(new_lecturers_practical + existing_with_new_content_practical)[0]  # Just use first one
-                weekly_hrs = individual_practical_hours[t]
-                total_hrs = weekly_hrs * practical_week_count
-                new_lecturer_repeat_hrs = (repeat_sessions / n_teachers) * config.REPETITION_MULTIPLIER
-                practical_details.append(
-                    f"- First time delivery: {first_time_sessions} group(s) (one per lecturer). {contact_per_practical:.1f}h x 2.5 multiplier per week."
-                )
-                practical_details.append(
-                    f"Repeated sessions: {repeat_sessions} group(s) without first-session slots ({repeat_sessions/n_teachers:.1f} group(s)/lecturer @ 1.5x)"
-                )
-                # Only show indented Total line (no First delivery or Repeated delivery intermediate lines)
-                practical_details.append(
-                    f"    Total: {weekly_hrs:.1f}h/week = {total_hrs:.1f}h total"
-                )
-            elif standard_lecturers_practical:
-                # Only standard lecturers - show single breakdown
-                t = sorted(standard_lecturers_practical)[0]  # Just use first one for values
-                weekly_hrs = individual_practical_hours[t]
-                total_hrs = weekly_hrs * practical_week_count
-                standard_repeat_hrs = (repeat_sessions / n_teachers) * config.REPETITION_MULTIPLIER
-                practical_details.append(
-                    f"- First time delivery: {first_time_sessions} group(s) (one per lecturer). {contact_per_practical:.1f}h x 2.5 multiplier per week."
-                )
-                practical_details.append(
-                    f"Repeated sessions: {repeat_sessions} group(s) without first-session slots ({repeat_sessions/n_teachers:.1f} group(s)/lecturer @ 1.5x)"
-                )
-                # Only show indented Total line (no First delivery or Repeated delivery intermediate lines)
-                practical_details.append(
-                    f"    Total: {weekly_hrs:.1f}h/week = {total_hrs:.1f}h total"
-                )
-
-            # Add to breakdown (per-teacher values - use individual hours)
-            for t in teachers:
-                if t not in practical_breakdown.get("practicals_per_teacher", {}):
-                    if "practicals_per_teacher" not in practical_breakdown:
-                        practical_breakdown["practicals_per_teacher"] = {}
-                    practical_breakdown["practicals_per_teacher"][t] = individual_practical_hours[t] * practical_week_count
-
+                practical_hours_one = first_week_per_teacher + other_weeks_per_teacher
+            else:
+                practical_hours_one = first_week_per_teacher
         else:
+            # No additional sessions or no parallel groups - use individual hours from above
+            practical_hours_one = 0.0
+
+        practical_hours_total = practical_hours_one * n_teachers
+
+        for t in teachers:
             # No parallel groups - single session type shared by all teachers
             # Each week: one session delivered once at 2.5x (first delivery) or 1.5x (repeat)
 
