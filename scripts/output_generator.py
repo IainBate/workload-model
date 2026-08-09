@@ -790,7 +790,7 @@ def generate_html_report(results: List[WorkloadResult], year_data: YearData,
                 </div>
                 <div class="summary-item">
                     <span class="summary-label">Nominal Total</span>
-                    <span class="summary-value">{total_fte * NOMINAL_WORKING_HOURS_PER_YEAR:,.0f}h</span>
+                    <span class="summary-value">{total_fte * config.NOMINAL_WORKING_HOURS_PER_YEAR:,.0f}h</span>
                     <span class="summary-subtext">At 100% FTE</span>
                 </div>
             </div>
