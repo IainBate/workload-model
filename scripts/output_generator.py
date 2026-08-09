@@ -1588,15 +1588,3 @@ def generate_all_outputs(results: List[WorkloadResult], year_data: YearData,
 
     # Generate HTML report
     generate_html_report(results, year_data, output_dir)
-
-    # Generate role-based reports (individual and department summary only)
-    # Use output_dir passed to this function instead of module-level constants
-    individual_output = os.path.join(output_dir, "Individual Reports")
-    department_output = os.path.join(output_dir, "Department Summary")
-
-    print("\n" + "=" * 60)
-    print("Generating Role-Based Reports")
-    print("=" * 60)
-
-    generate_individual_reports(results, year_data, individual_output)
-    generate_department_summary(results, year_data, department_output)
