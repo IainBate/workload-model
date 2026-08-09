@@ -883,7 +883,7 @@ def generate_html_report(results: List[WorkloadResult], year_data: YearData,
         staff_report_path = os.path.join(staff_report_dir, report_filename)
 
         # Generate individual HTML for this staff member
-        individual_html = generate_individual_staff_report(r, year_data)
+        individual_html = _create_individual_staff_report_html(r, year_data)
         with open(staff_report_path, "w", encoding="utf-8") as f:
             f.write(individual_html)
 
