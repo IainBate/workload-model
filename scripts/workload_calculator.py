@@ -334,10 +334,6 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
             first_week = 1
             other_weeks = list(range(2, TEACHING_WEEKS_PER_SEMESTER + 1))
 
-        if "COM00029I" in module.codes and any("Crispin" in t or "Christopher" in t for t in teachers):
-            print(f"practical_week_count: {practical_week_count}")
-            print(f"other_weeks: {other_weeks}")
-
         n_teachers = len(teachers)
 
         # Identify new vs standard lecturers for practical calculations (use per-module tracking)
@@ -347,11 +343,6 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
                                    if t not in known_lecturers_for_module and t not in known_lecturers_global]
         existing_with_new_content_practical = []  # Taught before but on new content
         standard_lecturers_practical = []
-
-        if ("COM00029I" in module.codes or "COM00018I" in module.codes) and any("Crispin" in t or "Christopher" in t for t in teachers):
-            print(f"known_lecturers_for_module: {list(known_lecturers_for_module)}")
-            print(f"known_lecturers_global (first 5): {list(known_lecturers_global)[:5]}...")
-            print(f"new_lecturers_practical: {new_lecturers_practical}")
 
         for t in teachers:
             if t in known_lecturers_for_module or t in known_lecturers_global:
