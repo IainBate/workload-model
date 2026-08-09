@@ -22,6 +22,11 @@ PROJECT_ROOT = SCRIPTS_DIR.parent
 # Add project root to path for imports
 sys.path.insert(0, str(SCRIPTS_DIR))
 
+from data_loader import load_all_data
+from workload_calculator import calculate_workload
+from output_generator import generate_all_outputs
+
+
 # Override OUTPUT_DIR before importing output_generator and role_based_reports
 # This ensures all generated files go to baseline/ instead of output/
 BASELINE_DIR = PROJECT_ROOT / "baseline"
