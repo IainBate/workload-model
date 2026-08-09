@@ -246,10 +246,17 @@ _NON_PERSON_ENTRIES = {
 
 
 def normalize_name(name: str, reverse_lookup: Dict[str, str],
-                   unknown_callback=None) -> Optional[str]:
+                   unknown_callback=None,
+                   mappings: Dict[str, List[str]] = None) -> Optional[str]:
     """
     Normalize a staff name to its canonical form.
     If the name is not in the lookup, prompt the user if unknown_callback is provided.
+
+    Args:
+        name: The raw name to normalize
+        reverse_lookup: Mapping from alias lowercase to canonical name
+        unknown_callback: Callback for unknown names (receives name, canonical_hint, mappings)
+        mappings: Optional staff name mappings for alias suggestions
     """
     if not name:
         return None
@@ -272,8 +279,12 @@ def normalize_name(name: str, reverse_lookup: Dict[str, str],
         if (len(key) <= 3 and key == alias.lower()[:len(key)]) or \
            (' ' in key and key == alias.lower()[:len(key)]):
             if unknown_callback:
-                if unknown_callback(name, canonical):
-                    return canonical
+                if mappings:
+                    if unknown_callback(name, canonical, mappings=mappings):
+                        return canonical
+                else:
+                    if unknown_callback(name, canonical):
+                        return canonical
                 # User said no - don't match this alias, try next one
                 continue
             else:
@@ -281,11 +292,14 @@ def normalize_name(name: str, reverse_lookup: Dict[str, str],
 
     # If nothing matches, ask the user or return as-is
     if unknown_callback:
-        if unknown_callback(name, None):
-            return name
+        if mappings:
+            if unknown_callback(name, None, mappings=mappings):
+                return name
         else:
-            # User said no - skip this unknown staff member
-            return None
+            if unknown_callback(name, None):
+                return name
+        # User said no - skip this unknown staff member
+        return None
     # Non-interactive mode: return the raw name (will be flagged later)
     # Also skip obvious non-person entries
     if name.strip().lower() in _NON_PERSON_ENTRIES:
