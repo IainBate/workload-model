@@ -1555,103 +1555,18 @@ def generate_per_staff_reports(results: List[WorkloadResult], year_data: YearDat
     staff_reports_dir = os.path.join(output_dir, "Individual Reports")
     os.makedirs(staff_reports_dir, exist_ok=True)
 
+    # Generate individual reports using the helper function
     for r in results:
-        # Get module details if available
-        module_details = getattr(r, 'module_details', []) or []
+        html_content = _create_individual_staff_report_html(r, year_data)
 
-        # Build a map of module names and count modules with various teaching components
-        module_teaching_map = {}
-        module_count = 0
-        modules_with_practicals = []
-        modules_with_supervision = []
+        # Sanitize filename
+        safe_name = "".join(c if c.isalnum() or c in " -_" else "_" for c in r.name)
+        filepath = os.path.join(staff_reports_dir, f"{safe_name}_workload.html")
 
-        for detail in module_details:
-            if '(' in detail and ')' in detail:
-                # Extract module name like "SOF1 (COM00015C) [20cr, Stage 1]"
-                parts = detail.split(' (')
-                if len(parts) >= 2:
-                    module_name = parts[0].strip()
-                    module_info = '(' + parts[1] if ')' in parts[1] else detail
-                    module_count += 1
+        with open(filepath, "w", encoding="utf-8") as f:
+            f.write(html_content)
 
-                    # Track modules with different components
-                    if 'practical' in detail.lower():
-                        modules_with_practicals.append(module_name)
-
-                    # Check for supervision-related terms (Pastoral, Projects, Supervision)
-                    if any(term in detail for term in ['Pastoral:', 'Projects:', 'Supervision:']):
-                        modules_with_supervision.append(module_name)
-
-                    module_teaching_map[module_name] = {
-                        'info': module_info,
-                        'has_practicals': 'practical' in detail.lower(),
-                        'has_supervision': any(term in detail for term in ['Pastoral:', 'Projects:', 'Supervision:'])
-                    }
-                    # Try to extract teacher count from the detail string
-                    if 'per teacher' in detail.lower():
-                        # Look for patterns like "1.0/teacher" or "3/teacher"
-                        teacher_match = re.search(r'([\d.]+)\s*/\s*teacher', detail, re.IGNORECASE)
-                        if teacher_match:
-                            # Convert to int - round to nearest integer since teachers are whole people
-                            num_teachers = int(round(float(teacher_match.group(1))))
-                            module_teaching_map[module_name]['num_teachers'] = num_teachers
-
-        def format_detail_section(title, hours, breakdown, css_class, is_teaching=False, supervision_details=None,
-                                   known_lecturers_per_module=None):
-            """Format a detail section for the workload report HTML."""
-            if not breakdown or all(v == 0 for v in breakdown.values()):
-                return f"""<div class="section-card {css_class}">
-                <div class="card-header">
-                    <span class="card-title">{title}</span>
-                    <span class="card-total">{hours:.1f}h</span>
-                </div>
-                <p>No activities recorded for this category.</p>
-            </div>"""
-
-            # Special handling for teaching - show hierarchical structure
-            if is_teaching:
-                return format_teaching_section(title, hours, breakdown, css_class, supervision_details,
-                                                known_lecturers_per_module)
-
-            # Group items by subcategory for research/admin
-            def get_category(item_name):
-                if item_name.startswith("grant_"):
-                    return "Research Grants"
-                elif item_name in ["primary_research_allowance", "protected_research_baseline"]:
-                    return "Research Allowances"
-                elif item_name in ["phd_supervision", "primary_supervisor", "co_supervisor", "assessor"]:
-                    # Skip phd_supervision as it's a combined total (redundant with individual items)
-                    if item_name == "phd_supervision":
-                        return None  # Mark for exclusion
-                    return "PhD Supervision"
-                else:
-                    return "Other"
-
-            # Group items by subcategory
-            categories = {}
-            for name, value in breakdown.items():
-                if value > 0:
-                    cat = get_category(name)
-                    # Skip items marked as None (e.g., phd_supervision combined total)
-                    if cat is None:
-                        continue
-                    if cat not in categories:
-                        categories[cat] = []
-                    categories[cat].append((name, value))
-
-            items_html_parts = []
-
-            for category_name, items in sorted(categories.items()):
-                # Category header with subtotal
-                cat_total = sum(v for _, v in items)
-                items_html_parts.append(f"""<div style="margin-bottom:20px;">
-                    <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #4CAF50;padding-left:10px;">{category_name} ({cat_total:.1f}h)</h4>""")
-
-                if len(items) == 1:
-                    item_name, item_value = items[0]
-                    # Use display-friendly names for specific items
-                    display_names = {
-                        "service_points": "University committee work",
+    print(f"Per-staff reports saved to {staff_reports_dir}")
                         "engagement": "General departmental engagement, e.g. meetings and email",
                         "personal_development": "Personal Development",
                         "protected_research_baseline": "Protected research baseline"
