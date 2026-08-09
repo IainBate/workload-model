@@ -747,6 +747,6 @@ When reviewing individual reports (for output or calculation verification), chec
    - [ ] Grand total matches sum of components
    - [ ] Subtotals match section card totals
 
-8. **Assumptions/Missing Data**
+7. **Assumptions/Missing Data**
    - [ ] All assumptions are documented
    - [ ] Missing data is flagged appropriately
