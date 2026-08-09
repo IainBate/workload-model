@@ -1303,7 +1303,7 @@ def load_all_data(data_dir: str = None,
             if yaml_role is None:
                 continue  # Skip non-role entries like "Group Leads"
             for member in members:
-                norm_member = normalize_name(member, reverse_lookup, unknown_callback)
+                norm_member = normalize_name(member, reverse_lookup, unknown_callback, mappings)
                 if norm_member == canonical:
                     staff_roles.append(yaml_role)
 
