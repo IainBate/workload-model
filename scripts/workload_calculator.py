@@ -468,16 +468,32 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
                 t = sorted(new_lecturers_practical + existing_with_new_content_practical)[0]  # Just use first one
                 weekly_hrs = individual_practical_hours[t]
                 total_hrs = weekly_hrs * practical_week_count
+                new_lecturer_first_delivery_hrs = contact_per_practical * config.TEACHING_MULTIPLIERS["lecture_new_content_or_lecturer"]
+                new_lecturer_repeat_hrs = (repeat_sessions / n_teachers) * config.REPETITION_MULTIPLIER
                 practical_details.append(
-                    f"  - First delivery: {contact_per_practical:.1f}h/week lecture @ 5x (new content) + {repeat_sessions/n_teachers:.1f}h repeated delivery @ 1.5x = {weekly_hrs:.1f}h/week = {total_hrs:.1f}h total"
+                    f"  - First delivery: {contact_per_practical:.1f}h/week lecture @ 5x (new content)"
+                )
+                practical_details.append(
+                    f"    Repeated delivery: {repeat_sessions/n_teachers:.1f}h/week @ 1.5x = {new_lecturer_repeat_hrs:.1f}h/week"
+                )
+                practical_details.append(
+                    f"    Total: {weekly_hrs:.1f}h/week = {total_hrs:.1f}h total"
                 )
             # For standard lecturers, show ONE generic line (all get same calculation)
             if standard_lecturers_practical:
                 t = sorted(standard_lecturers_practical)[0]  # Just use first one for values
                 weekly_hrs = individual_practical_hours[t]
                 total_hrs = weekly_hrs * practical_week_count
+                standard_first_delivery_hrs = contact_per_practical * config.TEACHING_MULTIPLIERS["problem_class_seminar_practical"]
+                standard_repeat_hrs = (repeat_sessions / n_teachers) * config.REPETITION_MULTIPLIER
                 practical_details.append(
-                    f"  - First delivery: {contact_per_practical:.1f}h/week lecture @ 2.5x + {repeat_sessions/n_teachers:.1f}h repeated delivery @ 1.5x = {weekly_hrs:.1f}h/week = {total_hrs:.1f}h total"
+                    f"  - First delivery: {contact_per_practical:.1f}h/week lecture @ 2.5x"
+                )
+                practical_details.append(
+                    f"    Repeated delivery: {repeat_sessions/n_teachers:.1f}h/week @ 1.5x = {standard_repeat_hrs:.1f}h/week"
+                )
+                practical_details.append(
+                    f"    Total: {weekly_hrs:.1f}h/week = {total_hrs:.1f}h total"
                 )
 
             # Show repeat breakdown if any
