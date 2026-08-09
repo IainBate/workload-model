@@ -1523,6 +1523,8 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
             grant_titles=grant_titles,
             module_details=tuple(module_details),  # Convert to tuple for frozen dataclass
             supervision_details=tuple(unique_supervision),  # Convert to tuple for frozen dataclass
+            pastoral_breakdown=pastoral_breakdown,  # Structured pastoral supervision breakdown
+            project_breakdown=project_breakdown,  # Structured project supervision breakdown
         )
         results.append(result)
 
