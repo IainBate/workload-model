@@ -1344,23 +1344,11 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
 
             items_html_parts.append("</div>")
 
-        supervision_details_list = supervision_details or []
-        if supervision_details_list:
-            past_hours_total = 0.0
-            proj_hours_total = 0.0
-            past_students_total = 0
-            proj_projects_total = 0
-
-            for detail in supervision_details_list:
-                past_match = re.search(r'(?:.*?:\s*)?Pastoral:\s*(\d+(?:\.\d+)?)\s+students\s*x\s*(\d+(?:\.\d+)?)h\s*=\s*(\d+(?:\.\d+)?)h', detail)
-                if past_match:
-                    past_students_total += int(float(past_match.group(1)))
-                    past_hours_total += float(past_match.group(3))
-
-                proj_match = re.search(r'(?:.*?:\s*)?Projects:\s*(\d+(?:\.\d+)?)\s+projects\s+x\s+(UG|MSc)\s*\((\d+(?:\.\d+)?)h\)\s*=\s*(\d+(?:\.\d+)?)h', detail)
-                if proj_match:
-                    proj_projects_total += int(float(proj_match.group(1)))
-                    proj_hours_total += float(proj_match.group(4))
+        # Phase 3b: Use structured supervision breakdowns instead of regex parsing
+        # Pastoral supervision
+        if pastoral_breakdown:
+            past_hours_total = pastoral_breakdown.get('total', 0.0)
+            past_students_total = pastoral_breakdown.get('student_count', 0)
 
             items_html_parts.append(f"""<div style="margin-bottom:25px;">
                 <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #FF9800;padding-left:10px;">Pastoral Supervision ({past_hours_total:.1f}h)</h4>
@@ -1373,12 +1361,18 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
                 </div>
             </div>""")
 
+        # Project supervision
+        if project_breakdown:
+            proj_hours_total = project_breakdown.get('total', 0.0)
+            proj_projects_total = project_breakdown.get('project_count', 0)
+            proj_level = project_breakdown.get('level', 'UG')
+
             items_html_parts.append(f"""<div style="margin-bottom:25px;">
                 <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #FF9800;padding-left:10px;">Project Supervision ({proj_hours_total:.1f}h)</h4>
                 <div style="margin-left:20px;">
                     <div class="detail-item {css_class}">
                         <span class="detail-name">Projects</span>
-                        <span class="detail-hours">{proj_projects_total} projects x UG = {proj_hours_total:.1f}h</span>
+                        <span class="detail-hours">{proj_projects_total} projects x {proj_level} = {proj_hours_total:.1f}h</span>
                         <span class="detail-activity admin-activity"></span>
                     </div>
                 </div>
