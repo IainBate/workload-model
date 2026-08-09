@@ -1150,7 +1150,7 @@ def load_all_data(data_dir: str = None,
             # Track teachers per module
             module_teachers: Set[str] = set()
             for t in m.teachers:
-                name = normalize_name(t, reverse_lookup, unknown_callback)
+                name = normalize_name(t, reverse_lookup, unknown_callback, mappings)
                 if name:
                     known_lecturers.add(name)
                     module_teachers.add(name)
