@@ -439,8 +439,14 @@ def validate_workload_result(result, tolerance: float = 0.1) -> List[ValidationI
             field_name="admin_hours"
         ))
 
+    # Helper to get numeric values from breakdown dict (filtering out nested dicts)
+    def get_numeric_values(d):
+        """Extract only numeric values from a breakdown dict, filtering out nested dicts."""
+        return [v for v in d.values() if isinstance(v, (int, float))]
+
     # Check teaching breakdown sum
-    teaching_sum = sum(result.teaching_breakdown.values())
+    teaching_values = get_numeric_values(result.teaching_breakdown)
+    teaching_sum = sum(teaching_values) if teaching_values else 0.0
     if abs(teaching_sum - result.teaching_hours) > tolerance:
         issues.append(ValidationIssue(
             level=ValidationLevel.ERROR,
@@ -449,7 +455,8 @@ def validate_workload_result(result, tolerance: float = 0.1) -> List[ValidationI
         ))
 
     # Check research breakdown sum
-    research_sum = sum(result.research_breakdown.values())
+    research_values = get_numeric_values(result.research_breakdown)
+    research_sum = sum(research_values) if research_values else 0.0
     if abs(research_sum - result.research_hours) > tolerance:
         issues.append(ValidationIssue(
             level=ValidationLevel.ERROR,
@@ -458,7 +465,8 @@ def validate_workload_result(result, tolerance: float = 0.1) -> List[ValidationI
         ))
 
     # Check admin breakdown sum
-    admin_sum = sum(result.admin_breakdown.values())
+    admin_values = get_numeric_values(result.admin_breakdown)
+    admin_sum = sum(admin_values) if admin_values else 0.0
     if abs(admin_sum - result.admin_hours) > tolerance:
         issues.append(ValidationIssue(
             level=ValidationLevel.ERROR,
