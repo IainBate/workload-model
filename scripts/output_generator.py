@@ -1163,28 +1163,22 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
             lecture_contact_hours = module_breakdown.get('lecture_contact_hours', 0.0)
             total_lecture_hours = module_breakdown.get('total_lecture_hours', 0.0)
 
-            # Calculate teacher count from total lecture hours and per-teacher contact hours
-            teacher_count = int(round(total_lecture_hours / lecture_contact_hours)) if lecture_contact_hours > 0 else 1
-
             # Calculate weeks of teaching (typically 11 weeks per semester)
             weeks = config.TEACHING_WEEKS_PER_SEMESTER
 
             if is_new_lecturer:
                 lecturer_type = "New lecturer (5x)"
 
-                # First line: describe the schedule simply
-                # Format: "11 weeks of 2 hour lectures split between 3 lecturers = 26.7h"
-                description = f"{weeks} weeks of {lecture_contact_hours:.1f}h lectures split between {teacher_count} lecturers = {total_lecture_hours:.1f}h total"
-
-                # Calculation breakdown on second line
+                # First line: show the calculation breakdown directly
+                # For new lecturers: standard_equivalent @ 2.5x + content_dev = total
                 standard_equivalent = delivery_per_module / 5.0 * 2.5
                 content_dev = delivery_per_module - standard_equivalent
-                calculation_text = f"{standard_equivalent:.1f}h @ 2.5x + {content_dev:.1f}h content dev = {delivery_per_module:.1f}h"
+                description = f"{standard_equivalent:.1f}h @ 2.5x + {content_dev:.1f}h content dev = {delivery_per_module:.1f}h"
             else:
                 lecturer_type = "Standard (2.5x)"
-                # For standard lecturers, show schedule on first line
-                description = f"{weeks} weeks of {lecture_contact_hours:.1f}h lectures split between {teacher_count} lecturers = {total_lecture_hours:.1f}h total"
-                calculation_text = f"{total_lecture_hours:.1f}h contact @ {teacher_count} teachers = {lecture_contact_hours:.1f} each × 2.5x"
+                # For standard lecturers: show weekly schedule
+                hours_per_week = lecture_contact_hours * weeks if lecture_contact_hours > 0 else total_lecture_hours / weeks if weeks > 0 else 0
+                description = f"{weeks} weeks of {lecture_contact_hours:.1f}h/week = {hours_per_week:.1f}h"
 
             # Include module code in label for clarity, but only if it looks like a valid code
             # Skip codes that are empty or look like placeholders (contain < or >)
@@ -1195,10 +1189,6 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
                 <span class="detail-name">{label_prefix}Delivery (Lectures)</span>
                 <span class="detail-hours">{description}</span>
                 <span class="detail-activity teaching-activity"></span>
-            </div>""")
-            parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
-                <span class="detail-name" style="color:#333;">Calculation</span>
-                <span class="detail-hours">{calculation_text}</span>
             </div>""")
         return parts
 
