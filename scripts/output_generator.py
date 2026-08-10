@@ -1264,7 +1264,7 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
             is_new_lecturer = _determine_lecturer_type(r.name, code, known_lecturers_per_module or {})
 
             # Build module items
-            parts.extend(_format_module_delivery_section(module_breakdown, is_new_lecturer, css_class))
+            parts.extend(_format_module_delivery_section(module_breakdown, is_new_lecturer, css_class, code))
             parts.extend(_format_module_practicals_section(module_breakdown, css_class))
             parts.extend(_format_module_assessment_section(module_breakdown, css_class))
 
