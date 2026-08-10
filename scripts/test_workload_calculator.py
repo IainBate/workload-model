@@ -465,7 +465,7 @@ class TestResearchWorkload:
             active=True
         )
 
-        total, breakdown, detail, grant_titles = _calculate_research_workload(staff)
+        total, breakdown, detail, grant_titles, _ = _calculate_research_workload(staff)
 
         expected_hours = (
             2 * config.SUPERVISION_MULTIPLIERS["pgr_primary_supervisor_per_fte"] +
