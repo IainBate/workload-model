@@ -268,7 +268,8 @@ def _calculate_practical_hours_and_breakdown(module: ModuleData, teachers: List[
 
                 # Calculate total hours for one teacher teaching one group
                 # First session rate applies to the first session per week
-                first_session_total = weekly_hrs * first_session_rate * contact_weeks
+                # Note: group_sessions is the number of sessions per week, weekly_hrs is hours per session
+                first_session_total = group_sessions * weekly_hrs * first_session_rate * contact_weeks
                 repeat_sessions = max(0, group_sessions - 1)
                 repeat_session_total = repeat_sessions * weekly_hrs * first_session_rate * repeat_rate * contact_weeks
 
