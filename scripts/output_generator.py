@@ -1245,8 +1245,18 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
             </div>""")
         else:
             # Fallback to default rates if structured data not available
+            # Calculate practicals from breakdown values if total isn't available
             first_session_rate = config.TEACHING_MULTIPLIERS.get('problem_class_seminar_practical', 2.5)
             rep_rate = config.REPETITION_MULTIPLIER
+
+            # Try to get total from structured breakdown, or calculate from components
+            practicals_per_module = practicals_structured.get('total', 0) if isinstance(practicals_structured, dict) and practicals_structured else 0
+            if practicals_per_module == 0:
+                # Calculate from components: first_session_total + repeat_session_total
+                fs_total = practicals_structured.get('first_session_total', 0) if isinstance(practicals_structured, dict) else 0
+                rs_total = practicals_structured.get('repeat_session_total', 0) if isinstance(practicals_structured, dict) else 0
+                practicals_per_module = fs_total + rs_total
+
             label_prefix = ""
             if module_code and not module_code.startswith('<') and not module_code.endswith('>'):
                 label_prefix = f"[{module_code}] "
