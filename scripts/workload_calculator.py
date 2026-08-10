@@ -290,7 +290,7 @@ def _calculate_practical_hours_and_breakdown(module: ModuleData, teachers: List[
                     )
         else:
             # No parallel groups - all teachers get same rate
-            std_first_session_weekly = getattr(module, 'practical_hours_per_week', config.TEACHING_PROBLEM_CLASS)
+            std_first_session_weekly = getattr(module, 'practical_contact_hours', config.TEACHING_PROBLEM_CLASS)
             repeat_rate = config.REPETITION_MULTIPLIER
 
             # Calculate total practical hours for the semester (including weeks and repetition multiplier)
