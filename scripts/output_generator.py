@@ -1059,39 +1059,8 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
         ".footer { text-align: center; margin-top: 40px; padding-top: 20px; border-top: 2px solid #eee; font-size: 0.85em; color: #888; } "
     )
 
-    # Get module details if available
+    # Get module details if available (for backward compatibility)
     module_details = getattr(r, 'module_details', []) or []
-
-    # Build a map of module names and count modules with various teaching components
-    module_teaching_map = {}
-    module_count = 0
-    modules_with_practicals = []
-    modules_with_supervision = []
-
-    for detail in module_details:
-        if '(' in detail and ')' in detail:
-            parts = detail.split(' (')
-            if len(parts) >= 2:
-                module_name = parts[0].strip()
-                module_info = '(' + parts[1] if ')' in parts[1] else detail
-                module_count += 1
-
-                if 'practical' in detail.lower():
-                    modules_with_practicals.append(module_name)
-
-                if any(term in detail for term in ['Pastoral:', 'Projects:', 'Supervision:']):
-                    modules_with_supervision.append(module_name)
-
-                module_teaching_map[module_name] = {
-                    'info': module_info,
-                    'has_practicals': 'practical' in detail.lower(),
-                    'has_supervision': any(term in detail for term in ['Pastoral:', 'Projects:', 'Supervision:'])
-                }
-                if 'per teacher' in detail.lower():
-                    teacher_match = re.search(r'([\d.]+)\s*/\s*teacher', detail, re.IGNORECASE)
-                    if teacher_match:
-                        num_teachers = int(round(float(teacher_match.group(1))))
-                        module_teaching_map[module_name]['num_teachers'] = num_teachers
 
     def format_detail_section(title: str, hours: float, breakdown: Dict[str, float], css_class: str,
                               is_teaching: bool = False,
