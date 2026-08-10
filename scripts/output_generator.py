@@ -1227,14 +1227,16 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
             </div>""")
         return parts
 
-    def _format_module_assessment_section(module_breakdown: Dict[str, Any], css_class: str) -> List[str]:
+    def _format_module_assessment_section(module_breakdown: Dict[str, Any], css_class: str,
+                                          module_code: Optional[str] = None) -> List[str]:
         """Format assessment setting and marking sections for a module."""
         parts = []
+        label_prefix = f"[{module_code}] " if module_code else ""
 
         assessment_setting_per_module = module_breakdown.get('assessment_setting', 0)
         if assessment_setting_per_module > 0:
             parts.append(f"""<div class="detail-item {css_class}">
-                <span class="detail-name">Assessment Setting</span>
+                <span class="detail-name">{label_prefix}Assessment Setting</span>
                 <span class="detail-hours">{assessment_setting_per_module:.1f}h</span>
                 <span class="detail-activity teaching-activity"></span>
             </div>""")
@@ -1246,7 +1248,7 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
         marking_per_module = module_breakdown.get('marking', 0)
         if marking_per_module > 0:
             parts.append(f"""<div class="detail-item {css_class}">
-                <span class="detail-name">Assessment Marking</span>
+                <span class="detail-name">{label_prefix}Assessment Marking</span>
                 <span class="detail-hours">{marking_per_module:.1f}h</span>
                 <span class="detail-activity teaching-activity"></span>
             </div>""")
