@@ -187,8 +187,15 @@ def _calculate_practical_hours_and_breakdown(module: ModuleData, teachers: List[
         parallel_groups = getattr(module, 'parallel_groups', None)
 
         # Convert integer practical_groups to list of group objects for compatibility
+        # First check if parallel_groups is an int (already set), otherwise check practical_groups
         if isinstance(parallel_groups, int):
             n_parallel_groups = parallel_groups
+        elif hasattr(module, 'practical_groups') and isinstance(module.practical_groups, int) and module.practical_groups > 1:
+            n_parallel_groups = module.practical_groups
+        else:
+            n_parallel_groups = None
+
+        if n_parallel_groups is not None:
             parallel_groups = []
             for i in range(n_parallel_groups):
                 parallel_groups.append(type('ParallelGroup', (), {
