@@ -147,6 +147,13 @@ def main():
     print("\nCalculating workload...")
     results = calculate_workload(year_data)
 
+    # Validate calculations before output
+    print("\nValidating calculations...")
+    if not run_validation_pipeline(results):
+        print("\nValidation failed. Please check the errors above.")
+        sys.exit(1)
+    print("  All validations passed.")
+
     # Print results
     print_data_summary(year_data, results)
 
