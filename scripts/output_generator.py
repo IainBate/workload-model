@@ -1190,27 +1190,29 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
                                 pastoral_breakdown: Dict[str, float] = {},
                                 project_breakdown: Dict[str, float] = {}) -> str:
         """Format teaching section with hierarchical structure."""
-        import re
-
         items_html_parts = []
 
+        # Phase 3: Use structured data from teaching_module_breakdowns instead of regex parsing
+        module_breakdowns = getattr(r, 'teaching_module_breakdowns', {})
+
+        # Build module info list from structured breakdowns (no regex parsing)
         module_info_list = []
-        for detail in module_details or []:
-            match = re.search(r'([A-Z]+(?:\d+)?)\s+\(([^)]+)\)', detail)
-            if match:
-                stage_or_name = match.group(1)
-                code_or_info = match.group(2)
+        for module_name, mb in module_breakdowns.items():
+            # Extract codes from structured data (Phase 3: no regex parsing)
+            code_tuple = mb.get('module_codes', ())
+            code_str = ', '.join(code_tuple) if code_tuple else ''
 
-                info_match = re.search(r'\)\s*(.+)$', detail)
-                info = info_match.group(1) if info_match else ""
+            # Get the first code as primary code
+            primary_code = code_tuple[0] if code_tuple else ''
 
-                module_info_list.append({
-                    'stage': stage_or_name,
-                    'code': code_or_info,
-                    'info': info.strip(),
-                    'detail': detail
-                })
+            module_info_list.append({
+                'stage': module_name,
+                'code': primary_code,
+                'codes': code_tuple,
+                'module_breakdown': mb
+            })
 
+        # Group modules by stage (module name)
         stages = {}
         for mod in module_info_list:
             stage = mod['stage']
@@ -1218,8 +1220,7 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
                 stages[stage] = []
             stages[stage].append(mod)
 
-        code_to_detail = {mod['stage']: mod for mod in module_info_list}
-
+        # Sort stages and iterate
         for stage in sorted(stages.keys()):
             modules_in_stage = stages[stage]
 
@@ -1228,14 +1229,12 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
 
             for mod in modules_in_stage:
                 code = mod['code']
-                info = mod['info']
-
-                detail = mod['detail']
+                module_breakdown = mod['module_breakdown']
 
                 is_new_lecturer = _determine_lecturer_type(r.name, stage, known_lecturers_per_module or {})
 
-                module_name = stage
-                module_breakdown = getattr(r, 'teaching_module_breakdowns', {}).get(module_name, {})
+                # Use the module breakdown directly (no regex parsing needed)
+                delivery_per_module = module_breakdown.get('teaching', 0)
                 delivery_per_module = module_breakdown.get('teaching', 0)
 
                 # Handle structured practicals breakdown (dict) or flat value (int/float)
