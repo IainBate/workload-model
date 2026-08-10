@@ -249,50 +249,47 @@ def _calculate_practical_hours_and_breakdown(module: ModuleData, teachers: List[
 
         if parallel_groups and len(parallel_groups) > 1:
             # Multiple parallel groups - each group has its own session count
-            first_session_rate = config.TEACHING_PROBLEM_CLASS
+            # In parallel groups, each teacher teaches one group (or shares one group),
+            # so we calculate for ONE representative group only.
+            group = parallel_groups[0]
+            group_sessions = getattr(group, 'sessions', practicals_count)
 
-            for i, group in enumerate(parallel_groups):
-                group_sessions = getattr(group, 'sessions', practicals_count)
+            if group_sessions > 0:
+                weekly_hrs = getattr(group, 'hours_per_week', config.TEACHING_PROBLEM_CLASS)
+                first_session_rate = config.TEACHING_PROBLEM_CLASS
+                repeat_rate = config.REPETITION_MULTIPLIER
 
-                if group_sessions > 0:
-                    weekly_hrs = getattr(group, 'hours_per_week', config.TEACHING_PROBLEM_CLASS)
+                # Calculate total hours for one teacher teaching one group
+                # First session rate applies to the first session per week
+                first_session_total = weekly_hrs * first_session_rate * contact_weeks
+                repeat_sessions = max(0, group_sessions - 1)
+                repeat_session_total = repeat_sessions * weekly_hrs * first_session_rate * repeat_rate * contact_weeks
 
-                    # Calculate total hours including weeks
-                    first_session_rate = config.TEACHING_PROBLEM_CLASS
-                    repeat_rate = config.REPETITION_MULTIPLIER
-                    first_session_total = weekly_hrs * first_session_rate * contact_weeks  # First session per week for one teacher
-                    repeat_sessions = max(0, group_sessions - 1)
-                    repeat_session_total = repeat_sessions * weekly_hrs * first_session_rate * repeat_rate * contact_weeks
+                # Total for one teacher teaching one group
+                total_group_hours = first_session_total + repeat_session_total
 
-                    # Total for this group across all teachers (first session + repeats)
-                    total_group_hours = first_session_total + repeat_session_total
+                for t in teachers:
+                    if t not in result['individual_practical_hours']:
+                        result['individual_practical_hours'][t] = 0.0
+                    result['individual_practical_hours'][t] += total_group_hours
 
-                    # Distribute to individual teachers (all get same rate in parallel groups)
-                    per_teacher_group_hours = total_group_hours / n_teachers
+                # Store structured breakdown (per teacher, per group)
+                result['practicals_breakdown'] = {
+                    "first_session_hours": round(weekly_hrs, 2),
+                    "repeat_hours": round(repeat_sessions * weekly_hrs, 2),
+                    "week_count": group_sessions,
+                    "first_session_rate": first_session_rate,
+                    "repeat_rate": repeat_rate,
+                    "total": round(total_group_hours, 2)
+                }
 
-                    for t in teachers:
-                        if t not in result['individual_practical_hours']:
-                            result['individual_practical_hours'][t] = 0.0
-                        result['individual_practical_hours'][t] += per_teacher_group_hours
-
-                    # Store structured breakdown
-                    result['practicals_breakdown'] = {
-                        "first_session_hours": round(weekly_hrs, 2),
-                        "repeat_hours": round(repeat_session_total / contact_weeks if contact_weeks > 0 else 0, 2),
-                        "week_count": group_sessions,
-                        "first_session_rate": first_session_rate,
-                        "repeat_rate": repeat_rate,
-                        "total": round(per_teacher_group_hours, 2)
-                    }
-
-                    # Calculate total for display
-                    first_session_display = round(first_session_total, 1)
-                    repeat_display = round(repeat_session_total, 1)
-                    result['practical_details'].append(
-                        f"First time delivery: {group_sessions} sessions/week @ {weekly_hrs}h each = "
-                        f"{first_session_display:.1f}h ({first_session_rate}x rate) + "
-                        f"{repeat_display:.1f}h repeats ({repeat_rate}x)"
-                    )
+                # Display shows per-group calculation
+                first_session_display = round(first_session_total, 1)
+                repeat_display = round(repeat_session_total, 1)
+                result['practical_details'].append(
+                    f"First time delivery: {group_sessions} sessions/week @ {weekly_hrs}h each; "
+                    f"- Standard lecturers: {first_session_rate}x first session (standard), {repeat_rate}x repeats"
+                )
         else:
             # No parallel groups - all teachers get same rate
             std_first_session_weekly = getattr(module, 'practical_contact_hours', config.TEACHING_PROBLEM_CLASS)
