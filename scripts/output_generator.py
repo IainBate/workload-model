@@ -1197,13 +1197,6 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
         """Format practical sessions section for a module."""
         parts = []
 
-        # Handle structured practicals breakdown (dict) or flat value (int/float)
-        _practicals_raw = module_breakdown.get('practicals', 0)
-        if isinstance(_practicals_raw, dict):
-            practicals_per_module = _practicals_raw.get('total', 0)
-        else:
-            practicals_per_module = _practicals_raw
-
         # Phase 3: Use structured practicals breakdown instead of regex parsing
         # First check for 'practicals_structured' (Phase 3 format), then fall back to 'practicals'
         practicals_structured = module_breakdown.get('practicals_structured', {})
@@ -1212,6 +1205,8 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
             practicals_structured = module_breakdown.get('practicals', {})
 
         if isinstance(practicals_structured, dict) and practicals_structured:
+            # Structured practicals data available - get total from breakdown
+            practicals_per_module = practicals_structured.get('total', 0)
             # Structured practicals data available (from Phase 3)
             first_session_rate = practicals_structured.get('first_session_rate', config.TEACHING_MULTIPLIERS.get('problem_class_seminar_practical', 2.5))
             rep_rate = practicals_structured.get('repeat_rate', config.REPETITION_MULTIPLIER)
