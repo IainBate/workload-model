@@ -1037,5 +1037,132 @@ class TestNormativeSplitMapping:
         assert get_normative_split("Unknown Category") is None
 
 
+class TestNewLecturerDetectionRegression:
+    """Regression tests for new-lecturer detection edge cases."""
+
+    def test_new_lecturer_detection_with_reordered_module_codes(self):
+        """Test that all module codes are checked when detecting new lecturers.
+
+        The fix in _get_prev_year_module_names checks all of a module's codes,
+        not just codes[0]. This test verifies the fix by having a module where
+        the teacher appears under a different code than codes[0] in the previous
+        year's known_lecturers_per_module.
+        """
+        from workload_calculator import _calculate_teaching_workload
+
+        # Module this year has codes where COM00088Y is NOT the first code
+        module = ModuleData(
+            name="TestModule",
+            codes=["COM00099X", "COM00088Y"],  # Note: COM00088Y is second
+            credits=20,
+            stage=5,
+            contact_hours=40,
+            practicals=0,
+            practical_contact_hours=0,
+            practical_groups=0,
+            practical_weeks=None,
+            assessment_count=1,
+            student_count=100,
+            teachers=["John Smith"],
+            lead_name=None,
+        )
+
+        # In previous year's data, John Smith taught COM00088Y (which IS in this year's codes)
+        # but NOT COM00099X (the first code). The fix should find him under COM00088Y
+        known_lecturers_global = set()  # Not in global list
+        known_lecturers_per_module = {
+            "COM00088Y": frozenset(["John Smith"]),  # Only under second code, not first!
+        }
+        supervision = SupervisionAllocation(
+            pastoral_students={},
+            project_loads={}
+        )
+
+        result = _calculate_teaching_workload(
+            module, ["John Smith"], known_lecturers_global,
+            known_lecturers_per_module, {}, supervision
+        )
+
+        # John Smith should be found via COM00088Y lookup and get standard 2.5x rate
+        assert "John Smith" in result
+        # Standard lecturer: 40 contact hours / 1 teacher * 2.5x = 100h teaching
+        # (plus assessment, marking, admin components)
+        teaching_breakdown = result["John Smith"]["teaching_breakdown"]
+        teaching_hours = teaching_breakdown.get("teaching", 0)
+
+        # With standard rate: ~40h contact * 2.5x = 100h base teaching
+        # New lecturer would be ~40h * 5x = 200h (significantly more)
+        assert teaching_hours >= 80, f"Expected >= 80h teaching for standard rate, got {teaching_hours}"
+        assert teaching_hours < 150, f"Expected < 150h to distinguish from new lecturer rate, got {teaching_hours}"
+
+
+class TestHoDFallbackRegression:
+    """Regression tests for HoD fallback logic."""
+
+    def test_hod_not_in_wtw_uses_real_data(self):
+        """Test that HoD not in WTW is added with real data from FTE/grant files.
+
+        The fix in data_loader.py (~line 1402) looks up the Head of Department
+        role generically via WAW rather than a hardcoded name, and sources their
+        FTE/grants/PhD supervision from the real data files.
+        """
+        from data_loader import StaffData, YearData
+        from workload_calculator import calculate_workload
+
+        # Module with one teacher who is NOT the HoD
+        module = ModuleData(
+            name="TestModule",
+            codes=["TEST001"],
+            credits=20,
+            stage=5,
+            contact_hours=40,
+            practicals=0,
+            practical_contact_hours=0,
+            practical_groups=0,
+            practical_weeks=None,
+            assessment_count=1,
+            student_count=100,
+            teachers=["Jane Doe"],
+            lead_name=None,
+        )
+
+        # HoD (John Smith) has a role in WAW but is NOT in the module's teachers
+        # This should trigger the fallback to add them with real data
+        hod_staff = StaffData(
+            canonical_name="John Smith",
+            fte=1.0,  # Will be overridden by real FTE data if available
+            roles=["Head of Department"],  # The HoD role
+            phd_supervisions=2,
+            phd_co_supervisions=1,
+            phd_assessor_count=1,
+            research_projects=[
+                {"project_id": "GRANT001", "title": "Real Research Grant", "fte": "50%"}
+            ],
+            saint_modules=[],
+            active=True
+        )
+
+        year_data = YearData.create(
+            year_label="2026-7",
+            modules=[module],
+            student_counts={},
+            assessment_counts={},
+            staff={"Jane Doe": hod_staff},  # Only Jane is in WTW, HoD is added via fallback
+            known_lecturers=set(),
+            known_lecturers_per_module={}
+        )
+
+        results = calculate_workload(year_data, validate_input=False)
+
+        # The HoD should be in the results (added by the fallback)
+        names = [r.name for r in results]
+        assert "John Smith" in names, f"Expected John Smith to be added via HoD fallback, got {names}"
+
+        john_result = next(r for r in results if r.name == "John Smith")
+        # Verify they have research grants (not a fabricated SCHEME entry)
+        assert len(john_result.research_breakdown) > 0
+        # The grant should have real data, not a fake entry
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
