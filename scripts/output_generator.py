@@ -1227,7 +1227,7 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
             # First-time delivery line
             parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
                 <span class="detail-name" style="color:#333;">First time delivery</span>
-                <span class="detail-hours">{week_count} sessions/week @ {first_session_weekly:.1f}h each = {first_session_weekly * week_count:.1f}h/week x {TEACHING_WEEKS_PER_SEMESTER} weeks = {(first_session_weekly * week_count * TEACHING_WEEKS_PER_SEMESTER):.1f}h</span>
+                <span class="detail-hours">{week_count} sessions/week @ {first_session_weekly:.1f}h each = {first_session_weekly * week_count:.1f}h/week x {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {(first_session_weekly * week_count * config.TEACHING_WEEKS_PER_SEMESTER):.1f}h</span>
             </div>""")
             # Repeated sessions line (only if there are repeats)
             if repeat_weekly > 0:
