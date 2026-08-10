@@ -795,6 +795,8 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
                 "online_content_dev": 0.0,  # Not calculated per-module in current implementation
                 # Store the base contact hours (before multiplier) for display purposes
                 "lecture_contact_hours": lecture_result['individual_lecture_contact_hours'].get(teacher, 0.0),
+                # Store total lecture hours (before splitting among teachers) for display
+                "total_lecture_hours": lecture_result.get('total_lecture_hours', 0.0),
             },
             "practicals_breakdown": teacher_practicals_structured,
             "detail_text": "; ".join(module_detail_parts),
