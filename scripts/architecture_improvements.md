@@ -191,10 +191,10 @@ def test_html_output_matches_baseline():
     assert normalize_whitespace(html) == normalize_whitespace(expected_html)
 ```
 
-### Step 4: Add validation step
+### Step 4: Add validation step (IMPLEMENTED)
 
 ```python
-# scripts/main.py - modified
+# scripts/main.py - IMPLEMENTED
 
 def main():
     args = parse_args()
@@ -204,21 +204,18 @@ def main():
     # Calculate workload
     results = calculate_workload(year_data, validate_input=True)
     
-    # NEW: Validate all results before output
-    validation_issues = validate_all_results(results)
-    
-    if any(validation_issues.values()):
-        print("Validation errors found:")
-        for name, issues in validation_issues.items():
-            if issues:
-                print(f"  {name}:")
-                for issue in issues:
-                    print(f"    - [{issue.level}] {issue.message}")
+    # NEW: Validate all results before output (lines 145-149)
+    print("\nValidating calculations...")
+    if not run_validation_pipeline(results):
+        print("\nValidation failed. Please check the errors above.")
         sys.exit(1)
+    print("  All validations passed.")
     
     # Generate outputs
     generate_all_outputs(results, year_data, args.output_dir)
 ```
+
+**Status:** Validation is now integrated into `main.py` and runs automatically.
 
 ---
 
