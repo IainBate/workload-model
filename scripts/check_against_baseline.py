@@ -40,8 +40,8 @@ def patch_module_paths(output_dir: Path):
     Patch module-level path constants to point to the specified output directory.
 
     This monkey-patches the OUTPUT_DIR, INDIVIDUAL_DIR, and DEPARTMENT_DIR
-    constants in both output_generator.py and role_based_reports.py modules
-    so they write to the temp output directory instead of the default.
+    constants in output_generator.py so they write to the temp output directory
+    instead of the default.
     """
     (output_dir / "Individual Reports").mkdir(parents=True, exist_ok=True)
     (output_dir / "Department Summary").mkdir(parents=True, exist_ok=True)
@@ -57,8 +57,6 @@ def patch_module_paths(output_dir: Path):
         except ImportError:
             pass
 
-    # Patch role_based_reports first (it's imported by output_generator)
-    patch_module('role_based_reports')
     patch_module('output_generator')
 
 
