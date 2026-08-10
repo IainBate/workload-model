@@ -26,7 +26,48 @@ from dataclasses import dataclass
 import math
 
 import config
-from data_loader import YearData, ModuleData, StaffData, WorkloadResult, SupervisionAllocation, allocate_supervision, normalize_name
+from data_loader import (
+    YearData,
+    ModuleData,
+    StaffData,
+    WorkloadResult,
+    SupervisionAllocation,
+    allocate_supervision,
+    normalize_name,
+    _load_module_mapping,
+)
+
+
+def _get_prev_year_module_names(module: ModuleData) -> List[str]:
+    """Get all possible module names from previous year that could map to this module.
+
+    This handles H/M variant merging where a single current-year module might
+    combine two variants from the previous year (e.g., AURO-H + AURO-M -> AURO).
+
+    Returns:
+        List of possible previous year module names to check, in order of preference.
+    """
+    names_to_check = []
+
+    # Add all codes first
+    if module.codes:
+        names_to_check.extend(list(module.codes))
+
+    # Add current module name
+    if module.name:
+        names_to_check.append(module.name)
+
+    # Check module mapping for previous year variant names
+    module_mapping = _load_module_mapping()
+    merged_modules = module_mapping.get("merged_modules", {})
+
+    # If this is a combined module, also check the H/M variants from previous year
+    if module.name:
+        for old_name, mapping in merged_modules.items():
+            if mapping.get("2026-7") == module.name:
+                names_to_check.append(old_name)
+
+    return names_to_check
 from validation import (
     validate_year_data,
     run_validation_pipeline,
