@@ -609,13 +609,13 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
         teacher_hw_lab = individual_hw_lab_hours.get(teacher, 0.0)
         teacher_drop_in = individual_drop_in_hours.get(teacher, 0.0)
 
-        # Get practical hours for this teacher (from helper result or default to weekly rate)
-        teacher_weekly_practical_hrs = individual_practical_hours.get(teacher, 0.0)
+        # Get practical hours for this teacher (from helper result - already includes weeks)
+        teacher_practical_hrs = individual_practical_hours.get(teacher, 0.0)
 
         # Total for this teacher from module activities
         total_teacher_hours = (
             teacher_lecture_hours_with_mult +
-            teacher_weekly_practical_hrs * practical_week_count +
+            teacher_practical_hrs +
             teacher_assessment_hours +
             marking_hours_per_teacher +
             admin_hours_per_teacher +
