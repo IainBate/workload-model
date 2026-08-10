@@ -204,6 +204,8 @@ def _calculate_lecture_hours_and_multipliers(module: ModuleData,
         per_teacher_with_multiplier = per_teacher_lecture_hours * multiplier
 
         result['individual_lecture_hours'][t] = per_teacher_with_multiplier
+        # Store the base contact hours (before multiplier) for display purposes
+        result['individual_lecture_contact_hours'][t] = per_teacher_lecture_hours
         result['lecture_multipliers'][t] = multiplier
 
     return result
