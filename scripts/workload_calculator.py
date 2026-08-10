@@ -995,7 +995,7 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
     """
     # Run input validation if requested
     if validate_input:
-        validation_result = run_validation_pipeline(year_data)
+        validation_result = run_validation_pipeline_input(year_data)
         if validation_result["has_warnings"]:
             # Store warnings in assumptions for reporting
             pass  # Warnings are captured in results, not raised as errors
