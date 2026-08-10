@@ -1159,7 +1159,20 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
         delivery_per_module = module_breakdown.get('teaching', 0)
 
         if delivery_per_module > 0:
-            lecturer_type = "New lecturer (5x)" if is_new_lecturer else "Standard (2.5x)"
+            # Calculate base hours (what would be charged at standard 2.5x rate)
+            # For new lecturer (5x), base = total / 5 * 2.5 = total * 0.5
+            # For standard (2.5x), base = total (no content dev)
+            is_new_lecturer_multiplier = is_new_lecturer
+            if is_new_lecturer_multiplier:
+                lecturer_type = "New lecturer (5x)"
+                delivery_base = delivery_per_module / 5.0 * 2.5  # Convert 5x hours back to base @ 2.5x
+                content_dev = delivery_per_module - delivery_base
+                calculation_text = f"{delivery_base:.1f}h of lectures per semester @ 2.5x + {content_dev:.1f}h content dev = {delivery_per_module:.0f}h"
+            else:
+                lecturer_type = "Standard (2.5x)"
+                delivery_base = delivery_per_module  # For standard, base equals total
+                calculation_text = f"{delivery_per_module:.1f}h of lectures per semester @ 2.5x"
+
             # Include module code in label for clarity, but only if it looks like a valid code
             # Skip codes that are empty or look like placeholders (contain < or >)
             label_prefix = ""
@@ -1170,18 +1183,10 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
                 <span class="detail-hours">{delivery_per_module:.1f}h @ {lecturer_type}</span>
                 <span class="detail-activity teaching-activity"></span>
             </div>""")
-            if is_new_lecturer:
-                delivery_base = delivery_per_module / 5.0
-                content_dev = delivery_per_module - delivery_base
-                parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
-                    <span class="detail-name" style="color:#333;">Calculation</span>
-                    <span class="detail-hours">{delivery_base:.1f}h base @ 2.5x + {content_dev:.1f}h content dev = {delivery_per_module:.0f}h</span>
-                </div>""")
-            else:
-                parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
-                    <span class="detail-name" style="color:#333;">Calculation</span>
-                    <span class="detail-hours">{delivery_per_module:.1f}h @ Standard (2.5x)</span>
-                </div>""")
+            parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+                <span class="detail-name" style="color:#333;">Calculation</span>
+                <span class="detail-hours">{calculation_text}</span>
+            </div>""")
         return parts
 
     def _format_module_practicals_section(module_breakdown: Dict[str, Any], css_class: str,
