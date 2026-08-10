@@ -1165,12 +1165,18 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
 
             if is_new_lecturer:
                 lecturer_type = "New lecturer (5x)"
-                # Calculate standard equivalent at 2.5x rate
-                # standard_equivalent = delivery_per_module / 5 × 2.5
-                # content_dev = delivery_per_module - standard_equivalent
-                standard_equivalent = delivery_per_module / 5.0 * 2.5
-                content_dev = delivery_per_module - standard_equivalent
-                calculation_text = f"{standard_equivalent:.1f}h @ 2.5x + {content_dev:.1f}h content dev = {delivery_per_module:.1f}h"
+
+                # Calculate teacher count from total lecture hours and per-teacher contact hours
+                teacher_count = int(round(total_lecture_hours / lecture_contact_hours)) if lecture_contact_hours > 0 else 1
+
+                # Calculate weeks of teaching (typically 11 weeks per semester)
+                weeks = config.TEACHING_WEEKS_PER_SEMESTER
+
+                # Format: "11 weeks of X hour lectures split between Y lecturers"
+                hours_per_week_total = total_lecture_hours / weeks if weeks > 0 else lecture_contact_hours * teacher_count
+                hours_per_week_each = lecture_contact_hours  # This is the weekly contact per teacher
+
+                calculation_text = f"{total_lecture_hours:.1f}h contact @ {teacher_count} teachers = {hours_per_week_each:.1f} each × 5x = {delivery_per_module:.1f}h"
             else:
                 lecturer_type = "Standard (2.5x)"
                 # For standard, total equals the contact hours at 2.5x rate
