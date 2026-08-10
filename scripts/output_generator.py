@@ -15,7 +15,6 @@ instead of parsing free-form detail strings.
 
 import csv
 import os
-import re
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import List, Optional, Dict, Any, Tuple
