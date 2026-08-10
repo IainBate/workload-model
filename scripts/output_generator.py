@@ -1240,7 +1240,7 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
                 total_repeat_hrs = repeat_weekly * first_session_rate * rep_rate * config.TEACHING_WEEKS_PER_SEMESTER
                 parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
                     <span class="detail-name" style="color:#333;">Repeated sessions</span>
-                    <span class="detail-hours">{week_count - 1} repeat(s) @ {rep_rate}x = {total_repeat_hrs:.1f}h</span>
+                    <span class="detail-hours">{week_count - 1} repeat(s) × {first_session_weekly:.1f}h × {config.TEACHING_WEEKS_PER_SEMESTER} weeks × {first_session_rate}x × {rep_rate}x = {total_repeat_hrs:.1f}h</span>
             </div>""")
         else:
             # Fallback to default rates if structured data not available
