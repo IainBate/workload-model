@@ -70,7 +70,7 @@ def _get_prev_year_module_names(module: ModuleData) -> List[str]:
     return names_to_check
 from validation import (
     validate_year_data,
-    run_validation_pipeline,
+    run_validation_pipeline_input,
     ValidationResult,
     ValidationLevel
 )
