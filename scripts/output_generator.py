@@ -1209,17 +1209,32 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
             rep_rate = practicals_structured.get('repeat_rate', config.REPETITION_MULTIPLIER)
             week_count = practicals_structured.get('week_count', 0)
 
+            # Extract structured values for calculation display
+            # first_session_hours: hours per week for first session
+            # repeat_hours: additional hours for repeated sessions (per week)
+            first_session_weekly = practicals_structured.get('first_session_hours', first_session_rate)
+            repeat_weekly = practicals_structured.get('repeat_hours', 0)
+
             label_prefix = ""
             if module_code and not module_code.startswith('<') and not module_code.endswith('>'):
                 label_prefix = f"[{module_code}] "
+
             parts.append(f"""<div class="detail-item {css_class}">
                 <span class="detail-name">{label_prefix}Practical Sessions</span>
-                <span class="detail-hours">{practicals_per_module:.1f}h</span>
+                <span class="detail-hours">{practicals_per_module:.1f}h total</span>
                 <span class="detail-activity teaching-activity"></span>
             </div>""")
+            # First-time delivery line
             parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
-                <span class="detail-name" style="color:#333;">Calculation</span>
-                <span class="detail-hours">{week_count} sessions/week @ {first_session_rate:.1f}h each, {rep_rate}x repeats = {practicals_per_module:.1f}h</span>
+                <span class="detail-name" style="color:#333;">First time delivery</span>
+                <span class="detail-hours">{week_count} sessions/week @ {first_session_weekly:.1f}h each = {first_session_weekly * week_count:.1f}h/week x {TEACHING_WEEKS_PER_SEMESTER} weeks = {(first_session_weekly * week_count * TEACHING_WEEKS_PER_SEMESTER):.1f}h</span>
+            </div>""")
+            # Repeated sessions line (only if there are repeats)
+            if repeat_weekly > 0:
+                total_repeat_hrs = first_session_weekly * week_count * rep_rate * TEACHING_WEEKS_PER_SEMESTER
+                parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+                    <span class="detail-name" style="color:#333;">Repeated sessions</span>
+                    <span class="detail-hours">{week_count - 1} repeat(s) @ {rep_rate}x = {total_repeat_hrs:.1f}h</span>
             </div>""")
         else:
             # Fallback to default rates if structured data not available
