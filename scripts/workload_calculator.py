@@ -258,10 +258,11 @@ def _calculate_practical_hours_and_breakdown(module: ModuleData, teachers: List[
                     weekly_hrs = getattr(group, 'hours_per_week', config.TEACHING_PROBLEM_CLASS)
 
                     # Calculate total hours including weeks
-                    first_session_total = weekly_hrs * contact_weeks  # First session per week for one teacher
-                    repeat_sessions = max(0, group_sessions - 1)
+                    first_session_rate = config.TEACHING_PROBLEM_CLASS
                     repeat_rate = config.REPETITION_MULTIPLIER
-                    repeat_session_total = repeat_sessions * weekly_hrs * repeat_rate * contact_weeks
+                    first_session_total = weekly_hrs * first_session_rate * contact_weeks  # First session per week for one teacher
+                    repeat_sessions = max(0, group_sessions - 1)
+                    repeat_session_total = repeat_sessions * weekly_hrs * first_session_rate * repeat_rate * contact_weeks
 
                     # Total for this group across all teachers (first session + repeats)
                     total_group_hours = first_session_total + repeat_session_total
