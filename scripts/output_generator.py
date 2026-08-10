@@ -1228,8 +1228,8 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
                 <span class="detail-activity teaching-activity"></span>
             </div>""")
             # First-time delivery line
-            # Calculate first session total: one session per week × hours × weeks × rate
-            first_session_total = first_session_weekly * config.TEACHING_WEEKS_PER_SEMESTER * first_session_rate
+            # Calculate first session total: sessions per week × hours per session × weeks × rate
+            first_session_total = week_count * first_session_weekly * config.TEACHING_WEEKS_PER_SEMESTER * first_session_rate
             # Repeat sessions are shown separately with their own calculation
             parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
                 <span class="detail-name" style="color:#333;">First time delivery</span>
