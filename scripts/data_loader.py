@@ -1399,40 +1399,81 @@ def load_all_data(data_dir: str = None,
     staff = filtered_staff
 
     # Include HoD even if not in WTW (for completeness)
-    if "Iain Bate" not in staff:
-        # Look up Iain's PhD info specifically
-        iain_phd_info = None
-        for key, val in phd_data.items():
-            norm_key = normalize_name(key, reverse_lookup, unknown_callback=None)
-            if norm_key == "Iain Bate":
-                iain_phd_info = val
+    # Generalized: look up Head of Department role from WAW instead of hardcoding name
+    hod_role = "Head of Department"
+    hod_name_from_waw = None
+    for role, members in waw_roles.items():
+        yaml_role = _WAW_ROLE_MAPPING.get(role, role)
+        if yaml_role == hod_role and members:
+            # First member is the HoD
+            potential_hod = members[0] if isinstance(members, list) else members
+            norm_name = normalize_name(potential_hod, reverse_lookup, unknown_callback=None)
+            if norm_name:
+                hod_name_from_waw = norm_name
                 break
 
-        staff["Iain Bate"] = StaffData(
-            canonical_name="Iain Bate",
-            aliases=tuple(mappings.get("Iain Bate", ["Iain B", "Iain Bate"])),
-            fte=1.0,
-            employment_start=0,
-            active=True,
-            category="ART",
-            project_load=0,
-            pastoral_load=0,
-            adjusted_project_load=0,
-            adjusted_pastoral_load=0,
-            ecr_year="N/A",
-            ecr_value=0,
-            citizenship_level=0,
-            research_grant_income="N/A",
-            research_grant_income_value=0,
-            citizenship_value=0,
-            initial_fractional_project_load=0,
-            initial_fractional_pastoral_load=0,
+    # If HoD not already in staff and found in WAW, add them with proper data
+    if hod_name_from_waw and hod_name_from_waw not in staff:
+        # Look up PhD info for the HoD (if available)
+        phd_info = None
+        for key, val in phd_data.items():
+            norm_key = normalize_name(key, reverse_lookup, unknown_callback=None)
+            if norm_key == hod_name_from_waw:
+                phd_info = val
+                break
+
+        # Look up FTE/research grant info for the HoD (if available)
+        fte_info = None
+        for key, val in fte_data.items():
+            norm_key = normalize_name(key, reverse_lookup, unknown_callback=None)
+            if norm_key == hod_name_from_waw:
+                fte_info = val
+                break
+
+        # Get project_load data for the HoD (if available)
+        proj_data_hod = None
+        for key, val in project_load_data.items():
+            norm_key = normalize_name(key, reverse_lookup, unknown_callback=None)
+            if norm_key == hod_name_from_waw:
+                proj_data_hod = val
+                break
+
+        # Get part-time info (FTE) for the HoD (if available)
+        pt_info_hod = None
+        for key, val in part_time_data.items():
+            norm_key = normalize_name(key, reverse_lookup, unknown_callback=None)
+            if norm_key == hod_name_from_waw:
+                pt_info_hod = val
+                break
+
+        # Default FTE to 1.0 if no part-time data found
+        hod_fte = pt_info_hod["fte"] if pt_info_hod else 1.0
+
+        staff[hod_name_from_waw] = StaffData(
+            canonical_name=hod_name_from_waw,
+            aliases=tuple(mappings.get(hod_name_from_waw, [hod_name_from_waw])),
+            fte=hod_fte,
+            employment_start=proj_data_hod["employment_start"] if proj_data_hod else 0,
+            active=proj_data_hod["active"] if proj_data_hod else True,
+            category=pt_info_hod["staff_category"] if pt_info_hod else "",
+            project_load=proj_data_hod["project_load"] if proj_data_hod else 0,
+            pastoral_load=proj_data_hod["pastoral_load"] if proj_data_hod else 0,
+            adjusted_project_load=proj_data_hod["adjusted_project_load"] if proj_data_hod else 0,
+            adjusted_pastoral_load=proj_data_hod["adjusted_pastoral_load"] if proj_data_hod else 0,
+            ecr_year=proj_data_hod["ecr_year"] if proj_data_hod else "N/A",
+            ecr_value=proj_data_hod["ecr_value"] if proj_data_hod else 0,
+            citizenship_level=proj_data_hod["citizenship_level"] if proj_data_hod else 0,
+            research_grant_income=proj_data_hod["research_grant_income"] if proj_data_hod else "N/A",
+            research_grant_income_value=proj_data_hod["research_grant_income_value"] if proj_data_hod else 0,
+            citizenship_value=proj_data_hod["citizenship_value"] if proj_data_hod else 0,
+            initial_fractional_project_load=proj_data_hod["initial_fractional_project_load"] if proj_data_hod else 0,
+            initial_fractional_pastoral_load=proj_data_hod["initial_fractional_pastoral_load"] if proj_data_hod else 0,
             notes="HoD - added for completeness, not in WTW",
-            roles=tuple(["Head of Department"]),
-            phd_supervisions=iain_phd_info["sole_supervisor"] if iain_phd_info else 0,
-            phd_co_supervisions=iain_phd_info["co_supervisor"] if iain_phd_info else 0,
-            phd_assessor_count=iain_phd_info["tap_member"] if iain_phd_info else 0,
-            research_projects=tuple([{"project_id": "SCHEME", "title": "SCHEME", "fte": "20%"}]),
+            roles=tuple([hod_role]),
+            phd_supervisions=phd_info["sole_supervisor"] if phd_info else 0,
+            phd_co_supervisions=phd_info["co_supervisor"] if phd_info else 0,
+            phd_assessor_count=phd_info["tap_member"] if phd_info else 0,
+            research_projects=tuple(fte_info) if fte_info else (),
             saint_modules=(),
         )
 
