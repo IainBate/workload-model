@@ -285,9 +285,13 @@ def _calculate_practical_hours_and_breakdown(module: ModuleData, teachers: List[
                         "total": round(per_teacher_group_hours, 2)
                     }
 
+                    # Calculate total for display
+                    first_session_display = round(first_session_total, 1)
+                    repeat_display = round(repeat_session_total, 1)
                     result['practical_details'].append(
-                        f"First time delivery: {group_sessions} sessions/week @ {weekly_hrs}h each; "
-                        f"- Standard lecturers: {first_session_rate}x first session (standard), {repeat_rate}x repeats"
+                        f"First time delivery: {group_sessions} sessions/week @ {weekly_hrs}h each = "
+                        f"{first_session_display:.1f}h ({first_session_rate}x rate) + "
+                        f"{repeat_display:.1f}h repeats ({repeat_rate}x)"
                     )
         else:
             # No parallel groups - all teachers get same rate
