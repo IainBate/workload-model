@@ -1304,11 +1304,13 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
             if "teaching_module_breakdowns" in staff_data and staff_data["teaching_module_breakdowns"]:
                 teaching_module_breakdowns = dict(staff_data["teaching_module_breakdowns"])
             # Aggregated teaching_breakdown (sum of all modules)
-            if "teaching_breakdown" in staff_data and staff_data["teaching_breakdown"]:
-                teaching_breakdown = _sum_breakdown_dict(staff_data["teaching_breakdown"])
+            if "teaching_module_breakdowns" in staff_data and staff_data["teaching_module_breakdowns"]:
+                # Use new aggregation function to sum per-module breakdowns
+                teaching_breakdown = _aggregate_teaching_breakdown(staff_data)
             elif len(staff_data.get("details", [])) > 0:
                 # Fallback: parse from details string for backward compatibility
-                pass
+                if "teaching_breakdown" in staff_data and staff_data["teaching_breakdown"]:
+                    teaching_breakdown = _sum_breakdown_dict(staff_data["teaching_breakdown"])
         else:
             # For admin staff with only minimum teaching load
             if min_teaching > 0:
