@@ -1263,6 +1263,38 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
                     result[k] = v
             return result
 
+        def _aggregate_teaching_breakdown(staff_data):
+            """Aggregate teaching breakdowns from all modules for a staff member.
+
+            Sums per-module teaching components and combines with supervision components
+            that are already at staff level.
+            """
+            aggregated = {}
+
+            # Keys that should be summed across modules
+            sum_keys = ["teaching", "practicals", "assessment_setting", "marking",
+                       "admin", "supervision", "hw_lab", "drop_in"]
+
+            module_breakdowns = staff_data.get("teaching_module_breakdowns", {})
+            for module_name, module_breakdown in module_breakdowns.items():
+                for key in sum_keys:
+                    if key in module_breakdown:
+                        aggregated[key] = aggregated.get(key, 0.0) + module_breakdown[key]
+
+            # Include supervision components (already at staff level, not summed)
+            if "pastoral_supervision" in staff_data.get("teaching_breakdown", {}):
+                aggregated["pastoral_supervision"] = staff_data["teaching_breakdown"]["pastoral_supervision"]
+            if "project_supervision" in staff_data.get("teaching_breakdown", {}):
+                aggregated["project_supervision"] = staff_data["teaching_breakdown"]["project_supervision"]
+            if "project_setting" in staff_data.get("teaching_breakdown", {}):
+                aggregated["project_setting"] = staff_data["teaching_breakdown"]["project_setting"]
+
+            # Include minimum admin load if present
+            if "minimum_admin_load" in staff_data.get("teaching_breakdown", {}):
+                aggregated["minimum_admin_load"] = staff_data["teaching_breakdown"]["minimum_admin_load"]
+
+            return aggregated
+
         # Build structured teaching breakdown from per-module data
         teaching_breakdown = {}
         teaching_module_breakdowns = {}
