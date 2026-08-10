@@ -1181,7 +1181,8 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
                 </div>""")
         return parts
 
-    def _format_module_practicals_section(module_breakdown: Dict[str, Any], css_class: str) -> List[str]:
+    def _format_module_practicals_section(module_breakdown: Dict[str, Any], css_class: str,
+                                          module_code: Optional[str] = None) -> List[str]:
         """Format practical sessions section for a module."""
         parts = []
 
@@ -1200,8 +1201,9 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
             rep_rate = practicals_structured.get('repeat_rate', config.REPETITION_MULTIPLIER)
             week_count = practicals_structured.get('week_count', 0)
 
+            label_prefix = f"[{module_code}] " if module_code else ""
             parts.append(f"""<div class="detail-item {css_class}">
-                <span class="detail-name">Practical Sessions</span>
+                <span class="detail-name">{label_prefix}Practical Sessions</span>
                 <span class="detail-hours">{practicals_per_module:.1f}h</span>
                 <span class="detail-activity teaching-activity"></span>
             </div>""")
@@ -1213,8 +1215,9 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
             # Fallback to default rates if structured data not available
             first_session_rate = config.TEACHING_MULTIPLIERS.get('problem_class_seminar_practical', 2.5)
             rep_rate = config.REPETITION_MULTIPLIER
+            label_prefix = f"[{module_code}] " if module_code else ""
             parts.append(f"""<div class="detail-item {css_class}">
-                <span class="detail-name">Practical Sessions</span>
+                <span class="detail-name">{label_prefix}Practical Sessions</span>
                 <span class="detail-hours">{practicals_per_module:.1f}h</span>
                 <span class="detail-activity teaching-activity"></span>
             </div>""")
