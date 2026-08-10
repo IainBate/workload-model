@@ -1053,11 +1053,12 @@ _WAW_ROLE_MAPPING = {
     "Undergraduate Admissions Tutor": "Deputy Director of Admissions (UG Admissions)",
     "Deputy Graduate Chair": "Deputy Graduate Chair",
     "Graduate School Board (PGR Supervisor Representative)": "Graduate School Board (Ordinary member)",
-    # Other roles
+    # Additional roles from WAW
+    "Head of Department": "Head of Department",
+    "PGR Training Officer": "PhD Training Officer",  # PGR = Postgraduate Research
     "Research Progression Panel member": "Progression Panel",
-    "PhD Training Officer": "PhD Training Officer",
-    "Internally Distributed Funding panel reviewer": "Internally Distributed Funding panel reviewer",
     "REF lead": "REF Lead",
+    "Internally Distributed Funding panel reviewer": "Internally Distributed Funding panel reviewer",
     "Research Impact (including REF impact submission)": "Impact",
     "Deputy Director of Admissions (POVD etc)": "Deputy Director of Admissions (POVD etc)",
     "Deputy Director of Admissions (UG Admissions)": "Deputy Director of Admissions (UG Admissions)",
