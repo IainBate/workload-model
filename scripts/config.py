@@ -119,7 +119,9 @@ PROJECT_SETTING_ALLOWANCE: float = 6.0  # Teaching-related, for setting projects
 STAGE_UG_LEVEL_1: int = 1  # Year 1 undergraduate
 STAGE_UG_LEVEL_2: int = 2  # Year 2 undergraduate
 STAGE_UG_LEVEL_3: int = 3  # Year 3 undergraduate
-STAGE_MSC_LEVEL: int = 4   # Master's level (stage >= 4 typically)
+# TODO(human): confirm STAGE_MSC_LEVEL against real WTW stage codes - does 4 mean
+# integrated-masters-year, and is there a separate encoding (e.g., 10+) for standalone MSc modules?
+STAGE_MSC_LEVEL: int = 4   # Master's level threshold (currently unconfirmed against real data)
 STAGE_PGR_LEVEL: int = 7   # Postgraduate research level
 
 # Helper function to determine module level from stage code
