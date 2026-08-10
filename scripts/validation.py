@@ -387,3 +387,138 @@ def run_validation_pipeline(year_data) -> Dict[str, Any]:
         "staff_issues": staff_issues,
         "summary": result.summary
     }
+
+
+# --- Post-Calculation Validation (WorkloadResult) ---
+
+def validate_workload_result(result, tolerance: float = 0.1) -> List[ValidationIssue]:
+    """Validate a workload result after calculation.
+
+    Checks:
+    - Total = Teaching + Research + Admin (within tolerance)
+    - No negative hours
+    - Breakdowns sum to category totals
+
+    Args:
+        result: The WorkloadResult to validate
+        tolerance: Maximum allowed difference for sums
+
+    Returns:
+        List of validation issues (empty if valid)
+    """
+    issues = []
+
+    # Check total split
+    expected_total = (
+        result.teaching_hours +
+        result.research_hours +
+        result.admin_hours
+    )
+
+    diff = abs(expected_total - result.total_hours)
+    if diff > tolerance:
+        issues.append(ValidationIssue(
+            level=ValidationLevel.ERROR,
+            message=f"Total mismatch: {result.total_hours:.1f} != {expected_total:.1f}",
+            field_name="total_hours"
+        ))
+
+    # Check for negative hours
+    if result.teaching_hours < 0:
+        issues.append(ValidationIssue(
+            level=ValidationLevel.ERROR,
+            message=f"Negative teaching hours: {result.teaching_hours:.1f}",
+            field_name="teaching_hours"
+        ))
+
+    if result.research_hours < 0:
+        issues.append(ValidationIssue(
+            level=ValidationLevel.ERROR,
+            message=f"Negative research hours: {result.research_hours:.1f}",
+            field_name="research_hours"
+        ))
+
+    if result.admin_hours < 0:
+        issues.append(ValidationIssue(
+            level=ValidationLevel.ERROR,
+            message=f"Negative admin hours: {result.admin_hours:.1f}",
+            field_name="admin_hours"
+        ))
+
+    # Check teaching breakdown sum
+    teaching_sum = sum(result.teaching_breakdown.values())
+    if abs(teaching_sum - result.teaching_hours) > tolerance:
+        issues.append(ValidationIssue(
+            level=ValidationLevel.ERROR,
+            message=f"Teaching breakdown sum mismatch: {teaching_sum:.1f} != {result.teaching_hours:.1f}",
+            field_name="teaching_breakdown"
+        ))
+
+    # Check research breakdown sum
+    research_sum = sum(result.research_breakdown.values())
+    if abs(research_sum - result.research_hours) > tolerance:
+        issues.append(ValidationIssue(
+            level=ValidationLevel.ERROR,
+            message=f"Research breakdown sum mismatch: {research_sum:.1f} != {result.research_hours:.1f}",
+            field_name="research_breakdown"
+        ))
+
+    # Check admin breakdown sum
+    admin_sum = sum(result.admin_breakdown.values())
+    if abs(admin_sum - result.admin_hours) > tolerance:
+        issues.append(ValidationIssue(
+            level=ValidationLevel.ERROR,
+            message=f"Admin breakdown sum mismatch: {admin_sum:.1f} != {result.admin_hours:.1f}",
+            field_name="admin_breakdown"
+        ))
+
+    return issues
+
+
+def validate_all_results(results: List[Any], tolerance: float = 0.1) -> Dict[str, List[ValidationIssue]]:
+    """Validate all workload results and group by staff member.
+
+    Args:
+        results: List of WorkloadResult objects to validate
+        tolerance: Maximum allowed difference for sums
+
+    Returns:
+        Dict mapping staff name to list of validation issues
+    """
+    return {
+        result.name: validate_workload_result(result, tolerance)
+        for result in results
+    }
+
+
+def run_validation_pipeline(results: List[Any]) -> bool:
+    """Run post-calculation validation and print results.
+
+    Args:
+        results: List of WorkloadResult objects to validate
+
+    Returns:
+        True if all validations passed, False otherwise
+    """
+    issues_by_staff = validate_all_results(results)
+
+    has_errors = False
+
+    for staff_name, issues in sorted(issues_by_staff.items()):
+        if not issues:
+            continue
+
+        print(f"\n{staff_name}:")
+        for issue in issues:
+            level_str = {
+                ValidationLevel.ERROR: "[ERROR]",
+                ValidationLevel.WARNING: "[WARN ]",
+                ValidationLevel.INFO: "[INFO ]"
+            }.get(issue.level, "[     ]")
+
+            print(f"  {level_str} {issue.field_name or 'unknown'}: {issue.message}")
+
+            if issue.level == ValidationLevel.ERROR:
+                has_errors = True
+
+    return not has_errors
