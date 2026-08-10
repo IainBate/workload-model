@@ -499,202 +499,66 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
     # Calculate weeks of teaching (typical semester is ~22 weeks)
     contact_weeks = TEACHING_WEEKS_PER_SEMESTER
 
-    # --- Teaching (Lecture) Hours ---
-    # Contact hours from credits represents total contact time.
-    # We need to separate lecture hours from practical hours for correct calculation.
-    # If practical_contact_hours is available, use that to estimate actual teaching structure.
+    # --- Use helper functions for structured calculations ---
 
-    contact_hours = module.contact_hours
-    practicals_count = module.practicals
+    # 1. Calculate lecture hours and multipliers per teacher
+    lecture_result = _calculate_lecture_hours_and_multipliers(
+        module, teachers, known_lecturers_global, known_lecturers_per_module
+    )
 
-    if practicals_count > 0 and module.practical_contact_hours > 0:
-        # We have actual practical data: Total Duration / Number of Practicals gives hours per session
-        total_practical_duration = module.practical_contact_hours * practicals_count
-        # Estimate lecture hours as contact_hours minus practical hours (if practicals are part of contact time)
-        # If practicals represent significant portion, subtract them from contact_hours
-        lecture_hours = max(0, contact_hours - total_practical_duration)
-    else:
-        # No practical data available, assume all contact hours are lectures
-        lecture_hours = contact_hours
-        total_practical_duration = 0.0
-
+    lecture_hours_with_mult = lecture_result['individual_lecture_hours']
     teaching_details = []
+    for lecturer_type in lecture_result['lecturer_types']:
+        teacher_name, ltype = lecturer_type
+        # Build detail string for each teacher based on their type
+        base_share = lecture_result['lecture_hours'] / len(teachers) if teachers else 0
+        multiplier = lecture_result['lecture_multipliers'][teacher_name]
 
-    # Store individual practical hours per teacher (initialized here for all cases)
-    individual_practical_hours = {}
+        if ltype == 'video':
+            teaching_details.append(
+                f"{teacher_name}: Video ({multiplier}x): {base_share:.1f}h base @ 2.5x"
+            )
+        elif ltype == 'new_lecturer_new_content':
+            content_dev = base_share * (multiplier - 2.5)
+            teaching_details.append(
+                f"{teacher_name}: New lecturer + new content ({multiplier}x): {base_share:.1f}h base @ 2.5x + {content_dev:.1f}h content dev"
+            )
+        elif ltype == 'new_lecturer':
+            content_dev = base_share * (multiplier - 2.5)
+            teaching_details.append(
+                f"{teacher_name}: New lecturer ({multiplier}x): {base_share:.1f}h base @ 2.5x + {content_dev:.1f}h content dev"
+            )
+        elif ltype == 'existing_lecturer_new_content':
+            content_dev = base_share * (multiplier - 2.5)
+            teaching_details.append(
+                f"{teacher_name}: Existing lecturer + new content ({multiplier}x): {base_share:.1f}h base @ 2.5x + {content_dev:.1f}h content dev"
+            )
+        else:  # standard
+            estimated_lectures = round(lecture_result['lecture_hours'] / 2) if lecture_result['lecture_hours'] > 0 else 0
+            lectures_per_teacher = math.ceil(estimated_lectures / len(teachers)) if teachers else 0
+            teaching_details.append(
+                f"{teacher_name}: Standard ({multiplier}x): {estimated_lectures} two-hour lectures split between {len(teachers)} staff"
+            )
 
-    # Determine which teachers from last year taught THIS specific module
-    # Use per-module tracking first, fall back to global set for modules without tracking
-    module_code = module.codes[0] if module.codes else None
+    # 2. Calculate practical hours with structured breakdown
+    practical_result = _calculate_practical_hours_and_breakdown(module, teachers)
 
-    # Try looking up by full code first (e.g., COM00029I)
-    known_teachers_this_module = known_lecturers_per_module.get(module_code)
+    # Store individual practical hours per teacher for later use
+    individual_practical_hours = practical_result['individual_practical_hours']
+    practical_week_count = TEACHING_WEEKS_PER_SEMESTER if module.practicals > 0 else 0
 
-    # If not found, try the module name (e.g., "SYS2") which may be stored
-    if known_teachers_this_module is None:
-        known_teachers_this_module = known_lecturers_per_module.get(module.name)
+    # Build practical details for display
+    practical_details = []
+    if practical_result['practical_details']:
+        practical_details.extend(practical_result['practical_details'])
 
-    # If we have module-specific tracking, use it; otherwise use global known lecturers
-    if known_teachers_this_module is not None:
-        known_lecturers_for_module = known_teachers_this_module
-    else:
-        # No per-module tracking available - fall back to global set
-        # This handles new modules or modules without previous year data
-        known_lecturers_for_module = known_lecturers_global
+    # 3. Calculate assessment setting hours per teacher
+    assessment_result = _calculate_assessment_setting_hours(
+        module, teachers, known_lecturers_global, known_lecturers_per_module
+    )
 
-    # Check if this is a new content module (for 7.5x rate when teacher is also new)
-    is_new_content_module = getattr(module, 'new_content', False)
-
-    # Detect online modules by name pattern for special rates
-    module_name_lower = module.name.lower()
-    is_online_module = "online" in module_name_lower
-
-    # Detect video teaching format (by name pattern or module attribute)
-    module_name_lower = module.name.lower()
-    is_video_module = getattr(module, 'teaching_format', '') == "video" or "video" in module_name_lower
-
-    # Calculate lecture multiplier per-teacher based on:
-    # - Whether THAT teacher is new for THIS module
-    # - Whether THIS module has new content (for combined "new lecturer AND new content" 7.5x rate)
-    # New lecturers get 5x for content development + delivery
-    # New lecturers on NEW content get 7.5x (additional content dev time)
-    # Existing lecturers on new content get 5x (content development only)
-    # Existing lecturers get 2.5x for delivery only (content already developed)
-    lecture_multipliers = {}
-    # Track lecturer types for reporting purposes
-    new_lecturers = []  # Never taught before (new to global set)
-    existing_with_new_content = []  # Taught before but on new content
-    standard_lecturers = []  # Taught before and not new content
-
-    for t in teachers:
-        # A lecturer is "new" only if they are NOT in this module's known set AND NOT in the global known set
-        is_new_lecturer = (t not in known_lecturers_for_module) and (t not in known_lecturers_global)
-        if is_new_lecturer and is_new_content_module:
-            lecture_multipliers[t] = config.TEACHING_MULTIPLIERS["lecture_new_content_and_lecturer"]  # 7.5
-            new_lecturers.append(t)
-        elif is_new_lecturer:
-            lecture_multipliers[t] = config.TEACHING_MULTIPLIERS["lecture_new_content_or_lecturer"]  # 5
-            new_lecturers.append(t)
-        elif is_new_content_module:
-            lecture_multipliers[t] = config.TEACHING_MULTIPLIERS["lecture_new_content_or_lecturer"]  # 5 for existing lecturer + new content
-            existing_with_new_content.append(t)
-        else:
-            lecture_multipliers[t] = config.TEACHING_MULTIPLIERS["lecture_standard"]  # 2.5
-            standard_lecturers.append(t)
-
-    # Build teaching details string showing multiplier type for each teacher
-
-    # Calculate lecture hours using the new approach:
-    # 1. All lecturers get an equal "base" share at standard rate (2.5x)
-    # 2. New lecturers get additional time to account for content development
-    # 3. New lecturers on NEW content get extra additional time (7.5x total)
-    #
-    # This reflects that existing lecturers (e.g., Mike, Andy) just deliver,
-    # while new lecturers need time to develop materials in addition to delivery.
-    n_teachers = len(teachers)
-
-    # Base share: divide total contact hours equally among all teachers
-    base_lecture_share = lecture_hours / n_teachers
-
-    # Calculate per-teacher hours:
-    # - Standard lecturers: base_share * standard_multiplier (just delivery)
-    # - New lecturers on existing content: base + 2.5x content dev (5x total)
-    # - New lecturers on NEW content: base + 5x content dev (7.5x total)
-    # - Existing lecturers with new content: base + 2.5x content dev (5x total)
-    #
-    # The content_dev_time represents the additional effort for new material.
-    lecture_hours_with_mult = {}
-    detail_parts = []
-
-    # Determine if video format applies (higher multiplier for video content creation)
-    # Video modules get 10x rate for new lecturer delivery + content dev
-    use_video_rate = is_video_module
-
-    for t in teachers:
-        # A lecturer is "new" only if they are NOT in this module's known set AND NOT in the global known set
-        is_new_lecturer = (t not in known_lecturers_for_module) and (t not in known_lecturers_global)
-
-        if is_new_lecturer:
-            if use_video_rate:
-                # New lecturer on VIDEO content: 10x total (highest rate for video)
-                delivery_hours = base_lecture_share * config.TEACHING_MULTIPLIERS["lecture_standard"]
-                content_dev_hours = base_lecture_share * (config.TEACHING_MULTIPLIERS["lecture_new_video"] - config.TEACHING_MULTIPLIERS["lecture_standard"])
-                total_hours = delivery_hours + content_dev_hours
-
-                lecture_hours_with_mult[t] = total_hours
-                detail_parts.append(f"New lecturer + video ({config.TEACHING_MULTIPLIERS['lecture_new_video']}x): {base_lecture_share:.1f}h base @ 2.5x = {delivery_hours:.1f}h + {content_dev_hours:.1f}h content dev")
-            elif is_new_content_module:
-                # New lecturer on NEW content: 7.5x total
-                delivery_hours = base_lecture_share * config.TEACHING_MULTIPLIERS["lecture_standard"]
-                content_dev_hours = base_lecture_share * (config.TEACHING_MULTIPLIERS["lecture_new_content_and_lecturer"] - config.TEACHING_MULTIPLIERS["lecture_standard"])
-                total_hours = delivery_hours + content_dev_hours
-
-                lecture_hours_with_mult[t] = total_hours
-                detail_parts.append(f"New lecturer + new content ({config.TEACHING_MULTIPLIERS['lecture_new_content_and_lecturer']}x): {base_lecture_share:.1f}h base @ 2.5x = {delivery_hours:.1f}h + {content_dev_hours:.1f}h content dev")
-            else:
-                # New lecturer on existing content: 5x total
-                delivery_hours = base_lecture_share * config.TEACHING_MULTIPLIERS["lecture_standard"]
-                content_dev_hours = base_lecture_share * (config.TEACHING_MULTIPLIERS["lecture_new_content_or_lecturer"] - config.TEACHING_MULTIPLIERS["lecture_standard"])
-                total_hours = delivery_hours + content_dev_hours
-
-                lecture_hours_with_mult[t] = total_hours
-                detail_parts.append(f"New lecturer ({config.TEACHING_MULTIPLIERS['lecture_new_content_or_lecturer']}x): {base_lecture_share:.1f}h base @ 2.5x = {delivery_hours:.1f}h + {content_dev_hours:.1f}h content dev")
-        else:
-            # Existing lecturer - check if this is new content
-            if is_new_content_module:
-                # Existing lecturer with new content: 5x total (2.5x delivery + 2.5x content dev)
-                delivery_hours = base_lecture_share * config.TEACHING_MULTIPLIERS["lecture_standard"]
-                content_dev_hours = base_lecture_share * (config.TEACHING_MULTIPLIERS["lecture_new_content_or_lecturer"] - config.TEACHING_MULTIPLIERS["lecture_standard"])
-                total_hours = delivery_hours + content_dev_hours
-
-                lecture_hours_with_mult[t] = total_hours
-                detail_parts.append(f"Existing lecturer + new content ({config.TEACHING_MULTIPLIERS['lecture_new_content_or_lecturer']}x): {base_lecture_share:.1f}h base @ 2.5x = {delivery_hours:.1f}h + {content_dev_hours:.1f}h content dev")
-            else:
-                # Standard lecturer: just delivery at standard rate
-                total_hours = base_lecture_share * config.TEACHING_MULTIPLIERS["lecture_standard"]
-                lecture_hours_with_mult[t] = total_hours
-
-                # Calculate and display clearer breakdown showing lectures, staff split, and calculation
-                # Estimate number of 2-hour lectures from total lecture hours
-                estimated_lectures = round(lecture_hours / 2) if lecture_hours > 0 else 0
-                lectures_per_teacher = math.ceil(estimated_lectures / n_teachers) if n_teachers > 0 else 0
-
-                detail_parts.append(
-                    f"Standard ({config.TEACHING_MULTIPLIERS['lecture_standard']}x): "
-                    f"{estimated_lectures} two-hour lectures split between {n_teachers} staff = "
-                    f"{lectures_per_teacher} lectures each (rounded up). {lectures_per_teacher} x 2h x 2.5x = {total_hours:.1f}h"
-                )
-
-    teaching_details.append("; ".join(detail_parts))
-
-    # --- Online Content Development (for online modules with new content) ---
-    # Per the spec, online modules have separate content development rates:
-    # - Refreshing existing material: 100h/module
-    # - New material for new lecturer: 600h/module
-    # - New material for new lecturer on NEW content: 800h/module
-    # - Existing lecturer with new content: 200h/module (content development only)
-    online_content_dev_hours = {}
-    online_details = []
-
-    if is_online_module and is_new_content_module:
-        # Apply online content development rates for new content in online modules
-        for t in teachers:
-            # A lecturer is "new" only if they are NOT in this module's known set AND NOT in the global known set
-            is_new_lecturer = (t not in known_lecturers_for_module) and (t not in known_lecturers_global)
-            if is_new_lecturer:
-                # New lecturer on NEW content: 800h total for content dev
-                online_hours = config.ONLINE_PROGRAMS["content_development_new_material_new_lecturer_per_module"]  # 800
-                per_teacher_online = online_hours / len(teachers)
-            else:
-                # Existing lecturer with new content: 200h/module (refreshing at higher rate than standard)
-                per_teacher_online = config.ONLINE_PROGRAMS.get("content_development_new_content_existing_lecturer_per_module", 200) / len(teachers)
-
-            online_content_dev_hours[t] = per_teacher_online
-            if per_teacher_online > 0:
-                online_details.append(f"Online content dev: {per_teacher_online:.1f}h/teacher")
-
-    if online_details:
-        teaching_details.append("; ".join(online_details))
+    # 4. Calculate assessment marking hours per teacher
+    marking_result = _calculate_assessment_marking_hours(module, teachers)
 
     # --- Practical Sessions with Repetition Multiplier ---
     # Per the spec: "For each repetition of an identical class (e.g. 2nd and 3rd version)
