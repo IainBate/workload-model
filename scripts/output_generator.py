@@ -1161,15 +1161,17 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
         if delivery_per_module > 0:
             # Get the stored contact hours (before multiplier was applied)
             lecture_contact_hours = module_breakdown.get('lecture_contact_hours', 0.0)
+            total_lecture_hours = module_breakdown.get('total_lecture_hours', 0.0)
 
             if is_new_lecturer:
                 lecturer_type = "New lecturer (5x)"
                 # Display: show contact hours and that they're multiplied by 5x for new lecturer
-                calculation_text = f"{lecture_contact_hours:.1f}h contact @ 5x (new lecturer) = {delivery_per_module:.1f}h"
+                # Show both the per-teacher base hours and total before splitting
+                calculation_text = f"{total_lecture_hours:.1f}h contact @ {int(lecture_contact_hours * 3 if lecture_contact_hours > 0 else 0)} teachers = {lecture_contact_hours:.1f} each × 5x = {delivery_per_module:.1f}h"
             else:
                 lecturer_type = "Standard (2.5x)"
                 # For standard, total equals the contact hours at 2.5x rate
-                calculation_text = f"{lecture_contact_hours:.1f}h of lectures @ 2.5x"
+                calculation_text = f"{total_lecture_hours:.1f}h contact @ {int(lecture_contact_hours * 3 if lecture_contact_hours > 0 else 0)} teachers = {lecture_contact_hours:.1f} each × 2.5x"
 
             # Include module code in label for clarity, but only if it looks like a valid code
             # Skip codes that are empty or look like placeholders (contain < or >)
