@@ -1078,7 +1078,12 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
         protected_research = config.PROTECTED_RESEARCH_BASELINE * fte_value
 
         # Research (grants, supervision - additional to protected baseline)
-        research_hours, research_breakdown, research_detail, grant_titles = _calculate_research_workload(staff)
+        # Pass assumptions list to capture any issues found during calculation
+        research_hours, research_breakdown, research_detail, grant_titles, grant_assumptions = _calculate_research_workload(staff, assumptions)
+
+        # Add assumptions from research grants calculation to the main assumptions list
+        if grant_assumptions:
+            assumptions.extend(grant_assumptions)
 
         # Add protected baseline to breakdown
         research_breakdown['protected_research_baseline'] = protected_research
