@@ -22,7 +22,7 @@ sys.path.insert(0, SCRIPTS_DIR)
 
 from data_loader import load_all_data, normalize_name, _load_name_lookup, _build_reverse_lookup
 from workload_calculator import calculate_workload
-from validation import run_validation_pipeline
+from validation import validate_all_results, run_validation_pipeline
 from output_generator import OUTPUT_DIR, generate_all_outputs
 
 # Try to import Google Sheets integration (optional)
