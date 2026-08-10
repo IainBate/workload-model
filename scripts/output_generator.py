@@ -1152,6 +1152,123 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
             <p style="font-size:0.85em;color:#666;padding-top:10px;">Subtotal: {hours:.1f}h</p>
         </div>"""
 
+    def _format_module_delivery_section(module_breakdown: Dict[str, Any], is_new_lecturer: bool,
+                                         css_class: str) -> List[str]:
+        """Format delivery/lecture section for a module."""
+        parts = []
+        delivery_per_module = module_breakdown.get('teaching', 0)
+
+        if delivery_per_module > 0:
+            lecturer_type = "New lecturer (5x)" if is_new_lecturer else "Standard (2.5x)"
+            parts.append(f"""<div class="detail-item {css_class}">
+                <span class="detail-name">Delivery (Lectures)</span>
+                <span class="detail-hours">{delivery_per_module:.1f}h @ {lecturer_type}</span>
+                <span class="detail-activity teaching-activity"></span>
+            </div>""")
+            if is_new_lecturer:
+                delivery_base = delivery_per_module / 5.0
+                content_dev = delivery_per_module - delivery_base
+                parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+                    <span class="detail-name" style="color:#333;">Calculation</span>
+                    <span class="detail-hours">{delivery_base:.1f}h base @ 2.5x + {content_dev:.1f}h content dev = {delivery_per_module:.0f}h</span>
+                </div>""")
+            else:
+                parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+                    <span class="detail-name" style="color:#333;">Calculation</span>
+                    <span class="detail-hours">{delivery_per_module:.1f}h @ Standard (2.5x)</span>
+                </div>""")
+        return parts
+
+    def _format_module_practicals_section(module_breakdown: Dict[str, Any], css_class: str) -> List[str]:
+        """Format practical sessions section for a module."""
+        parts = []
+
+        # Handle structured practicals breakdown (dict) or flat value (int/float)
+        _practicals_raw = module_breakdown.get('practicals', 0)
+        if isinstance(_practicals_raw, dict):
+            practicals_per_module = _practicals_raw.get('total', 0)
+        else:
+            practicals_per_module = _practicals_raw
+
+        # Phase 3: Use structured practicals breakdown instead of regex parsing
+        practicals_structured = module_breakdown.get('practicals', {})
+        if isinstance(practicals_structured, dict) and practicals_structured:
+            # Structured practicals data available (from Phase 3)
+            first_session_rate = practicals_structured.get('first_session_rate', config.TEACHING_MULTIPLIERS.get('problem_class_seminar_practical', 2.5))
+            rep_rate = practicals_structured.get('repeat_rate', config.REPETITION_MULTIPLIER)
+            week_count = practicals_structured.get('week_count', 0)
+
+            parts.append(f"""<div class="detail-item {css_class}">
+                <span class="detail-name">Practical Sessions</span>
+                <span class="detail-hours">{practicals_per_module:.1f}h</span>
+                <span class="detail-activity teaching-activity"></span>
+            </div>""")
+            parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+                <span class="detail-name" style="color:#333;">Calculation</span>
+                <span class="detail-hours">{week_count} sessions/week @ {first_session_rate:.1f}h each, {rep_rate}x repeats = {practicals_per_module:.1f}h</span>
+            </div>""")
+        else:
+            # Fallback to default rates if structured data not available
+            first_session_rate = config.TEACHING_MULTIPLIERS.get('problem_class_seminar_practical', 2.5)
+            rep_rate = config.REPETITION_MULTIPLIER
+            parts.append(f"""<div class="detail-item {css_class}">
+                <span class="detail-name">Practical Sessions</span>
+                <span class="detail-hours">{practicals_per_module:.1f}h</span>
+                <span class="detail-activity teaching-activity"></span>
+            </div>""")
+            parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+                <span class="detail-name" style="color:#333;">Calculation</span>
+                <span class="detail-hours">{first_session_rate}x first session (standard), {rep_rate}x repeats</span>
+            </div>""")
+        return parts
+
+    def _format_module_assessment_section(module_breakdown: Dict[str, Any], css_class: str) -> List[str]:
+        """Format assessment setting and marking sections for a module."""
+        parts = []
+
+        assessment_setting_per_module = module_breakdown.get('assessment_setting', 0)
+        if assessment_setting_per_module > 0:
+            parts.append(f"""<div class="detail-item {css_class}">
+                <span class="detail-name">Assessment Setting</span>
+                <span class="detail-hours">{assessment_setting_per_module:.1f}h</span>
+                <span class="detail-activity teaching-activity"></span>
+            </div>""")
+            parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+                <span class="detail-name" style="color:#333;">Calculation</span>
+                <span class="detail-hours">{assessment_setting_per_module:.1f}h total (main + resit)</span>
+            </div>""")
+
+        marking_per_module = module_breakdown.get('marking', 0)
+        if marking_per_module > 0:
+            parts.append(f"""<div class="detail-item {css_class}">
+                <span class="detail-name">Assessment Marking</span>
+                <span class="detail-hours">{marking_per_module:.1f}h</span>
+                <span class="detail-activity teaching-activity"></span>
+            </div>""")
+            parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+                <span class="detail-name" style="color:#333;">Calculation</span>
+                <span class="detail-hours">{marking_per_module:.1f}h total (initial + resit)</span>
+            </div>""")
+        return parts
+
+    def _format_module_items(modules_in_stage: List[Dict], css_class: str,
+                             known_lecturers_per_module: Optional[Dict[str, frozenset]]) -> List[str]:
+        """Format all items for a list of modules in a stage."""
+        parts = []
+        for mod in modules_in_stage:
+            code = mod['code']
+            module_breakdown = mod['module_breakdown']
+
+            is_new_lecturer = _determine_lecturer_type(r.name, code, known_lecturers_per_module or {})
+
+            # Build module items
+            parts.extend(_format_module_delivery_section(module_breakdown, is_new_lecturer, css_class))
+            parts.extend(_format_module_practicals_section(module_breakdown, css_class))
+            parts.extend(_format_module_assessment_section(module_breakdown, css_class))
+
+            parts.append("</div>")
+        return parts
+
     def format_teaching_section(title: str, hours: float, breakdown: Dict[str, float], css_class: str,
                                 supervision_details: Tuple[str, ...] = (),
                                 known_lecturers_per_module: Optional[Dict[str, frozenset]] = None,
@@ -1168,9 +1285,6 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
         for module_name, mb in module_breakdowns.items():
             # Extract codes from structured data (Phase 3: no regex parsing)
             code_tuple = mb.get('module_codes', ())
-            code_str = ', '.join(code_tuple) if code_tuple else ''
-
-            # Get the first code as primary code
             primary_code = code_tuple[0] if code_tuple else ''
 
             module_info_list.append({
@@ -1195,103 +1309,7 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
             items_html_parts.append(f"""<div style="margin-bottom:25px;">
                 <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #2196F3;padding-left:10px;">{stage} Modules ({len(modules_in_stage)} module(s))</h4>""")
 
-            for mod in modules_in_stage:
-                code = mod['code']
-                module_breakdown = mod['module_breakdown']
-
-                is_new_lecturer = _determine_lecturer_type(r.name, stage, known_lecturers_per_module or {})
-
-                # Use the module breakdown directly (no regex parsing needed)
-                delivery_per_module = module_breakdown.get('teaching', 0)
-                delivery_per_module = module_breakdown.get('teaching', 0)
-
-                # Handle structured practicals breakdown (dict) or flat value (int/float)
-                _practicals_raw = module_breakdown.get('practicals', 0)
-                if isinstance(_practicals_raw, dict):
-                    practicals_per_module = _practicals_raw.get('total', 0)
-                else:
-                    practicals_per_module = _practicals_raw
-
-                assessment_setting_per_module = module_breakdown.get('assessment_setting', 0)
-                marking_per_module = module_breakdown.get('marking', 0)
-
-                if delivery_per_module > 0:
-                    lecturer_type = "New lecturer (5x)" if is_new_lecturer else "Standard (2.5x)"
-                    items_html_parts.append(f"""<div class="detail-item {css_class}">
-                        <span class="detail-name">Delivery (Lectures)</span>
-                        <span class="detail-hours">{delivery_per_module:.1f}h @ {lecturer_type}</span>
-                        <span class="detail-activity teaching-activity"></span>
-                    </div>""")
-                    if is_new_lecturer:
-                        delivery_base = delivery_per_module / 5.0
-                        content_dev = delivery_per_module - delivery_base
-                        items_html_parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
-                            <span class="detail-name" style="color:#333;">Calculation</span>
-                            <span class="detail-hours">{delivery_base:.1f}h base @ 2.5x + {content_dev:.1f}h content dev = {delivery_per_module:.0f}h</span>
-                        </div>""")
-                    else:
-                        items_html_parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
-                            <span class="detail-name" style="color:#333;">Calculation</span>
-                            <span class="detail-hours">{delivery_per_module:.1f}h @ Standard (2.5x)</span>
-                        </div>""")
-
-                # Phase 3: Use structured practicals breakdown instead of regex parsing
-                practicals_structured = module_breakdown.get('practicals', {})
-                if isinstance(practicals_structured, dict) and practicals_structured:
-                    # Structured practicals data available (from Phase 3)
-                    first_session_rate = practicals_structured.get('first_session_rate', config.TEACHING_MULTIPLIERS.get('problem_class_seminar_practical', 2.5))
-                    rep_rate = practicals_structured.get('repeat_rate', config.REPETITION_MULTIPLIER)
-                    week_count = practicals_structured.get('week_count', 0)
-
-                    items_html_parts.append(f"""<div class="detail-item {css_class}">
-                        <span class="detail-name">Practical Sessions</span>
-                        <span class="detail-hours">{practicals_per_module:.1f}h</span>
-                        <span class="detail-activity teaching-activity"></span>
-                    </div>""")
-
-                    # Display structured practical details
-                    items_html_parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
-                        <span class="detail-name" style="color:#333;">Calculation</span>
-                        <span class="detail-hours">{week_count} sessions/week @ {first_session_rate:.1f}h each, {rep_rate}x repeats = {practicals_per_module:.1f}h</span>
-                    </div>""")
-                else:
-                    # Fallback to default rates if structured data not available
-                    first_session_rate = config.TEACHING_MULTIPLIERS.get('problem_class_seminar_practical', 2.5)
-                    rep_rate = config.REPETITION_MULTIPLIER
-                    items_html_parts.append(f"""<div class="detail-item {css_class}">
-                        <span class="detail-name">Practical Sessions</span>
-                        <span class="detail-hours">{practicals_per_module:.1f}h</span>
-                        <span class="detail-activity teaching-activity"></span>
-                    </div>""")
-                    items_html_parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
-                        <span class="detail-name" style="color:#333;">Calculation</span>
-                        <span class="detail-hours">{first_session_rate}x first session (standard), {rep_rate}x repeats</span>
-                    </div>""")
-
-                if assessment_setting_per_module > 0:
-                    items_html_parts.append(f"""<div class="detail-item {css_class}">
-                        <span class="detail-name">Assessment Setting</span>
-                        <span class="detail-hours">{assessment_setting_per_module:.1f}h</span>
-                        <span class="detail-activity teaching-activity"></span>
-                    </div>""")
-                    items_html_parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
-                        <span class="detail-name" style="color:#333;">Calculation</span>
-                        <span class="detail-hours">{assessment_setting_per_module:.1f}h total (main + resit)</span>
-                    </div>""")
-
-                if marking_per_module > 0:
-                    items_html_parts.append(f"""<div class="detail-item {css_class}">
-                        <span class="detail-name">Assessment Marking</span>
-                        <span class="detail-hours">{marking_per_module:.1f}h</span>
-                        <span class="detail-activity teaching-activity"></span>
-                    </div>""")
-                    items_html_parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
-                        <span class="detail-name" style="color:#333;">Calculation</span>
-                        <span class="detail-hours">{marking_per_module:.1f}h total (initial + resit)</span>
-                    </div>""")
-
-                items_html_parts.append("</div>")
-
+            items_html_parts.extend(_format_module_items(modules_in_stage, css_class, known_lecturers_per_module))
             items_html_parts.append("</div>")
 
         # Phase 3b: Use structured supervision breakdowns instead of regex parsing
