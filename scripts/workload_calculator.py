@@ -142,6 +142,8 @@ def _calculate_lecture_hours_and_multipliers(module: ModuleData,
         total_practical_duration = 0.0
 
     result['lecture_hours'] = lecture_hours
+    result['total_lecture_hours'] = lecture_hours  # Total before splitting among teachers
+    result['teacher_count'] = len(teachers) if teachers else 0
 
     # Determine which teachers from last year taught THIS specific module
     # Check ALL possible names (codes, current name, AND previous year H/M variants)
