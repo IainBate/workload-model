@@ -288,37 +288,47 @@ def _calculate_practical_hours_and_breakdown(
                 first_session_rate = config.TEACHING_PROBLEM_CLASS
                 repeat_rate = config.REPETITION_MULTIPLIER
 
-                # Calculate total hours for one teacher teaching one group
-                # First session rate applies to the first session per week
-                # Note: group_sessions is the number of sessions per week, weekly_hrs is hours per session
-                first_session_total = group_sessions * weekly_hrs * first_session_rate * contact_weeks
-                repeat_sessions = max(0, group_sessions - 1)
-                repeat_session_total = repeat_sessions * weekly_hrs * first_session_rate * repeat_rate * contact_weeks
+                # Calculate hours for one teacher teaching one group (base hours without their multiplier)
+                base_first_session_total = group_sessions * weekly_hrs * first_session_rate * contact_weeks
+                base_repeat_session_total = repeat_sessions * weekly_hrs * first_session_rate * repeat_rate * contact_weeks
+                base_group_hours = base_first_session_total + base_repeat_session_total
 
-                # Total for one teacher teaching one group
-                total_group_hours = first_session_total + repeat_session_total
-
+                # Apply each teacher's multiplier to their practical hours
                 for t in teachers:
+                    multiplier = teacher_multiplier.get(t, 1.0)
                     if t not in result['individual_practical_hours']:
                         result['individual_practical_hours'][t] = 0.0
-                    result['individual_practical_hours'][t] += total_group_hours
+                    result['individual_practical_hours'][t] += base_group_hours * multiplier
 
-                # Store structured breakdown (per teacher, per group)
+                # Store structured breakdown (per teacher, per group) - shows base rates without multipliers
+                # Multipliers are applied in individual hours calculation above
                 result['practicals_breakdown'] = {
                     "first_session_hours": round(weekly_hrs, 2),
                     "repeat_hours": round(repeat_sessions * weekly_hrs, 2),
                     "week_count": group_sessions,
                     "first_session_rate": first_session_rate,
                     "repeat_rate": repeat_rate,
-                    "total": round(total_group_hours, 2)
+                    "total": round(base_group_hours, 2)
                 }
 
-                # Display shows per-group calculation
-                first_session_display = round(first_session_total, 1)
-                repeat_display = round(repeat_session_total, 1)
+                # Display shows per-group calculation with lecturer type info
+                display_first = round(base_first_session_total, 1)
+                display_repeat = round(base_repeat_session_total, 1)
+
+                # Build rate text based on teacher multipliers (check if all same or mixed)
+                unique_multipliers = set(teacher_multiplier.get(t, 1.0) for t in teachers)
+                if len(unique_multipliers) == 1:
+                    mult_val = list(unique_multipliers)[0]
+                    mult_text = f"{mult_val}x" if mult_val != 1.0 else "standard"
+                    rate_display = f"- {mult_text} lecturer rate applied (first session: {first_session_rate}x, repeats: {repeat_rate}x)"
+                else:
+                    # Mixed multipliers - list them
+                    mult_details = ", ".join(f"{t}: {teacher_multiplier.get(t, 1.0)}x" for t in teachers)
+                    rate_display = f"- Per-teacher rates applied: {mult_details}"
+
                 result['practical_details'].append(
                     f"First time delivery: {group_sessions} sessions/week @ {weekly_hrs}h each; "
-                    f"- Standard lecturers: {first_session_rate}x first session (standard), {repeat_rate}x repeats"
+                    f"{rate_display}"
                 )
         else:
             # No parallel groups - all teachers get same rate
