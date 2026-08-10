@@ -119,11 +119,13 @@ def _calculate_lecture_hours_and_multipliers(module: ModuleData,
         - lecturer_types: List of (teacher, type) tuples for reporting
     """
     result = {
-        'lecture_hours': 0.0,
+        'lecture_hours': 0.0,  # Total lecture hours for the module
         'individual_lecture_hours': {},  # After multiplier applied
         'individual_lecture_contact_hours': {},  # Base contact hours (before multiplier)
         'lecture_multipliers': {},
         'lecturer_types': [],
+        'total_lecture_hours': 0.0,  # Total lecture hours before splitting among teachers
+        'teacher_count': 0,  # Number of teachers
     }
 
     contact_weeks = TEACHING_WEEKS_PER_SEMESTER
