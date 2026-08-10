@@ -358,34 +358,18 @@ def validate_year_data(year_data) -> ValidationResult:
     return result
 
 
-def run_validation_pipeline(year_data) -> Dict[str, Any]:
+def run_validation_pipeline(year_data):
+    """DEPRECATED: Run validation on YearData.
+
+    Use validate_year_data() directly instead.
     """
-    Run full validation and return structured results.
-
-    Args:
-        year_data: The YearData instance to validate
-
-    Returns:
-        Dictionary with validation results including:
-            - valid: Overall validity
-            - issues: List of all issues
-            - module_issues: Issues per module
-            - staff_issues: Issues per staff member
-            - summary: Human-readable summary
-    """
-    result = validate_year_data(year_data)
-
-    # Categorize issues by type
-    module_issues = [i for i in result.issues if 'modules[' in str(i.field_name)]
-    staff_issues = [i for i in result.issues if 'staff[' in str(i.field_name)]
-
     return {
-        "valid": result.valid and not result.has_errors,
-        "has_warnings": result.has_warnings,
-        "issues": result.issues,
-        "module_issues": module_issues,
-        "staff_issues": staff_issues,
-        "summary": result.summary
+        "valid": False,
+        "has_warnings": False,
+        "issues": [ValidationIssue(ValidationLevel.WARNING, "run_validation_pipeline for YearData is deprecated")],
+        "module_issues": [],
+        "staff_issues": [],
+        "summary": "Deprecated - use validate_year_data()"
     }
 
 
