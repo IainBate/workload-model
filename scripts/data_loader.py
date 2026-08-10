@@ -1450,6 +1450,17 @@ def load_all_data(data_dir: str = None,
         # Default FTE to 1.0 if no part-time data found
         hod_fte = pt_info_hod["fte"] if pt_info_hod else 1.0
 
+        # Collect ALL roles this person holds in WAW (same logic as normal staff)
+        hod_roles = []
+        for role, members in waw_roles.items():
+            yaml_role = _WAW_ROLE_MAPPING.get(role, role)
+            if yaml_role is None:
+                continue  # Skip non-role entries like "Group Leads"
+            for member in members:
+                norm_member = normalize_name(member, reverse_lookup, unknown_callback=None)
+                if norm_member == hod_name_from_waw:
+                    hod_roles.append(yaml_role)
+
         staff[hod_name_from_waw] = StaffData(
             canonical_name=hod_name_from_waw,
             aliases=tuple(mappings.get(hod_name_from_waw, [hod_name_from_waw])),
@@ -1470,7 +1481,7 @@ def load_all_data(data_dir: str = None,
             initial_fractional_project_load=proj_data_hod["initial_fractional_project_load"] if proj_data_hod else 0,
             initial_fractional_pastoral_load=proj_data_hod["initial_fractional_pastoral_load"] if proj_data_hod else 0,
             notes="HoD - added for completeness, not in WTW",
-            roles=tuple([hod_role]),
+            roles=tuple(sorted(hod_roles)),
             phd_supervisions=phd_info["sole_supervisor"] if phd_info else 0,
             phd_co_supervisions=phd_info["co_supervisor"] if phd_info else 0,
             phd_assessor_count=phd_info["tap_member"] if phd_info else 0,
