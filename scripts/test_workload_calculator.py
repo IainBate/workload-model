@@ -1169,9 +1169,6 @@ class TestHoDFallbackRegression:
         When the HoD also holds other roles in WAW (e.g., also chairs a committee),
         those additional roles should be included, not just Head of Department.
         """
-        from data_loader import load_waw_data, normalize_name
-        # We'll test this by creating a mock scenario where the HoD has multiple roles
-
         # Create staff with HoD role plus another role (e.g., Committee Chair)
         hod_staff = StaffData(
             canonical_name="John Smith",
