@@ -791,7 +791,11 @@ def _calculate_research_workload(staff_member: StaffData, assumptions: List[str]
                 assumptions = []
             assumptions.append(f"Invalid FTE value for grant: '{fte_str}'")
 
-    return total, breakdown, "; ".join(details) if details else "No research activities recorded", grant_titles
+    # Ensure assumptions is always a list (convert None to empty list)
+    if assumptions is None:
+        assumptions = []
+
+    return total, breakdown, "; ".join(details) if details else "No research activities recorded", grant_titles, assumptions
 
 
 # --- Administration Workload ---
