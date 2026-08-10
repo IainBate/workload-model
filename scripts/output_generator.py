@@ -1160,18 +1160,21 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
 
         if delivery_per_module > 0:
             # Calculate base hours (what would be charged at standard 2.5x rate)
-            # For new lecturer (5x), base = total / 5 * 2.5 = total * 0.5
-            # For standard (2.5x), base = total (no content dev)
-            is_new_lecturer_multiplier = is_new_lecturer
-            if is_new_lecturer_multiplier:
+            # For new lecturer (5x), contact_hours × 5 = total
+            # So contact_hours = total / 5, and standard_equivalent = contact_hours × 2.5
+            # This gives us: standard_equivalent = total / 5 × 2.5 = total × 0.5
+            if is_new_lecturer:
                 lecturer_type = "New lecturer (5x)"
-                delivery_base = delivery_per_module / 5.0 * 2.5  # Convert 5x hours back to base @ 2.5x
-                content_dev = delivery_per_module - delivery_base
-                calculation_text = f"{delivery_base:.1f}h of lectures per semester @ 2.5x + {content_dev:.1f}h content dev = {delivery_per_module:.0f}h"
+                # Total hours = contact_hours × 5
+                # Standard equivalent of contact hours = contact_hours × 2.5
+                # Content dev = total - standard_equivalent
+                standard_equivalent = delivery_per_module / 5.0 * 2.5
+                content_dev = delivery_per_module - standard_equivalent
+                calculation_text = f"{standard_equivalent:.1f}h of lectures @ 2.5x + {content_dev:.1f}h content dev = {delivery_per_module:.0f}h"
             else:
                 lecturer_type = "Standard (2.5x)"
-                delivery_base = delivery_per_module  # For standard, base equals total
-                calculation_text = f"{delivery_per_module:.1f}h of lectures per semester @ 2.5x"
+                standard_equivalent = delivery_per_module  # For standard, total equals standard equivalent
+                calculation_text = f"{standard_equivalent:.1f}h of lectures @ 2.5x"
 
             # Include module code in label for clarity, but only if it looks like a valid code
             # Skip codes that are empty or look like placeholders (contain < or >)
