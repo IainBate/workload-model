@@ -787,7 +787,7 @@ def _calculate_research_workload(staff_member: StaffData, assumptions: List[str]
             details.append(f"Grant {display_name}: {fte_str} of {config.NOMINAL_WORKING_HOURS_PER_YEAR}h = {grant_hours:.1f}h")
         except ValueError:
             # Record the invalid FTE value but don't fail silently
-            if "assumptions" not in locals():
+            if assumptions is None:
                 assumptions = []
             assumptions.append(f"Invalid FTE value for grant: '{fte_str}'")
 
