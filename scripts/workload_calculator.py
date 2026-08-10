@@ -1271,7 +1271,7 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
             """
             aggregated = {}
 
-            # Keys that should be summed across modules
+            # Keys that should be summed across modules (only numeric values, not nested dicts)
             sum_keys = ["teaching", "practicals", "assessment_setting", "marking",
                        "admin", "supervision", "hw_lab", "drop_in"]
 
@@ -1279,7 +1279,11 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
             for module_name, module_breakdown in module_breakdowns.items():
                 for key in sum_keys:
                     if key in module_breakdown:
-                        aggregated[key] = aggregated.get(key, 0.0) + module_breakdown[key]
+                        value = module_breakdown[key]
+                        # Only sum if the value is numeric (not a nested dict like practicals_breakdown)
+                        if isinstance(value, (int, float)):
+                            aggregated[key] = aggregated.get(key, 0.0) + value
+                        # If it's a dict, skip it - those are structured breakdowns for display
 
             # Include supervision components (already at staff level, not summed)
             if "pastoral_supervision" in staff_data.get("teaching_breakdown", {}):
