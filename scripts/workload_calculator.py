@@ -120,7 +120,8 @@ def _calculate_lecture_hours_and_multipliers(module: ModuleData,
     """
     result = {
         'lecture_hours': 0.0,
-        'individual_lecture_hours': {},
+        'individual_lecture_hours': {},  # After multiplier applied
+        'individual_lecture_contact_hours': {},  # Base contact hours (before multiplier)
         'lecture_multipliers': {},
         'lecturer_types': [],
     }
