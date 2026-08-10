@@ -1160,8 +1160,11 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
 
         if delivery_per_module > 0:
             lecturer_type = "New lecturer (5x)" if is_new_lecturer else "Standard (2.5x)"
-            # Include module code in label for clarity
-            label_prefix = f"[{module_code}] " if module_code else ""
+            # Include module code in label for clarity, but only if it looks like a valid code
+            # Skip codes that are empty or look like placeholders (contain < or >)
+            label_prefix = ""
+            if module_code and not module_code.startswith('<') and not module_code.endswith('>'):
+                label_prefix = f"[{module_code}] "
             parts.append(f"""<div class="detail-item {css_class}">
                 <span class="detail-name">{label_prefix}Delivery (Lectures)</span>
                 <span class="detail-hours">{delivery_per_module:.1f}h @ {lecturer_type}</span>
