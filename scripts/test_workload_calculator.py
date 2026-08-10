@@ -512,7 +512,7 @@ class TestResearchWorkload:
             active=True
         )
 
-        total, breakdown, detail, grant_titles = _calculate_research_workload(staff)
+        total, breakdown, detail, grant_titles, _ = _calculate_research_workload(staff)
 
         # PhD supervision hours are NOT scaled by FTE in the current implementation
         expected_phd_hours = 2 * config.SUPERVISION_MULTIPLIERS["pgr_primary_supervisor_per_fte"]
