@@ -1166,11 +1166,12 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
             if is_new_lecturer:
                 lecturer_type = "New lecturer (5x)"
                 # Total hours = contact_hours × 5
+                # Contact hours = total / 5
                 # Standard equivalent of contact hours = contact_hours × 2.5
-                # Content dev = total - standard_equivalent
-                standard_equivalent = delivery_per_module / 5.0 * 2.5
-                content_dev = delivery_per_module - standard_equivalent
-                calculation_text = f"{standard_equivalent:.1f}h of lectures @ 2.5x + {content_dev:.1f}h content dev = {delivery_per_module:.0f}h"
+                # Display: show contact hours and that they're multiplied by 5x for new lecturer
+                contact_hours = delivery_per_module / 5.0
+                standard_equivalent = contact_hours * 2.5
+                calculation_text = f"{contact_hours:.1f}h contact @ 5x (new lecturer) = {delivery_per_module:.1f}h"
             else:
                 lecturer_type = "Standard (2.5x)"
                 standard_equivalent = delivery_per_module  # For standard, total equals standard equivalent
