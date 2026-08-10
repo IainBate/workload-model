@@ -866,10 +866,11 @@ def _calculate_research_workload(staff_member: StaffData, assumptions: List[str]
 
     if phd_hours > 0:
         total += phd_hours
-        # Add detailed breakdown items first (primary, co-supervisor, assessor)
+        # Add detailed breakdown items (primary, co-supervisor, assessor)
+        # NOTE: We do NOT add a separate "phd_supervision" entry as it would
+        # double-count the individual components. The sum of individual items
+        # equals the total PhD supervision hours.
         breakdown.update(phd_breakdown)
-        # Then add the combined total for reference
-        breakdown["phd_supervision"] = phd_hours
         # Build formula string showing N × 80 + M × 48 structure
         formula_parts = []
         if staff_member.phd_supervisions > 0:
