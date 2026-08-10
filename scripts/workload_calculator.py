@@ -294,8 +294,9 @@ def _calculate_practical_hours_and_breakdown(module: ModuleData, teachers: List[
             repeat_rate = config.REPETITION_MULTIPLIER
 
             # Calculate total practical hours for the semester (including weeks and repetition multiplier)
+            first_session_rate = config.TEACHING_PROBLEM_CLASS
             if practicals_count > 1:
-                first_session_total = std_first_session_weekly * contact_weeks
+                first_session_total = std_first_session_weekly * first_session_rate * contact_weeks
                 repeat_sessions = max(0, practicals_count - 1)
                 repeat_session_total = repeat_sessions * std_first_session_weekly * repeat_rate * contact_weeks
                 total_practical_hours = first_session_total + repeat_session_total
