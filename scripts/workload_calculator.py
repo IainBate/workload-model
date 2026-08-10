@@ -684,9 +684,6 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
         teacher_practicals_structured = {}
         if 'practicals_breakdown' in practical_result:
             teacher_practicals_structured = practical_result['practicals_breakdown'].copy()
-            # Scale by weeks for the total
-            if practical_week_count > 0 and 'total' in teacher_practicals_structured:
-                teacher_practicals_structured['total'] = round(teacher_practicals_structured.get('total', 0) * practical_week_count, 2)
 
         result[teacher] = {
             "hours": total_teacher_hours,
