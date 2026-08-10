@@ -675,7 +675,7 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
             "hours": total_teacher_hours,
             "teaching_breakdown": {
                 "teaching": teacher_lecture_hours_with_mult,
-                "practicals": teacher_weekly_practical_hrs * practical_week_count,
+                "practicals": teacher_practical_hrs,
                 "assessment_setting": teacher_assessment_hours,
                 "marking": marking_hours_per_teacher,
                 "admin": admin_hours_per_teacher,
