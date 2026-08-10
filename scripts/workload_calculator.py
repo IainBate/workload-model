@@ -157,10 +157,11 @@ def _calculate_lecture_hours_and_multipliers(module: ModuleData,
                 lecturer_type = "Standard"
                 result['lecturer_types'].append((t, "standard"))
 
-        # Calculate per-teacher lecture hours (split equally among teachers)
+        # Calculate per-teacher lecture hours (split equally among teachers) with multiplier applied
         per_teacher_lecture_hours = lecture_hours / len(teachers) if teachers else 0.0
+        per_teacher_with_multiplier = per_teacher_lecture_hours * multiplier
 
-        result['individual_lecture_hours'][t] = per_teacher_lecture_hours
+        result['individual_lecture_hours'][t] = per_teacher_with_multiplier
         result['lecture_multipliers'][t] = multiplier
 
     return result
