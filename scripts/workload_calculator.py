@@ -305,7 +305,7 @@ def _calculate_practical_hours_and_breakdown(module: ModuleData, teachers: List[
                     "first_session_hours": round(std_first_session_weekly, 2),
                     "repeat_hours": round(repeat_sessions * std_first_session_weekly, 2),
                     "week_count": practicals_count,
-                    "first_session_rate": std_first_session_weekly,
+                    "first_session_rate": config.TEACHING_PROBLEM_CLASS,
                     "repeat_rate": repeat_rate,
                     "total": round(total_practical_hours, 2),
                 }
