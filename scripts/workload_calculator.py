@@ -961,6 +961,11 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
                     staff_teaching[teacher]["teaching_module_breakdowns"][module.name].update({
                         "practicals": breakdown["practicals_breakdown"]
                     })
+                # Store module code as structured data (Phase 3: avoid regex parsing)
+                if module.codes:
+                    staff_teaching[teacher]["teaching_module_breakdowns"][module.name].update({
+                        "module_codes": tuple(sorted(set(module.codes)))
+                    })
                 # Aggregate supervision details (to be shown separately)
                 if "supervision_details" not in staff_teaching[teacher]:
                     staff_teaching[teacher]["supervision_details"] = []
