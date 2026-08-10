@@ -1205,7 +1205,12 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
             practicals_per_module = _practicals_raw
 
         # Phase 3: Use structured practicals breakdown instead of regex parsing
-        practicals_structured = module_breakdown.get('practicals', {})
+        # First check for 'practicals_structured' (Phase 3 format), then fall back to 'practicals'
+        practicals_structured = module_breakdown.get('practicals_structured', {})
+        if not isinstance(practicals_structured, dict) or not practicals_structured:
+            # Fallback to 'practicals' key for backwards compatibility
+            practicals_structured = module_breakdown.get('practicals', {})
+
         if isinstance(practicals_structured, dict) and practicals_structured:
             # Structured practicals data available (from Phase 3)
             first_session_rate = practicals_structured.get('first_session_rate', config.TEACHING_MULTIPLIERS.get('problem_class_seminar_practical', 2.5))
@@ -1213,8 +1218,8 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
             week_count = practicals_structured.get('week_count', 0)
 
             # Extract structured values for calculation display
-            # first_session_hours: hours per week for first session
-            # repeat_hours: additional hours for repeated sessions (per week)
+            # first_session_hours: hours per session (not per week total - each session has this many hours)
+            # repeat_hours: additional hours for repeated sessions (per week, includes session count)
             first_session_weekly = practicals_structured.get('first_session_hours', first_session_rate)
             repeat_weekly = practicals_structured.get('repeat_hours', 0)
 
