@@ -100,10 +100,14 @@ def _calculate_lecture_hours_and_multipliers(module: ModuleData,
     result['lecture_hours'] = lecture_hours
 
     # Determine which teachers from last year taught THIS specific module
-    module_code = module.codes[0] if module.codes else None
-    known_teachers_this_module = known_lecturers_per_module.get(module_code)
+    # Check ALL module codes (H/M variants can have multiple codes), then fall back to name
+    known_teachers_this_module = None
+    for code in module.codes if module.codes else []:
+        known_teachers_this_module = known_lecturers_per_module.get(code)
+        if known_teachers_this_module is not None:
+            break
 
-    if known_teachers_this_module is None:
+    if known_teachers_this_module is None and module.name:
         known_teachers_this_module = known_lecturers_per_module.get(module.name)
 
     if known_teachers_this_module is not None:
