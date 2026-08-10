@@ -1176,9 +1176,9 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
                 description = f"{standard_equivalent:.1f}h @ 2.5x + {content_dev:.1f}h content dev = {delivery_per_module:.1f}h"
             else:
                 lecturer_type = "Standard (2.5x)"
-                # For standard lecturers: show weekly schedule
-                hours_per_week = lecture_contact_hours * weeks if lecture_contact_hours > 0 else total_lecture_hours / weeks if weeks > 0 else 0
-                description = f"{weeks} weeks of {lecture_contact_hours:.1f}h/week = {hours_per_week:.1f}h"
+                # For standard lecturers: show the contact hours calculation
+                teacher_count = int(round(total_lecture_hours / lecture_contact_hours)) if lecture_contact_hours > 0 else 1
+                description = f"{total_lecture_hours:.1f}h contact @ {teacher_count} teachers = {lecture_contact_hours:.1f} each × 2.5x"
 
             # Include module code in label for clarity, but only if it looks like a valid code
             # Skip codes that are empty or look like placeholders (contain < or >)
