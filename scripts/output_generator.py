@@ -1231,7 +1231,7 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
             </div>""")
             # Repeated sessions line (only if there are repeats)
             if repeat_weekly > 0:
-                total_repeat_hrs = first_session_weekly * week_count * rep_rate * TEACHING_WEEKS_PER_SEMESTER
+                total_repeat_hrs = first_session_weekly * week_count * rep_rate * config.TEACHING_WEEKS_PER_SEMESTER
                 parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
                     <span class="detail-name" style="color:#333;">Repeated sessions</span>
                     <span class="detail-hours">{week_count - 1} repeat(s) @ {rep_rate}x = {total_repeat_hrs:.1f}h</span>
