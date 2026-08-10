@@ -35,8 +35,7 @@ def patch_module_paths():
     Patch module-level path constants to point to baseline directory.
 
     This monkey-patches the OUTPUT_DIR, INDIVIDUAL_DIR, and DEPARTMENT_DIR
-    constants in both output_generator.py and role_based_reports.py modules
-    so they write to baseline/ instead of output/.
+    constants in output_generator.py so they write to baseline/ instead of output/.
 
     Must be called BEFORE importing any modules that use these paths.
     """
@@ -55,8 +54,6 @@ def patch_module_paths():
         except ImportError:
             pass
 
-    # Patch role_based_reports first (it's imported by output_generator)
-    patch_module('role_based_reports')
     patch_module('output_generator')
 
 
