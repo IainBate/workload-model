@@ -216,8 +216,24 @@ def _calculate_lecture_hours_and_multipliers(module: ModuleData,
     return result
 
 
-def _calculate_practical_hours_and_breakdown(module: ModuleData, teachers: List[str]) -> dict:
+def _calculate_practical_hours_and_breakdown(
+    module: ModuleData,
+    teachers: List[str],
+    lecturer_types: Optional[List[Tuple[str, str]]] = None
+) -> dict:
     """Calculate practical session hours with repetition multipliers.
+
+    Practical sessions use two rates:
+    - First session rate: Standard problem class rate (TEACHING_PROBLEM_CLASS)
+    - Repeat session rate: REPETITION_MULTIPLIER applied to first-session rate
+
+    Each teacher's multiplier is applied based on their lecturer type (new lecturer gets 5x).
+
+    Args:
+        module: ModuleData with practicals count and contact hours
+        teachers: List of teacher names (canonical)
+        lecturer_types: Optional list of (teacher, lecturer_type) tuples from lecture calculation.
+                       If provided, each teacher's multiplier is used for their practical hours.
 
     Returns a dict with structured breakdown suitable for output display.
     """
@@ -227,6 +243,12 @@ def _calculate_practical_hours_and_breakdown(module: ModuleData, teachers: List[
         'practicals_breakdown': None,  # Structured breakdown dict or None
         'practical_details': [],  # List of detail strings for HTML display
     }
+
+    # Build multiplier lookup from lecturer_types
+    teacher_multiplier = {}
+    if lecturer_types:
+        for t, ltype in lecturer_types:
+            teacher_multiplier[t] = config.TEACHING_MULTIPLIERS.get(ltype, config.TEACHING_PROBLEM_CLASS)
 
     contact_weeks = TEACHING_WEEKS_PER_SEMESTER
     practicals_count = module.practicals
