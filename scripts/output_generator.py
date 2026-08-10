@@ -1238,7 +1238,9 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
                                           module_code: Optional[str] = None) -> List[str]:
         """Format assessment setting and marking sections for a module."""
         parts = []
-        label_prefix = f"[{module_code}] " if module_code else ""
+        label_prefix = ""
+        if module_code and not module_code.startswith('<') and not module_code.endswith('>'):
+            label_prefix = f"[{module_code}] "
 
         assessment_setting_per_module = module_breakdown.get('assessment_setting', 0)
         if assessment_setting_per_module > 0:
