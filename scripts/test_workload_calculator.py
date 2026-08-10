@@ -491,7 +491,7 @@ class TestResearchWorkload:
             active=True
         )
 
-        total, breakdown, detail, grant_titles = _calculate_research_workload(staff)
+        total, breakdown, detail, grant_titles, _ = _calculate_research_workload(staff)
 
         # 50% of 1642h = 821h
         expected_grant_hours = config.NOMINAL_WORKING_HOURS_PER_YEAR * 0.5
