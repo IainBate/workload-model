@@ -1163,6 +1163,45 @@ class TestHoDFallbackRegression:
         assert len(john_result.research_breakdown) > 0
         # The grant should have real data, not a fake entry
 
+    def test_hod_with_multiple_roles_collects_all(self):
+        """Test that HoD with multiple WAW roles gets all roles assigned.
+
+        When the HoD also holds other roles in WAW (e.g., also chairs a committee),
+        those additional roles should be included, not just Head of Department.
+        """
+        from data_loader import load_waw_data, normalize_name
+        # We'll test this by creating a mock scenario where the HoD has multiple roles
+
+        # Create staff with HoD role plus another role (e.g., Committee Chair)
+        hod_staff = StaffData(
+            canonical_name="John Smith",
+            fte=1.0,
+            roles=["Head of Department", "Committee Chair"],  # Multiple roles
+            phd_supervisions=0,
+            phd_co_supervisions=0,
+            phd_assessor_count=0,
+            research_projects=[],
+            saint_modules=[],
+            active=True
+        )
+
+        year_data = YearData.create(
+            year_label="2026-7",
+            modules=[],
+            student_counts={},
+            assessment_counts={},
+            staff={"John Smith": hod_staff},
+            known_lecturers=set(),
+            known_lecturers_per_module={}
+        )
+
+        results = calculate_workload(year_data, validate_input=False)
+        john_result = next(r for r in results if r.name == "John Smith")
+
+        # Both roles should be present
+        assert "Head of Department" in john_result.admin_detail
+        assert "Committee Chair" in john_result.admin_detail
+
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
