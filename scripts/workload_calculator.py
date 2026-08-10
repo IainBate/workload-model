@@ -186,6 +186,16 @@ def _calculate_practical_hours_and_breakdown(module: ModuleData, teachers: List[
         # Get parallel groups configuration (if available)
         parallel_groups = getattr(module, 'parallel_groups', None)
 
+        # Convert integer practical_groups to list of group objects for compatibility
+        if isinstance(parallel_groups, int):
+            n_parallel_groups = parallel_groups
+            parallel_groups = []
+            for i in range(n_parallel_groups):
+                parallel_groups.append(type('ParallelGroup', (), {
+                    'sessions': practicals_count,
+                    'hours_per_week': getattr(module, 'practical_contact_hours', config.TEACHING_PROBLEM_CLASS)
+                })())
+
         n_teachers = len(teachers) if teachers else 1
 
         if parallel_groups and len(parallel_groups) > 1:
