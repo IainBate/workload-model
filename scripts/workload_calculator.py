@@ -1276,7 +1276,10 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
                        "admin", "supervision", "hw_lab", "drop_in"]
 
             module_breakdowns = staff_data.get("teaching_module_breakdowns", {})
+            # DEBUG: print module breakdown keys
             for module_name, module_breakdown in module_breakdowns.items():
+                if canonical_name == "Christopher Crispin-Bailey":
+                    print(f"DEBUG {module_name}: keys={list(module_breakdown.keys())}")
                 for key in sum_keys:
                     if key in module_breakdown:
                         value = module_breakdown[key]
