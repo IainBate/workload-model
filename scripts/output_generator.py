@@ -1159,23 +1159,17 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
         delivery_per_module = module_breakdown.get('teaching', 0)
 
         if delivery_per_module > 0:
-            # Calculate base hours (what would be charged at standard 2.5x rate)
-            # For new lecturer (5x), contact_hours × 5 = total
-            # So contact_hours = total / 5, and standard_equivalent = contact_hours × 2.5
-            # This gives us: standard_equivalent = total / 5 × 2.5 = total × 0.5
+            # Get the stored contact hours (before multiplier was applied)
+            lecture_contact_hours = module_breakdown.get('lecture_contact_hours', 0.0)
+
             if is_new_lecturer:
                 lecturer_type = "New lecturer (5x)"
-                # Total hours = contact_hours × 5
-                # Contact hours = total / 5
-                # Standard equivalent of contact hours = contact_hours × 2.5
                 # Display: show contact hours and that they're multiplied by 5x for new lecturer
-                contact_hours = delivery_per_module / 5.0
-                standard_equivalent = contact_hours * 2.5
-                calculation_text = f"{contact_hours:.1f}h contact @ 5x (new lecturer) = {delivery_per_module:.1f}h"
+                calculation_text = f"{lecture_contact_hours:.1f}h contact @ 5x (new lecturer) = {delivery_per_module:.1f}h"
             else:
                 lecturer_type = "Standard (2.5x)"
-                standard_equivalent = delivery_per_module  # For standard, total equals standard equivalent
-                calculation_text = f"{standard_equivalent:.1f}h of lectures @ 2.5x"
+                # For standard, total equals the contact hours at 2.5x rate
+                calculation_text = f"{lecture_contact_hours:.1f}h of lectures @ 2.5x"
 
             # Include module code in label for clarity, but only if it looks like a valid code
             # Skip codes that are empty or look like placeholders (contain < or >)
