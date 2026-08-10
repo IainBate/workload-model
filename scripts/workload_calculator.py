@@ -695,7 +695,7 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
 # --- Research Workload ---
 
 
-def _calculate_research_workload(staff_member: StaffData) -> tuple:
+def _calculate_research_workload(staff_member: StaffData, assumptions: List[str] = None) -> tuple:
     """Calculate research workload for a staff member.
 
     University has a 10% protected baseline for all staff. Research grants,
@@ -703,6 +703,7 @@ def _calculate_research_workload(staff_member: StaffData) -> tuple:
 
     Args:
         staff_member: StaffData object with supervision counts and grant data
+        assumptions: Optional list to append assumption strings to (for invalid FTE values)
 
     Returns:
         Tuple of (total_hours, breakdown_dict, detail_string, grant_titles_dict) where:
