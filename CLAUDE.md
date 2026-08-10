@@ -229,96 +229,62 @@ The calculator applies different multipliers based on teaching format and conten
 #### Lecture/Delivery Section
 
 For lectures, show:
-1. **Main line**: Total hours with lecturer type (e.g., `44.0h @ New lecturer (5x)`)
-2. **Calculation breakdown**: Show contact hours at standard rate plus content development
+1. **Main line**: Total hours with lecturer type
+2. **Calculation breakdown**: Show standard equivalent at 2.5x plus content development
 
-**Option A format (preferred)**:
+**Format**:
 ```
-Contact hours = total / lecturer_multiplier
-Standard equivalent = contact_hours × 2.5
-Content dev = total - standard_equivalent
+Total = standard_equivalent + content_dev
+Where: standard_equivalent = total / lecturer_multiplier × 2.5
+       content_dev = total - standard_equivalent
 
-Example: "17.6h of lectures @ 2.5x + 26.4h content dev = 44.0h"
-         (where 44/5 = 8.8 contact hrs, 8.8 × 2.5 = 22h standard equiv... wait that's wrong)
-
-Actually: For 44h at 5x rate:
-- Contact hours = 44 / 5 = 8.8h (what was actually taught)
-- Standard equivalent = 8.8 × 2.5 = 22h (value at standard rate)
-- Content dev = 44 - 22 = 22h (the extra for new content)
-
-So the format should be: "{standard_equiv:.1f}h @ 2.5x + {content_dev:.1f}h content dev = {total:.1f}h"
-```
-
-**Option B format (alternative)**:
-```
-Show contact hours with multiplier applied directly:
-"{contact_hrs:.1f}h × {multiplier}x = {total_hrs:.1f}h"
+Example for new lecturer (5x): "17.6h @ 2.5x + 26.4h content dev = 44.0h"
+Example for standard lecturer: "37.5h @ 2.5x"
 ```
 
 #### Practical Sessions Section
 
-For practical sessions, split into two lines:
+Practical sessions use two rates:
+- **First session rate**: Standard problem class rate (TEACHING_PROBLEM_CLASS = 2.5)
+- **Repeat session rate**: REPETITION_MULTIPLIER (1.5) applied to the first-session rate
 
-1. **Main line**: Total practical hours
-2. **First-time delivery**: Show sessions/week with hours each, with explicit multiplier notation
-3. **Repeated sessions** (only if repeats exist): Show repeat count and rate
-
-**Format for first-time delivery**:
-```
-"{sessions_per_week} sessions/week @ {hrs_per_session:.1f}h each = {weekly_total:.1f}h/week × {weeks} weeks = {total_hrs:.1f}h"
-Multiplied by: {first_session_rate}x (standard rate for first session)
-```
-
-**Format for repeated sessions**:
-```
-"{repeat_count} repeat(s) @ {repetition_rate}x = {total_repeat_hrs:.1f}h"
-Repeat rate = 1.5x (config.REPETITION_MULTIPLIER)
-```
-
-**Important**: The display must clarify that:
-- First session gets standard rate (2.5x for problem classes)
-- Repeated sessions get repetition multiplier (1.5x) applied to the first-session rate
-- Total = first_session_total + repeat_sessions_total
-
-#### Example: Practical Sessions with 2 sessions/week
-
-If `practicals=2`, `contact_weeks=11`, `standard_rate=2.5`:
+**Display format**:
 
 ```
-Practical Sessions: 55.0h total
+Practical Sessions: XX.Xh total
 
 First time delivery:
-  "2 sessions/week @ 2.0h each = 4.0h/week × 11 weeks = 44.0h"
-  Multiplied by: 2.5x first session (standard)
+  "{sessions_per_week} sessions/week @ {contact_hrs:.1f}h each = {weekly_contact:.1f}h/week × {weeks} weeks"
+  Rate applied: {first_session_rate}x (standard rate for first session)
 
 Repeated sessions:
-  "1 repeat(s) @ 1.5x = 11.0h"
-  (This is: 4.0h/week × 1.5 × 11 weeks = 66.0h... wait that doesn't match)
-
-Actually the calculation should be:
-- First session: 2 sessions/week × 2.0h × 2.5x × 11 weeks = 110h total for first sessions
-- Second session (repeat): 1 session/week × 2.0h × 2.5x × 1.5x × 11 weeks = 82.5h
-
-Total: 192.5h
-
-But wait - the practical_hours_per_week might already include the rate? Let me clarify...
+  "{repeat_count} repeat(s) @ {repetition_rate}x = {total_repeat_hrs:.1f}h"
 ```
 
-**Clarified practicals calculation**:
-- `practicals` = number of sessions per week (e.g., 2 means one first-time + one repeat)
-- First session gets standard rate multiplier (TEACHING_PROBLEM_CLASS = 2.5)
+**Calculation example** for practicals=2, contact_hrs=2.0, weeks=11:
+
+```
+First session total: 2 × 2.0 × 2.5 × 11 = 110.0h
+Repeat session (1 repeat): 1 × 2.0 × 2.5 × 1.5 × 11 = 82.5h
+Total practical hours: 192.5h
+
+Display as:
+  2 sessions/week @ 2.0h each = 4.0h/week × 11 weeks
+  Rate applied: 2.5x first session (standard), 1.5x repeats
+```
+
+**Important clarifications**:
+- `contact_hrs` comes from module data (`practical_contact_hours` or default TEACHING_PROBLEM_CLASS)
+- First session rate is always TEACHING_PROBLEM_CLASS (2.5 for problem classes)
 - Repeat sessions get REPETITION_MULTIPLIER (1.5) applied to the standard rate
-- Total per teacher = (first_session_rate × contact_weeks) + (repeat_count × first_session_rate × rep_rate × contact_weeks)
+- Total per teacher = first_session_total + repeat_session_total, divided by number of teachers
 
-**Display should show**:
-```
-First time delivery: 2 sessions/week @ 2.0h each × 2.5x rate = 10.0h/week × 11 weeks = 110.0h
-Repeated sessions: 1 repeat(s) @ 1.5x = 33.0h
+#### Assessment Setting and Marking
 
-Total: 143.0h (but this doesn't match the math either...)
+**Setting**: Hours based on marking type (automated/manual) and whether it's a new assessment
+**Marking**: Hours per script × number of students, split between initial and resit
 
-Let me re-read the actual calculation...
-```
+Display shows total hours with calculation breakdown showing main + resit.
 
 ### Workload Calculation Formula
 
