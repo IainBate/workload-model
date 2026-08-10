@@ -479,6 +479,113 @@ def _calculate_assessment_marking_hours(module: ModuleData, teachers: List[str])
 # --- Teaching Workload ---
 
 
+def _build_lecture_details(lecture_result: dict, teachers: List[str]) -> list:
+    """Build lecture detail strings for display from lecture calculation results.
+
+    Args:
+        lecture_result: Dict from _calculate_lecture_hours_and_multipliers
+        teachers: List of teacher names
+
+    Returns:
+        List of formatted detail strings for each lecturer type
+    """
+    teaching_details = []
+    for lecturer_type in lecture_result['lecturer_types']:
+        teacher_name, ltype = lecturer_type
+        base_share = lecture_result['lecture_hours'] / len(teachers) if teachers else 0
+        multiplier = lecture_result['lecture_multipliers'][teacher_name]
+
+        if ltype == 'video':
+            teaching_details.append(
+                f"{teacher_name}: Video ({multiplier}x): {base_share:.1f}h base @ 2.5x"
+            )
+        elif ltype == 'new_lecturer_new_content':
+            content_dev = base_share * (multiplier - 2.5)
+            teaching_details.append(
+                f"{teacher_name}: New lecturer + new content ({multiplier}x): {base_share:.1f}h base @ 2.5x + {content_dev:.1f}h content dev"
+            )
+        elif ltype == 'new_lecturer':
+            content_dev = base_share * (multiplier - 2.5)
+            teaching_details.append(
+                f"{teacher_name}: New lecturer ({multiplier}x): {base_share:.1f}h base @ 2.5x + {content_dev:.1f}h content dev"
+            )
+        elif ltype == 'existing_lecturer_new_content':
+            content_dev = base_share * (multiplier - 2.5)
+            teaching_details.append(
+                f"{teacher_name}: Existing lecturer + new content ({multiplier}x): {base_share:.1f}h base @ 2.5x + {content_dev:.1f}h content dev"
+            )
+        else:  # standard
+            estimated_lectures = round(lecture_result['lecture_hours'] / 2) if lecture_result['lecture_hours'] > 0 else 0
+            lectures_per_teacher = math.ceil(estimated_lectures / len(teachers)) if teachers else 0
+            teaching_details.append(
+                f"{teacher_name}: Standard ({multiplier}x): {estimated_lectures} two-hour lectures split between {len(teachers)} staff"
+            )
+    return teaching_details
+
+
+def _build_module_detail_parts(teacher: str, lecture_result: dict, practical_result: dict,
+                                hw_lab_details: list, drop_in_details: list,
+                                assessment_details: list, marking_result: dict) -> list:
+    """Build the detail parts list for a single teacher's module breakdown.
+
+    Args:
+        teacher: Teacher name
+        lecture_result: Dict from _calculate_lecture_hours_and_multipliers
+        practical_result: Dict from _calculate_practical_hours_and_breakdown
+        hw_lab_details: List of HW lab detail strings
+        drop_in_details: List of drop-in detail strings
+        assessment_details: List of assessment detail strings
+        marking_result: Dict from _calculate_assessment_marking_hours
+
+    Returns:
+        List of formatted detail strings for this teacher's module activities
+    """
+    module_detail_parts = []
+
+    # Add lecture details (from helper result)
+    if 'lecturer_types' in lecture_result:
+        for lecturer_type in lecture_result['lecturer_types']:
+            t, ltype = lecturer_type
+            if t == teacher:
+                base_share = lecture_result['lecture_hours'] / len(lecture_result.get('teachers', [])) if lecture_result.get('teachers') else 0
+                multiplier = lecture_result['lecture_multipliers'].get(t, 2.5)
+                if ltype == 'video':
+                    module_detail_parts.append(f"{t}: Video ({multiplier}x): {base_share:.1f}h base @ 2.5x")
+                elif ltype == 'new_lecturer_new_content':
+                    content_dev = base_share * (multiplier - 2.5)
+                    module_detail_parts.append(f"{t}: New lecturer + new content ({multiplier}x): {base_share:.1f}h base @ 2.5x + {content_dev:.1f}h content dev")
+                elif ltype == 'new_lecturer':
+                    content_dev = base_share * (multiplier - 2.5)
+                    module_detail_parts.append(f"{t}: New lecturer ({multiplier}x): {base_share:.1f}h base @ 2.5x + {content_dev:.1f}h content dev")
+                elif ltype == 'existing_lecturer_new_content':
+                    content_dev = base_share * (multiplier - 2.5)
+                    module_detail_parts.append(f"{t}: Existing lecturer + new content ({multiplier}x): {base_share:.1f}h base @ 2.5x + {content_dev:.1f}h content dev")
+                else:
+                    module_detail_parts.append(f"{t}: Standard ({multiplier}x): {base_share:.1f}h/teacher @ 2.5x")
+
+    # Add practical details (from helper result)
+    if 'practical_details' in practical_result and practical_result['practical_details']:
+        module_detail_parts.extend(practical_result['practical_details'])
+
+    # Add HW lab details
+    if hw_lab_details:
+        module_detail_parts.extend(hw_lab_details)
+
+    # Add drop-in details
+    if drop_in_details:
+        module_detail_parts.extend(drop_in_details)
+
+    # Add assessment details (from helper result)
+    if assessment_details:
+        module_detail_parts.extend(assessment_details)
+
+    # Add marking details (from helper result)
+    if 'marking_details' in marking_result and marking_result['marking_details']:
+        module_detail_parts.extend(marking_result['marking_details'])
+
+    return module_detail_parts
+
+
 def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
                                   known_lecturers_global: set,
                                   known_lecturers_per_module: Dict[str, frozenset],
@@ -511,6 +618,9 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
     # Calculate weeks of teaching (typical semester is ~22 weeks)
     contact_weeks = TEACHING_WEEKS_PER_SEMESTER
 
+    # Check if this is a new content module (for HW lab multiplier selection)
+    is_new_content_module = getattr(module, 'new_content', False)
+
     # --- Use helper functions for structured calculations ---
 
     # 1. Calculate lecture hours and multipliers per teacher
@@ -519,38 +629,9 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
     )
 
     lecture_hours_with_mult = lecture_result['individual_lecture_hours']
-    teaching_details = []
-    for lecturer_type in lecture_result['lecturer_types']:
-        teacher_name, ltype = lecturer_type
-        # Build detail string for each teacher based on their type
-        base_share = lecture_result['lecture_hours'] / len(teachers) if teachers else 0
-        multiplier = lecture_result['lecture_multipliers'][teacher_name]
 
-        if ltype == 'video':
-            teaching_details.append(
-                f"{teacher_name}: Video ({multiplier}x): {base_share:.1f}h base @ 2.5x"
-            )
-        elif ltype == 'new_lecturer_new_content':
-            content_dev = base_share * (multiplier - 2.5)
-            teaching_details.append(
-                f"{teacher_name}: New lecturer + new content ({multiplier}x): {base_share:.1f}h base @ 2.5x + {content_dev:.1f}h content dev"
-            )
-        elif ltype == 'new_lecturer':
-            content_dev = base_share * (multiplier - 2.5)
-            teaching_details.append(
-                f"{teacher_name}: New lecturer ({multiplier}x): {base_share:.1f}h base @ 2.5x + {content_dev:.1f}h content dev"
-            )
-        elif ltype == 'existing_lecturer_new_content':
-            content_dev = base_share * (multiplier - 2.5)
-            teaching_details.append(
-                f"{teacher_name}: Existing lecturer + new content ({multiplier}x): {base_share:.1f}h base @ 2.5x + {content_dev:.1f}h content dev"
-            )
-        else:  # standard
-            estimated_lectures = round(lecture_result['lecture_hours'] / 2) if lecture_result['lecture_hours'] > 0 else 0
-            lectures_per_teacher = math.ceil(estimated_lectures / len(teachers)) if teachers else 0
-            teaching_details.append(
-                f"{teacher_name}: Standard ({multiplier}x): {estimated_lectures} two-hour lectures split between {len(teachers)} staff"
-            )
+    # Build lecture details for display (one-time, not per-teacher)
+    teaching_details = _build_lecture_details(lecture_result, teachers)
 
     # 2. Calculate practical hours with structured breakdown
     practical_result = _calculate_practical_hours_and_breakdown(module, teachers)
@@ -637,48 +718,10 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
         )
 
         # Build detail text for display using helper results
-        module_detail_parts = []
-
-        # Add lecture details (from helper result)
-        if 'lecturer_types' in lecture_result:
-            for lecturer_type in lecture_result['lecturer_types']:
-                t, ltype = lecturer_type
-                if t == teacher:
-                    base_share = lecture_result['lecture_hours'] / len(teachers) if teachers else 0
-                    multiplier = lecture_result['lecture_multipliers'].get(t, 2.5)
-                    if ltype == 'video':
-                        module_detail_parts.append(f"{t}: Video ({multiplier}x): {base_share:.1f}h base @ 2.5x")
-                    elif ltype == 'new_lecturer_new_content':
-                        content_dev = base_share * (multiplier - 2.5)
-                        module_detail_parts.append(f"{t}: New lecturer + new content ({multiplier}x): {base_share:.1f}h base @ 2.5x + {content_dev:.1f}h content dev")
-                    elif ltype == 'new_lecturer':
-                        content_dev = base_share * (multiplier - 2.5)
-                        module_detail_parts.append(f"{t}: New lecturer ({multiplier}x): {base_share:.1f}h base @ 2.5x + {content_dev:.1f}h content dev")
-                    elif ltype == 'existing_lecturer_new_content':
-                        content_dev = base_share * (multiplier - 2.5)
-                        module_detail_parts.append(f"{t}: Existing lecturer + new content ({multiplier}x): {base_share:.1f}h base @ 2.5x + {content_dev:.1f}h content dev")
-                    else:
-                        module_detail_parts.append(f"{t}: Standard ({multiplier}x): {base_share:.1f}h/teacher @ 2.5x")
-
-        # Add practical details (from helper result)
-        if 'practical_details' in practical_result and practical_result['practical_details']:
-            module_detail_parts.extend(practical_result['practical_details'])
-
-        # Add HW lab details
-        if hw_lab_details:
-            module_detail_parts.extend(hw_lab_details)
-
-        # Add drop-in details
-        if drop_in_details:
-            module_detail_parts.extend(drop_in_details)
-
-        # Add assessment details (from helper result)
-        if assessment_details:
-            module_detail_parts.extend(assessment_details)
-
-        # Add marking details (from helper result)
-        if 'marking_details' in marking_result and marking_result['marking_details']:
-            module_detail_parts.extend(marking_result['marking_details'])
+        module_detail_parts = _build_module_detail_parts(
+            teacher, lecture_result, practical_result,
+            hw_lab_details, drop_in_details, assessment_details, marking_result
+        )
 
         # Build structured practicals breakdown from helper result
         teacher_practicals_structured = {}
