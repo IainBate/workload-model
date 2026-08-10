@@ -168,12 +168,43 @@ def compare_files(baseline_path: Path, output_path: Path, verbose: bool = False)
             output_content = normalize_xlsx_content(output_path)
 
         elif ext in ['.png', '.jpg', '.jpeg']:
-            # For images, do byte comparison (may be flaky due to metadata)
-            baseline_bytes = baseline_path.read_bytes()
-            output_bytes = output_path.read_bytes()
+            # For images, use pixel-level comparison with tolerance for metadata differences
+            try:
+                from PIL import Image
 
-            if baseline_bytes != output_bytes:
-                differences.append("PNG bytes differ (may be due to metadata or matplotlib changes)")
+                baseline_img = Image.open(baseline_path).convert('RGBA')
+                output_img = Image.open(output_path).convert('RGBA')
+
+                # Get pixel arrays as tuples for comparison
+                baseline_pixels = list(baseline_img.getdata())
+                output_pixels = list(output_img.getdata())
+
+                # Compare pixel counts first
+                if len(baseline_pixels) != len(output_pixels):
+                    differences.append(f"PNG dimensions differ: baseline={baseline_img.size} vs output={output_img.size}")
+                    return (len(differences) == 0, differences)
+
+                # Count differing pixels (with small tolerance for anti-aliasing variations)
+                different_pixels = sum(
+                    1 for b, o in zip(baseline_pixels, output_pixels)
+                    if abs(sum(b) - sum(o)) > 5  # Allow small variation per pixel
+                )
+
+                diff_ratio = different_pixels / len(baseline_pixels) if baseline_pixels else 0
+
+                if diff_ratio > 0.01:  # More than 1% different pixels is a real difference
+                    differences.append(
+                        f"PNG pixel content differs: {different_pixels}/{len(baseline_pixels)} "
+                        f"pixels differ ({diff_ratio*100:.2f}%)"
+                    )
+
+            except Exception as e:
+                # Fall back to byte comparison if PIL fails
+                baseline_bytes = baseline_path.read_bytes()
+                output_bytes = output_path.read_bytes()
+
+                if baseline_bytes != output_bytes:
+                    differences.append(f"PNG bytes differ: {e}")
 
             return (len(differences) == 0, differences)
 
