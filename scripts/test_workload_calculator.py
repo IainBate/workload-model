@@ -717,7 +717,7 @@ class TestEdgeCases:
             active=True
         )
 
-        total, breakdown, detail, grant_titles = _calculate_research_workload(staff)
+        total, breakdown, detail, grant_titles, _ = _calculate_research_workload(staff)
         # _calculate_research_workload does not include protected baseline
         assert total == 0
 
