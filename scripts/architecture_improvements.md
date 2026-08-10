@@ -101,49 +101,28 @@ def calculate_display_hours(hours: float, multiplier: str) -> str:
     return f"{hours:.1f}h {multiplier}"
 ```
 
-### Phase 3: Validation Pipeline
+### Phase 3: Validation Pipeline (IMPLEMENTED)
+
+The validation pipeline has been added to `validation.py`:
 
 ```python
-# validation.py - NEW FILE
+# validation.py - IMPLEMENTED
 
-def validate_workload_result(result: WorkloadResult) -> List[ValidationIssue]:
+def validate_workload_result(result: WorkloadResult, tolerance: float = 0.1) -> List[ValidationIssue]:
     """Validate a workload result for structural correctness.
     
     Checks:
     - Total = Teaching + Research + Admin (within tolerance)
     - No negative hours
-    - Hours within reasonable bounds (0 to 2x nominal)
-    - Required fields present
+    - Breakdowns sum to category totals
     
     Returns:
         List of issues found (empty if valid)
     """
-    issues = []
-    
-    expected_total = (
-        result.teaching_hours + 
-        result.research_hours + 
-        result.admin_hours
-    )
-    
-    if abs(expected_total - result.total_hours) > 0.1:
-        issues.append(ValidationIssue(
-            level="ERROR",
-            message=f"Total mismatch: {result.total_hours} != {expected_total}"
-        ))
-    
-    # More validation rules...
-    
-    return issues
-
+    # Validates total, teaching/research/admin breakdowns
 
 def validate_all_results(results: List[WorkloadResult]) -> Dict[str, List[ValidationIssue]]:
     """Validate all results and group by staff member."""
-    return {
-        result.name: validate_workload_result(result)
-        for result in results
-    }
-```
 
 ---
 
