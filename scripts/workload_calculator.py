@@ -312,7 +312,7 @@ def _calculate_practical_hours_and_breakdown(module: ModuleData, teachers: List[
 
                 result['practical_details'].append(
                     f"First time delivery: {practicals_count} sessions/week @ {std_first_session_weekly}h each; "
-                    f"- Standard lecturers: {std_first_session_weekly}x first session (standard), {repeat_rate}x repeats"
+                    f"- Standard lecturers: {config.TEACHING_PROBLEM_CLASS}x first session (standard), {repeat_rate}x repeats"
                 )
             else:
                 # Single session - no repetition
