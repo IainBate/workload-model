@@ -1204,7 +1204,9 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
             rep_rate = practicals_structured.get('repeat_rate', config.REPETITION_MULTIPLIER)
             week_count = practicals_structured.get('week_count', 0)
 
-            label_prefix = f"[{module_code}] " if module_code else ""
+            label_prefix = ""
+            if module_code and not module_code.startswith('<') and not module_code.endswith('>'):
+                label_prefix = f"[{module_code}] "
             parts.append(f"""<div class="detail-item {css_class}">
                 <span class="detail-name">{label_prefix}Practical Sessions</span>
                 <span class="detail-hours">{practicals_per_module:.1f}h</span>
@@ -1218,7 +1220,9 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
             # Fallback to default rates if structured data not available
             first_session_rate = config.TEACHING_MULTIPLIERS.get('problem_class_seminar_practical', 2.5)
             rep_rate = config.REPETITION_MULTIPLIER
-            label_prefix = f"[{module_code}] " if module_code else ""
+            label_prefix = ""
+            if module_code and not module_code.startswith('<') and not module_code.endswith('>'):
+                label_prefix = f"[{module_code}] "
             parts.append(f"""<div class="detail-item {css_class}">
                 <span class="detail-name">{label_prefix}Practical Sessions</span>
                 <span class="detail-hours">{practicals_per_module:.1f}h</span>
