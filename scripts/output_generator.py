@@ -1153,15 +1153,17 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
         </div>"""
 
     def _format_module_delivery_section(module_breakdown: Dict[str, Any], is_new_lecturer: bool,
-                                         css_class: str) -> List[str]:
+                                         css_class: str, module_code: Optional[str] = None) -> List[str]:
         """Format delivery/lecture section for a module."""
         parts = []
         delivery_per_module = module_breakdown.get('teaching', 0)
 
         if delivery_per_module > 0:
             lecturer_type = "New lecturer (5x)" if is_new_lecturer else "Standard (2.5x)"
+            # Include module code in label for clarity
+            label_prefix = f"[{module_code}] " if module_code else ""
             parts.append(f"""<div class="detail-item {css_class}">
-                <span class="detail-name">Delivery (Lectures)</span>
+                <span class="detail-name">{label_prefix}Delivery (Lectures)</span>
                 <span class="detail-hours">{delivery_per_module:.1f}h @ {lecturer_type}</span>
                 <span class="detail-activity teaching-activity"></span>
             </div>""")
