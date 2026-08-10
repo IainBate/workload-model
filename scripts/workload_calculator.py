@@ -419,11 +419,13 @@ def _calculate_assessment_marking_hours(module: ModuleData, teachers: List[str])
         - total_hours: Total marking time
         - individual_hours: Dict mapping teachers to their hours
         - details: Detail string for HTML display
+        - admin_flat: The admin flat rate used
     """
     result = {
         'total_hours': 0.0,
         'individual_hours': {},
         'details': '',
+        'admin_flat': config.MARKING_MANUAL_ADMIN,  # Default
     }
 
     student_count = module.student_count
@@ -435,22 +437,19 @@ def _calculate_assessment_marking_hours(module: ModuleData, teachers: List[str])
     is_automated = getattr(module, 'marking_type', 'manual') == 'automated'
 
     if is_automated:
-        # Automated marking takes less time
-        first_mark_hrs = config.MARKING_FIRST_MARK_AUTO * student_count
-        resit_hrs = config.MARKING_REBIT_AUTO * student_count
-        total_marking_hours = first_mark_hrs + resit_hrs
+        result['admin_flat'] = config.MARKING_AUTO_ADMIN
+        first_mark_hrs = config.MARKING_AUTO_MSC * student_count if config.is_msc_level(getattr(module, 'stage', 1)) else config.MARKING_AUTO_UG * student_count
+        resit_hrs = first_mark_hrs * 0.2  # 20% resits for automated
     else:
-        # Manual marking: MSc 0.5h/script, UG 0.33h/script
-        # Determine stage for appropriate rate
+        result['admin_flat'] = config.MARKING_MANUAL_ADMIN
         stage = getattr(module, 'stage', 1)
         if config.is_msc_level(stage):
-            first_mark_hrs = config.MARKING_FIRST_MARK_MSC * student_count
-            resit_hrs = config.MARKING_REBIT_MSC * student_count
+            first_mark_hrs = config.MARKING_MANUAL_MSC * student_count
         else:
-            first_mark_hrs = config.MARKING_FIRST_MARK_U * student_count
-            resit_hrs = config.MARKING_REBIT_U * student_count
+            first_mark_hrs = config.MARKING_MANUAL_UG * student_count
+        resit_hrs = first_mark_hrs * 0.2  # 20% resits for manual
 
-        total_marking_hours = first_mark_hrs + resit_hrs
+    total_marking_hours = first_mark_hrs + resit_hrs
 
     # Split equally among teachers
     per_teacher_hours = total_marking_hours / len(teachers) if teachers else 0.0
