@@ -410,6 +410,7 @@ def _calculate_practical_hours_and_breakdown(
                     "first_session_rate": std_first_session_weekly,
                     "repeat_rate": repeat_rate,
                     "total": round(total_practical_hours, 2),
+                    "n_teachers": n_teachers,
                 }
 
             # Distribute to individual teachers based on their multiplier
