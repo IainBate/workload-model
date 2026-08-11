@@ -368,8 +368,6 @@ def _calculate_practical_hours_and_breakdown(
                 }
 
                 # Display shows per-group calculation with lecturer type info
-                display_first = round(base_first_session_total, 1)
-                display_repeat = round(base_repeat_session_total, 1)
 
                 # Build rate text based on teacher multipliers (check if all same or mixed)
                 unique_multipliers = set(teacher_multiplier.get(t, 1.0) for t in teachers)
