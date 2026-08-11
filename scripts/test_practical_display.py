@@ -160,7 +160,6 @@ class TestPracticalDisplayCalculation:
                 assert module_breakdown is not None, "Module breakdown not found"
 
                 # Get the practicals section display text (method of TeachingBreakdown class)
-                tb = TeachingBreakdown()
                 parts = tb._format_module_practicals_section(
                     module_breakdown,
                     css_class="teaching-section",
