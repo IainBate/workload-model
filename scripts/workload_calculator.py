@@ -1292,8 +1292,13 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
         if grant_assumptions:
             assumptions.extend(grant_assumptions)
 
-        # Add protected baseline to breakdown
-        research_breakdown['protected_research_baseline'] = protected_research
+        # Add protected baseline as a top-level entry, with grants and phd_students nested
+        # This creates the hierarchical structure: protected_research_baseline at top level,
+        # then grants dict and phd_students dict as separate entries
+        structured_research_breakdown = {
+            "protected_research_baseline": protected_research,
+            **research_breakdown  # Unpack grants and phd_students from _calculate_research_workload
+        }
 
         # Total research = protected baseline + additional work from grants/supervision
         research_total = protected_research + research_hours
