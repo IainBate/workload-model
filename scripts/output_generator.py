@@ -1193,7 +1193,7 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
             <p style="font-size:0.85em;color:#666;padding-top:10px;">Subtotal: {hours:.1f}h</p>
         </div>"""
 
-    def _format_module_delivery_section(module_breakdown: Dict[str, Any], is_new_lecturer: bool,
+    def _format_module_delivery_section(self, module_breakdown: Dict[str, Any], is_new_lecturer: bool,
                                          css_class: str, module_code: Optional[str] = None) -> List[str]:
         """Format delivery/lecture section for a module."""
         parts = []
