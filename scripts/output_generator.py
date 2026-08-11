@@ -1434,10 +1434,10 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
             items_html_parts.append(f"""<div style="margin-bottom:25px;">
                 <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #2196F3;padding-left:10px;">Pastoral Supervision ({past_hours_total:.1f}h)</h4>
                 <div style="margin-left:20px;">
-                    <div class="detail-item {css_class}">
+                    <div class="detail-item teaching-item">
                         <span class="detail-name">Students</span>
                         <span class="detail-hours">{past_students_total} students x {config.SUPERVISION_MULTIPLIERS['pastoral']}h each = {past_hours_total:.1f}h</span>
-                        <span class="detail-activity admin-activity"></span>
+                        <span class="detail-activity teaching-activity"></span>
                     </div>
                 </div>
             </div>""")
