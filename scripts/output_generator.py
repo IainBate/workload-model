@@ -1505,9 +1505,10 @@ def _format_module_practicals_section(
 
         # Show first session calculation with teacher's actual multiplier applied
         # Display format: "X.Xh per session @ rate × weeks = total"
+        # Use the teacher's actual multiplier (not the standard 2.5x) for new lecturers
         parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
             <span class="detail-name" style="color:#333;">First session</span>
-            <span class="detail-hours">{first_session_weekly:.1f}h per session @ {first_session_rate:.1f}x × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {first_session_actual:.1f}h</span>
+            <span class="detail-hours">{first_session_weekly:.1f}h per session @ {actual_multiplier:.1f}x × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {first_session_actual:.1f}h</span>
         </div>""")
 
         if repeat_module_total > 0:
