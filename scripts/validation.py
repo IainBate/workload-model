@@ -479,8 +479,8 @@ def validate_workload_result(result, tolerance: float = 0.1) -> List[ValidationI
             field_name="teaching_breakdown"
         ))
 
-    # Check research breakdown sum
-    research_values = get_numeric_values(result.research_breakdown)
+    # Check research breakdown sum (pass is_research=True to handle nested grants/phd_students)
+    research_values = get_numeric_values(result.research_breakdown, is_research=True)
     research_sum = sum(research_values) if research_values else 0.0
     if abs(research_sum - result.research_hours) > tolerance:
         issues.append(ValidationIssue(
