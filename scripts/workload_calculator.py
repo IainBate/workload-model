@@ -218,13 +218,6 @@ def _calculate_lecture_hours_and_multipliers(module: ModuleData,
                 config_key = LECTURER_TYPE_TO_CONFIG_KEY.get('standard')
                 multiplier = config.TEACHING_MULTIPLIERS.get(config_key, 2.5)
                 result['lecturer_types'].append((t, 'standard'))
-                lecturer_type = "Existing + new content"
-                result['lecturer_types'].append((t, "existing_lecturer_new_content"))
-            else:
-                # Standard existing lecturer gets 2.5x
-                multiplier = config.TEACHING_MULTIPLIERS.get('standard', 2.5)
-                lecturer_type = "Standard"
-                result['lecturer_types'].append((t, "standard"))
 
         # Calculate per-teacher lecture hours (split equally among teachers) with multiplier applied
         per_teacher_lecture_hours = lecture_hours / len(teachers) if teachers else 0.0
