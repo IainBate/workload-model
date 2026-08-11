@@ -1268,6 +1268,14 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
             if module_code and not module_code.startswith('<') and not module_code.endswith('>'):
                 label_prefix = f"[{module_code}] "
 
+            # Calculate the actual teacher multiplier from their practical hours
+            # This is more accurate than relying on is_new_lecturer which is per-module
+            n_teachers = practicals_structured.get('n_teachers', 1)
+            total_module_practicals = practicals_structured.get('total', 0)
+            base_per_teacher = total_module_practicals / n_teachers if n_teachers > 0 else 0
+            # Derive actual multiplier: teacher's hours / base per teacher (should be 2.5 or 5.0)
+            actual_multiplier = practicals_per_module / base_per_teacher if base_per_teacher > 0 else 2.5
+
             parts.append(f"""<div class="detail-item {css_class}">
                 <span class="detail-name">{label_prefix}Practical Sessions</span>
                 <span class="detail-hours">{practicals_per_module:.1f}h total</span>
@@ -1276,13 +1284,10 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
             # First-time delivery line
             # Calculate first session total: sessions per week × hours per session × weeks × rate
             first_session_total = week_count * first_session_weekly * config.TEACHING_WEEKS_PER_SEMESTER * first_session_rate
-            # Determine lecturer type text for display
-            lecturer_type_text = "new lecturer 5x" if is_new_lecturer else "standard"
 
             # Calculate per-teacher values with multiplier applied for consistent display
-            n_teachers = practicals_structured.get('n_teachers', 1)
             first_session_per_teacher_base = first_session_total / n_teachers
-            first_session_with_mult = first_session_per_teacher_base * (5.0 if is_new_lecturer else 2.5)
+            first_session_with_mult = first_session_per_teacher_base * actual_multiplier
 
             # Repeat sessions are shown separately with their own calculation
             parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
@@ -1290,27 +1295,27 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
                 <span class="detail-hours">{week_count} sessions/week @ {first_session_weekly:.1f}h each × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {first_session_total:.1f}h module total / {n_teachers} teachers = {first_session_per_teacher_base:.1f}h each</span>
             </div>""")
 
-            if is_new_lecturer:
+            if actual_multiplier != 2.5:
                 parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
-                    <span class="detail-name" style="color:#333;">At 5x rate (new lecturer)</span>
-                    <span class="detail-hours">{first_session_per_teacher_base:.1f}h × 5x = {first_session_with_mult:.1f}h</span>
+                    <span class="detail-name" style="color:#333;">At {actual_multiplier:.1f}x rate</span>
+                    <span class="detail-hours">{first_session_per_teacher_base:.1f}h × {actual_multiplier:.1f}x = {first_session_with_mult:.1f}h</span>
                 </div>""")
 
             if repeat_weekly > 0:
                 # Note: repeat_weekly already includes the session count (from breakdown)
                 total_repeat_hrs = repeat_weekly * first_session_rate * rep_rate * config.TEACHING_WEEKS_PER_SEMESTER
                 repeat_per_teacher_base = total_repeat_hrs / n_teachers
-                repeat_with_mult = repeat_per_teacher_base * (5.0 if is_new_lecturer else 2.5)
+                repeat_with_mult = repeat_per_teacher_base * actual_multiplier
 
                 parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
                     <span class="detail-name" style="color:#333;">Repeated sessions</span>
                     <span class="detail-hours">{week_count - 1} repeat(s) × {first_session_weekly:.1f}h × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {repeat_weekly * config.TEACHING_WEEKS_PER_SEMESTER:.1f}h module total / {n_teachers} teachers = {repeat_per_teacher_base:.1f}h each</span>
                 </div>""")
 
-                if is_new_lecturer:
+                if actual_multiplier != 2.5:
                     parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
-                        <span class="detail-name" style="color:#333;">At 5x rate (new lecturer)</span>
-                        <span class="detail-hours">{repeat_per_teacher_base:.1f}h × 5x = {repeat_with_mult:.1f}h</span>
+                        <span class="detail-name" style="color:#333;">At {actual_multiplier:.1f}x rate</span>
+                        <span class="detail-hours">{repeat_per_teacher_base:.1f}h × {actual_multiplier:.1f}x = {repeat_with_mult:.1f}h</span>
                     </div>""")
         else:
             # Fallback to default rates if structured data not available
