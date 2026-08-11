@@ -1366,7 +1366,7 @@ def _format_module_practicals_section(
             # Show repeat sessions: repeats at repetition rate (no per-session calculation needed)
             parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
                 <span class="detail-name" style="color:#333;">Repeat sessions</span>
-                <span class="detail-hours">{repeat_per_teacher_base:.1f}h total @ {config.REPETITION_MULTIPLIER:.1f}x rate</span>
+                <span class="detail-hours">{repeat_per_teacher_base:.1f}h total × {config.REPETITION_MULTIPLIER:.1f}x rate</span>
             </div>""")
 
         # Show per-teacher base (without their lecturer multiplier)
