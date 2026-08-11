@@ -1437,9 +1437,9 @@ def _format_module_practicals_section(
             is_new_lecturer = _determine_lecturer_type(r.name, module_stage, known_lecturers_per_module or {})
 
             # Build module items
-            parts.extend(self._format_module_delivery_section(module_breakdown, is_new_lecturer, css_class, code))
-            parts.extend(self._format_module_practicals_section(module_breakdown, css_class, code, is_new_lecturer))
-            parts.extend(self._format_module_assessment_section(module_breakdown, css_class, code))
+            parts.extend(_format_module_delivery_section(module_breakdown, is_new_lecturer, css_class, code))
+            parts.extend(_format_module_practicals_section(module_breakdown, css_class, code, is_new_lecturer))
+            parts.extend(_format_module_assessment_section(module_breakdown, css_class, code))
 
         return parts
 
