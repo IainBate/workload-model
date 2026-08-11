@@ -1720,6 +1720,98 @@ def _format_module_items(modules_in_stage: List[Dict], css_class: str,
     return parts
 
 
+def format_teaching_section(title: str, hours: float, breakdown: Dict[str, float], css_class: str,
+                            supervision_details: Tuple[str, ...] = (),
+                            known_lecturers_per_module: Optional[Dict[str, frozenset]] = None,
+                            pastoral_breakdown: Dict[str, float] = {},
+                            project_breakdown: Dict[str, float] = {}) -> str:
+    """Format teaching section - wrapper for _format_teaching_section_for_staff."""
+    # This is a placeholder that will be implemented when we refactor
+    # For now, return a basic structure
+    items_html_parts = []
+
+    # Build module info from breakdown
+    if isinstance(breakdown, dict) and 'teaching_module_breakdowns' in breakdown:
+        module_breakdowns = breakdown['teaching_module_breakdowns']
+
+        # Build module info list
+        module_info_list = []
+        for module_name, mb in module_breakdowns.items():
+            code_tuple = mb.get('module_codes', ())
+            primary_code = code_tuple[0] if code_tuple else ''
+            module_info_list.append({
+                'stage': module_name,
+                'code': primary_code,
+                'codes': code_tuple,
+                'module_breakdown': mb
+            })
+
+        # Group modules by stage
+        stages = {}
+        for mod in module_info_list:
+            stage = mod['stage']
+            if stage not in stages:
+                stages[stage] = []
+            stages[stage].append(mod)
+
+        # Format each stage
+        for stage in sorted(stages.keys()):
+            modules_in_stage = stages[stage]
+            items_html_parts.append(f"""<div style="margin-bottom:25px;">
+                <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #2196F3;padding-left:10px;">{stage} Modules ({len(modules_in_stage)} module(s))</h4>""")
+
+            for mod in modules_in_stage:
+                code = mod['code']
+                module_breakdown = mod['module_breakdown']
+                is_new_lecturer = False  # This would need to be determined from context
+                items_html_parts.extend(_format_module_delivery_section(module_breakdown, is_new_lecturer, css_class, code))
+                items_html_parts.extend(_format_module_practicals_section(module_breakdown, css_class, code, is_new_lecturer))
+                items_html_parts.extend(_format_module_assessment_section(module_breakdown, css_class, code))
+
+            items_html_parts.append("</div>")
+
+    # Format supervision if present
+    if pastoral_breakdown:
+        past_hours_total = pastoral_breakdown.get('total', 0.0)
+        past_students_total = pastoral_breakdown.get('student_count', 0)
+        items_html_parts.append(f"""<div style="margin-bottom:25px;">
+            <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #2196F3;padding-left:10px;">Pastoral Supervision ({past_hours_total:.1f}h)</h4>
+            <div style="margin-left:20px;">
+                <div class="detail-item teaching-item">
+                    <span class="detail-name">Students</span>
+                    <span class="detail-hours">{past_students_total} students x {config.SUPERVISION_MULTIPLIERS['pastoral']}h each = {past_hours_total:.1f}h</span>
+                    <span class="detail-activity teaching-activity"></span>
+                </div>
+            </div>
+        </div>""")
+
+    if project_breakdown:
+        proj_hours_total = project_breakdown.get('total', 0.0)
+        proj_projects_total = project_breakdown.get('project_count', 0)
+        proj_level = project_breakdown.get('level', 'UG')
+        items_html_parts.append(f"""<div style="margin-bottom:25px;">
+            <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #2196F3;padding-left:10px;">Project Supervision ({proj_hours_total:.1f}h)</h4>
+            <div style="margin-left:20px;">
+                <div class="detail-item teaching-item">
+                    <span class="detail-name">Projects</span>
+                    <span class="detail-hours">{proj_projects_total} projects x {proj_level} = {proj_hours_total:.1f}h</span>
+                    <span class="detail-activity teaching-activity"></span>
+                </div>
+            </div>
+        </div>""")
+
+    items_html = ''.join(items_html_parts)
+
+    return f"""<div class="section-card {css_class}">
+        <div class="card-header">
+            <span class="card-title">{title}</span>
+            <span class="card-total">{hours:.1f}h</span>
+        </div>
+        {items_html}
+        <p style="font-size:0.85em;color:#666;padding-top:10px;">Subtotal: {hours:.1f}h</p>
+    </div>"""
+
+
 def _format_teaching_section_for_staff(result: WorkloadResult, title: str, hours: float, breakdown: Dict[str, float], css_class: str,
                                        supervision_details: Tuple[str, ...] = (),
                                        known_lecturers_per_module: Optional[Dict[str, frozenset]] = None,
