@@ -144,7 +144,7 @@ class TestPracticalDisplayCalculation:
             if result.name == "John Smith":
                 module_breakdown = None
                 for code, breakdown in result.teaching_module_breakdowns.items():
-                    if 'TEST001' in code:
+                    if 'TEST001' in code or 'TestModule' in code:
                         module_breakdown = breakdown
                         break
 
