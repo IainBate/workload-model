@@ -1443,48 +1443,303 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
 
         return parts
 
-    def format_teaching_section(title: str, hours: float, breakdown: Dict[str, float], css_class: str,
-                                supervision_details: Tuple[str, ...] = (),
-                                known_lecturers_per_module: Optional[Dict[str, frozenset]] = None,
-                                pastoral_breakdown: Dict[str, float] = {},
-                                project_breakdown: Dict[str, float] = {}) -> str:
-        """Format teaching section with hierarchical structure."""
-        items_html_parts = []
+def _format_module_delivery_section(module_breakdown: Dict[str, Any], is_new_lecturer: bool,
+                                     css_class: str, module_code: Optional[str] = None) -> List[str]:
+    """Format delivery/lecture section for a module."""
+    parts = []
+    delivery_per_module = module_breakdown.get('teaching', 0)
 
-        # Phase 3: Use structured data from teaching_module_breakdowns instead of regex parsing
-        module_breakdowns = getattr(r, 'teaching_module_breakdowns', {})
+    if delivery_per_module > 0:
+        # Get the stored contact hours (before multiplier was applied)
+        lecture_contact_hours = module_breakdown.get('lecture_contact_hours', 0.0)
+        total_lecture_hours = module_breakdown.get('total_lecture_hours', 0.0)
 
-        # Build module info list from structured breakdowns (no regex parsing)
-        module_info_list = []
-        for module_name, mb in module_breakdowns.items():
-            # Extract codes from structured data (Phase 3: no regex parsing)
-            code_tuple = mb.get('module_codes', ())
-            primary_code = code_tuple[0] if code_tuple else ''
+        # Calculate weeks of teaching (typically 11 weeks per semester)
+        weeks = config.TEACHING_WEEKS_PER_SEMESTER
 
-            module_info_list.append({
-                'stage': module_name,
-                'code': primary_code,
-                'codes': code_tuple,
-                'module_breakdown': mb
-            })
+        # Derive actual multiplier from delivery hours and contact hours
+        # actual_multiplier = delivery_per_module / lecture_contact_hours when there's one teacher
+        # For multiple teachers, we need to account for the share
+        # The breakdown stores total_lecture_hours (module-level) and teaching (per-teacher with multiplier)
+        if lecture_contact_hours > 0:
+            # Calculate what multiplier was applied based on actual hours vs contact hours
+            # If total_lecture_hours equals delivery_per_module, there's one teacher
+            # Otherwise, we have multiple teachers sharing the load
+            teacher_count = int(round(total_lecture_hours / lecture_contact_hours)) if lecture_contact_hours > 0 else 1
+            if teacher_count < 1:
+                teacher_count = 1
+            base_per_teacher = total_lecture_hours / teacher_count
+            actual_multiplier = delivery_per_module / base_per_teacher if base_per_teacher > 0 else 2.5
+        else:
+            actual_multiplier = 2.5
 
-        # Group modules by stage (module name)
-        stages = {}
-        for mod in module_info_list:
-            stage = mod['stage']
-            if stage not in stages:
-                stages[stage] = []
-            stages[stage].append(mod)
+        # Use actual multiplier instead of is_new_lecturer for display
+        if actual_multiplier >= 4.5:  # Approximately 5x (allowing some floating point tolerance)
+            lecturer_type = "New lecturer (5x)"
 
-        # Sort stages and iterate
-        for stage in sorted(stages.keys()):
-            modules_in_stage = stages[stage]
+            # First line: show the calculation breakdown directly
+            # For new lecturers: standard_equivalent @ 2.5x + content_dev = total
+            standard_equivalent = delivery_per_module / 5.0 * 2.5
+            content_dev = delivery_per_module - standard_equivalent
+            description = f"{standard_equivalent:.1f}h @ 5.0x = {delivery_per_module:.1f}h"
+        else:
+            lecturer_type = "Standard (2.5x)"
+            # For standard lecturers: show the contact hours calculation
+            teacher_count = int(round(total_lecture_hours / lecture_contact_hours)) if lecture_contact_hours > 0 else 1
+            description = f"{total_lecture_hours:.1f}h contact @ {teacher_count} teachers = {lecture_contact_hours:.1f} each × 2.5x"
 
-            items_html_parts.append(f"""<div style="margin-bottom:25px;">
-                <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #2196F3;padding-left:10px;">{stage} Modules ({len(modules_in_stage)} module(s))</h4>""")
+        # Include module code in label for clarity, but only if it looks like a valid code
+        # Skip codes that are empty or look like placeholders (contain < or >)
+        label_prefix = ""
+        if module_code and not module_code.startswith('<') and not module_code.endswith('>'):
+            label_prefix = f"[{module_code}] "
+        parts.append(f"""<div class="detail-item {css_class}">
+            <span class="detail-name">{label_prefix}Delivery (Lectures)</span>
+            <span class="detail-hours">{description}</span>
+            <span class="detail-activity teaching-activity"></span>
+        </div>""")
+    return parts
 
-            items_html_parts.extend(_format_module_items(modules_in_stage, css_class, known_lecturers_per_module))
-            items_html_parts.append("</div>")
+
+def _format_module_practicals_section(
+    module_breakdown: Dict[str, Any],
+    css_class: str,
+    module_code: Optional[str] = None,
+    is_new_lecturer: bool = False
+) -> List[str]:
+    """Format practical sessions section for a module."""
+    parts = []
+
+    # Phase 3: Use structured practicals breakdown instead of regex parsing
+    # First check for 'practicals_structured' (Phase 3 format), then fall back to 'practicals'
+    practicals_structured = module_breakdown.get('practicals_structured', {})
+    if not isinstance(practicals_structured, dict) or not practicals_structured:
+        # Fallback to 'practicals' key for backwards compatibility
+        practicals_structured = module_breakdown.get('practicals', {})
+
+    if isinstance(practicals_structured, dict) and practicals_structured:
+        # Use per-teacher actual hours if available (includes their multiplier),
+        # fall back to structured total for display
+        practicals_per_module = module_breakdown.get('practicals', practicals_structured.get('total', 0))
+        # Structured practicals data available (from Phase 3)
+        first_session_rate = practicals_structured.get('first_session_rate', config.TEACHING_MULTIPLIERS.get('problem_class_seminar_practical', 2.5))
+        rep_rate = practicals_structured.get('repeat_rate', config.REPETITION_MULTIPLIER)
+        week_count = practicals_structured.get('week_count', 0)
+
+        # Extract structured values for calculation display
+        # first_session_hours: hours per session (not per week total - each session has this many hours)
+        # repeat_hours: additional hours for repeated sessions (per week, includes session count)
+        first_session_weekly = practicals_structured.get('first_session_hours', first_session_rate)
+        repeat_weekly = practicals_structured.get('repeat_hours', 0)
+
+        # Get total parallel groups in the module and sessions per group
+        total_groups = practicals_structured.get('total_groups', week_count)  # Fall back to week_count for compatibility
+
+        label_prefix = ""
+        if module_code and not module_code.startswith('<') and not module_code.endswith('>'):
+            label_prefix = f"[{module_code}] "
+
+        # Calculate the actual teacher multiplier from their practical hours
+        # This is more accurate than relying on is_new_lecturer which is per-module
+        n_teachers = practicals_structured.get('n_teachers', 1)
+        total_module_practicals = practicals_structured.get('total', 0)
+        base_per_teacher = total_module_practicals / n_teachers if n_teachers > 0 else 0
+        # Derive actual multiplier: teacher's hours / base per teacher (should be 2.5 or 5.0)
+        actual_multiplier = practicals_per_module / base_per_teacher if base_per_teacher > 0 else 2.5
+
+        parts.append(f"""<div class="detail-item {css_class}">
+            <span class="detail-name">{label_prefix}Practical Sessions</span>
+            <span class="detail-hours">{practicals_per_module:.1f}h total</span>
+            <span class="detail-activity teaching-activity"></span>
+        </div>""")
+        # Calculate first session total: parallel groups × sessions per group × hours per session × weeks × rate
+        # Note: week_count is sessions per group (always 1), total_groups is parallel groups in module
+        # Module total = all groups, per-teacher = module_total / n_teachers
+        first_session_total = total_groups * week_count * first_session_weekly * config.TEACHING_WEEKS_PER_SEMESTER * first_session_rate
+
+        # Calculate repeat session total (module-wide)
+        # repeat_weekly already includes both rates: first_session_rate × repeat_rate
+        # To get the weekly "pure" repeat hours, we divide by first_session_rate
+        repeat_weekly_pure = repeat_weekly / first_session_rate  # Pure repeat hours/week (without first session rate)
+        repeat_module_total = repeat_weekly * config.TEACHING_WEEKS_PER_SEMESTER  # Total module repeats with rates
+
+        # Total practicals module = first_session_total + repeat_module_total
+        total_practicals_module = first_session_total + repeat_module_total
+        per_teacher_base = total_practicals_module / n_teachers
+
+        # Calculate per-teacher values
+        # Each teacher teaches: total_groups / n_teachers worth of groups on average
+        first_session_per_teacher_base = first_session_total / n_teachers
+        repeat_per_teacher_base = repeat_module_total / n_teachers
+
+        # Show first session calculation (base rate without teacher multiplier)
+        # Display format per Q10: "2h × 2.5x × 11 = 110h" showing the per-teacher calculation
+        # For parallel groups, we show: total_groups / n_teachers sessions/week worth of groups
+        first_session_sessions_per_week = total_groups / n_teachers
+
+        parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+            <span class="detail-name" style="color:#333;">First session</span>
+            <span class="detail-hours">{first_session_sessions_per_week:.2f} sessions/week × {first_session_weekly:.1f}h × {first_session_rate:.1f}x × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {per_teacher_base:.1f}h</span>
+        </div>""")
+
+        if repeat_module_total > 0:
+            # Show repeat sessions: (groups/teachers - 1) repeats at repetition rate
+            repeat_sessions_per_week = max(0, total_groups / n_teachers - 1)
+            parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+                <span class="detail-name" style="color:#333;">Repeat sessions</span>
+                <span class="detail-hours">{repeat_sessions_per_week:.2f} × {first_session_weekly:.1f}h × {config.REPETITION_MULTIPLIER:.1f}x × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {repeat_per_teacher_base:.1f}h</span>
+            </div>""")
+
+        # Show per-teacher base (without their lecturer multiplier)
+        parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+            <span class="detail-name" style="color:#333;">Per teacher base</span>
+            <span class="detail-hours">{first_session_per_teacher_base:.1f}h + {repeat_per_teacher_base:.1f}h = {per_teacher_base:.1f}h</span>
+        </div>""")
+
+        if actual_multiplier != 2.5:
+            # Show lecturer multiplier applied separately (Q11 requirement - separate lines)
+            first_session_with_mult = per_teacher_base * actual_multiplier
+            parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+                <span class="detail-name" style="color:#333;">At {actual_multiplier:.1f}x lecturer rate</span>
+                <span class="detail-hours">{per_teacher_base:.1f}h × {actual_multiplier:.1f}x = {first_session_with_mult:.1f}h</span>
+            </div>""")
+    else:
+        # Fallback to default rates if structured data not available
+        # Calculate practicals from breakdown values if total isn't available
+        # Use lecturer type to determine the rate to display
+        first_session_rate = config.TEACHING_MULTIPLIERS.get('problem_class_seminar_practical', 2.5)
+        rep_rate = config.REPETITION_MULTIPLIER
+
+        # If we have is_new_lecturer info, show the appropriate rate
+        display_rate = first_session_rate
+        if is_new_lecturer:
+            # For new lecturers, their actual multiplier is 5x (not 2.5x)
+            # But the base rate for problem classes is still 2.5x - they just get 5x overall
+            # So we show the standard rate but note it's applied to a new lecturer
+            pass
+
+        # Try to get total from structured breakdown, or calculate from components
+        practicals_per_module = practicals_structured.get('total', 0) if isinstance(practicals_structured, dict) and practicals_structured else 0
+        if practicals_per_module == 0:
+            # Calculate from components: first_session_total + repeat_session_total
+            fs_total = practicals_structured.get('first_session_total', 0) if isinstance(practicals_structured, dict) else 0
+            rs_total = practicals_structured.get('repeat_session_total', 0) if isinstance(practicals_structured, dict) else 0
+            practicals_per_module = fs_total + rs_total
+
+        label_prefix = ""
+        if module_code and not module_code.startswith('<') and not module_code.endswith('>'):
+            label_prefix = f"[{module_code}] "
+        parts.append(f"""<div class="detail-item {css_class}">
+            <span class="detail-name">{label_prefix}Practical Sessions</span>
+            <span class="detail-hours">{practicals_per_module:.1f}h</span>
+            <span class="detail-activity teaching-activity"></span>
+        </div>""")
+        lecturer_type_text = "new lecturer 5x" if is_new_lecturer else "standard"
+        parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+            <span class="detail-name" style="color:#333;">Calculation</span>
+            <span class="detail-hours">{first_session_rate}x first session (standard), {rep_rate}x repeats ({lecturer_type_text})</span>
+        </div>""")
+    return parts
+
+
+def _format_module_assessment_section(module_breakdown: Dict[str, Any], css_class: str,
+                                      module_code: Optional[str] = None) -> List[str]:
+    """Format assessment setting and marking sections for a module."""
+    parts = []
+    label_prefix = ""
+    if module_code and not module_code.startswith('<') and not module_code.endswith('>'):
+        label_prefix = f"[{module_code}] "
+
+    assessment_setting_per_module = module_breakdown.get('assessment_setting', 0)
+    if assessment_setting_per_module > 0:
+        parts.append(f"""<div class="detail-item {css_class}">
+            <span class="detail-name">{label_prefix}Assessment Setting</span>
+            <span class="detail-hours">{assessment_setting_per_module:.1f}h</span>
+            <span class="detail-activity teaching-activity"></span>
+        </div>""")
+        parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+            <span class="detail-name" style="color:#333;">Calculation</span>
+            <span class="detail-hours">{assessment_setting_per_module:.1f}h total (main + resit)</span>
+        </div>""")
+
+    marking_per_module = module_breakdown.get('marking', 0)
+    if marking_per_module > 0:
+        parts.append(f"""<div class="detail-item {css_class}">
+            <span class="detail-name">{label_prefix}Assessment Marking</span>
+            <span class="detail-hours">{marking_per_module:.1f}h</span>
+            <span class="detail-activity teaching-activity"></span>
+        </div>""")
+        parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+            <span class="detail-name" style="color:#333;">Calculation</span>
+            <span class="detail-hours">{marking_per_module:.1f}h total (initial + resit)</span>
+        </div>""")
+    return parts
+
+
+def _format_module_items(modules_in_stage: List[Dict], css_class: str,
+                         known_lecturers_per_module: Optional[Dict[str, frozenset]],
+                         staff_name: str) -> List[str]:
+    """Format all items for a list of modules in a stage."""
+    parts = []
+    for mod in modules_in_stage:
+        code = mod['code']
+        module_breakdown = mod['module_breakdown']
+        # Use the stage name (e.g., "SYS2") from the breakdown for lookup,
+        # not the module code (e.g., "COM00029I")
+        module_stage = mod.get('stage', '')
+
+        is_new_lecturer = _determine_lecturer_type(staff_name, module_stage, known_lecturers_per_module or {})
+
+        # Build module items
+        parts.extend(_format_module_delivery_section(module_breakdown, is_new_lecturer, css_class, code))
+        parts.extend(_format_module_practicals_section(module_breakdown, css_class, code, is_new_lecturer))
+        parts.extend(_format_module_assessment_section(module_breakdown, css_class, code))
+
+    return parts
+
+
+def _format_teaching_section_for_staff(result: WorkloadResult, title: str, hours: float, breakdown: Dict[str, float], css_class: str,
+                                       supervision_details: Tuple[str, ...] = (),
+                                       known_lecturers_per_module: Optional[Dict[str, frozenset]] = None,
+                                       pastoral_breakdown: Dict[str, float] = {},
+                                       project_breakdown: Dict[str, float] = {}) -> str:
+    """Format teaching section with hierarchical structure for a staff member."""
+    items_html_parts = []
+
+    # Phase 3: Use structured data from teaching_module_breakdowns instead of regex parsing
+    module_breakdowns = getattr(result, 'teaching_module_breakdowns', {})
+
+    # Build module info list from structured breakdowns (no regex parsing)
+    module_info_list = []
+    for module_name, mb in module_breakdowns.items():
+        # Extract codes from structured data (Phase 3: no regex parsing)
+        code_tuple = mb.get('module_codes', ())
+        primary_code = code_tuple[0] if code_tuple else ''
+
+        module_info_list.append({
+            'stage': module_name,
+            'code': primary_code,
+            'codes': code_tuple,
+            'module_breakdown': mb
+        })
+
+    # Group modules by stage (module name)
+    stages = {}
+    for mod in module_info_list:
+        stage = mod['stage']
+        if stage not in stages:
+            stages[stage] = []
+        stages[stage].append(mod)
+
+    # Sort stages and iterate
+    for stage in sorted(stages.keys()):
+        modules_in_stage = stages[stage]
+
+        items_html_parts.append(f"""<div style="margin-bottom:25px;">
+            <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #2196F3;padding-left:10px;">{stage} Modules ({len(modules_in_stage)} module(s))</h4>""")
+
+        items_html_parts.extend(_format_module_items(modules_in_stage, css_class, known_lecturers_per_module or {}, result.name))
+        items_html_parts.append("</div>")
 
         # Phase 3b: Use structured supervision breakdowns instead of regex parsing
         # Pastoral supervision
