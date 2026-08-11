@@ -1610,10 +1610,31 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
                 </div>
             </div>
 
-            <!-- Total workload in green band at top of staff header -->
-            <div style="margin-top:20px;padding-top:15px;border-top:1px solid rgba(255,255,255,0.3);">
-                <span class="label" style="color:white;font-size:1.2em;font-weight:bold;">Total Workload:</span>
-                <span class="value" style="color:white;font-size:2em;font-weight:bold;">{total_for_display:.1f} hours</span>
+            <!-- Overall Workload Summary - hierarchical tree format -->
+            <div style="margin-top:25px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.3);">
+                <h4 style="color:white;margin:0 0 15px 0;font-size:1em;">Overall Workload Summary</h4>
+                <div style="display:flex;flex-direction:column;gap:8px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.2);">
+                        <span style="color:white;font-size:1em;">Total Workload</span>
+                        <strong style="color:#4CAF50;font-size:1.3em;">{total_for_display:.1f}h</strong>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding-left:20px;border-bottom:1px solid rgba(255,255,255,0.1);">
+                        <span style="color:white;font-size:0.9em;">Teaching</span>
+                        <strong style="color:#e3f2fd;font-size:1.1em;">{r.teaching_hours:.1f}h</strong>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding-left:20px;border-bottom:1px solid rgba(255,255,255,0.1);">
+                        <span style="color:white;font-size:0.9em;">Research</span>
+                        <strong style="color:#fff3e0;font-size:1.1em;">{r.research_hours:.1f}h</strong>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding-left:20px;border-bottom:1px solid rgba(255,255,255,0.1);">
+                        <span style="color:white;font-size:0.9em;">Admin</span>
+                        <strong style="color:#fce4ec;font-size:1.1em;">{r.admin_hours:.1f}h</strong>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding-left:20px;">
+                        <span style="color:white;font-size:0.9em;">Nominal Hours (reference)</span>
+                        <span style="color:#bbb;font-size:1em;">{nominal_hours:.0f}h</span>
+                    </div>
+                </div>
             </div>
         </div>
 
