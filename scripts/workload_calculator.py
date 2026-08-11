@@ -255,7 +255,6 @@ def _calculate_practical_hours_and_breakdown(
     if lecturer_types:
         for t, ltype in lecturer_types:
             mult = config.TEACHING_MULTIPLIERS.get(ltype, config.TEACHING_PROBLEM_CLASS)
-            print(f"DEBUG: {t} has ltype '{ltype}', lookup returned {mult}")
             teacher_multiplier[t] = mult
 
     contact_weeks = TEACHING_WEEKS_PER_SEMESTER
@@ -275,7 +274,6 @@ def _calculate_practical_hours_and_breakdown(
             n_parallel_groups = None
 
         if n_parallel_groups is not None:
-            print(f"DEBUG: n_parallel_groups = {n_parallel_groups}")
             parallel_groups = []
             for i in range(n_parallel_groups):
                 parallel_groups.append(type('ParallelGroup', (), {
