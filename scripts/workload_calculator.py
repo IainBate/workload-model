@@ -310,7 +310,7 @@ def _calculate_practical_hours_and_breakdown(
                     multiplier = teacher_multiplier.get(t, 1.0)
                     if t not in result['individual_practical_hours']:
                         result['individual_practical_hours'][t] = 0.0
-                    result['individual_practical_hours'][t] += base_group_hours * multiplier
+                    result['individual_practical_hours'][t] += (base_group_hours / n_teachers) * multiplier
 
                 # Store structured breakdown (per teacher, per group) - shows base rates without multipliers
                 # Multipliers are applied in individual hours calculation above
