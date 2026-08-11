@@ -43,6 +43,28 @@ class TeachingBreakdown:
     marking_hours: float
     marking_detail: Optional[str]
 
+    @staticmethod
+    def _format_module_delivery_section(module_breakdown: Dict[str, Any], is_new_lecturer: bool,
+                                         css_class: str, module_code: Optional[str] = None) -> List[str]:
+        """Format delivery/lecture section for a module."""
+        return _format_module_delivery_section(module_breakdown, is_new_lecturer, css_class, module_code)
+
+    @staticmethod
+    def _format_module_practicals_section(
+        module_breakdown: Dict[str, Any],
+        css_class: str,
+        module_code: Optional[str] = None,
+        is_new_lecturer: bool = False
+    ) -> List[str]:
+        """Format practical sessions section for a module."""
+        return _format_module_practicals_section(module_breakdown, css_class, module_code, is_new_lecturer)
+
+    @staticmethod
+    def _format_module_assessment_section(module_breakdown: Dict[str, Any], css_class: str,
+                                          module_code: Optional[str] = None) -> List[str]:
+        """Format assessment setting and marking sections for a module."""
+        return _format_module_assessment_section(module_breakdown, css_class, module_code)
+
 
 def parse_teaching_breakdown(teaching_breakdown: Dict[str, float],
                              detail_text: str = "",
