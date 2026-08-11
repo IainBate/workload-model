@@ -1451,10 +1451,10 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
             items_html_parts.append(f"""<div style="margin-bottom:25px;">
                 <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #2196F3;padding-left:10px;">Project Supervision ({proj_hours_total:.1f}h)</h4>
                 <div style="margin-left:20px;">
-                    <div class="detail-item {css_class}">
+                    <div class="detail-item teaching-item">
                         <span class="detail-name">Projects</span>
                         <span class="detail-hours">{proj_projects_total} projects x {proj_level} = {proj_hours_total:.1f}h</span>
-                        <span class="detail-activity admin-activity"></span>
+                        <span class="detail-activity teaching-activity"></span>
                     </div>
                 </div>
             </div>""")
