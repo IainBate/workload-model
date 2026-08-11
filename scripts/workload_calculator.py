@@ -317,9 +317,9 @@ def _calculate_practical_hours_and_breakdown(
 
                 # Calculate hours for one teacher teaching one group (base hours without their multiplier)
                 # For parallel groups: repeats are sessions beyond what each teacher does as first session
-                # Each teacher gets group_sessions/n_teachers worth of practicals
+                # Each teacher gets n_parallel_groups/n_teachers worth of practicals on average
                 # First session is the base share; additional is repeat
-                repeat_sessions = max(0, group_sessions / n_teachers - 1) if n_teachers > 0 else 0
+                repeat_sessions = max(0, n_parallel_groups / n_teachers - 1) if n_teachers > 0 else 0
                 base_first_session_total = group_sessions * weekly_hrs * first_session_rate * contact_weeks
                 base_repeat_session_total = repeat_sessions * weekly_hrs * first_session_rate * repeat_rate * contact_weeks
                 base_group_hours = base_first_session_total + base_repeat_session_total
