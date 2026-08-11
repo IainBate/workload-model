@@ -3,9 +3,15 @@
 import sys
 sys.path.insert(0, '.')
 
-# Suppress interactive prompts by setting environment variable before import
-import os
-os.environ['WORKLOAD_MODEL_INTERACTIVE'] = '0'
+# Patch input() to always return "y" for interactive prompts
+original_input = __builtins__.input if isinstance(__builtins__, dict) else getattr(__builtins__, 'input', None)
+def mock_input(prompt=""):
+    return "y"
+if isinstance(__builtins__, dict):
+    __builtins__['input'] = mock_input
+else:
+    import builtins
+    builtins.input = mock_input
 
 from data_loader import load_all_data
 from workload_calculator import calculate_workload
