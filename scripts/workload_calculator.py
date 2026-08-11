@@ -332,7 +332,7 @@ def _calculate_practical_hours_and_breakdown(
                     f"{rate_display}"
                 )
         else:
-            # No parallel groups - all teachers get same rate
+            # No parallel groups - each teacher gets practical hours based on their multiplier
             std_first_session_weekly = getattr(module, 'practical_contact_hours', config.TEACHING_PROBLEM_CLASS)
             repeat_rate = config.REPETITION_MULTIPLIER
 
@@ -345,7 +345,7 @@ def _calculate_practical_hours_and_breakdown(
                 repeat_session_total = repeat_sessions * std_first_session_weekly * first_session_rate * repeat_rate * contact_weeks
                 total_practical_hours = first_session_total + repeat_session_total
 
-                # Store structured breakdown
+                # Store structured breakdown (base hours without multipliers)
                 result['practicals_breakdown'] = {
                     "first_session_hours": round(std_first_session_weekly, 2),
                     "repeat_hours": round(repeat_sessions * std_first_session_weekly, 2),
@@ -355,9 +355,22 @@ def _calculate_practical_hours_and_breakdown(
                     "total": round(total_practical_hours, 2),
                 }
 
+                # Build display text based on teacher multipliers
+                unique_multipliers = set(teacher_multiplier.get(t, 1.0) for t in teachers)
+                if len(unique_multipliers) == 1:
+                    mult_val = list(unique_multipliers)[0]
+                    if mult_val != 1.0:
+                        rate_display = f"- {mult_val}x lecturer rate applied (first session: {first_session_rate}x, repeats: {repeat_rate}x)"
+                    else:
+                        rate_display = f"- Standard lecturer rate applied (first session: {first_session_rate}x, repeats: {repeat_rate}x)"
+                else:
+                    # Mixed multipliers
+                    mult_details = ", ".join(f"{t}: {teacher_multiplier.get(t, 1.0)}x" for t in teachers)
+                    rate_display = f"- Per-teacher rates applied: {mult_details}"
+
                 result['practical_details'].append(
                     f"First time delivery: {practicals_count} sessions/week @ {std_first_session_weekly}h each; "
-                    f"- Standard lecturers: {config.TEACHING_PROBLEM_CLASS}x first session (standard), {repeat_rate}x repeats"
+                    f"{rate_display}"
                 )
             else:
                 # Single session - no repetition
@@ -372,12 +385,14 @@ def _calculate_practical_hours_and_breakdown(
                     "total": round(total_practical_hours, 2),
                 }
 
-            # Distribute to individual teachers (all get same rate)
-            per_teacher_practical_hours = total_practical_hours / n_teachers
+            # Distribute to individual teachers based on their multiplier
             for t in teachers:
                 if t not in result['individual_practical_hours']:
                     result['individual_practical_hours'][t] = 0.0
-                result['individual_practical_hours'][t] += per_teacher_practical_hours
+                # Apply each teacher's multiplier to their share of practical hours
+                multiplier = teacher_multiplier.get(t, 1.0)
+                base_share = total_practical_hours / n_teachers
+                result['individual_practical_hours'][t] += base_share * multiplier
     else:
         # No practicals - empty structured breakdown
         result['practicals_breakdown'] = {}
