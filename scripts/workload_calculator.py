@@ -335,7 +335,8 @@ def _calculate_practical_hours_and_breakdown(
                     "week_count": group_sessions,
                     "first_session_rate": first_session_rate,
                     "repeat_rate": repeat_rate,
-                    "total": round(base_group_hours, 2)
+                    "total": round(base_group_hours, 2),
+                    "n_teachers": n_teachers
                 }
 
                 # Display shows per-group calculation with lecturer type info
