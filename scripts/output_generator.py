@@ -1474,12 +1474,6 @@ def _format_module_practicals_section(
         # Derive actual multiplier: teacher's hours / base per teacher (should be 2.5 or 5.0)
         actual_multiplier = practicals_per_module / base_per_teacher if base_per_teacher > 0 else 2.5
 
-        parts.append(f"""<div class="detail-item {css_class}">
-            <span class="detail-name">{label_prefix}Practical Sessions</span>
-            <span class="detail-hours">{practicals_per_module:.1f}h total</span>
-            <span class="detail-activity teaching-activity"></span>
-        </div>""")
-
         # Calculate Chris's actual workload based on what he delivers
         # Per Q8: First session = 1/week, Repeats = (total_groups/n_teachers - 1) per week
         groups_per_teacher = total_groups / n_teachers if n_teachers > 0 else 0
