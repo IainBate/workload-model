@@ -1250,15 +1250,14 @@ def _format_module_delivery_section(module_breakdown: Dict[str, Any], is_new_lec
             </div>""")
         return parts
 
-    def _format_module_practicals_section(
-        self,
-        module_breakdown: Dict[str, Any],
-        css_class: str,
-        module_code: Optional[str] = None,
-        is_new_lecturer: bool = False
-    ) -> List[str]:
-        """Format practical sessions section for a module."""
-        parts = []
+def _format_module_practicals_section(
+    module_breakdown: Dict[str, Any],
+    css_class: str,
+    module_code: Optional[str] = None,
+    is_new_lecturer: bool = False
+) -> List[str]:
+    """Format practical sessions section for a module."""
+    parts = []
 
         # Phase 3: Use structured practicals breakdown instead of regex parsing
         # First check for 'practicals_structured' (Phase 3 format), then fall back to 'practicals'
