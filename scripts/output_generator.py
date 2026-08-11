@@ -1498,31 +1498,17 @@ def _format_module_practicals_section(
         repeat_per_teacher_base = repeat_module_total / n_teachers
 
         # Show first session calculation (base rate without teacher multiplier)
-        # Display format: "X.Xh per session × rate × weeks = total"
+        # Display format: "X.Xh per session @ rate × weeks = total"
         parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
             <span class="detail-name" style="color:#333;">First session</span>
-            <span class="detail-hours">{first_session_weekly:.1f}h per session @ {first_session_rate:.1f}x × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {per_teacher_base:.1f}h</span>
+            <span class="detail-hours">{first_session_weekly:.1f}h per session @ {first_session_rate:.1f}x × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {first_session_per_teacher_base:.1f}h</span>
         </div>""")
 
         if repeat_module_total > 0:
-            # Show repeat sessions: repeats at repetition rate (no per-session calculation needed)
+            # Show repeat sessions: repeats at repetition rate
             parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
                 <span class="detail-name" style="color:#333;">Repeat sessions</span>
                 <span class="detail-hours">{repeat_per_teacher_base:.1f}h total × {config.REPETITION_MULTIPLIER:.1f}x rate</span>
-            </div>""")
-
-        # Show per-teacher base (without their lecturer multiplier)
-        parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
-            <span class="detail-name" style="color:#333;">Per teacher base</span>
-            <span class="detail-hours">{first_session_per_teacher_base:.1f}h + {repeat_per_teacher_base:.1f}h = {per_teacher_base:.1f}h</span>
-        </div>""")
-
-        if actual_multiplier != 2.5:
-            # Show lecturer multiplier applied separately (Q11 requirement - separate lines)
-            first_session_with_mult = per_teacher_base * actual_multiplier
-            parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
-                <span class="detail-name" style="color:#333;">At {actual_multiplier:.1f}x lecturer rate</span>
-                <span class="detail-hours">{per_teacher_base:.1f}h × {actual_multiplier:.1f}x = {first_session_with_mult:.1f}h</span>
             </div>""")
     else:
         # Fallback to default rates if structured data not available
