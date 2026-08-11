@@ -202,8 +202,9 @@ class TestPracticalDisplayText:
 
         results = calculate_workload(year_data, validate_input=False)
 
-        # Generate HTML to check display text (function is at module level)
-        from output_generator import _format_module_practicals_section
+        # Generate HTML to check display text (method of TeachingBreakdown class)
+        from output_generator import TeachingBreakdown
+        tb = TeachingBreakdown()
 
         for result in results:
             module_breakdown = None
@@ -212,7 +213,7 @@ class TestPracticalDisplayText:
                     module_breakdown = breakdown
                     break
 
-            parts = _format_module_practicals_section(
+            parts = tb._format_module_practicals_section(
                 module_breakdown,
                 css_class="teaching-section",
                 module_code="TEST002",
