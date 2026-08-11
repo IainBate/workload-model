@@ -1443,13 +1443,13 @@ def _format_module_items(modules_in_stage: List[Dict], css_class: str,
 
         return parts
 
-    def format_teaching_section(self, title: str, hours: float, breakdown: Dict[str, float], css_class: str,
-                                supervision_details: Tuple[str, ...] = (),
-                                known_lecturers_per_module: Optional[Dict[str, frozenset]] = None,
-                                pastoral_breakdown: Dict[str, float] = {},
-                                project_breakdown: Dict[str, float] = {}) -> str:
-        """Format teaching section with hierarchical structure."""
-        items_html_parts = []
+def format_teaching_section(title: str, hours: float, breakdown: Dict[str, float], css_class: str,
+                            supervision_details: Tuple[str, ...] = (),
+                            known_lecturers_per_module: Optional[Dict[str, frozenset]] = None,
+                            pastoral_breakdown: Dict[str, float] = {},
+                            project_breakdown: Dict[str, float] = {}) -> str:
+    """Format teaching section with hierarchical structure."""
+    items_html_parts = []
 
         # Phase 3: Use structured data from teaching_module_breakdowns instead of regex parsing
         module_breakdowns = getattr(r, 'teaching_module_breakdowns', {})
