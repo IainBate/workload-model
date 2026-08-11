@@ -1432,7 +1432,7 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
             past_students_total = pastoral_breakdown.get('student_count', 0)
 
             items_html_parts.append(f"""<div style="margin-bottom:25px;">
-                <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #FF9800;padding-left:10px;">Pastoral Supervision ({past_hours_total:.1f}h)</h4>
+                <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #2196F3;padding-left:10px;">Pastoral Supervision ({past_hours_total:.1f}h)</h4>
                 <div style="margin-left:20px;">
                     <div class="detail-item {css_class}">
                         <span class="detail-name">Students</span>
