@@ -131,14 +131,19 @@ def _calculate_lecture_hours_and_multipliers(module: ModuleData,
     contact_weeks = TEACHING_WEEKS_PER_SEMESTER
 
     # Calculate weeks of teaching (typical semester is ~22 weeks)
-    contact_hours = module.contact_hours
     practicals_count = module.practicals
 
+    # Default lecture hours per week (standard modules without specified contact time)
+    # This represents the standard weekly lecture contact time for staff
+    default_lecture_hours_per_week = DEFAULT_LECURE_HOURS_PER_WEEK
+
+    # Calculate lecture hours using the default (2h/week × 11 weeks = 22h typical)
+    lecture_hours = default_lecture_hours_per_week * contact_weeks
+
+    # Calculate practical duration for reporting purposes
     if practicals_count > 0 and module.practical_contact_hours > 0:
         total_practical_duration = module.practical_contact_hours * practicals_count
-        lecture_hours = max(0, contact_hours - total_practical_duration)
     else:
-        lecture_hours = contact_hours
         total_practical_duration = 0.0
 
     result['lecture_hours'] = lecture_hours
