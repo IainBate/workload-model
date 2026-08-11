@@ -39,12 +39,30 @@ if sys2_module:
 
     print(f"Normalized teachers: {normalized_teachers}")
 
+    # Create a fake staff_dict for supervision allocation
+    staff_dict = {}
+    for t in normalized_teachers:
+        staff_dict[t] = type('StaffData', (), {
+            'fte': 1.0,
+            'roles': [],
+            'phd_supervisions': 0,
+            'phd_co_supervisions': 0,
+            'phd_assessor_count': 0,
+            'student_load': None,
+            'project_count_ug': 0,
+            'project_count_msc': 0,
+            'active': True
+        })()
+
+    supervision = allocate_supervision(staff_dict)
+
     module_teaching = _calculate_teaching_workload(
         sys2_module,
         normalized_teachers,
         year_data.known_lecturers,
         year_data.known_lecturers_per_module,
-        {}
+        {},
+        supervision=supervision
     )
 
     print("\nPer-teacher breakdown from _calculate_teaching_workload:")
