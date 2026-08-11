@@ -1504,7 +1504,7 @@ def _format_module_practicals_section(
         # Per Q10: "2.0h per session @ 5x × 11 weeks = 110h"
         parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
             <span class="detail-name" style="color:#333;">First session</span>
-            <span class="detail-hours">1 first session/week × {contact_hrs:.1f}h per session @ {actual_multiplier:.0f}x × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {first_session_actual:.1f}h</span>
+            <span class="detail-hours">{groups_per_teacher:.2f} first session(s)/week × {contact_hrs:.1f}h per session @ {actual_multiplier:.0f}x × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {first_session_actual:.1f}h</span>
         </div>""")
 
         if repeat_sessions_per_teacher > 0:
