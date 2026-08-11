@@ -1252,8 +1252,17 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
         else:
             # Fallback to default rates if structured data not available
             # Calculate practicals from breakdown values if total isn't available
+            # Use lecturer type to determine the rate to display
             first_session_rate = config.TEACHING_MULTIPLIERS.get('problem_class_seminar_practical', 2.5)
             rep_rate = config.REPETITION_MULTIPLIER
+
+            # If we have is_new_lecturer info, show the appropriate rate
+            display_rate = first_session_rate
+            if is_new_lecturer:
+                # For new lecturers, their actual multiplier is 5x (not 2.5x)
+                # But the base rate for problem classes is still 2.5x - they just get 5x overall
+                # So we show the standard rate but note it's applied to a new lecturer
+                pass
 
             # Try to get total from structured breakdown, or calculate from components
             practicals_per_module = practicals_structured.get('total', 0) if isinstance(practicals_structured, dict) and practicals_structured else 0
@@ -1271,9 +1280,10 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
                 <span class="detail-hours">{practicals_per_module:.1f}h</span>
                 <span class="detail-activity teaching-activity"></span>
             </div>""")
+            lecturer_type_text = "new lecturer 5x" if is_new_lecturer else "standard"
             parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
                 <span class="detail-name" style="color:#333;">Calculation</span>
-                <span class="detail-hours">{first_session_rate}x first session (standard), {rep_rate}x repeats</span>
+                <span class="detail-hours">{first_session_rate}x first session (standard), {rep_rate}x repeats ({lecturer_type_text})</span>
             </div>""")
         return parts
 
