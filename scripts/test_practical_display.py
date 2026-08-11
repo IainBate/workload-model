@@ -352,7 +352,16 @@ class TestPracticalDisplayMath:
         results = calculate_workload(year_data, validate_input=False)
 
         from output_generator import TeachingBreakdown
-        tb = TeachingBreakdown()
+        tb = TeachingBreakdown(
+            delivery_hours=0.0,
+            delivery_multiplier="",
+            practical_hours=0.0,
+            practical_detail="",
+            assessment_setting_hours=0.0,
+            assessment_setting_detail="",
+            marking_hours=0.0,
+            marking_detail=""
+        )
 
         chris_result = next(r for r in results if r.name == "Christopher Crispin-Bailey")
 
