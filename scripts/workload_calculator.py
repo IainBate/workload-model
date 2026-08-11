@@ -326,32 +326,45 @@ def _calculate_practical_hours_and_breakdown(
                 # For parallel groups: repeats are sessions beyond what each teacher does as first session
                 # Each teacher gets n_parallel_groups/n_teachers worth of practicals on average
                 # First session is the base share; additional is repeat
-                repeat_sessions = max(0, n_parallel_groups / n_teachers - 1) if n_teachers > 0 else 0
-                base_first_session_total = n_parallel_groups * weekly_hrs * first_session_rate * contact_weeks
-                base_repeat_session_total = repeat_sessions * weekly_hrs * first_session_rate * repeat_rate * contact_weeks
-                base_group_hours = base_first_session_total + base_repeat_session_total
 
-                # Apply each teacher's multiplier to their practical hours
+                # Calculate per-teacher first session and repeat shares separately
+                groups_per_teacher = n_parallel_groups / n_teachers if n_teachers > 0 else 0
+                repeat_sessions = max(0, groups_per_teacher - 1)
+
+                # First session: each teacher delivers their share of groups as "first time" delivery
+                # At standard rate (TEACHING_PROBLEM_CLASS), then apply lecturer's multiplier
+                first_session_base = groups_per_teacher * weekly_hrs * contact_weeks
+                first_session_with_mult = first_session_base * first_session_rate
+
+                # Repeat sessions: only apply REPETITION_MULTIPLIER to the base repeat hours
+                # (the repetition rate accounts for teaching same content to multiple groups)
+                repeat_base = repeat_sessions * weekly_hrs * contact_weeks
+                repeat_with_rate = repeat_base * repeat_rate
+
+                # Total per teacher = first session (with lecturer multiplier) + repeats (with rep rate only)
+                total_per_teacher = first_session_with_mult + repeat_with_rate
+
                 for t in teachers:
                     multiplier = teacher_multiplier.get(t, 1.0)
                     if t not in result['individual_practical_hours']:
                         result['individual_practical_hours'][t] = 0.0
-                    result['individual_practical_hours'][t] += (base_group_hours / n_teachers) * multiplier
+                    # Apply lecturer's multiplier to the entire per-teacher total
+                    result['individual_practical_hours'][t] += total_per_teacher * multiplier
 
                 # Store structured breakdown (per teacher, per group) - shows base rates without multipliers
-                # Multipliers are applied in individual hours calculation above
                 # week_count = sessions per group (always 1), total_groups = parallel groups count
-                # Note: repeat_hours includes both first_session_rate and repeat_rate since it represents
-                # the additional hours beyond the base first session share
                 result['practicals_breakdown'] = {
                     "first_session_hours": round(weekly_hrs, 2),
-                    "repeat_hours": round(repeat_sessions * weekly_hrs * first_session_rate * repeat_rate, 2),
-                    "week_count": group_sessions,  # sessions per group (always 1)
-                    "total_groups": n_parallel_groups,  # total parallel groups in module
+                    "repeat_hours": round(repeat_sessions * weekly_hrs, 2),  # Base repeat hours without rates
+                    "week_count": group_sessions,
+                    "total_groups": n_parallel_groups,
                     "first_session_rate": first_session_rate,
                     "repeat_rate": repeat_rate,
-                    "total": round(base_group_hours, 2),
-                    "n_teachers": n_teachers
+                    "total": round(first_session_with_mult + repeat_base, 2),
+                    "n_teachers": n_teachers,
+                    # Store per-teacher values for display
+                    "groups_per_teacher": groups_per_teacher,
+                    "repeat_sessions_per_teacher": repeat_sessions
                 }
 
                 # Display shows per-group calculation with lecturer type info
