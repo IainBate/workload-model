@@ -1313,14 +1313,15 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
             first_session_with_mult = first_session_per_teacher_base * actual_multiplier
 
             # Repeat sessions are shown separately with their own calculation
+            # Show first session calculation (base rate without teacher multiplier)
             parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
-                <span class="detail-name" style="color:#333;">First time delivery</span>
-                <span class="detail-hours">{(total_groups / n_teachers):.2f} sessions/week @ {first_session_weekly:.1f}h each × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {first_session_total:.1f}h module total / {n_teachers} teachers = {first_session_per_teacher_base:.1f}h each</span>
+                <span class="detail-name" style="color:#333;">First session share</span>
+                <span class="detail-hours">{(total_groups / n_teachers):.2f} sessions/week @ {first_session_weekly:.1f}h each × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {first_session_total:.1f}h module total / {n_teachers} teachers = {first_session_per_teacher_base:.1f}h base</span>
             </div>""")
 
             if actual_multiplier != 2.5:
                 parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
-                    <span class="detail-name" style="color:#333;">At {actual_multiplier:.1f}x rate</span>
+                    <span class="detail-name" style="color:#333;">At {actual_multiplier:.1f}x lecturer rate</span>
                     <span class="detail-hours">{first_session_per_teacher_base:.1f}h × {actual_multiplier:.1f}x = {first_session_with_mult:.1f}h</span>
                 </div>""")
 
@@ -1336,13 +1337,13 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
                 rep_rate = config.REPETITION_MULTIPLIER
 
                 parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
-                    <span class="detail-name" style="color:#333;">Repeated sessions</span>
-                    <span class="detail-hours">{(total_groups / n_teachers - 1):.2f} repeat(s) × {first_session_weekly:.1f}h × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {repeat_weekly * config.TEACHING_WEEKS_PER_SEMESTER:.1f}h module total / {n_teachers} teachers = {repeat_per_teacher_base:.1f}h each</span>
+                    <span class="detail-name" style="color:#333;">Repeat sessions</span>
+                    <span class="detail-hours">{(total_groups / n_teachers - 1):.2f} repeat(s) × {first_session_weekly:.1f}h @ {first_session_rate:.1f}x × {rep_rate:.1f}x repeat rate = {repeat_weekly * config.TEACHING_WEEKS_PER_SEMESTER:.1f}h module total / {n_teachers} teachers = {repeat_per_teacher_base:.1f}h base</span>
                 </div>""")
 
                 if actual_multiplier != 2.5:
                     parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
-                        <span class="detail-name" style="color:#333;">At {actual_multiplier:.1f}x rate</span>
+                        <span class="detail-name" style="color:#333;">At {actual_multiplier:.1f}x lecturer rate</span>
                         <span class="detail-hours">{repeat_per_teacher_base:.1f}h × {actual_multiplier:.1f}x = {repeat_with_mult:.1f}h</span>
                     </div>""")
         else:
