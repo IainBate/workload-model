@@ -1234,10 +1234,12 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
             # First-time delivery line
             # Calculate first session total: sessions per week × hours per session × weeks × rate
             first_session_total = week_count * first_session_weekly * config.TEACHING_WEEKS_PER_SEMESTER * first_session_rate
+            # Determine lecturer type text for display
+            lecturer_type_text = "new lecturer 5x" if is_new_lecturer else "standard"
             # Repeat sessions are shown separately with their own calculation
             parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
                 <span class="detail-name" style="color:#333;">First time delivery</span>
-                <span class="detail-hours">{week_count} sessions/week @ {first_session_weekly:.1f}h each = {first_session_total:.1f}h (standard rate)</span>
+                <span class="detail-hours">{week_count} sessions/week @ {first_session_weekly:.1f}h each = {first_session_total:.1f}h ({lecturer_type_text})</span>
             </div>""")
             # Repeated sessions line (only if there are repeats)
             if repeat_weekly > 0:
