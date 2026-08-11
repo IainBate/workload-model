@@ -61,7 +61,7 @@ class TestPracticalDisplayCalculation:
                 modules=[module],
                 student_counts={},
                 assessment_counts={},
-                staff={t: StaffData(t, 1.0, [], 0, 0, 0, [], [], True) for t in teachers},
+                staff={t: StaffData(canonical_name=t, fte=1.0, aliases=[], roles=[], research_projects=[], saint_modules=[], active=True) for t in teachers},
                 known_lecturers=known_lecturers_global,
                 known_lecturers_per_module=known_lecturers_per_module
             ),
