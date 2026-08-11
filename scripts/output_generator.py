@@ -1423,7 +1423,7 @@ def _format_module_practicals_section(
             </div>""")
         return parts
 
-    def _format_module_items(modules_in_stage: List[Dict], css_class: str,
+    def _format_module_items(self, modules_in_stage: List[Dict], css_class: str,
                              known_lecturers_per_module: Optional[Dict[str, frozenset]]) -> List[str]:
         """Format all items for a list of modules in a stage."""
         parts = []
