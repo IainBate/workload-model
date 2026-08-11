@@ -1316,34 +1316,38 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
             total_practicals_module = first_session_total + repeat_module_total
             per_teacher_base = total_practicals_module / n_teachers
 
-            # Calculate per-teacher values with multiplier applied for consistent display
+            # Calculate per-teacher values
             # Each teacher teaches: total_groups / n_teachers worth of groups on average
             first_session_per_teacher_base = first_session_total / n_teachers
             repeat_per_teacher_base = repeat_module_total / n_teachers
-            first_session_with_mult = per_teacher_base * actual_multiplier
 
-            # Repeat sessions are shown separately with their own calculation
             # Show first session calculation (base rate without teacher multiplier)
-            # Display: sessions/week, hours per session, weeks, rate
-            total_sessions_per_week = total_groups * week_count
+            # Display format per Q10: "2h × 2.5x × 11 = 110h" showing the per-teacher calculation
+            # For parallel groups, we show: total_groups / n_teachers sessions/week worth of groups
+            first_session_sessions_per_week = total_groups / n_teachers
 
             parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
                 <span class="detail-name" style="color:#333;">First session</span>
-                <span class="detail-hours">{total_sessions_per_week} sessions/week × {first_session_weekly:.1f}h per session @ {first_session_rate:.1f}x rate × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {first_session_total:.1f}h module total</span>
+                <span class="detail-hours">{first_session_sessions_per_week:.2f} sessions/week × {first_session_weekly:.1f}h × {first_session_rate:.1f}x × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {per_teacher_base:.1f}h</span>
             </div>""")
 
             if repeat_module_total > 0:
+                # Show repeat sessions: (groups/teachers - 1) repeats at repetition rate
+                repeat_sessions_per_week = max(0, total_groups / n_teachers - 1)
                 parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
                     <span class="detail-name" style="color:#333;">Repeat sessions</span>
-                    <span class="detail-hours">{(total_groups / n_teachers - 1):.2f} repeat(s) × {first_session_weekly:.1f}h × {config.REPETITION_MULTIPLIER:.1f}x = {repeat_weekly_pure:.1f}h/week × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {repeat_module_total:.1f}h module total</span>
+                    <span class="detail-hours">{repeat_sessions_per_week:.2f} × {first_session_weekly:.1f}h × {config.REPETITION_MULTIPLIER:.1f}x × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {repeat_per_teacher_base:.1f}h</span>
                 </div>""")
 
+            # Show per-teacher base (without their lecturer multiplier)
             parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
-                <span class="detail-name" style="color:#333;">Per teacher base (total module / {n_teachers} teachers)</span>
-                <span class="detail-hours">{first_session_total:.1f}h + {repeat_module_total:.1f}h = {per_teacher_base:.1f}h</span>
+                <span class="detail-name" style="color:#333;">Per teacher base</span>
+                <span class="detail-hours">{first_session_per_teacher_base:.1f}h + {repeat_per_teacher_base:.1f}h = {per_teacher_base:.1f}h</span>
             </div>""")
 
             if actual_multiplier != 2.5:
+                # Show lecturer multiplier applied separately (Q11 requirement - separate lines)
+                first_session_with_mult = per_teacher_base * actual_multiplier
                 parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
                     <span class="detail-name" style="color:#333;">At {actual_multiplier:.1f}x lecturer rate</span>
                     <span class="detail-hours">{per_teacher_base:.1f}h × {actual_multiplier:.1f}x = {first_session_with_mult:.1f}h</span>
