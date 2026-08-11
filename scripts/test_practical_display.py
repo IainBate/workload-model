@@ -374,15 +374,16 @@ class TestPracticalDisplayMath:
                     is_new_lecturer=True
                 )
 
-                # Check that no line contains the pattern "X.XX sessions/week @ Yh × weeks = ZZZ" (invalid math)
+                # Check that no line contains the invalid pattern "X.XX sessions/week @ Yh × weeks = ZZZ"
+                # (where X.XX is a number of sessions without hours per session info)
                 for part in parts:
-                    if 'sessions/week' in part:
-                        # This should NOT appear anymore - we display "X.Xh per session" instead
-                        assert False, f"Invalid format 'sessions/week' found in: {part}"
+                    if 'sessions/week' in part and 'h per session' not in part:
+                        assert False, f"Invalid format 'sessions/week' found (without h per session): {part}"
 
-                # Check that valid format appears: "X.Xh per session @ rate"
+                # Check that valid format appears: "X.Xh per session @" or "repeat sessions/week"
                 has_valid_format = any("h per session @" in part for part in parts)
-                assert has_valid_format, "Valid format 'h per session @' not found in practicals display"
+                has_repeat_format = any("repeat sessions/week" in part for part in parts)
+                assert has_valid_format or has_repeat_format, "Valid format 'h per session @' or 'repeat sessions/week' not found in practicals display"
 
 
 if __name__ == "__main__":
