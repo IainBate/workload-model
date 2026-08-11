@@ -281,7 +281,7 @@ class TestPracticalDisplayMath:
         # Find the module breakdown
         module_breakdown = None
         for code, breakdown in teacher_a.teaching_module_breakdowns.items():
-            if 'TEST003' in code:
+            if 'TEST003' in code or 'TestModule' in code:
                 module_breakdown = breakdown
                 break
 
