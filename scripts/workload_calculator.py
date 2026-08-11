@@ -292,6 +292,13 @@ def _calculate_practical_hours_and_breakdown(
         else:
             n_parallel_groups = None
 
+        # Validation: practical groups should not exceed practicals per week
+        # If it does, the data is likely incorrect (e.g., SYS3 has groups=6 but only 1 practical/week)
+        if n_parallel_groups is not None and n_parallel_groups > practicals_count:
+            # Data inconsistency: more groups than sessions/week means no parallel delivery
+            # Treat as standard (non-parallel) practical delivery
+            n_parallel_groups = None
+
         if n_parallel_groups is not None:
             parallel_groups = []
             for i in range(n_parallel_groups):
