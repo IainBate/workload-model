@@ -1390,7 +1390,7 @@ def _format_module_practicals_section(
             </div>""")
         return parts
 
-    def _format_module_assessment_section(module_breakdown: Dict[str, Any], css_class: str,
+    def _format_module_assessment_section(self, module_breakdown: Dict[str, Any], css_class: str,
                                           module_code: Optional[str] = None) -> List[str]:
         """Format assessment setting and marking sections for a module."""
         parts = []
