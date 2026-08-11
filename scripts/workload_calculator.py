@@ -379,6 +379,7 @@ def _calculate_practical_hours_and_breakdown(
                     "first_session_rate": config.TEACHING_PROBLEM_CLASS,
                     "repeat_rate": repeat_rate,
                     "total": round(total_practical_hours, 2),
+                    "n_teachers": n_teachers,
                 }
 
                 # Build display text based on teacher multipliers
