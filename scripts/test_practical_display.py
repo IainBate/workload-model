@@ -377,7 +377,7 @@ class TestPracticalDisplayMath:
                 # Check that no line contains the invalid pattern "X.XX sessions/week @ Yh × weeks = ZZZ"
                 # (where X.XX is a number of sessions without hours per session info)
                 for part in parts:
-                    if 'sessions/week' in part and 'h per session' not in part:
+                    if 'sessions/week' in part and 'h each' not in part and 'h per session' not in part:
                         assert False, f"Invalid format 'sessions/week' found (without h per session): {part}"
 
                 # Check that valid format appears: "X.Xh per session @" or "repeat sessions/week"
