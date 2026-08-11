@@ -1207,7 +1207,24 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
             # Calculate weeks of teaching (typically 11 weeks per semester)
             weeks = config.TEACHING_WEEKS_PER_SEMESTER
 
-            if is_new_lecturer:
+            # Derive actual multiplier from delivery hours and contact hours
+            # actual_multiplier = delivery_per_module / lecture_contact_hours when there's one teacher
+            # For multiple teachers, we need to account for the share
+            # The breakdown stores total_lecture_hours (module-level) and teaching (per-teacher with multiplier)
+            if lecture_contact_hours > 0:
+                # Calculate what multiplier was applied based on actual hours vs contact hours
+                # If total_lecture_hours equals delivery_per_module, there's one teacher
+                # Otherwise, we have multiple teachers sharing the load
+                teacher_count = int(round(total_lecture_hours / lecture_contact_hours)) if lecture_contact_hours > 0 else 1
+                if teacher_count < 1:
+                    teacher_count = 1
+                base_per_teacher = total_lecture_hours / teacher_count
+                actual_multiplier = delivery_per_module / base_per_teacher if base_per_teacher > 0 else 2.5
+            else:
+                actual_multiplier = 2.5
+
+            # Use actual multiplier instead of is_new_lecturer for display
+            if actual_multiplier >= 4.5:  # Approximately 5x (allowing some floating point tolerance)
                 lecturer_type = "New lecturer (5x)"
 
                 # First line: show the calculation breakdown directly
