@@ -1302,9 +1302,10 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
                 <span class="detail-activity teaching-activity"></span>
             </div>""")
             # First-time delivery line
-            # Calculate first session total: sessions per group × hours per session × weeks × rate
+            # Calculate first session total: parallel groups × sessions per group × hours per session × weeks × rate
             # Note: week_count is sessions per group (always 1), total_groups is parallel groups in module
-            first_session_total = week_count * first_session_weekly * config.TEACHING_WEEKS_PER_SEMESTER * first_session_rate
+            # Module total = all groups, per-teacher = module_total / n_teachers
+            first_session_total = total_groups * week_count * first_session_weekly * config.TEACHING_WEEKS_PER_SEMESTER * first_session_rate
 
             # Calculate per-teacher values with multiplier applied for consistent display
             # Each teacher teaches: total_groups / n_teachers worth of groups on average
