@@ -4,7 +4,6 @@ import sys
 sys.path.insert(0, '.')
 
 # Patch input() to always return "y" for interactive prompts
-original_input = __builtins__.input if isinstance(__builtins__, dict) else getattr(__builtins__, 'input', None)
 def mock_input(prompt=""):
     return "y"
 if isinstance(__builtins__, dict):
@@ -13,7 +12,7 @@ else:
     import builtins
     builtins.input = mock_input
 
-from data_loader import load_all_data
+from data_loader import load_all_data, normalize_name
 from workload_calculator import calculate_workload, _calculate_teaching_workload
 
 year_data = load_all_data(data_dir='../data')
@@ -30,9 +29,19 @@ if sys2_module:
     print(f"Teachers: {sys2_module.teachers}")
 
     # Calculate module teaching directly
+    normalized_teachers = []
+    for t in sys2_module.teachers:
+        norm = normalize_name(t.strip(), year_data.reverse_lookup, unknown_callback=None)
+        if norm:
+            normalized_teachers.append(norm)
+        else:
+            normalized_teachers.append(t.strip())
+
+    print(f"Normalized teachers: {normalized_teachers}")
+
     module_teaching = _calculate_teaching_workload(
         sys2_module,
-        [normalize_name(t.strip(), year_data.reverse_lookup, unknown_callback=None) or t.strip() for t in sys2_module.teachers],
+        normalized_teachers,
         year_data.known_lecturers,
         year_data.known_lecturers_per_module,
         {}
@@ -42,14 +51,3 @@ if sys2_module:
     for teacher, breakdown in module_teaching.items():
         practicals = breakdown.get('teaching_breakdown', {}).get('practicals', 'NOT FOUND')
         print(f"  {teacher}: practicals={practicals}")
-
-# Now run full calculation
-results = calculate_workload(year_data, validate_input=True)
-
-print("\nPer-teacher module breakdown after full calculation:")
-for r in results:
-    if 'Crispin-Bailey' in r.name or 'Pomfret' in r.name:
-        print(f'{r.name}:')
-        for mod_name, mb in sorted(r.teaching_module_breakdowns.items()):
-            practicals = mb.get('practicals', 'NOT FOUND')
-            print(f"  {mod_name}: practicals={practicals}")
