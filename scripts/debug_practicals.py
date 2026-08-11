@@ -39,20 +39,23 @@ if sys2_module:
 
     print(f"Normalized teachers: {normalized_teachers}")
 
+    from dataclasses import dataclass
+
     # Create a fake staff_dict for supervision allocation
+    @dataclass
+    class FakeStaffData:
+        fte: float = 1.0
+        roles: list = None
+        phd_supervisions: int = 0
+        phd_co_supervisions: int = 0
+        phd_assessor_count: int = 0
+        pastoral_students: int = 20
+        project_load: float = 10.0
+        active: bool = True
+
     staff_dict = {}
     for t in normalized_teachers:
-        staff_dict[t] = type('StaffData', (), {
-            'fte': 1.0,
-            'roles': [],
-            'phd_supervisions': 0,
-            'phd_co_supervisions': 0,
-            'phd_assessor_count': 0,
-            'student_load': None,
-            'project_count_ug': 0,
-            'project_count_msc': 0,
-            'active': True
-        })()
+        staff_dict[t] = FakeStaffData()
 
     supervision = allocate_supervision(staff_dict)
 
