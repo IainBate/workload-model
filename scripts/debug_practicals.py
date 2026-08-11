@@ -59,6 +59,20 @@ if sys2_module:
 
     supervision = allocate_supervision(staff_dict)
 
+    # Add debug to _calculate_practical_hours_and_breakdown
+    import workload_calculator as wc
+
+    original_func = wc._calculate_practical_hours_and_breakdown
+    def debug_practical_calc(module, teachers, lecturer_types):
+        result = original_func(module, teachers, lecturer_types)
+        print(f"\n=== DEBUG: {module.name} ===")
+        print(f"  Teachers: {teachers}")
+        print(f"  lecturers_types: {lecturer_types}")
+        print(f"  practicals_breakdown: {result.get('practicals_breakdown', {})}")
+        print(f"  individual_practical_hours: {result.get('individual_practical_hours', {})}")
+        return result
+    wc._calculate_practical_hours_and_breakdown = debug_practical_calc
+
     module_teaching = _calculate_teaching_workload(
         sys2_module,
         normalized_teachers,
