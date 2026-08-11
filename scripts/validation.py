@@ -439,10 +439,22 @@ def validate_workload_result(result, tolerance: float = 0.1) -> List[ValidationI
             field_name="admin_hours"
         ))
 
-    # Helper to get numeric values from breakdown dict (filtering out nested dicts)
+    # Helper to get numeric values from breakdown dict (recursively extracting)
     def get_numeric_values(d):
-        """Extract only numeric values from a breakdown dict, filtering out nested dicts."""
-        return [v for v in d.values() if isinstance(v, (int, float))]
+        """Extract all numeric values from a breakdown dict, recursively.
+
+        Handles nested structures where some keys contain dicts of sub-values
+        (e.g., grants, phd_students). Returns only the leaf numeric values.
+        """
+        result = []
+        for v in d.values():
+            if isinstance(v, (int, float)):
+                # Direct numeric value
+                result.append(v)
+            elif isinstance(v, dict):
+                # Recursively extract from nested dicts
+                result.extend(get_numeric_values(v))
+        return result
 
     # Check teaching breakdown sum
     teaching_values = get_numeric_values(result.teaching_breakdown)
