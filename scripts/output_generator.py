@@ -1465,6 +1465,149 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
 
         return parts
 
+
+def format_detail_section(r: WorkloadResult, title: str, hours: float, breakdown: Dict[str, Any], css_class: str,
+                          is_teaching: bool = False,
+                          supervision_details: Tuple[str, ...] = (),
+                          known_lecturers_per_module: Optional[Dict[str, frozenset]] = None,
+                          pastoral_breakdown: Dict[str, float] = {},
+                          project_breakdown: Dict[str, float] = {}) -> str:
+    """Format a detail section for the workload report HTML.
+
+    For research breakdown, handles hierarchical structure:
+    - protected_research_baseline at top level
+    - grants dict containing grant entries (grant_ABC)
+    - phd_students dict containing supervision/co_supervision/assessor
+
+    Args:
+        r: WorkloadResult object (needed for grant_titles access)
+        title: Section title
+        hours: Total hours for the section
+        breakdown: Dict of component values
+        css_class: CSS class for styling
+        is_teaching: If True, delegate to format_teaching_section
+        supervision_details, known_lecturers_per_module, pastoral_breakdown, project_breakdown:
+            Additional parameters for teaching sections
+    """
+    if not breakdown or all(v == 0 for v in breakdown.values()):
+        return f"""<div class="section-card {css_class}">
+            <div class="card-header">
+                <span class="card-title">{title}</span>
+                <span class="card-total">{hours:.1f}h</span>
+            </div>
+            <p>No activities recorded for this category.</p>
+        </div>"""
+
+    if is_teaching:
+        return format_teaching_section(title, hours, breakdown, css_class, supervision_details,
+                                        known_lecturers_per_module, pastoral_breakdown, project_breakdown)
+
+    items_html_parts = []
+
+    # Handle research section specially to show hierarchical structure
+    if css_class == "research-item":
+        # Protected research baseline (top level)
+        protected_baseline = breakdown.get('protected_research_baseline', 0)
+        if protected_baseline > 0:
+            items_html_parts.append(f"""<div class="detail-item {css_class}">
+                <span class="detail-name">Protected research baseline</span>
+                <span class="detail-hours">{protected_baseline:.1f}h</span>
+                <span class="detail-activity research-activity"></span>
+            </div>""")
+
+        # Grants (nested under "Research Grants" heading if present)
+        grants = breakdown.get('grants', {})
+        grant_items = [(k, v) for k, v in grants.items() if v > 0]
+        if grant_items:
+            items_html_parts.append(f"""<h4 style="color:#333;margin:25px 0 10px 0;border-left:4px solid #4CAF50;padding-left:10px;">Research Grants ({sum(v for _, v in grant_items):.1f}h)</h4>""")
+            for grant_key, grant_value in sorted(grant_items, key=lambda x: -x[1]):
+                project_id = grant_key.replace('grant_', '')
+                display_name = r.grant_titles.get(project_id, f"Grant {project_id}") if hasattr(r, 'grant_titles') else f"Grant {project_id}"
+                items_html_parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;">
+                    <span class="detail-name">{display_name}</span>
+                    <span class="detail-hours">{grant_value:.1f}h</span>
+                    <span class="detail-activity research-activity"></span>
+                </div>""")
+
+        # PhD students (nested under "PhD Supervision" heading if present)
+        phd_students = breakdown.get('phd_students', {})
+        phd_supervision_items = [(k, v) for k, v in phd_students.items() if v > 0]
+        phd_total = sum(v for _, v in phd_supervision_items)
+        if phd_supervision_items:
+            items_html_parts.append(f"""<h4 style="color:#333;margin:25px 0 10px 0;border-left:4px solid #4CAF50;padding-left:10px;">PhD Supervision ({phd_total:.1f}h)</h4>""")
+            for phd_key, phd_value in sorted(phd_supervision_items, key=lambda x: -x[1]):
+                display_names = {
+                    'supervision': 'Supervision (primary)',
+                    'co_supervision': 'Co-supervision',
+                    'assessor': 'Assessor'
+                }
+                display_name = display_names.get(phd_key, phd_key.replace('_', ' ').title())
+                items_html_parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;">
+                    <span class="detail-name">{display_name}</span>
+                    <span class="detail-hours">{phd_value:.1f}h</span>
+                    <span class="detail-activity research-activity"></span>
+                </div>""")
+
+    else:
+        # Generic formatting for admin and other sections
+        # Admin section: departmental roles, engagement, personal_development at same level
+        def get_category(item_name: str) -> Optional[str]:
+            if item_name in ["engagement", "personal_development"]:
+                return None  # These are top-level entries, not categories
+            elif item_name.startswith("grant_"):
+                return "Research Grants"
+            else:
+                return "Departmental Roles"
+
+        categories = {}
+        top_level_items = []
+        for name, value in breakdown.items():
+            if value > 0:
+                cat = get_category(name)
+                if cat is None:
+                    # These are top-level items (engagement, personal_development)
+                    display_names = {
+                        "engagement": "Engagement",
+                        "personal_development": "Personal Development"
+                    }
+                    display_name = display_names.get(name, name.replace('_', ' ').title())
+                    top_level_items.append((name, value, display_name))
+                else:
+                    if cat not in categories:
+                        categories[cat] = []
+                    categories[cat].append((name, value))
+
+        # Add top-level items first
+        for item_name, item_value, display_name in sorted(top_level_items, key=lambda x: -x[1]):
+            items_html_parts.append(f"""<div class="detail-item {css_class}">
+                <span class="detail-name">{display_name}</span>
+                <span class="detail-hours">{item_value:.1f}h</span>
+                <span class="detail-activity {css_class.replace('-item', '-') + 'activity'}"></span>
+            </div>""")
+
+        # Add category items
+        for category_name, items in sorted(categories.items()):
+            cat_total = sum(v for _, v in items)
+            items_html_parts.append(f"""<h4 style="color:#333;margin:25px 0 10px 0;border-left:4px solid #4CAF50;padding-left:10px;">{category_name} ({cat_total:.1f}h)</h4>""")
+            for item_name, item_value in sorted(items, key=lambda x: -x[1]):
+                display_name = item_name.replace('_', ' ').title()
+                items_html_parts.append(f"""<div class="detail-item {css_class}">
+                    <span class="detail-name">{display_name}</span>
+                    <span class="detail-hours">{item_value:.1f}h</span>
+                    <span class="detail-activity {css_class.replace('-item', '-') + 'activity'}"></span>
+                </div>""")
+
+    items_html = ''.join(items_html_parts)
+
+    return f"""<div class="section-card {css_class}">
+        <div class="card-header">
+            <span class="card-title">{title}</span>
+            <span class="card-total">{hours:.1f}h</span>
+        </div>
+        {items_html}
+        <p style="font-size:0.85em;color:#666;padding-top:10px;">Subtotal: {hours:.1f}h</p>
+    </div>"""
+
 def _format_module_delivery_section(module_breakdown: Dict[str, Any], is_new_lecturer: bool,
                                      css_class: str, module_code: Optional[str] = None) -> List[str]:
     """Format delivery/lecture section for a module."""
