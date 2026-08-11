@@ -211,7 +211,16 @@ class TestPracticalDisplayText:
 
         # Generate HTML to check display text (method of TeachingBreakdown class)
         from output_generator import TeachingBreakdown
-        tb = TeachingBreakdown()
+        tb = TeachingBreakdown(
+            delivery_hours=0.0,
+            delivery_multiplier="",
+            practical_hours=0.0,
+            practical_detail="",
+            assessment_setting_hours=0.0,
+            assessment_setting_detail="",
+            marking_hours=0.0,
+            marking_detail=""
+        )
 
         for result in results:
             module_breakdown = None
