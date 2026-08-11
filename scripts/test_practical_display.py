@@ -208,7 +208,7 @@ class TestPracticalDisplayText:
         for result in results:
             module_breakdown = None
             for code, breakdown in result.teaching_module_breakdowns.items():
-                if 'TEST002' in code:
+                if 'TEST002' in code or 'TestModule' in code:
                     module_breakdown = breakdown
                     break
 
