@@ -1250,13 +1250,12 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
             </div>""")
         return parts
 
-    def _format_module_practicals_section(
-        self,
-        module_breakdown: Dict[str, Any],
-        css_class: str,
-        module_code: Optional[str] = None,
-        is_new_lecturer: bool = False
-    ) -> List[str]:
+def _format_module_practicals_section(
+    module_breakdown: Dict[str, Any],
+    css_class: str,
+    module_code: Optional[str] = None,
+    is_new_lecturer: bool = False
+) -> List[str]:
         """Format practical sessions section for a module."""
         parts = []
 
