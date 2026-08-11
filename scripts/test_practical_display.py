@@ -96,8 +96,10 @@ class TestPracticalDisplayCalculation:
 
         assert first_session_hours == 2.0, f"Expected first_session_hours=2.0, got {first_session_hours}"
 
-        # Expected repeat_hours = 0.67 × 2.0 × 2.5 × 1.5 = 5.0h (per week)
-        expected_repeat_weekly = (total_groups / n_teachers - 1) * first_session_hours * config.TEACHING_PROBLEM_CLASS * config.REPETITION_MULTIPLIER
+        # Expected repeat_hours per week = groups_per_teacher - 1 × hours × rate
+        # groups_per_teacher = 5/3 = 1.67, so repeats = 1.67 - 1 = 0.67 per teacher
+        # repeat_weekly = 0.67 × 2.0 × 2.5 × 1.5 = 5.0h (per week)
+        expected_repeat_weekly = ((total_groups / n_teachers) - 1) * first_session_hours * config.TEACHING_PROBLEM_CLASS * config.REPETITION_MULTIPLIER
         assert abs(repeat_hours - expected_repeat_weekly) < 0.1, f"Expected repeat_hours≈{expected_repeat_weekly}, got {repeat_hours}"
 
     def test_practical_display_termination(self):
@@ -134,7 +136,9 @@ class TestPracticalDisplayCalculation:
         results = calculate_workload(year_data, validate_input=False)
 
         # Generate HTML output to verify display text
-        from output_generator import _format_module_practicals_section
+        from output_generator import HTMLReportGenerator
+
+        generator = HTMLReportGenerator()
 
         for result in results:
             if result.name == "John Smith":
@@ -147,7 +151,7 @@ class TestPracticalDisplayCalculation:
                 assert module_breakdown is not None, "Module breakdown not found"
 
                 # Get the practicals section display text
-                parts = _format_module_practicals_section(
+                parts = generator._format_module_practicals_section(
                     module_breakdown,
                     css_class="teaching-section",
                     module_code="TEST001",
@@ -197,7 +201,9 @@ class TestPracticalDisplayText:
         results = calculate_workload(year_data, validate_input=False)
 
         # Generate HTML to check display text
-        from output_generator import _format_module_practicals_section
+        from output_generator import HTMLReportGenerator
+
+        generator = HTMLReportGenerator()
 
         for result in results:
             module_breakdown = None
@@ -206,20 +212,157 @@ class TestPracticalDisplayText:
                     module_breakdown = breakdown
                     break
 
-            parts = _format_module_practicals_section(
+            parts = generator._format_module_practicals_section(
                 module_breakdown,
                 css_class="teaching-section",
                 module_code="TEST002",
                 is_new_lecturer=False
             )
 
-            # Check that "First time session" or similar appears (not "First time delivery")
-            has_first_time = any("first time session" in p.lower() for p in parts)
+            # Check that "First session share" or similar appears (not "First time delivery")
+            has_first_session = any("first session" in p.lower() for p in parts)
             has_repeat = any("repeat" in p.lower() for p in parts)
 
-            # Both should use consistent terminology
+            # When there are no repeats, we shouldn't see "Repeat sessions"
+            # But when repeats exist, both should use consistent terminology
             if has_repeat:
-                assert has_first_time, "Should have first time session text when repeat sessions appear"
+                assert has_first_session, "Should have first session text when repeat sessions appear"
+
+
+class TestPracticalDisplayMath:
+    """Tests to verify display math is correct."""
+
+    def test_display_math_is_correct_for_parallel_groups(self):
+        """
+        Verify the display calculation matches actual mathematical calculation.
+
+        For a module with 5 parallel groups, 3 teachers, 2h sessions:
+        - First session total (module): 5 × 2.0 × 2.5 × 11 = 275.0h
+        - Repeat weekly: (5/3 - 1) × 2.0 × 2.5 × 1.5 = 5.0h/week
+        - Repeat total (module): 5.0 × 11 = 55.0h
+        - Total practicals (module): 275 + 55 = 330.0h
+        - Per teacher base: 330 / 3 = 110.0h
+        """
+        module = ModuleData(
+            name="TestModule",
+            codes=["TEST003"],
+            credits=20,
+            stage=5,
+            contact_hours=40,
+            practicals=1,
+            practical_contact_hours=2.0,
+            practical_groups=5,  # 5 parallel groups
+            practical_weeks=list(range(1, 12)),
+            assessment_count=1,
+            student_count=100,
+            teachers=["Teacher A", "Teacher B", "Teacher C"],
+            lead_name=None,
+        )
+
+        year_data = YearData.create(
+            year_label="2026-7",
+            modules=[module],
+            student_counts={},
+            assessment_counts={},
+            staff={
+                "Teacher A": StaffData("Teacher A", 1.0, [], 0, 0, 0, [], [], True),
+                "Teacher B": StaffData("Teacher B", 1.0, [], 0, 0, 0, [], [], True),
+                "Teacher C": StaffData("Teacher C", 1.0, [], 0, 0, 0, [], [], True)
+            },
+            known_lecturers=set(),
+            known_lecturers_per_module={}
+        )
+
+        results = calculate_workload(year_data, validate_input=False)
+
+        # Get Teacher A's result
+        teacher_a = next(r for r in results if r.name == "Teacher A")
+
+        # Find the module breakdown
+        module_breakdown = None
+        for code, breakdown in teacher_a.teaching_module_breakdowns.items():
+            if 'TEST003' in code:
+                module_breakdown = breakdown
+                break
+
+        assert module_breakdown is not None, "Module breakdown not found"
+
+        structured = module_breakdown.get('practicals_structured', {})
+
+        # Verify the key values match expected calculations
+        total_groups = structured['total_groups']  # 5
+        n_teachers = structured['n_teachers']  # 3
+        hours_per_session = structured['first_session_hours']  # 2.0
+
+        # Expected: first_session_total = groups × sessions/week × hours × weeks × rate
+        expected_first_session_module = total_groups * 1 * hours_per_session * config.TEACHING_WEEKS_PER_SEMESTER * config.TEACHING_PROBLEM_CLASS
+
+        assert abs(structured.get('first_session_total', 0) - expected_first_session_module) < 0.1, \
+            f"First session module total mismatch: expected {expected_first_session_module}, got {structured.get('first_session_total')}"
+
+        # Expected: repeat_weekly = (groups/teachers - 1) × hours × rate × rep_rate
+        expected_repeat_weekly = ((total_groups / n_teachers) - 1) * hours_per_session * config.TEACHING_PROBLEM_CLASS * config.REPETITION_MULTIPLIER
+
+        assert abs(structured.get('repeat_hours', 0) - expected_repeat_weekly) < 0.1, \
+            f"Repeat weekly mismatch: expected {expected_repeat_weekly}, got {structured.get('repeat_hours')}"
+
+    def test_display_text_does_not_contain_invalid_math(self):
+        """Verify display doesn't show mathematically incorrect formulas like '1.67 sessions/week × 2h × 11 = 275'."""
+        module = ModuleData(
+            name="SYS2 Module",
+            codes=["COM00029I"],
+            credits=20,
+            stage=2,
+            contact_hours=40,
+            practicals=1,
+            practical_contact_hours=2.0,
+            practical_groups=5,
+            practical_weeks=list(range(1, 12)),
+            assessment_count=1,
+            student_count=100,
+            teachers=["Christopher Crispin-Bailey", "Teacher B", "Teacher C"],
+            lead_name=None,
+        )
+
+        year_data = YearData.create(
+            year_label="2026-7",
+            modules=[module],
+            student_counts={},
+            assessment_counts={},
+            staff={
+                "Christopher Crispin-Bailey": StaffData("Christopher Crispin-Bailey", 1.0, [], 0, 0, 0, [], [], True),
+                "Teacher B": StaffData("Teacher B", 1.0, [], 0, 0, 0, [], [], True),
+                "Teacher C": StaffData("Teacher C", 1.0, [], 0, 0, 0, [], [], True)
+            },
+            known_lecturers=set(),
+            known_lecturers_per_module={}
+        )
+
+        results = calculate_workload(year_data, validate_input=False)
+
+        from output_generator import HTMLReportGenerator
+        generator = HTMLReportGenerator()
+
+        chris_result = next(r for r in results if r.name == "Christopher Crispin-Bailey")
+
+        for code, breakdown in chris_result.teaching_module_breakdowns.items():
+            if 'COM00029I' in code:
+                parts = generator._format_module_practicals_section(
+                    breakdown,
+                    css_class="teaching-section",
+                    module_code="COM00029I",
+                    is_new_lecturer=True
+                )
+
+                # Check that no line contains the pattern "X.XX sessions/week @ Yh × weeks = ZZZ" (invalid math)
+                for part in parts:
+                    if 'sessions/week' in part:
+                        # This should NOT appear anymore - we display "X.Xh per session" instead
+                        assert False, f"Invalid format 'sessions/week' found in: {part}"
+
+                # Check that valid format appears: "X.Xh per session @ rate"
+                has_valid_format = any("h per session @" in part for part in parts)
+                assert has_valid_format, "Valid format 'h per session @' not found in practicals display"
 
 
 if __name__ == "__main__":
