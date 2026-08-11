@@ -1306,53 +1306,46 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
             # Module total = all groups, per-teacher = module_total / n_teachers
             first_session_total = total_groups * week_count * first_session_weekly * config.TEACHING_WEEKS_PER_SEMESTER * first_session_rate
 
+            # Calculate repeat session total (module-wide)
+            repeat_weekly_base = repeat_weekly / first_session_rate  # Remove first_session_rate to get pure repeat hours
+            repeat_module_total = repeat_weekly_base * config.TEACHING_WEEKS_PER_SEMESTER
+
+            # Total practicals module = first_session_total + repeat_module_total
+            total_practicals_module = first_session_total + repeat_module_total
+            per_teacher_base = total_practicals_module / n_teachers
+
             # Calculate per-teacher values with multiplier applied for consistent display
             # Each teacher teaches: total_groups / n_teachers worth of groups on average
             first_session_per_teacher_base = first_session_total / n_teachers
-            first_session_with_mult = first_session_per_teacher_base * actual_multiplier
+            repeat_per_teacher_base = repeat_module_total / n_teachers
+            first_session_with_mult = per_teacher_base * actual_multiplier
 
             # Repeat sessions are shown separately with their own calculation
             # Show first session calculation (base rate without teacher multiplier)
             # Display: sessions/week, hours per session, weeks, rate
             total_sessions_per_week = total_groups * week_count
+
             parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
                 <span class="detail-name" style="color:#333;">First session</span>
-                <span class="detail-hours">{total_sessions_per_week} sessions/week × {first_session_weekly:.1f}h per session @ {first_session_rate:.1f}x rate × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {first_session_total:.1f}h module total / {n_teachers} teachers = {first_session_per_teacher_base:.1f}h base</span>
+                <span class="detail-hours">{total_sessions_per_week} sessions/week × {first_session_weekly:.1f}h per session @ {first_session_rate:.1f}x rate × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {first_session_total:.1f}h module total</span>
+            </div>""")
+
+            if repeat_module_total > 0:
+                parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+                    <span class="detail-name" style="color:#333;">Repeat sessions</span>
+                    <span class="detail-hours">{(total_groups / n_teachers - 1):.2f} repeat(s) × {first_session_weekly:.1f}h × {config.REPETITION_MULTIPLIER:.1f}x = {repeat_weekly_base:.1f}h/week × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {repeat_module_total:.1f}h module total</span>
+                </div>""")
+
+            parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+                <span class="detail-name" style="color:#333;">Per teacher base (total module / {n_teachers} teachers)</span>
+                <span class="detail-hours">{first_session_total:.1f}h + {repeat_module_total:.1f}h = {per_teacher_base:.1f}h</span>
             </div>""")
 
             if actual_multiplier != 2.5:
                 parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
                     <span class="detail-name" style="color:#333;">At {actual_multiplier:.1f}x lecturer rate</span>
-                    <span class="detail-hours">{first_session_per_teacher_base:.1f}h × {actual_multiplier:.1f}x = {first_session_with_mult:.1f}h</span>
+                    <span class="detail-hours">{per_teacher_base:.1f}h × {actual_multiplier:.1f}x = {first_session_with_mult:.1f}h</span>
                 </div>""")
-
-            if repeat_weekly > 0:
-                # Note: repeat_weekly from calculator includes rates (first_session_rate × repeat_rate)
-                # The display should show the repeat rate explicitly, not combined with first session
-                total_repeat_hrs = repeat_weekly * config.TEACHING_WEEKS_PER_SEMESTER
-                repeat_per_teacher_base = total_repeat_hrs / n_teachers
-                repeat_with_mult = repeat_per_teacher_base * actual_multiplier
-
-                rep_rate = config.REPETITION_MULTIPLIER
-
-                # Calculate per-teacher repeat hours
-                # The calculator stores total_repeat_hrs which includes both rates (2.5x × 1.5x)
-                # For display, we break it down:
-                # - The per-week rate without the first_session_rate: repeat_weekly / first_session_rate
-                # - But the module total should match what's actually calculated: total_repeat_hrs
-                # So we show: repeats × hours × 1.5x = weekly_without_base h/week, giving the correct module total
-                weekly_without_first = repeat_weekly / first_session_rate
-
-                parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
-                    <span class="detail-name" style="color:#333;">Repeat sessions</span>
-                    <span class="detail-hours">{(total_groups / n_teachers - 1):.2f} repeat(s) × {first_session_weekly:.1f}h × {rep_rate:.1f}x = {weekly_without_first:.1f}h/week × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {total_repeat_hrs:.1f}h module total / {n_teachers} teachers = {repeat_per_teacher_base:.1f}h base</span>
-                </div>""")
-
-                if actual_multiplier != 2.5:
-                    parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
-                        <span class="detail-name" style="color:#333;">At {actual_multiplier:.1f}x lecturer rate</span>
-                        <span class="detail-hours">{repeat_per_teacher_base:.1f}h × {actual_multiplier:.1f}x = {repeat_with_mult:.1f}h</span>
-                    </div>""")
         else:
             # Fallback to default rates if structured data not available
             # Calculate practicals from breakdown values if total isn't available
