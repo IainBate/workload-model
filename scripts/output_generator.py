@@ -1509,10 +1509,11 @@ def _format_module_practicals_section(
         </div>""")
 
         if repeat_module_base > 0:
-            # Display format: "0.67 repeat sessions/week @ X.Xh each × 1.5x rate = Y.YYh"
+            # Display format: "0.67 repeat sessions/week @ X.Xh each × weeks × multiplier / teachers = total"
+            # The formula shows the calculation path to get Chris's actual hours
             parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
                 <span class="detail-name" style="color:#333;">Repeat sessions</span>
-                <span class="detail-hours">{repeat_sessions_per_teacher:.2f} repeat sessions/week @ {contact_hrs:.1f}h each × {rep_rate:.1f}x rate = {repeat_actual:.1f}h</span>
+                <span class="detail-hours">{repeat_sessions_per_teacher:.2f} repeat sessions/week @ {contact_hrs:.1f}h each × {rep_rate:.1f}x rate / {n_teachers} teachers × {config.TEACHING_WEEKS_PER_SEMESTER} weeks × {actual_multiplier:.0f}x = {repeat_actual:.1f}h</span>
             </div>""")
     else:
         # Fallback to default rates if structured data not available
