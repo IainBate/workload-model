@@ -1251,6 +1251,7 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
         return parts
 
     def _format_module_practicals_section(
+        self,
         module_breakdown: Dict[str, Any],
         css_class: str,
         module_code: Optional[str] = None,
