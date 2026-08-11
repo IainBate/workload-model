@@ -1460,58 +1460,75 @@ def _format_module_practicals_section(
         first_session_weekly = practicals_structured.get('first_session_hours', first_session_rate)
         repeat_weekly = practicals_structured.get('repeat_hours', 0)
 
-        # Get total parallel groups in the module and sessions per group
-        total_groups = practicals_structured.get('total_groups', week_count)  # Fall back to week_count for compatibility
-
         label_prefix = ""
         if module_code and not module_code.startswith('<') and not module_code.endswith('>'):
             label_prefix = f"[{module_code}] "
 
-        # Calculate the actual teacher multiplier from their practical hours
-        # This is more accurate than relying on is_new_lecturer which is per-module
+        # Check if this is a parallel groups scenario (has total_groups explicitly set)
+        has_total_groups = 'total_groups' in practicals_structured
         n_teachers = practicals_structured.get('n_teachers', 1)
-        total_module_practicals = practicals_structured.get('total', 0)
-        base_per_teacher = total_module_practicals / n_teachers if n_teachers > 0 else 0
-        # Derive actual multiplier: teacher's hours / base per teacher (should be 2.5 or 5.0)
-        actual_multiplier = practicals_per_module / base_per_teacher if base_per_teacher > 0 else 2.5
 
-        # Calculate Chris's actual workload based on what he delivers
-        # Per Q8: First session = 1/week, Repeats = (total_groups/n_teachers - 1) per week
-        groups_per_teacher = total_groups / n_teachers if n_teachers > 0 else 0
-        repeat_sessions_per_teacher = max(0, groups_per_teacher - 1)
+        if has_total_groups:
+            # Parallel groups: each teacher gets total_groups/n_teachers worth of practicals on average
+            total_groups = practicals_structured.get('total_groups', week_count)
+            base_per_teacher = practicals_structured.get('total', 0) / n_teachers if n_teachers > 0 else 0
+            # Derive actual multiplier: teacher's hours / base per teacher (should be 2.5 or 5.0)
+            actual_multiplier = practicals_per_module / base_per_teacher if base_per_teacher > 0 else 2.5
 
-        contact_hrs = first_session_weekly  # hours per session
+            # Calculate Chris's workload based on groups he delivers
+            # First session = groups_per_teacher/week, Repeats = (groups_per_teacher - 1)/week
+            groups_per_teacher = total_groups / n_teachers if n_teachers > 0 else 0
+            repeat_sessions_per_teacher = max(0, groups_per_teacher - 1)
 
-        # First session: Chris delivers groups_per_teacher sessions/week at his rate (5x for new lecturer)
-        # This is his direct workload: groups_per_teacher × hours × weeks × multiplier
-        first_session_actual = groups_per_teacher * contact_hrs * config.TEACHING_WEEKS_PER_SEMESTER * actual_multiplier
+            contact_hrs = first_session_weekly
 
-        # Repeat sessions: Chris delivers repeat_sessions/week at repetition rate (1.5x)
-        # Note: repeats use the repetition rate, not Chris's new lecturer rate
-        repeat_actual = repeat_sessions_per_teacher * contact_hrs * rep_rate * config.TEACHING_WEEKS_PER_SEMESTER
+            # First session: Chris delivers groups_per_teacher sessions/week at his rate
+            first_session_actual = groups_per_teacher * contact_hrs * config.TEACHING_WEEKS_PER_SEMESTER * actual_multiplier
 
-        # Chris's total practical hours (sum of first session and repeat sessions)
-        chris_total_practicals = first_session_actual + repeat_actual
+            # Repeat sessions use repetition rate (1.5x), not Chris's new lecturer rate
+            repeat_actual = repeat_sessions_per_teacher * contact_hrs * rep_rate * config.TEACHING_WEEKS_PER_SEMESTER
 
-        # Display the total as Chris's actual hours, not module-level total
-        parts.append(f"""<div class="detail-item {css_class}">
-            <span class="detail-name">{label_prefix}Practical Sessions</span>
-            <span class="detail-hours">{chris_total_practicals:.1f}h total</span>
-            <span class="detail-activity teaching-activity"></span>
-        </div>""")
+            chris_total_practicals = first_session_actual + repeat_actual
 
-        # Display first session: show Chris's direct calculation (no /teachers division)
-        # Per Q10: "2.0h per session @ 5x × 11 weeks = 110h"
-        parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
-            <span class="detail-name" style="color:#333;">First session</span>
-            <span class="detail-hours">{groups_per_teacher:.2f} first session(s)/week × {contact_hrs:.1f}h per session @ {actual_multiplier:.0f}x × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {first_session_actual:.1f}h</span>
-        </div>""")
+            parts.append(f"""<div class="detail-item {css_class}">
+                <span class="detail-name">{label_prefix}Practical Sessions</span>
+                <span class="detail-hours">{chris_total_practicals:.1f}h total</span>
+                <span class="detail-activity teaching-activity"></span>
+            </div>""")
 
-        if repeat_sessions_per_teacher > 0:
-            # Display repeat sessions: show Chris's direct calculation
             parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
-                <span class="detail-name" style="color:#333;">Repeat sessions</span>
-                <span class="detail-hours">{repeat_sessions_per_teacher:.2f} repeat sessions/week @ {contact_hrs:.1f}h each × {rep_rate:.1f}x rate × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {repeat_actual:.1f}h</span>
+                <span class="detail-name" style="color:#333;">First session</span>
+                <span class="detail-hours">{groups_per_teacher:.2f} first session(s)/week × {contact_hrs:.1f}h per session @ {actual_multiplier:.0f}x × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {first_session_actual:.1f}h</span>
+            </div>""")
+
+            if repeat_sessions_per_teacher > 0:
+                parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+                    <span class="detail-name" style="color:#333;">Repeat sessions</span>
+                    <span class="detail-hours">{repeat_sessions_per_teacher:.2f} repeat sessions/week @ {contact_hrs:.1f}h each × {rep_rate:.1f}x rate × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {repeat_actual:.1f}h</span>
+                </div>""")
+        else:
+            # Non-parallel groups: use simple calculation
+            # Total hours per teacher = (total_practicals / n_teachers) × actual_multiplier
+            total_module_practicals = practicals_structured.get('total', 0)
+            base_per_teacher = total_module_practicals / n_teachers if n_teachers > 0 else 0
+            actual_multiplier = practicals_per_module / base_per_teacher if base_per_teacher > 0 else 2.5
+
+            contact_hrs = first_session_weekly
+
+            # Simple calculation: base share × multiplier
+            # For non-parallel, first session rate is already baked into total
+            # The display shows the rate that was applied to reach this value
+            chris_total_practicals = practicals_per_module  # Use actual value from breakdown
+
+            parts.append(f"""<div class="detail-item {css_class}">
+                <span class="detail-name">{label_prefix}Practical Sessions</span>
+                <span class="detail-hours">{chris_total_practicals:.1f}h total</span>
+                <span class="detail-activity teaching-activity"></span>
+            </div>""")
+
+            parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+                <span class="detail-name" style="color:#333;">Calculation</span>
+                <span class="detail-hours">{contact_hrs:.1f}h/week × {config.TEACHING_WEEKS_PER_SEMESTER} weeks / {n_teachers} teachers × {actual_multiplier:.0f}x = {chris_total_practicals:.1f}h</span>
             </div>""")
     else:
         # Fallback to default rates if structured data not available
