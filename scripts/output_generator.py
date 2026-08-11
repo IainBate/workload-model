@@ -1333,7 +1333,6 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
                 repeat_with_mult = repeat_per_teacher_base * actual_multiplier
 
                 # Get rate values for display
-                first_session_rate = repeat_weekly / (max(0, total_groups / n_teachers - 1) * first_session_weekly) if repeat_weekly > 0 else config.TEACHING_PROBLEM_CLASS
                 rep_rate = config.REPETITION_MULTIPLIER
 
                 parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
