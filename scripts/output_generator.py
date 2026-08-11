@@ -1061,12 +1061,12 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
     # Get module details if available (for backward compatibility)
     module_details = getattr(r, 'module_details', []) or []
 
-    def format_detail_section(self, title: str, hours: float, breakdown: Dict[str, Any], css_class: str,
-                              is_teaching: bool = False,
-                              supervision_details: Tuple[str, ...] = (),
-                              known_lecturers_per_module: Optional[Dict[str, frozenset]] = None,
-                              pastoral_breakdown: Dict[str, float] = {},
-                              project_breakdown: Dict[str, float] = {}) -> str:
+def format_detail_section(title: str, hours: float, breakdown: Dict[str, Any], css_class: str,
+                          is_teaching: bool = False,
+                          supervision_details: Tuple[str, ...] = (),
+                          known_lecturers_per_module: Optional[Dict[str, frozenset]] = None,
+                          pastoral_breakdown: Dict[str, float] = {},
+                          project_breakdown: Dict[str, float] = {}) -> str:
         """Format a detail section for the workload report HTML.
 
         For research breakdown, handles hierarchical structure:
