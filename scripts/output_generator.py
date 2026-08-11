@@ -1692,6 +1692,7 @@ def _format_teaching_section_for_staff(result: WorkloadResult, title: str, hours
     project_breakdown = getattr(r, 'project_breakdown', {}) or {}
 
     teaching_section = format_detail_section(
+        r,
         "Teaching Activities", r.teaching_hours, teaching_breakdown, "teaching-item",
         is_teaching=True,
         supervision_details=getattr(r, 'supervision_details', ()) or [],
@@ -1700,9 +1701,11 @@ def _format_teaching_section_for_staff(result: WorkloadResult, title: str, hours
         project_breakdown=project_breakdown
     )
     research_section = format_detail_section(
+        r,
         "Research Activities", r.research_hours, research_breakdown, "research-item"
     )
     admin_section = format_detail_section(
+        r,
         "Admin Activities", r.admin_hours, admin_breakdown, "admin-item"
     )
 
