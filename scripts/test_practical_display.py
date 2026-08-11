@@ -346,7 +346,7 @@ class TestPracticalDisplayMath:
         chris_result = next(r for r in results if r.name == "Christopher Crispin-Bailey")
 
         for code, breakdown in chris_result.teaching_module_breakdowns.items():
-            if 'COM00029I' in code:
+            if 'COM00029I' in code or 'SYS2' in code:
                 parts = generator._format_module_practicals_section(
                     breakdown,
                     css_class="teaching-section",
