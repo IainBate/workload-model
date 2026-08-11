@@ -1325,8 +1325,10 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
                 </div>""")
 
             if repeat_weekly > 0:
-                # Note: repeat_weekly already includes the session count (from breakdown)
-                total_repeat_hrs = repeat_weekly * first_session_rate * rep_rate * config.TEACHING_WEEKS_PER_SEMESTER
+                # Note: repeat_weekly from calculator already includes rates
+                # It represents additional hours beyond first session share, calculated as:
+                # repeat_sessions × weekly_hrs × first_session_rate × repeat_rate
+                total_repeat_hrs = repeat_weekly * config.TEACHING_WEEKS_PER_SEMESTER
                 repeat_per_teacher_base = total_repeat_hrs / n_teachers
                 repeat_with_mult = repeat_per_teacher_base * actual_multiplier
 
