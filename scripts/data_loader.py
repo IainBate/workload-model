@@ -513,10 +513,10 @@ def _parse_wtw_csv(filepath: str, known_lecturers: Set[str] = None,
                 extra_markers_str = row[9]
             extra_markers = tuple(m.strip() for m in extra_markers_str.split(",") if m.strip())
 
-            # Expert checker
+            # Expert checker (column 11 in WTW 2026-7 format)
             expert_checker = ""
-            if len(row) > 10:
-                val = row[10].strip()
+            if len(row) > 11:
+                val = row[11].strip()
                 if val and val.upper() not in ("N/A", "NONE", "TBD"):
                     expert_checker = val
 
