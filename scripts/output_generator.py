@@ -1499,11 +1499,15 @@ def _format_module_practicals_section(
         first_session_per_teacher_base = first_session_total / n_teachers
         repeat_per_teacher_base = repeat_module_total / n_teachers
 
-        # Show first session calculation (base rate without teacher multiplier)
+        # Apply the actual teacher multiplier to get their actual hours
+        first_session_actual = first_session_per_teacher_base * actual_multiplier
+        repeat_actual = repeat_per_teacher_base * actual_multiplier
+
+        # Show first session calculation with teacher's actual multiplier applied
         # Display format: "X.Xh per session @ rate × weeks = total"
         parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
             <span class="detail-name" style="color:#333;">First session</span>
-            <span class="detail-hours">{first_session_weekly:.1f}h per session @ {first_session_rate:.1f}x × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {first_session_per_teacher_base:.1f}h</span>
+            <span class="detail-hours">{first_session_weekly:.1f}h per session @ {first_session_rate:.1f}x × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {first_session_actual:.1f}h</span>
         </div>""")
 
         if repeat_module_total > 0:
@@ -1514,7 +1518,7 @@ def _format_module_practicals_section(
             # Display format: "0.67 repeat sessions/week @ X.Xh each × 1.5x rate = Y.YYh"
             parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
                 <span class="detail-name" style="color:#333;">Repeat sessions</span>
-                <span class="detail-hours">{repeat_sessions:.2f} repeat sessions/week @ {first_session_weekly:.1f}h each × {config.REPETITION_MULTIPLIER:.1f}x rate = {repeat_per_teacher_base:.1f}h</span>
+                <span class="detail-hours">{repeat_sessions:.2f} repeat sessions/week @ {first_session_weekly:.1f}h each × {config.REPETITION_MULTIPLIER:.1f}x rate = {repeat_actual:.1f}h</span>
             </div>""")
     else:
         # Fallback to default rates if structured data not available
