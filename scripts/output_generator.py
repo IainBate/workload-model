@@ -1642,8 +1642,9 @@ def format_teaching_section(r: WorkloadResult, title: str, hours: float, css_cla
     # Format each stage
     for stage in sorted(stages.keys()):
         modules_in_stage = stages[stage]
+        module_word = "Module" if len(modules_in_stage) == 1 else "Modules"
         items_html_parts.append(f"""<div style="margin-bottom:25px;">
-            <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #2196F3;padding-left:10px;">{stage} Modules ({len(modules_in_stage)} module(s))</h4>""")
+            <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #2196F3;padding-left:10px;">{stage} {module_word} ({len(modules_in_stage)} module(s))</h4>""")
 
         for mod in modules_in_stage:
             code = mod['code']
@@ -1654,6 +1655,20 @@ def format_teaching_section(r: WorkloadResult, title: str, hours: float, css_cla
             items_html_parts.extend(_format_module_assessment_section(module_breakdown, css_class, code))
 
         items_html_parts.append("</div>")
+
+        # Calculate and display total for this stage's modules
+        stage_total = 0.0
+        for mod in modules_in_stage:
+            mb = mod.get('module_breakdown', {})
+            # Sum up the main teaching components from the module breakdown
+            for key in ['delivery', 'practicals', 'assessment_setting', 'marking']:
+                if key in mb and isinstance(mb[key], (int, float)):
+                    stage_total += mb[key]
+
+        if stage_total > 0:
+            items_html_parts.append(f"""<div style="margin-bottom:15px;">
+                <p style="font-size:1.1em;color:#4CAF50;margin:0 0 5px 20px;font-weight:bold;">- Total = {stage_total:.1f}h</p>
+            </div>""")
 
     # Format supervision if present
     if pastoral_breakdown:
