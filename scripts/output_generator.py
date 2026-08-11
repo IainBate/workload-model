@@ -1443,7 +1443,7 @@ def _format_module_practicals_section(
 
         return parts
 
-    def format_teaching_section(title: str, hours: float, breakdown: Dict[str, float], css_class: str,
+    def format_teaching_section(self, title: str, hours: float, breakdown: Dict[str, float], css_class: str,
                                 supervision_details: Tuple[str, ...] = (),
                                 known_lecturers_per_module: Optional[Dict[str, frozenset]] = None,
                                 pastoral_breakdown: Dict[str, float] = {},
