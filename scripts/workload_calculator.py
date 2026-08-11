@@ -275,6 +275,7 @@ def _calculate_practical_hours_and_breakdown(
             n_parallel_groups = None
 
         if n_parallel_groups is not None:
+            print(f"DEBUG: n_parallel_groups = {n_parallel_groups}")
             parallel_groups = []
             for i in range(n_parallel_groups):
                 parallel_groups.append(type('ParallelGroup', (), {
@@ -283,6 +284,8 @@ def _calculate_practical_hours_and_breakdown(
                 })())
 
         n_teachers = len(teachers) if teachers else 1
+
+        print(f"DEBUG: parallel_groups = {parallel_groups}, len = {len(parallel_groups) if parallel_groups else 0}")
 
         if parallel_groups and len(parallel_groups) > 1:
             # Multiple parallel groups - each group has its own session count
