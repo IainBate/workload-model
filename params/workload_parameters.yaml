@@ -16,6 +16,10 @@ baselines_hours:
   min_admin_teaching: 30   # Minimum teaching load for admin staff
   teaching_weeks_per_semester: 11  # Number of teaching weeks per semester
 
+lecture_contact_hours:
+  # Default lecture contact time per week (standard modules without specified contact time)
+  default_hours_per_week: 2.0
+
 # Protected research time baseline (10% of nominal hours = 164.2h)
 # This is the minimum protected research time per year
 protected_research_baseline: 164.2
