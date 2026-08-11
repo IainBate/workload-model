@@ -1209,8 +1209,9 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
             practicals_structured = module_breakdown.get('practicals', {})
 
         if isinstance(practicals_structured, dict) and practicals_structured:
-            # Structured practicals data available - get total from breakdown
-            practicals_per_module = practicals_structured.get('total', 0)
+            # Use per-teacher actual hours if available (includes their multiplier),
+            # fall back to structured total for display
+            practicals_per_module = module_breakdown.get('practicals', practicals_structured.get('total', 0))
             # Structured practicals data available (from Phase 3)
             first_session_rate = practicals_structured.get('first_session_rate', config.TEACHING_MULTIPLIERS.get('problem_class_seminar_practical', 2.5))
             rep_rate = practicals_structured.get('repeat_rate', config.REPETITION_MULTIPLIER)
