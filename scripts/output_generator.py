@@ -1302,17 +1302,19 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
                 <span class="detail-activity teaching-activity"></span>
             </div>""")
             # First-time delivery line
-            # Calculate first session total: sessions per week × hours per session × weeks × rate
+            # Calculate first session total: sessions per group × hours per session × weeks × rate
+            # Note: week_count is sessions per group (always 1), total_groups is parallel groups in module
             first_session_total = week_count * first_session_weekly * config.TEACHING_WEEKS_PER_SEMESTER * first_session_rate
 
             # Calculate per-teacher values with multiplier applied for consistent display
+            # Each teacher teaches: total_groups / n_teachers worth of groups on average
             first_session_per_teacher_base = first_session_total / n_teachers
             first_session_with_mult = first_session_per_teacher_base * actual_multiplier
 
             # Repeat sessions are shown separately with their own calculation
             parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
                 <span class="detail-name" style="color:#333;">First time delivery</span>
-                <span class="detail-hours">{(week_count / n_teachers):.2f} sessions/week @ {first_session_weekly:.1f}h each × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {first_session_total:.1f}h module total / {n_teachers} teachers = {first_session_per_teacher_base:.1f}h each</span>
+                <span class="detail-hours">{(total_groups / n_teachers):.2f} sessions/week @ {first_session_weekly:.1f}h each × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {first_session_total:.1f}h module total / {n_teachers} teachers = {first_session_per_teacher_base:.1f}h each</span>
             </div>""")
 
             if actual_multiplier != 2.5:
