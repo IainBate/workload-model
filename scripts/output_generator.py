@@ -1322,7 +1322,7 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
 
             # Build module items
             parts.extend(_format_module_delivery_section(module_breakdown, is_new_lecturer, css_class, code))
-            parts.extend(_format_module_practicals_section(module_breakdown, css_class, code))
+            parts.extend(_format_module_practicals_section(module_breakdown, css_class, code, is_new_lecturer))
             parts.extend(_format_module_assessment_section(module_breakdown, css_class, code))
 
             parts.append("</div>")
