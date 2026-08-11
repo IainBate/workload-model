@@ -1482,9 +1482,9 @@ def _format_module_practicals_section(
 
         contact_hrs = first_session_weekly  # hours per session
 
-        # First session: Chris delivers 1 session/week at his rate (5x for new lecturer)
-        # This is his direct workload: 1 × hours × weeks × multiplier
-        first_session_actual = 1 * contact_hrs * config.TEACHING_WEEKS_PER_SEMESTER * actual_multiplier
+        # First session: Chris delivers groups_per_teacher sessions/week at his rate (5x for new lecturer)
+        # This is his direct workload: groups_per_teacher × hours × weeks × multiplier
+        first_session_actual = groups_per_teacher * contact_hrs * config.TEACHING_WEEKS_PER_SEMESTER * actual_multiplier
 
         # Repeat sessions: Chris delivers repeat_sessions/week at repetition rate (1.5x)
         # Note: repeats use the repetition rate, not Chris's new lecturer rate
