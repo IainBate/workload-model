@@ -1619,55 +1619,52 @@ def _format_module_items(modules_in_stage: List[Dict], css_class: str,
     return parts
 
 
-def format_teaching_section(title: str, hours: float, breakdown: Dict[str, float], css_class: str,
+def format_teaching_section(r: WorkloadResult, title: str, hours: float, css_class: str,
                             supervision_details: Tuple[str, ...] = (),
                             known_lecturers_per_module: Optional[Dict[str, frozenset]] = None,
                             pastoral_breakdown: Dict[str, float] = {},
                             project_breakdown: Dict[str, float] = {}) -> str:
     """Format teaching section - wrapper for _format_teaching_section_for_staff."""
-    # This is a placeholder that will be implemented when we refactor
-    # For now, return a basic structure
     items_html_parts = []
 
-    # Build module info from breakdown
-    if isinstance(breakdown, dict) and 'teaching_module_breakdowns' in breakdown:
-        module_breakdowns = breakdown['teaching_module_breakdowns']
+    # Use structured data from result.teaching_module_breakdowns (Phase 3)
+    module_breakdowns = getattr(r, 'teaching_module_breakdowns', {})
 
-        # Build module info list
-        module_info_list = []
-        for module_name, mb in module_breakdowns.items():
-            code_tuple = mb.get('module_codes', ())
-            primary_code = code_tuple[0] if code_tuple else ''
-            module_info_list.append({
-                'stage': module_name,
-                'code': primary_code,
-                'codes': code_tuple,
-                'module_breakdown': mb
-            })
+    # Build module info list from structured breakdowns
+    module_info_list = []
+    for module_name, mb in module_breakdowns.items():
+        code_tuple = mb.get('module_codes', ())
+        primary_code = code_tuple[0] if code_tuple else ''
+        module_info_list.append({
+            'stage': module_name,
+            'code': primary_code,
+            'codes': code_tuple,
+            'module_breakdown': mb
+        })
 
-        # Group modules by stage
-        stages = {}
-        for mod in module_info_list:
-            stage = mod['stage']
-            if stage not in stages:
-                stages[stage] = []
-            stages[stage].append(mod)
+    # Group modules by stage (module name)
+    stages = {}
+    for mod in module_info_list:
+        stage = mod['stage']
+        if stage not in stages:
+            stages[stage] = []
+        stages[stage].append(mod)
 
-        # Format each stage
-        for stage in sorted(stages.keys()):
-            modules_in_stage = stages[stage]
-            items_html_parts.append(f"""<div style="margin-bottom:25px;">
-                <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #2196F3;padding-left:10px;">{stage} Modules ({len(modules_in_stage)} module(s))</h4>""")
+    # Format each stage
+    for stage in sorted(stages.keys()):
+        modules_in_stage = stages[stage]
+        items_html_parts.append(f"""<div style="margin-bottom:25px;">
+            <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #2196F3;padding-left:10px;">{stage} Modules ({len(modules_in_stage)} module(s))</h4>""")
 
-            for mod in modules_in_stage:
-                code = mod['code']
-                module_breakdown = mod['module_breakdown']
-                is_new_lecturer = False  # This would need to be determined from context
-                items_html_parts.extend(_format_module_delivery_section(module_breakdown, is_new_lecturer, css_class, code))
-                items_html_parts.extend(_format_module_practicals_section(module_breakdown, css_class, code, is_new_lecturer))
-                items_html_parts.extend(_format_module_assessment_section(module_breakdown, css_class, code))
+        for mod in modules_in_stage:
+            code = mod['code']
+            module_breakdown = mod['module_breakdown']
+            is_new_lecturer = False  # This would need to be determined from context
+            items_html_parts.extend(_format_module_delivery_section(module_breakdown, is_new_lecturer, css_class, code))
+            items_html_parts.extend(_format_module_practicals_section(module_breakdown, css_class, code, is_new_lecturer))
+            items_html_parts.extend(_format_module_assessment_section(module_breakdown, css_class, code))
 
-            items_html_parts.append("</div>")
+        items_html_parts.append("</div>")
 
     # Format supervision if present
     if pastoral_breakdown:
