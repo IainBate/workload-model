@@ -1327,8 +1327,11 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
         for mod in modules_in_stage:
             code = mod['code']
             module_breakdown = mod['module_breakdown']
+            # Use the stage name (e.g., "SYS2") from the breakdown for lookup,
+            # not the module code (e.g., "COM00029I")
+            module_stage = mod.get('stage', '')
 
-            is_new_lecturer = _determine_lecturer_type(r.name, code, known_lecturers_per_module or {})
+            is_new_lecturer = _determine_lecturer_type(r.name, module_stage, known_lecturers_per_module or {})
 
             # Build module items
             parts.extend(_format_module_delivery_section(module_breakdown, is_new_lecturer, css_class, code))
