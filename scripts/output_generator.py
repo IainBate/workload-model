@@ -1157,9 +1157,10 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
                         }
                         display_name = display_names.get(name, name.replace('_', ' ').title())
                         top_level_items.append((name, value, display_name))
-                    elif cat not in categories:
-                        categories[cat] = []
-                    categories[cat].append((name, value))
+                    else:
+                        if cat not in categories:
+                            categories[cat] = []
+                        categories[cat].append((name, value))
 
             # Add top-level items first
             for item_name, item_value, display_name in sorted(top_level_items, key=lambda x: -x[1]):
