@@ -135,10 +135,19 @@ class TestPracticalDisplayCalculation:
 
         results = calculate_workload(year_data, validate_input=False)
 
-        # Generate HTML output to verify display text
-        from output_generator import HTMLReportGenerator
+        # Generate HTML output to verify display text (method of TeachingBreakdown class)
+        from output_generator import TeachingBreakdown
 
-        generator = HTMLReportGenerator()
+        tb = TeachingBreakdown(
+            delivery_hours=0.0,
+            delivery_multiplier="",
+            practical_hours=0.0,
+            practical_detail="",
+            assessment_setting_hours=0.0,
+            assessment_setting_detail="",
+            marking_hours=0.0,
+            marking_detail=""
+        )
 
         for result in results:
             if result.name == "John Smith":
@@ -151,7 +160,6 @@ class TestPracticalDisplayCalculation:
                 assert module_breakdown is not None, "Module breakdown not found"
 
                 # Get the practicals section display text (method of TeachingBreakdown class)
-                from output_generator import TeachingBreakdown
                 tb = TeachingBreakdown()
                 parts = tb._format_module_practicals_section(
                     module_breakdown,
