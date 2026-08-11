@@ -1342,7 +1342,7 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
 
                 parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
                     <span class="detail-name" style="color:#333;">Repeat sessions</span>
-                    <span class="detail-hours">{(total_groups / n_teachers - 1):.2f} repeat(s) × {first_session_weekly:.1f}h × {rep_rate:.1f}x = {repeat_without_base_rate:.1f}h/week × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {total_repeat_hrs:.1f}h module total / {n_teachers} teachers = {repeat_per_teacher_base:.1f}h base</span>
+                    <span class="detail-hours">{(total_groups / n_teachers - 1):.2f} repeat(s) × {first_session_weekly:.1f}h × {first_session_rate:.1f}x × {rep_rate:.1f}x = {repeat_weekly:.1f}h/week × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {total_repeat_hrs:.1f}h module total / {n_teachers} teachers = {repeat_per_teacher_base:.1f}h base</span>
                 </div>""")
 
                 if actual_multiplier != 2.5:
