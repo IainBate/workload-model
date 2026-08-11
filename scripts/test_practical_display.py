@@ -76,7 +76,7 @@ class TestPracticalDisplayCalculation:
 
         module_breakdown = None
         for code, breakdown in chris_result.teaching_module_breakdowns.items():
-            if 'COM00029I' in code:
+            if 'COM00029I' in code or 'SYS2' in code:
                 module_breakdown = breakdown
                 break
 
@@ -126,8 +126,8 @@ class TestPracticalDisplayCalculation:
             student_counts={},
             assessment_counts={},
             staff={
-                "John Smith": StaffData("John Smith", 1.0, [], 0, 0, 0, [], [], True),
-                "Jane Doe": StaffData("Jane Doe", 1.0, [], 0, 0, 0, [], [], True)
+                "John Smith": StaffData(canonical_name="John Smith", fte=1.0, aliases=[], roles=[], research_projects=[], saint_modules=[], active=True),
+                "Jane Doe": StaffData(canonical_name="Jane Doe", fte=1.0, aliases=[], roles=[], research_projects=[], saint_modules=[], active=True)
             },
             known_lecturers=set(),
             known_lecturers_per_module={}
@@ -193,7 +193,7 @@ class TestPracticalDisplayText:
             modules=[module],
             student_counts={},
             assessment_counts={},
-            staff={"John Smith": StaffData("John Smith", 1.0, [], 0, 0, 0, [], [], True)},
+            staff={"John Smith": StaffData(canonical_name="John Smith", fte=1.0, aliases=[], roles=[], research_projects=[], saint_modules=[], active=True)},
             known_lecturers=set(),
             known_lecturers_per_module={}
         )
@@ -265,9 +265,9 @@ class TestPracticalDisplayMath:
             student_counts={},
             assessment_counts={},
             staff={
-                "Teacher A": StaffData("Teacher A", 1.0, [], 0, 0, 0, [], [], True),
-                "Teacher B": StaffData("Teacher B", 1.0, [], 0, 0, 0, [], [], True),
-                "Teacher C": StaffData("Teacher C", 1.0, [], 0, 0, 0, [], [], True)
+                "Teacher A": StaffData(canonical_name="Teacher A", fte=1.0, aliases=[], roles=[], research_projects=[], saint_modules=[], active=True),
+                "Teacher B": StaffData(canonical_name="Teacher B", fte=1.0, aliases=[], roles=[], research_projects=[], saint_modules=[], active=True),
+                "Teacher C": StaffData(canonical_name="Teacher C", fte=1.0, aliases=[], roles=[], research_projects=[], saint_modules=[], active=True)
             },
             known_lecturers=set(),
             known_lecturers_per_module={}
@@ -330,9 +330,9 @@ class TestPracticalDisplayMath:
             student_counts={},
             assessment_counts={},
             staff={
-                "Christopher Crispin-Bailey": StaffData("Christopher Crispin-Bailey", 1.0, [], 0, 0, 0, [], [], True),
-                "Teacher B": StaffData("Teacher B", 1.0, [], 0, 0, 0, [], [], True),
-                "Teacher C": StaffData("Teacher C", 1.0, [], 0, 0, 0, [], [], True)
+                "Christopher Crispin-Bailey": StaffData(canonical_name="Christopher Crispin-Bailey", fte=1.0, aliases=[], roles=[], research_projects=[], saint_modules=[], active=True),
+                "Teacher B": StaffData(canonical_name="Teacher B", fte=1.0, aliases=[], roles=[], research_projects=[], saint_modules=[], active=True),
+                "Teacher C": StaffData(canonical_name="Teacher C", fte=1.0, aliases=[], roles=[], research_projects=[], saint_modules=[], active=True)
             },
             known_lecturers=set(),
             known_lecturers_per_module={}
