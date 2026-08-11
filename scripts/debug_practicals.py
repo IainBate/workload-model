@@ -12,7 +12,7 @@ else:
     import builtins
     builtins.input = mock_input
 
-from data_loader import load_all_data, normalize_name
+from data_loader import load_all_data, normalize_name, allocate_supervision
 from workload_calculator import calculate_workload, _calculate_teaching_workload
 
 year_data = load_all_data(data_dir='../data')
