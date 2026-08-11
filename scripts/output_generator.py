@@ -1307,8 +1307,10 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
             first_session_total = total_groups * week_count * first_session_weekly * config.TEACHING_WEEKS_PER_SEMESTER * first_session_rate
 
             # Calculate repeat session total (module-wide)
-            repeat_weekly_base = repeat_weekly / first_session_rate  # Remove first_session_rate to get pure repeat hours
-            repeat_module_total = repeat_weekly_base * config.TEACHING_WEEKS_PER_SEMESTER
+            # repeat_weekly already includes both rates: first_session_rate × repeat_rate
+            # To get the weekly "pure" repeat hours, we divide by first_session_rate
+            repeat_weekly_pure = repeat_weekly / first_session_rate  # Pure repeat hours/week (without first session rate)
+            repeat_module_total = repeat_weekly * config.TEACHING_WEEKS_PER_SEMESTER  # Total module repeats with rates
 
             # Total practicals module = first_session_total + repeat_module_total
             total_practicals_module = first_session_total + repeat_module_total
@@ -1333,7 +1335,7 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
             if repeat_module_total > 0:
                 parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
                     <span class="detail-name" style="color:#333;">Repeat sessions</span>
-                    <span class="detail-hours">{(total_groups / n_teachers - 1):.2f} repeat(s) × {first_session_weekly:.1f}h × {config.REPETITION_MULTIPLIER:.1f}x = {repeat_weekly_base:.1f}h/week × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {repeat_module_total:.1f}h module total</span>
+                    <span class="detail-hours">{(total_groups / n_teachers - 1):.2f} repeat(s) × {first_session_weekly:.1f}h × {config.REPETITION_MULTIPLIER:.1f}x = {repeat_weekly_pure:.1f}h/week × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {repeat_module_total:.1f}h module total</span>
                 </div>""")
 
             parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
