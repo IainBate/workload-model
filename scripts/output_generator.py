@@ -1480,38 +1480,37 @@ def _format_module_practicals_section(
             <span class="detail-activity teaching-activity"></span>
         </div>""")
 
-        # Calculate repeat sessions first (uses only repetition rate, not teacher's multiplier)
-        # repeat_weekly is per week for the module (includes both rates already)
-        # Per teacher repeat = repeat_weekly / n_teachers × weeks
-        # But display should show: groups_per_teacher-1 repeats/week × hours × 1.5x × weeks
+        # Calculate per-teacher values
         groups_per_teacher = total_groups / n_teachers if n_teachers > 0 else 0
         repeat_sessions_per_teacher = max(0, groups_per_teacher - 1)
 
-        # Repeat per teacher (only repetition rate applied):
-        # repeat_weekly already = repeat_sessions × hours × first_session_rate × repeat_rate
-        # So per teacher repeat = repeat_weekly / n_teachers × weeks
-        repeat_per_teacher = repeat_weekly / n_teachers * config.TEACHING_WEEKS_PER_SEMESTER
+        # First session per teacher base (at standard rate, before teacher multiplier)
+        # Module first session = total_groups × hours/week × weeks × standard_rate
+        first_session_module_base = total_groups * contact_hrs_first_session * config.TEACHING_WEEKS_PER_SEMESTER * first_session_rate
 
-        # First session per teacher:
-        # Module first session total = groups_per_teacher × hours × weeks × standard_rate
-        # Per teacher = module_first_session / n_teachers
-        # But display should show: hours × actual_multiplier × weeks (using teacher's rate)
-        first_session_per_teacher_base = total_groups * week_count * first_session_weekly * config.TEACHING_WEEKS_PER_SEMESTER / n_teachers
+        # Repeat per teacher base (at repetition rate, not teacher's multiplier)
+        # Module repeat = repeat_sessions/teacher × hours × weeks × standard_rate × repetition_rate
+        # Per teacher = module_repeat / n_teachers
+        repeat_module_base = repeat_sessions_per_teacher * contact_hrs_first_session * config.TEACHING_WEEKS_PER_SEMESTER * first_session_rate * rep_rate
 
-        # First session with teacher's actual multiplier
+        # Per teacher base (without their multiplier)
+        first_session_per_teacher_base = first_session_module_base / n_teachers
+        repeat_per_teacher_base = repeat_module_base / n_teachers
+
+        # Apply teacher's actual multiplier to get their hours
         first_session_actual = first_session_per_teacher_base * actual_multiplier
+        repeat_actual = repeat_per_teacher_base * actual_multiplier
 
-        # Display repeat sessions: only 1.5x rate, not teacher's full multiplier
         parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
             <span class="detail-name" style="color:#333;">First session</span>
             <span class="detail-hours">{first_session_weekly:.1f}h per session @ {actual_multiplier:.1f}x × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {first_session_actual:.1f}h</span>
         </div>""")
 
-        if repeat_per_teacher > 0:
+        if repeat_module_base > 0:
             # Display format: "0.67 repeat sessions/week @ X.Xh each × 1.5x rate = Y.YYh"
             parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
                 <span class="detail-name" style="color:#333;">Repeat sessions</span>
-                <span class="detail-hours">{repeat_sessions_per_teacher:.2f} repeat sessions/week @ {first_session_weekly:.1f}h each × {config.REPETITION_MULTIPLIER:.1f}x rate = {repeat_per_teacher:.1f}h</span>
+                <span class="detail-hours">{repeat_sessions_per_teacher:.2f} repeat sessions/week @ {first_session_weekly:.1f}h each × {rep_rate:.1f}x rate = {repeat_actual:.1f}h</span>
             </div>""")
     else:
         # Fallback to default rates if structured data not available
