@@ -1502,10 +1502,10 @@ def _format_module_practicals_section(
         first_session_actual = first_session_per_teacher_base * actual_multiplier
         repeat_actual = repeat_per_teacher_base * actual_multiplier
 
-        # Display first session: show the complete calculation including / n_teachers
+        # Display first session: show the complete calculation including / n_teachers and * actual_multiplier
         parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
             <span class="detail-name" style="color:#333;">First session</span>
-            <span class="detail-hours">{total_groups} groups × {contact_hrs:.1f}h per session @ {first_session_rate}x / {n_teachers} teachers × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {first_session_actual:.1f}h</span>
+            <span class="detail-hours">{total_groups} groups × {contact_hrs:.1f}h per session @ {first_session_rate}x / {n_teachers} teachers × {config.TEACHING_WEEKS_PER_SEMESTER} weeks × {actual_multiplier:.0f}x = {first_session_actual:.1f}h</span>
         </div>""")
 
         if repeat_module_base > 0:
