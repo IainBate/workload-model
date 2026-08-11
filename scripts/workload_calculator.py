@@ -180,28 +180,44 @@ def _calculate_lecture_hours_and_multipliers(module: ModuleData,
     existing_with_new_content = []
     standard_lecturers = []
 
+    # Mapping from internal lecturer_type strings to YAML config keys
+    LECTURER_TYPE_TO_CONFIG_KEY = {
+        'video': 'lecture_new_video',
+        'new_lecturer_new_content': 'lecture_new_content_and_lecturer',
+        'new_lecturer': 'lecture_new_content_or_lecturer',
+        'existing_lecturer_new_content': 'lecture_new_content_or_lecturer',
+        'standard': 'lecture_standard',
+    }
+
     for t in teachers:
         is_new_lecturer = t not in known_lecturers_for_module
         is_video_format = getattr(module, 'teaching_format', '') == "video" or "video" in module_name_lower
 
         if is_video_format:
-            multiplier = config.TEACHING_MULTIPLIERS.get('video', 10.0)
-            lecturer_type = "Video"
-            result['lecturer_types'].append((t, "video"))
+            config_key = LECTURER_TYPE_TO_CONFIG_KEY.get('video')
+            multiplier = config.TEACHING_MULTIPLIERS.get(config_key, 10.0)
+            result['lecturer_types'].append((t, 'video'))
         elif is_new_lecturer and is_new_content_module:
             # New lecturer + new content gets 7.5x
-            multiplier = config.TEACHING_MULTIPLIERS.get('new_lecturer_new_content', 7.5)
-            lecturer_type = "New lecturer + new content"
-            result['lecturer_types'].append((t, "new_lecturer_new_content"))
+            config_key = LECTURER_TYPE_TO_CONFIG_KEY.get('new_lecturer_new_content')
+            multiplier = config.TEACHING_MULTIPLIERS.get(config_key, 7.5)
+            result['lecturer_types'].append((t, 'new_lecturer_new_content'))
         elif is_new_lecturer:
             # New lecturer (not new content) gets 5x
-            multiplier = config.TEACHING_MULTIPLIERS.get('new_lecturer', 5.0)
-            lecturer_type = "New lecturer"
-            result['lecturer_types'].append((t, "new_lecturer"))
+            config_key = LECTURER_TYPE_TO_CONFIG_KEY.get('new_lecturer')
+            multiplier = config.TEACHING_MULTIPLIERS.get(config_key, 5.0)
+            result['lecturer_types'].append((t, 'new_lecturer'))
         else:
             if is_new_content_module:
                 # Existing lecturer on new content gets 5x (content dev only)
-                multiplier = config.TEACHING_MULTIPLIERS.get('existing_lecturer_new_content', 5.0)
+                config_key = LECTURER_TYPE_TO_CONFIG_KEY.get('existing_lecturer_new_content')
+                multiplier = config.TEACHING_MULTIPLIERS.get(config_key, 5.0)
+                result['lecturer_types'].append((t, 'existing_lecturer_new_content'))
+            else:
+                # Standard existing lecturer gets 2.5x
+                config_key = LECTURER_TYPE_TO_CONFIG_KEY.get('standard')
+                multiplier = config.TEACHING_MULTIPLIERS.get(config_key, 2.5)
+                result['lecturer_types'].append((t, 'standard'))
                 lecturer_type = "Existing + new content"
                 result['lecturer_types'].append((t, "existing_lecturer_new_content"))
             else:
