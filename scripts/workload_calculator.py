@@ -400,7 +400,9 @@ def _calculate_practical_hours_and_breakdown(
                 # Apply each teacher's multiplier to their share of practical hours
                 multiplier = teacher_multiplier.get(t, 1.0)
                 base_share = total_practical_hours / n_teachers
+                print(f"DEBUG2: {t}, mult={multiplier}, base_share={base_share}, result before += {result['individual_practical_hours'][t]}")
                 result['individual_practical_hours'][t] += base_share * multiplier
+                print(f"DEBUG2: result after += {result['individual_practical_hours'][t]}")
     else:
         # No practicals - empty structured breakdown
         result['practicals_breakdown'] = {}
