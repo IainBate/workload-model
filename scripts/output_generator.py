@@ -1390,10 +1390,10 @@ def _format_module_practicals_section(
             </div>""")
         return parts
 
-    def _format_module_assessment_section(self, module_breakdown: Dict[str, Any], css_class: str,
-                                          module_code: Optional[str] = None) -> List[str]:
-        """Format assessment setting and marking sections for a module."""
-        parts = []
+def _format_module_assessment_section(module_breakdown: Dict[str, Any], css_class: str,
+                                      module_code: Optional[str] = None) -> List[str]:
+    """Format assessment setting and marking sections for a module."""
+    parts = []
         label_prefix = ""
         if module_code and not module_code.startswith('<') and not module_code.endswith('>'):
             label_prefix = f"[{module_code}] "
