@@ -1336,9 +1336,11 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
                 # Get rate values for display
                 rep_rate = config.REPETITION_MULTIPLIER
 
+                # Calculate effective rate for repeat sessions (first_session_rate × rep_rate)
+                effective_repeat_rate = first_session_rate * rep_rate
                 parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
                     <span class="detail-name" style="color:#333;">Repeat sessions</span>
-                    <span class="detail-hours">{(total_groups / n_teachers - 1):.2f} repeat(s) × {first_session_weekly:.1f}h = {repeat_weekly:.1f}h/week × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {total_repeat_hrs:.1f}h module total / {n_teachers} teachers = {repeat_per_teacher_base:.1f}h base</span>
+                    <span class="detail-hours">{(total_groups / n_teachers - 1):.2f} repeat(s) × {first_session_weekly:.1f}h @ {effective_repeat_rate:.1f}x (2.5x base × {rep_rate:.1f}x repeat) = {repeat_weekly:.1f}h/week × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {total_repeat_hrs:.1f}h module total / {n_teachers} teachers = {repeat_per_teacher_base:.1f}h base</span>
                 </div>""")
 
                 if actual_multiplier != 2.5:
