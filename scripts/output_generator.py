@@ -1495,6 +1495,16 @@ def _format_module_practicals_section(
         # Note: repeats use the repetition rate, not Chris's new lecturer rate
         repeat_actual = repeat_sessions_per_teacher * contact_hrs * rep_rate * config.TEACHING_WEEKS_PER_SEMESTER
 
+        # Chris's total practical hours (sum of first session and repeat sessions)
+        chris_total_practicals = first_session_actual + repeat_actual
+
+        # Display the total as Chris's actual hours, not module-level total
+        parts.append(f"""<div class="detail-item {css_class}">
+            <span class="detail-name">{label_prefix}Practical Sessions</span>
+            <span class="detail-hours">{chris_total_practicals:.1f}h total</span>
+            <span class="detail-activity teaching-activity"></span>
+        </div>""")
+
         # Display first session: show Chris's direct calculation (no /teachers division)
         # Per Q10: "2.0h per session @ 5x × 11 weeks = 110h"
         parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
