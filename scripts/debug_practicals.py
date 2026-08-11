@@ -68,6 +68,31 @@ if sys2_module:
         print(f"\n=== DEBUG: {module.name} ===")
         print(f"  Teachers: {teachers}")
         print(f"  lecturers_types: {lecturer_types}")
+
+        # Calculate expected values
+        from workload_calculator import TEACHING_WEEKS_PER_SEMESTER, config
+        practicals_count = module.practicals
+        std_first_session_weekly = getattr(module, 'practical_contact_hours', config.TEACHING_PROBLEM_CLASS)
+        contact_weeks = TEACHING_WEEKS_PER_SEMESTER
+
+        first_session_rate = config.TEACHING_PROBLEM_CLASS
+        repeat_rate = config.REPETITION_MULTIPLIER
+
+        if practicals_count > 1:
+            first_session_total = practicals_count * std_first_session_weekly * first_session_rate * contact_weeks
+            repeat_sessions = max(0, practicals_count - 1)
+            repeat_session_total = repeat_sessions * std_first_session_weekly * first_session_rate * repeat_rate * contact_weeks
+            total_practical_hours = first_session_total + repeat_session_total
+
+            print(f"  Calculated total: {total_practical_hours}")
+            print(f"  n_teachers: {len(teachers)}")
+            print(f"  base_share per teacher (before multiplier): {total_practical_hours / len(teachers)}")
+
+            for t, ltype in lecturer_types:
+                mult = config.TEACHING_MULTIPLIERS.get(ltype, 1.0)
+                expected = (total_practical_hours / len(teachers)) * mult
+                print(f"    Expected for {t} ({ltype}, {mult}x): {expected}")
+
         print(f"  practicals_breakdown: {result.get('practicals_breakdown', {})}")
         print(f"  individual_practical_hours: {result.get('individual_practical_hours', {})}")
         return result

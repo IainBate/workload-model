@@ -254,7 +254,9 @@ def _calculate_practical_hours_and_breakdown(
     teacher_multiplier = {}
     if lecturer_types:
         for t, ltype in lecturer_types:
-            teacher_multiplier[t] = config.TEACHING_MULTIPLIERS.get(ltype, config.TEACHING_PROBLEM_CLASS)
+            mult = config.TEACHING_MULTIPLIERS.get(ltype, config.TEACHING_PROBLEM_CLASS)
+            print(f"DEBUG: {t} has ltype '{ltype}', lookup returned {mult}")
+            teacher_multiplier[t] = mult
 
     contact_weeks = TEACHING_WEEKS_PER_SEMESTER
     practicals_count = module.practicals
