@@ -335,13 +335,14 @@ class TestPracticalDisplayMath:
 
         results = calculate_workload(year_data, validate_input=False)
 
-        from output_generator import _format_module_practicals_section
+        from output_generator import TeachingBreakdown
+        tb = TeachingBreakdown()
 
         chris_result = next(r for r in results if r.name == "Christopher Crispin-Bailey")
 
         for code, breakdown in chris_result.teaching_module_breakdowns.items():
             if 'COM00029I' in code or 'SYS2' in code:
-                parts = _format_module_practicals_section(
+                parts = tb._format_module_practicals_section(
                     breakdown,
                     css_class="teaching-section",
                     module_code="COM00029I",
