@@ -295,8 +295,9 @@ def _calculate_practical_hours_and_breakdown(
         if n_parallel_groups is not None:
             parallel_groups = []
             for i in range(n_parallel_groups):
+                # Each group runs once per week (sessions=1), with the specified duration
                 parallel_groups.append(type('ParallelGroup', (), {
-                    'sessions': practicals_count,
+                    'sessions': 1,  # Each group meets once per week
                     'hours_per_week': getattr(module, 'practical_contact_hours', config.TEACHING_PROBLEM_CLASS)
                 })())
 
