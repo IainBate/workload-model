@@ -1380,7 +1380,6 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
             parts.extend(_format_module_practicals_section(module_breakdown, css_class, code, is_new_lecturer))
             parts.extend(_format_module_assessment_section(module_breakdown, css_class, code))
 
-            parts.append("</div>")
         return parts
 
     def format_teaching_section(title: str, hours: float, breakdown: Dict[str, float], css_class: str,
