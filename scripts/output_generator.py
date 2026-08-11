@@ -1480,40 +1480,33 @@ def _format_module_practicals_section(
             <span class="detail-activity teaching-activity"></span>
         </div>""")
 
-        # Calculate per-teacher values
+        # Calculate Chris's actual workload based on what he delivers
+        # Per Q8: First session = 1/week, Repeats = (total_groups/n_teachers - 1) per week
         groups_per_teacher = total_groups / n_teachers if n_teachers > 0 else 0
         repeat_sessions_per_teacher = max(0, groups_per_teacher - 1)
 
-        # First session per teacher base (at standard rate, before teacher multiplier)
-        # Module first session = total_groups × hours/session × weeks × standard_rate
         contact_hrs = first_session_weekly  # hours per session
-        first_session_module_base = total_groups * contact_hrs * config.TEACHING_WEEKS_PER_SEMESTER * first_session_rate
 
-        # Repeat per teacher base (at repetition rate, not teacher's multiplier)
-        # Module repeat = repeat_sessions/teacher × hours × weeks × standard_rate × repetition_rate
-        # Per teacher = module_repeat / n_teachers
-        repeat_module_base = repeat_sessions_per_teacher * contact_hrs * config.TEACHING_WEEKS_PER_SEMESTER * first_session_rate * rep_rate
+        # First session: Chris delivers 1 session/week at his rate (5x for new lecturer)
+        # This is his direct workload: 1 × hours × weeks × multiplier
+        first_session_actual = 1 * contact_hrs * config.TEACHING_WEEKS_PER_SEMESTER * actual_multiplier
 
-        # Per teacher base (without their multiplier)
-        first_session_per_teacher_base = first_session_module_base / n_teachers
-        repeat_per_teacher_base = repeat_module_base / n_teachers
+        # Repeat sessions: Chris delivers repeat_sessions/week at repetition rate (1.5x)
+        # Note: repeats use the repetition rate, not Chris's new lecturer rate
+        repeat_actual = repeat_sessions_per_teacher * contact_hrs * rep_rate * config.TEACHING_WEEKS_PER_SEMESTER
 
-        # Apply teacher's actual multiplier to get their hours
-        first_session_actual = first_session_per_teacher_base * actual_multiplier
-        repeat_actual = repeat_per_teacher_base * actual_multiplier
-
-        # Display first session: show the complete calculation including / n_teachers and * actual_multiplier
+        # Display first session: show Chris's direct calculation (no /teachers division)
+        # Per Q10: "2.0h per session @ 5x × 11 weeks = 110h"
         parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
             <span class="detail-name" style="color:#333;">First session</span>
-            <span class="detail-hours">{total_groups} groups × {contact_hrs:.1f}h per session @ {first_session_rate}x / {n_teachers} teachers × {config.TEACHING_WEEKS_PER_SEMESTER} weeks × {actual_multiplier:.0f}x = {first_session_actual:.1f}h</span>
+            <span class="detail-hours">1 first session/week × {contact_hrs:.1f}h per session @ {actual_multiplier:.0f}x × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {first_session_actual:.1f}h</span>
         </div>""")
 
-        if repeat_module_base > 0:
-            # Display format: "0.67 repeat sessions/week @ X.Xh each × weeks × multiplier / teachers = total"
-            # The formula shows the calculation path to get Chris's actual hours
+        if repeat_sessions_per_teacher > 0:
+            # Display repeat sessions: show Chris's direct calculation
             parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
                 <span class="detail-name" style="color:#333;">Repeat sessions</span>
-                <span class="detail-hours">{repeat_sessions_per_teacher:.2f} repeat sessions/week @ {contact_hrs:.1f}h each × {rep_rate:.1f}x rate / {n_teachers} teachers × {config.TEACHING_WEEKS_PER_SEMESTER} weeks × {actual_multiplier:.0f}x = {repeat_actual:.1f}h</span>
+                <span class="detail-hours">{repeat_sessions_per_teacher:.2f} repeat sessions/week @ {contact_hrs:.1f}h each × {rep_rate:.1f}x rate × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {repeat_actual:.1f}h</span>
             </div>""")
     else:
         # Fallback to default rates if structured data not available
