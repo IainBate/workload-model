@@ -1469,37 +1469,17 @@ def _format_module_practicals_section(
         n_teachers = practicals_structured.get('n_teachers', 1)
 
         if has_total_groups:
-            # Parallel groups: each teacher gets total_groups/n_teachers worth of practicals on average
-            total_groups = practicals_structured.get('total_groups', week_count)
+            # Parallel groups: use the total module hours directly from structured breakdown
+            # The 'total' field is the module's base hours at standard rates (no teacher multipliers)
+            # Per teacher share = total / n_teachers, then apply Chris's actual multiplier
 
-            # Calculate Chris's workload based on groups he delivers
-            # First session = groups_per_teacher/week, Repeats = (groups_per_teacher - 1)/week
-            groups_per_teacher = total_groups / n_teachers if n_teachers > 0 else 0
-            repeat_sessions_per_teacher = max(0, groups_per_teacher - 1)
-
-            contact_hrs = first_session_weekly
-
-            # Standard rates for parallel groups calculation:
-            # First session uses the standard problem class rate (2.5x)
-            # Repeats use the repetition rate (1.5x) applied to the standard rate
-            std_first_session_rate = practicals_structured.get('first_session_rate', config.TEACHING_PROBLEM_CLASS)
-
-            # Chris's actual multiplier is derived from his teaching hours
-            base_per_teacher = practicals_structured.get('total', 0) / n_teachers if n_teachers > 0 else 0
+            # Get Chris's actual multiplier from his teaching hours
+            total_module_base = practicals_structured.get('total', 0)
+            base_per_teacher = total_module_base / n_teachers if n_teachers > 0 else 0
             actual_multiplier = practicals_per_module / base_per_teacher if base_per_teacher > 0 else 2.5
 
-            # First session: Chris delivers groups_per_teacher sessions/week at standard rate (2.5x)
-            # This is the BASE workload before applying Chris's multiplier
-            first_session_base = groups_per_teacher * contact_hrs * config.TEACHING_WEEKS_PER_SEMESTER * std_first_session_rate
-
-            # Repeat sessions use repetition rate (1.5x), not Chris's new lecturer rate
-            repeat_actual = repeat_sessions_per_teacher * contact_hrs * rep_rate * config.TEACHING_WEEKS_PER_SEMESTER
-
-            # Total base hours for Chris = first session base + repeats
-            total_base_practicals = first_session_base + repeat_actual
-
-            # Apply Chris's multiplier to get his final practical hours
-            chris_total_practicals = total_base_practicals * actual_multiplier / std_first_session_rate
+            # Chris's final hours = base per teacher × actual multiplier
+            chris_total_practicals = practicals_per_module  # Already contains the correct value!
 
             parts.append(f"""<div class="detail-item {css_class}">
                 <span class="detail-name">{label_prefix}Practical Sessions</span>
@@ -1507,22 +1487,20 @@ def _format_module_practicals_section(
                 <span class="detail-activity teaching-activity"></span>
             </div>""")
 
-            # Display breakdown showing the calculation with Chris's multiplier
+            # Display the calculation breakdown
             parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
-                <span class="detail-name" style="color:#333;">First session</span>
-                <span class="detail-hours">{groups_per_teacher:.2f} first session(s)/week × {contact_hrs:.1f}h per session @ {std_first_session_rate:.1f}x × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {first_session_base:.1f}h base</span>
+                <span class="detail-name" style="color:#333;">Base hours (module)</span>
+                <span class="detail-hours">{total_module_base:.1f}h total at standard rates</span>
             </div>""")
 
-            if repeat_sessions_per_teacher > 0:
-                parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
-                    <span class="detail-name" style="color:#333;">Repeat sessions</span>
-                    <span class="detail-hours">{repeat_sessions_per_teacher:.2f} repeat sessions/week @ {contact_hrs:.1f}h each × {rep_rate:.1f}x rate × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {repeat_actual:.1f}h</span>
-                </div>""")
-
-            # Show multiplier application
             parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
-                <span class="detail-name" style="color:#333;">Multiplier</span>
-                <span class="detail-hours">{actual_multiplier:.1f}x applied to base = {chris_total_practicals:.1f}h</span>
+                <span class="detail-name" style="color:#333;">Per teacher share</span>
+                <span class="detail-hours">{total_module_base:.1f}h / {n_teachers} teachers = {base_per_teacher:.1f}h each</span>
+            </div>""")
+
+            parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+                <span class="detail-name" style="color:#333;">Multiplier applied</span>
+                <span class="detail-hours">{actual_multiplier:.1f}x = {chris_total_practicals:.1f}h</span>
             </div>""")
         else:
             # Non-parallel groups: use simple calculation
