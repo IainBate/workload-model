@@ -26,6 +26,7 @@ from dataclasses import dataclass
 import math
 
 import config
+from config import DEFAULT_LECURE_HOURS_PER_WEEK
 from data_loader import (
     YearData,
     ModuleData,
