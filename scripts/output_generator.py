@@ -1402,16 +1402,18 @@ def _format_module_delivery_section(module_breakdown: Dict[str, Any], is_new_lec
         if actual_multiplier >= 4.5:  # Approximately 5x (allowing some floating point tolerance)
             lecturer_type = "New lecturer (5x)"
 
-            # First line: show the calculation breakdown directly
-            # For new lecturers: standard_equivalent @ 2.5x + content_dev = total
-            standard_equivalent = delivery_per_module / 5.0 * 2.5
-            content_dev = delivery_per_module - standard_equivalent
-            description = f"{standard_equivalent:.1f}h @ 5.0x = {delivery_per_module:.1f}h"
+            # For new lecturers, calculate teacher count from total contact hours and per-teacher base
+            teacher_count = int(round(total_lecture_hours / lecture_contact_hours)) if lecture_contact_hours > 0 else 1
+            if teacher_count < 1:
+                teacher_count = 1
+            base_per_teacher = total_lecture_hours / teacher_count
+            description = f"{total_lecture_hours:.1f}h contact @ {teacher_count} teachers = {base_per_teacher:.1f} each × 5.0x"
         else:
             lecturer_type = "Standard (2.5x)"
             # For standard lecturers: show the contact hours calculation
             teacher_count = int(round(total_lecture_hours / lecture_contact_hours)) if lecture_contact_hours > 0 else 1
-            description = f"{total_lecture_hours:.1f}h contact @ {teacher_count} teachers = {lecture_contact_hours:.1f} each × 2.5x"
+            base_per_teacher = total_lecture_hours / teacher_count if teacher_count > 0 else lecture_contact_hours
+            description = f"{total_lecture_hours:.1f}h contact @ {teacher_count} teachers = {base_per_teacher:.1f} each × 2.5x"
 
         # Include module code in label for clarity, but only if it looks like a valid code
         # Skip codes that are empty or look like placeholders (contain < or >)
