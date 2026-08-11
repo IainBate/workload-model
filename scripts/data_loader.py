@@ -126,7 +126,13 @@ class StaffData:
 
 @dataclass(frozen=True)
 class WorkloadResult:
-    """Complete workload calculation for a single staff member."""
+    """Complete workload calculation for a single staff member.
+
+    The breakdown dicts support hierarchical display with nested structures:
+    - teaching_breakdown: Aggregated teaching components, with per-module details in teaching_module_breakdowns
+    - research_breakdown: Research components including protected baseline, grants, and PhD supervision (nested)
+    - admin_breakdown: Admin components including departmental roles, engagement, and personal development
+    """
     name: str
     fte: float
     total_hours: float
@@ -141,10 +147,23 @@ class WorkloadResult:
     research_detail: str = ""
     admin_detail: str = ""
     nominal_hours: float = 0.0  # FTE-adjusted nominal hours for reference
-    teaching_breakdown: Dict[str, float] = field(default_factory=dict)  # Detailed breakdown of teaching components (aggregated)
-    teaching_module_breakdowns: Dict[str, Dict[str, float]] = field(default_factory=dict)  # Per-module teaching breakdowns
-    research_breakdown: Dict[str, float] = field(default_factory=dict)  # Detailed breakdown of research components
-    admin_breakdown: Dict[str, float] = field(default_factory=dict)  # Detailed breakdown of admin components
+
+    # Teaching breakdown: aggregated top-level components
+    # Per-module details stored in teaching_module_breakdowns with full hierarchy
+    teaching_breakdown: Dict[str, Any] = field(default_factory=dict)  # Aggregated teaching components (delivery, practicals, assessment_setting, marking, pastoral_supervision, project_supervision, project_setting)
+
+    # Per-module teaching breakdowns - each module contains:
+    # { 'delivery': X, 'practicals': Y, 'assessment_setting': Z, 'marking': W,
+    #   'practicals_breakdown': {'first_time': A, 'repeated': B}, ... }
+    teaching_module_breakdowns: Dict[str, Any] = field(default_factory=dict)  # Per-module teaching breakdowns with full hierarchy
+
+    # Research breakdown: contains protected_research_baseline as top-level,
+    # then grant_X entries, and phd_students nested dict
+    research_breakdown: Dict[str, Any] = field(default_factory=dict)  # Research components (protected baseline, grants, PhD supervision)
+
+    # Admin breakdown: departmental roles, engagement, personal development at same level
+    admin_breakdown: Dict[str, float] = field(default_factory=dict)  # Admin components
+
     grant_titles: Dict[str, str] = field(default_factory=dict)  # Mapping of project IDs to display titles
     module_details: Tuple[str, ...] = ()  # Details of modules taught (immutable tuple)
     supervision_details: Tuple[str, ...] = ()  # Supervision details (to be shown separately)
