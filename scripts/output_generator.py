@@ -1506,9 +1506,10 @@ def _format_module_practicals_section(
 
         if repeat_module_total > 0:
             # Show repeat sessions: repeats at repetition rate
+            repeat_final = repeat_per_teacher_base * config.REPETITION_MULTIPLIER
             parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
                 <span class="detail-name" style="color:#333;">Repeat sessions</span>
-                <span class="detail-hours">{repeat_per_teacher_base:.1f}h total × {config.REPETITION_MULTIPLIER:.1f}x rate</span>
+                <span class="detail-hours">{repeat_per_teacher_base:.1f}h total × {config.REPETITION_MULTIPLIER:.1f}x rate = {repeat_final:.2f}h</span>
             </div>""")
     else:
         # Fallback to default rates if structured data not available
