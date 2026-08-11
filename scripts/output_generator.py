@@ -1424,7 +1424,7 @@ def _format_module_assessment_section(module_breakdown: Dict[str, Any], css_clas
         </div>""")
     return parts
 
-def _format_module_items(modules_in_stage: List[Dict], css_class: str,
+def _format_module_items(result: WorkloadResult, modules_in_stage: List[Dict], css_class: str,
                          known_lecturers_per_module: Optional[Dict[str, frozenset]]) -> List[str]:
     """Format all items for a list of modules in a stage."""
     parts = []
@@ -1435,7 +1435,7 @@ def _format_module_items(modules_in_stage: List[Dict], css_class: str,
         # not the module code (e.g., "COM00029I")
         module_stage = mod.get('stage', '')
 
-        is_new_lecturer = _determine_lecturer_type(r.name, module_stage, known_lecturers_per_module or {})
+        is_new_lecturer = _determine_lecturer_type(result.name, module_stage, known_lecturers_per_module or {})
 
         # Build module items
         parts.extend(_format_module_delivery_section(module_breakdown, is_new_lecturer, css_class, code))
