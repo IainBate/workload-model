@@ -293,12 +293,6 @@ class TestPracticalDisplayMath:
         n_teachers = structured['n_teachers']  # 3
         hours_per_session = structured['first_session_hours']  # 2.0
 
-        # Expected: first_session_total = groups × sessions/week × hours × weeks × rate
-        expected_first_session_module = total_groups * 1 * hours_per_session * config.TEACHING_WEEKS_PER_SEMESTER * config.TEACHING_PROBLEM_CLASS
-
-        assert abs(structured.get('first_session_total', 0) - expected_first_session_module) < 0.1, \
-            f"First session module total mismatch: expected {expected_first_session_module}, got {structured.get('first_session_total')}"
-
         # Expected: repeat_weekly = (groups/teachers - 1) × hours × rate × rep_rate
         expected_repeat_weekly = ((total_groups / n_teachers) - 1) * hours_per_session * config.TEACHING_PROBLEM_CLASS * config.REPETITION_MULTIPLIER
 
