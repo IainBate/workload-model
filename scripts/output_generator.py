@@ -1356,21 +1356,17 @@ def _format_module_practicals_section(
         repeat_per_teacher_base = repeat_module_total / n_teachers
 
         # Show first session calculation (base rate without teacher multiplier)
-        # Display format per Q10: "2h × 2.5x × 11 = 110h" showing the per-teacher calculation
-        # For parallel groups, we show: total_groups / n_teachers sessions/week worth of groups
-        first_session_sessions_per_week = total_groups / n_teachers
-
+        # Display format: "X.Xh per session × rate × weeks = total"
         parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
             <span class="detail-name" style="color:#333;">First session</span>
-            <span class="detail-hours">{first_session_sessions_per_week:.2f} sessions/week × {first_session_weekly:.1f}h × {first_session_rate:.1f}x × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {per_teacher_base:.1f}h</span>
+            <span class="detail-hours">{first_session_weekly:.1f}h per session × {first_session_rate:.1f}x × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {per_teacher_base:.1f}h</span>
         </div>""")
 
         if repeat_module_total > 0:
-            # Show repeat sessions: (groups/teachers - 1) repeats at repetition rate
-            repeat_sessions_per_week = max(0, total_groups / n_teachers - 1)
+            # Show repeat sessions: repeats at repetition rate (no per-session calculation needed)
             parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
                 <span class="detail-name" style="color:#333;">Repeat sessions</span>
-                <span class="detail-hours">{repeat_sessions_per_week:.2f} × {first_session_weekly:.1f}h × {config.REPETITION_MULTIPLIER:.1f}x × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {repeat_per_teacher_base:.1f}h</span>
+                <span class="detail-hours">{repeat_per_teacher_base:.1f}h total at {config.REPETITION_MULTIPLIER:.1f}x rate</span>
             </div>""")
 
         # Show per-teacher base (without their lecturer multiplier)
