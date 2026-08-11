@@ -285,8 +285,6 @@ def _calculate_practical_hours_and_breakdown(
 
         n_teachers = len(teachers) if teachers else 1
 
-        print(f"DEBUG: parallel_groups = {parallel_groups}, len = {len(parallel_groups) if parallel_groups else 0}")
-
         if parallel_groups and len(parallel_groups) > 1:
             # Multiple parallel groups - each group has its own session count
             # In parallel groups, each teacher teaches one group (or shares one group),
