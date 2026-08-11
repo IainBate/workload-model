@@ -289,6 +289,7 @@ def _calculate_practical_hours_and_breakdown(
                 repeat_rate = config.REPETITION_MULTIPLIER
 
                 # Calculate hours for one teacher teaching one group (base hours without their multiplier)
+                repeat_sessions = max(0, group_sessions - 1)
                 base_first_session_total = group_sessions * weekly_hrs * first_session_rate * contact_weeks
                 base_repeat_session_total = repeat_sessions * weekly_hrs * first_session_rate * repeat_rate * contact_weeks
                 base_group_hours = base_first_session_total + base_repeat_session_total
