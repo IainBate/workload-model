@@ -259,6 +259,15 @@ def _calculate_practical_hours_and_breakdown(
 
     Returns a dict with structured breakdown suitable for output display.
     """
+    # Mapping from internal lecturer_type strings to YAML config keys
+    LECTURER_TYPE_TO_CONFIG_KEY = {
+        'video': 'lecture_new_video',
+        'new_lecturer_new_content': 'lecture_new_content_and_lecturer',
+        'new_lecturer': 'lecture_new_content_or_lecturer',
+        'existing_lecturer_new_content': 'lecture_new_content_or_lecturer',
+        'standard': 'lecture_standard',
+    }
+
     result = {
         'total_practical_hours': 0.0,
         'individual_practical_hours': {},
@@ -266,11 +275,12 @@ def _calculate_practical_hours_and_breakdown(
         'practical_details': [],  # List of detail strings for HTML display
     }
 
-    # Build multiplier lookup from lecturer_types
+    # Build multiplier lookup from lecturer_types using the mapping
     teacher_multiplier = {}
     if lecturer_types:
         for t, ltype in lecturer_types:
-            mult = config.TEACHING_MULTIPLIERS.get(ltype, config.TEACHING_PROBLEM_CLASS)
+            config_key = LECTURER_TYPE_TO_CONFIG_KEY.get(ltype)
+            mult = config.TEACHING_MULTIPLIERS.get(config_key, config.TEACHING_PROBLEM_CLASS)
             teacher_multiplier[t] = mult
 
     contact_weeks = TEACHING_WEEKS_PER_SEMESTER
