@@ -1313,10 +1313,11 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
 
             # Repeat sessions are shown separately with their own calculation
             # Show first session calculation (base rate without teacher multiplier)
-            # Display: groups per teacher, hours per session, weeks, rate
+            # Display: sessions/week, hours per session, weeks, rate
+            total_sessions_per_week = total_groups * week_count
             parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
                 <span class="detail-name" style="color:#333;">First session</span>
-                <span class="detail-hours">{first_session_weekly:.1f}h per session @ {first_session_rate:.1f}x rate × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {first_session_total:.1f}h module total / {n_teachers} teachers = {first_session_per_teacher_base:.1f}h base</span>
+                <span class="detail-hours">{total_sessions_per_week} sessions/week × {first_session_weekly:.1f}h per session @ {first_session_rate:.1f}x rate × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {first_session_total:.1f}h module total / {n_teachers} teachers = {first_session_per_teacher_base:.1f}h base</span>
             </div>""")
 
             if actual_multiplier != 2.5:
