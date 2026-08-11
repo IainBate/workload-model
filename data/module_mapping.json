@@ -40,8 +40,8 @@
   "dropped_modules": {
     "VICO-H": {"notes": "No equivalent in 2026-7"},
     "VICO-M": {"notes": "No equivalent in 2026-7"},
-    "AIPS-H": {"notes": "No equivalent in 2026-7"},
-    "AIPS-M": {"notes": "No equivalent in 2026-7"},
+    "AIPS-H": {"2026-7": "SAIL", "notes": "Renamed to SAIL (same module)"},
+    "AIPS-M": {"2026-7": "SAIL", "notes": "Renamed to SAIL (same module)"},
     "EVAC-H": {"notes": "No equivalent in 2026-7"},
     "EVAC-M": {"notes": "No equivalent in 2026-7"},
     "PRCM": {"notes": "No equivalent in 2026-7"},
