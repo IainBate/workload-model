@@ -1281,6 +1281,9 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
             first_session_weekly = practicals_structured.get('first_session_hours', first_session_rate)
             repeat_weekly = practicals_structured.get('repeat_hours', 0)
 
+            # Get total parallel groups in the module and sessions per group
+            total_groups = practicals_structured.get('total_groups', week_count)  # Fall back to week_count for compatibility
+
             label_prefix = ""
             if module_code and not module_code.startswith('<') and not module_code.endswith('>'):
                 label_prefix = f"[{module_code}] "
