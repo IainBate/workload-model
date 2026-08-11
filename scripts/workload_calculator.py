@@ -901,15 +901,27 @@ def _calculate_research_workload(staff_member: StaffData, assumptions: List[str]
         assumptions: Optional list to append assumption strings to (for invalid FTE values)
 
     Returns:
-        Tuple of (total_hours, breakdown_dict, detail_string, grant_titles_dict) where:
-            - total_hours: Sum of all research activities
-            - breakdown_dict: Category-wise hour allocations
+        Tuple of (total_hours, structured_breakdown_dict, detail_string, grant_titles_dict) where:
+            - total_hours: Sum of all research activities (excluding protected baseline)
+            - structured_breakdown_dict: Nested dict with grants and phd_students as separate entries
+                Example structure:
+                {
+                    "grants": {"grant_ABC": 164.2, "grant_XYZ": 82.1},
+                    "phd_students": {
+                        "supervision": 240.0,
+                        "co_supervision": 144.0,
+                        "assessor": 32.0
+                    }
+                }
             - detail_string: Human-readable summary
             - grant_titles_dict: Mapping of project IDs to display titles
     """
     total = 0.0
     details = []
-    breakdown = {}
+    structured_breakdown = {
+        "grants": {},
+        "phd_students": {}
+    }
     grant_titles = {}  # project_id -> title mapping for output display
 
 
@@ -926,7 +938,7 @@ def _calculate_research_workload(staff_member: StaffData, assumptions: List[str]
         sole_count = staff_member.phd_supervisions
         sole_hours = sole_count * config.SUPERVISION_MULTIPLIERS["pgr_primary_supervisor_per_fte"]
         phd_hours += sole_hours
-        phd_breakdown["primary_supervisor"] = sole_hours
+        phd_breakdown["supervision"] = sole_hours
         phd_details.append(f"{sole_count}x full-time PhD student × {config.SUPERVISION_MULTIPLIERS['pgr_primary_supervisor_per_fte']}h/FTE")
 
     # Co-supervisors - part-time PhD students (60% of primary)
@@ -934,7 +946,7 @@ def _calculate_research_workload(staff_member: StaffData, assumptions: List[str]
         co_count = staff_member.phd_co_supervisions
         co_hours = co_count * config.SUPERVISION_MULTIPLIERS["pgr_co_supervisor_per_fte"]
         phd_hours += co_hours
-        phd_breakdown["co_supervisor"] = co_hours
+        phd_breakdown["co_supervision"] = co_hours
         phd_details.append(f"{co_count}x part-time PhD student × {config.SUPERVISION_MULTIPLIERS['pgr_co_supervisor_per_fte']}h/FTE")
 
     # TAP assessor work (assessor for PhD students)
@@ -947,11 +959,7 @@ def _calculate_research_workload(staff_member: StaffData, assumptions: List[str]
 
     if phd_hours > 0:
         total += phd_hours
-        # Add detailed breakdown items (primary, co-supervisor, assessor)
-        # NOTE: We do NOT add a separate "phd_supervision" entry as it would
-        # double-count the individual components. The sum of individual items
-        # equals the total PhD supervision hours.
-        breakdown.update(phd_breakdown)
+        structured_breakdown["phd_students"].update(phd_breakdown)
         # Build formula string showing N × 80 + M × 48 structure
         formula_parts = []
         if staff_member.phd_supervisions > 0:
@@ -962,8 +970,6 @@ def _calculate_research_workload(staff_member: StaffData, assumptions: List[str]
             formula_parts.append(f"{assessor_count} × {config.SUPERVISION_MULTIPLIERS['pgr_assessor']}")
         formula_str = " + ".join(formula_parts) if formula_parts else ""
         # Add explanation of what's included in PhD supervision
-        # Note: Individual items (primary_supervisor, co_supervisor, assessor) are already
-        # shown in the breakdown table; this line is just for reference
         details.append(f"PhD supervision: {'; '.join(phd_details)} = {phd_hours:.1f}h")
 
     # Research grant time (from % FTE for CS.csv)
@@ -975,7 +981,7 @@ def _calculate_research_workload(staff_member: StaffData, assumptions: List[str]
             grant_hours = fte * config.NOMINAL_WORKING_HOURS_PER_YEAR
             total += grant_hours
             project_id = proj['project_id']
-            breakdown[f"grant_{project_id}"] = grant_hours
+            structured_breakdown["grants"][f"grant_{project_id}"] = grant_hours
             # Use title if available and meaningful, otherwise use project ID
             title = proj.get('title', '').strip()
             display_name = title if title and len(title) > 3 else project_id
@@ -991,7 +997,7 @@ def _calculate_research_workload(staff_member: StaffData, assumptions: List[str]
     if assumptions is None:
         assumptions = []
 
-    return total, breakdown, "; ".join(details) if details else "No research activities recorded", grant_titles, assumptions
+    return total, structured_breakdown, "; ".join(details) if details else "No research activities recorded", grant_titles, assumptions
 
 
 # --- Administration Workload ---
