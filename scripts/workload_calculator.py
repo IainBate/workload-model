@@ -737,7 +737,10 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
     teaching_details = _build_lecture_details(lecture_result, teachers)
 
     # 2. Calculate practical hours with structured breakdown
-    practical_result = _calculate_practical_hours_and_breakdown(module, teachers)
+    # Pass lecturer_types so each teacher's multiplier is used for practical hours
+    practical_result = _calculate_practical_hours_and_breakdown(
+        module, teachers, lecture_result.get('lecturer_types', [])
+    )
 
     # Store individual practical hours per teacher for later use
     individual_practical_hours = practical_result['individual_practical_hours']
