@@ -371,7 +371,7 @@ def _calculate_practical_hours_and_breakdown(
             if practicals_count > 1:
                 # Note: practicals_count is sessions per week, std_first_session_weekly is hours per session
                 first_session_total = practicals_count * std_first_session_weekly * first_session_rate * contact_weeks
-                repeat_sessions = max(0, practicals_count - 1)
+                repeat_sessions = max(0, practicals_count - n_teachers) / n_teachers if n_teachers > 0 else 0
                 repeat_session_total = repeat_sessions * std_first_session_weekly * first_session_rate * repeat_rate * contact_weeks
                 total_practical_hours = first_session_total + repeat_session_total
 
