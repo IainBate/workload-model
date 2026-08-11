@@ -439,21 +439,34 @@ def validate_workload_result(result, tolerance: float = 0.1) -> List[ValidationI
             field_name="admin_hours"
         ))
 
-    # Helper to get numeric values from breakdown dict (recursively extracting)
-    def get_numeric_values(d):
-        """Extract all numeric values from a breakdown dict, recursively.
+    # Helper to get numeric values from breakdown dict
+    # For teaching/admin: only direct numeric values at top level (no nesting)
+    # For research: includes protected_research_baseline plus numeric leaves in nested dicts
+    def get_numeric_values(d, is_research=False):
+        """Extract numeric values from a breakdown dict.
 
-        Handles nested structures where some keys contain dicts of sub-values
-        (e.g., grants, phd_students). Returns only the leaf numeric values.
+        Args:
+            d: The breakdown dictionary
+            is_research: If True, recursively extract from grants/phd_students dicts
+
+        For teaching/admin breakdowns, only direct numeric values are summed.
+        For research breakdowns, we also include nested grant and phd_students values.
         """
+        if not isinstance(d, dict):
+            return [d] if isinstance(d, (int, float)) else []
+
         result = []
-        for v in d.values():
+        for k, v in d.items():
             if isinstance(v, (int, float)):
                 # Direct numeric value
                 result.append(v)
-            elif isinstance(v, dict):
-                # Recursively extract from nested dicts
-                result.extend(get_numeric_values(v))
+            elif isinstance(v, dict) and is_research:
+                # For research: grants and phd_students are nested but contain actual hours
+                # Recursively extract from these structure keys
+                result.extend(get_numeric_values(v, is_research=True))
+            elif isinstance(v, dict) and not is_research:
+                # For teaching/admin: skip nested dicts (they're metadata like pastoral_breakdown)
+                pass
         return result
 
     # Check teaching breakdown sum
