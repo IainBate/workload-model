@@ -1335,15 +1335,17 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
 
                 rep_rate = config.REPETITION_MULTIPLIER
 
-                # Calculate per-teacher repeat hours with the repetition multiplier only
+                # Calculate per-teacher repeat hours
                 # The calculator stores total_repeat_hrs which includes both rates (2.5x × 1.5x)
-                # For display, we show: repeats × hours × 1.5x rate
-                # First calculate what the repeat portion is without the base rate
-                repeat_per_week_without_base = repeat_weekly / first_session_rate
+                # For display, we break it down:
+                # - The per-week rate without the first_session_rate: repeat_weekly / first_session_rate
+                # - But the module total should match what's actually calculated: total_repeat_hrs
+                # So we show: repeats × hours × 1.5x = weekly_without_base h/week, giving the correct module total
+                weekly_without_first = repeat_weekly / first_session_rate
 
                 parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
                     <span class="detail-name" style="color:#333;">Repeat sessions</span>
-                    <span class="detail-hours">{(total_groups / n_teachers - 1):.2f} repeat(s) × {first_session_weekly:.1f}h × {rep_rate:.1f}x = {repeat_per_week_without_base:.1f}h/week × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {total_repeat_hrs:.1f}h module total / {n_teachers} teachers = {repeat_per_teacher_base:.1f}h base</span>
+                    <span class="detail-hours">{(total_groups / n_teachers - 1):.2f} repeat(s) × {first_session_weekly:.1f}h × {rep_rate:.1f}x = {weekly_without_first:.1f}h/week × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {total_repeat_hrs:.1f}h module total / {n_teachers} teachers = {repeat_per_teacher_base:.1f}h base</span>
                 </div>""")
 
                 if actual_multiplier != 2.5:
