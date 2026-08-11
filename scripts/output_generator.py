@@ -1479,47 +1479,39 @@ def _format_module_practicals_section(
             <span class="detail-hours">{practicals_per_module:.1f}h total</span>
             <span class="detail-activity teaching-activity"></span>
         </div>""")
-        # Calculate first session total: parallel groups × sessions per group × hours per session × weeks × rate
-        # Note: week_count is sessions per group (always 1), total_groups is parallel groups in module
-        # Module total = all groups, per-teacher = module_total / n_teachers
-        first_session_total = total_groups * week_count * first_session_weekly * config.TEACHING_WEEKS_PER_SEMESTER * first_session_rate
 
-        # Calculate repeat session total (module-wide)
-        # repeat_weekly already includes both rates: first_session_rate × repeat_rate
-        # To get the weekly "pure" repeat hours, we divide by first_session_rate
-        repeat_weekly_pure = repeat_weekly / first_session_rate  # Pure repeat hours/week (without first session rate)
-        repeat_module_total = repeat_weekly * config.TEACHING_WEEKS_PER_SEMESTER  # Total module repeats with rates
+        # Calculate repeat sessions first (uses only repetition rate, not teacher's multiplier)
+        # repeat_weekly is per week for the module (includes both rates already)
+        # Per teacher repeat = repeat_weekly / n_teachers × weeks
+        # But display should show: groups_per_teacher-1 repeats/week × hours × 1.5x × weeks
+        groups_per_teacher = total_groups / n_teachers if n_teachers > 0 else 0
+        repeat_sessions_per_teacher = max(0, groups_per_teacher - 1)
 
-        # Total practicals module = first_session_total + repeat_module_total
-        total_practicals_module = first_session_total + repeat_module_total
-        per_teacher_base = total_practicals_module / n_teachers
+        # Repeat per teacher (only repetition rate applied):
+        # repeat_weekly already = repeat_sessions × hours × first_session_rate × repeat_rate
+        # So per teacher repeat = repeat_weekly / n_teachers × weeks
+        repeat_per_teacher = repeat_weekly / n_teachers * config.TEACHING_WEEKS_PER_SEMESTER
 
-        # Calculate per-teacher values
-        # Each teacher teaches: total_groups / n_teachers worth of groups on average
-        first_session_per_teacher_base = first_session_total / n_teachers
-        repeat_per_teacher_base = repeat_module_total / n_teachers
+        # First session per teacher:
+        # Module first session total = groups_per_teacher × hours × weeks × standard_rate
+        # Per teacher = module_first_session / n_teachers
+        # But display should show: hours × actual_multiplier × weeks (using teacher's rate)
+        first_session_per_teacher_base = total_groups * week_count * first_session_weekly * config.TEACHING_WEEKS_PER_SEMESTER / n_teachers
 
-        # Apply the actual teacher multiplier to get their actual hours
+        # First session with teacher's actual multiplier
         first_session_actual = first_session_per_teacher_base * actual_multiplier
-        repeat_actual = repeat_per_teacher_base * actual_multiplier
 
-        # Show first session calculation with teacher's actual multiplier applied
-        # Display format: "X.Xh per session @ rate × weeks = total"
-        # Use the teacher's actual multiplier (not the standard 2.5x) for new lecturers
+        # Display repeat sessions: only 1.5x rate, not teacher's full multiplier
         parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
             <span class="detail-name" style="color:#333;">First session</span>
             <span class="detail-hours">{first_session_weekly:.1f}h per session @ {actual_multiplier:.1f}x × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {first_session_actual:.1f}h</span>
         </div>""")
 
-        if repeat_module_total > 0:
-            # Calculate repeat sessions display text
-            # repeat_sessions = groups_per_teacher - 1 (sessions beyond first session per week)
-            groups_per_teacher = total_groups / n_teachers if n_teachers > 0 else 0
-            repeat_sessions = max(0, groups_per_teacher - 1)
+        if repeat_per_teacher > 0:
             # Display format: "0.67 repeat sessions/week @ X.Xh each × 1.5x rate = Y.YYh"
             parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
                 <span class="detail-name" style="color:#333;">Repeat sessions</span>
-                <span class="detail-hours">{repeat_sessions:.2f} repeat sessions/week @ {first_session_weekly:.1f}h each × {config.REPETITION_MULTIPLIER:.1f}x rate = {repeat_actual:.1f}h</span>
+                <span class="detail-hours">{repeat_sessions_per_teacher:.2f} repeat sessions/week @ {first_session_weekly:.1f}h each × {config.REPETITION_MULTIPLIER:.1f}x rate = {repeat_per_teacher:.1f}h</span>
             </div>""")
     else:
         # Fallback to default rates if structured data not available
