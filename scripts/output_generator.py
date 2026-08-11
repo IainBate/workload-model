@@ -1359,14 +1359,14 @@ def _format_module_practicals_section(
         # Display format: "X.Xh per session × rate × weeks = total"
         parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
             <span class="detail-name" style="color:#333;">First session</span>
-            <span class="detail-hours">{first_session_weekly:.1f}h per session × {first_session_rate:.1f}x × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {per_teacher_base:.1f}h</span>
+            <span class="detail-hours">{first_session_weekly:.1f}h per session @ {first_session_rate:.1f}x × {config.TEACHING_WEEKS_PER_SEMESTER} weeks = {per_teacher_base:.1f}h</span>
         </div>""")
 
         if repeat_module_total > 0:
             # Show repeat sessions: repeats at repetition rate (no per-session calculation needed)
             parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
                 <span class="detail-name" style="color:#333;">Repeat sessions</span>
-                <span class="detail-hours">{repeat_per_teacher_base:.1f}h total at {config.REPETITION_MULTIPLIER:.1f}x rate</span>
+                <span class="detail-hours">{repeat_per_teacher_base:.1f}h total @ {config.REPETITION_MULTIPLIER:.1f}x rate</span>
             </div>""")
 
         # Show per-teacher base (without their lecturer multiplier)
