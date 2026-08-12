@@ -1,175 +1,188 @@
 # Improvement Plan (consolidated from 6 planning docs)
 
-**Status:** Draft for review. Built from `architecture_improvements.md`, `architecture_improvements_v2.md`,
+**Status:** Sections A and C complete. Section D found to be ~90% already built (see below —
+this plan originally assumed it needed building from scratch; that assumption was wrong).
+Section B (testing foundation) and the gated B10 refactor still to do. Built from
+`architecture_improvements.md`, `architecture_improvements_v2.md`,
 `academic_workload_test_strategy.md`, `BUGS_AND_FIXES.md`, `DISCREPANCIES.md`, and
 `WORKLOAD_OUTPUT_REDESIGN_PROMPTS.md`, reconciled and cross-checked against the live codebase
-(2026-08-12), plus four scoping decisions from Iain (recorded below). Supersedes those six
-source docs as the working plan — they can be archived once this is reviewed.
+(2026-08-12), plus decisions from Iain (recorded below).
 
-## Decisions already made (2026-08-12)
+## Decisions made (2026-08-12)
 
-1. **Doc of record:** `Work Allocation Model.docx` is now the sole source of truth (not the
-   older `Workload ModelFull Description.docx`). Code/config/report-footer citations have
-   already been updated to reflect this (`config.py`, `workload_parameters.yaml` header,
-   `output_generator.py` footer, root `CLAUDE.md`).
-2. **Ethics Committee Member %:** Confirmed **20%** is correct. `workload_parameters.yaml` has
-   been reverted to 0.20 (it had drifted to 0.10), and the self-contradictory prose caveat in
-   `Work Allocation Model.docx` (paragraph that referenced a "10% update... please confirm") has
-   been removed since Appendix A's table (20%) is simply correct. Verified via full pipeline
-   re-run + baseline regeneration — no other numbers affected besides Ethics Committee Member
-   holders' admin hours.
-3. **Individual Report redesign proposals:** Not decided yet — enumerated as a pick-list below
-   (Section C) per Iain's request. None have been started.
-4. **`output_generator.py` pure-rendering refactor:** Approved, but **gated** behind the
-   JSON-baseline + format-diff test infrastructure (Section B, items B1–B2) landing first, so
-   any accidental visible-output drift is caught automatically rather than by eye.
+1. **Doc of record:** `Work Allocation Model.docx` is the sole source of truth. Code/config/
+   report-footer citations updated accordingly.
+2. **Ethics Committee Member %:** Confirmed **20%**. `workload_parameters.yaml` reverted to 0.20,
+   self-contradictory prose caveat removed from the docx.
+3. **Individual Report redesign proposals:** "Show me the list" → **done**: all 7 proposals
+   built as independently-toggleable features in a brand-new `New Individual Reports/` folder,
+   generated alongside (never replacing) the existing `Individual Reports/`. See Section C below
+   for how to keep/drop individual pieces.
+4. **`output_generator.py` pure-rendering refactor:** Approved, gated behind B1–B2 landing first.
+   **Not started yet** — still pending Section B.
+
+## IMPORTANT — a real, currently-blocking data gap found while building Section C
+
+`config.get_normative_split(category)` — the function every "actual % vs. target %" comparison
+depends on, in both the *already-existing* department report and the *new* individual reports —
+returns `None` for **every single one of the 56 currently active staff**. Not a display bug: I
+traced it to source.
+
+- `WorkloadResult.category` is populated from `StaffData.category`, which is populated from
+  `Part time.csv`'s "Staff Category" column.
+- `Part time.csv` is a small file — **only 4 people** (Sarah Carrington, David Pumfrey, Mark
+  Sujan, Richard Wilson), matching its purpose as documented in `CLAUDE.md` ("FTE multiplier per
+  staff"), not a general staff-category roster.
+- None of those 4 are in this year's active WTW/WAW roster at all.
+- No other CSV in `data/` has any category/contract-type column (checked all of them).
+
+I also found and fixed a real bug in the lookup itself (`data_loader.py`, the `pt_info` match
+used a raw-name-only comparison instead of the same canonical-name fallback the other three
+per-staff data sources use) — that fix is correct and harmless, but doesn't solve the underlying
+problem: **there is currently no data source that tells the code anyone's contract category**
+(T&R / T&S / ART) for the active roster. Both the department report's "Expected: T%/R%/A%" line
+and normative-deviation column, and the new individual report's C1/C2 features, correctly degrade
+to "no data" for everyone right now — this is the graceful degradation working as designed
+(CLAUDE.md's "no guessed data" rule), not a crash or a silent wrong number.
+
+**I need your input:** is there a data source (a column in an existing CSV I mislabeled, an HR
+export, something not yet in `data/`) that has contract category for the full ~56-person roster?
+Without one, the normative-comparison features (already-built in Section D, and newly built in
+Section C) will keep showing "no target available" for almost everyone, which limits their value
+until this is resolved.
 
 ## Already verified as non-issues (no action needed)
 
-Two "bugs" from `architecture_improvements_v2.md` were checked against the current code and
-are **already resolved** — the codebase has moved on since that doc was written:
-- PhD supervision double-counting in `research_breakdown` — checked live: breakdown sums to
-  `research_hours` exactly (e.g. Adrian Bors: `{protected_research_baseline: 164.2, phd_students:
-  {supervision: 240, assessor: 8}}` sums to `research_hours` = 412.2). The flat `phd_supervision`
-  key the doc describes doesn't exist in current code.
-- Teaching breakdown not aggregating per-staff — checked live: `teaching_breakdown` sums to
-  `teaching_hours` exactly (Christopher Crispin-Bailey: 530.1 = 530.1).
-
-Most of `BUGS_AND_FIXES.md` is also already resolved (it's an archived doc; 5 of its 7 bugs are
-marked FIXED in its own "Completed Fixes" section) — including Bug #7's regex-parsing concern
-(`output_generator.py` now has zero `re.search`/`re.match` calls, confirmed by grep).
-
-`DISCREPANCIES.md`'s doc-text fixes appear to be **already incorporated** into
-`Work Allocation Model.docx` — spot-checked several: nominal hours already state 1,642h (§2),
-project setting is already placed under Supervision not general baselines (§2), and the 7.5×
-combined multiplier is already in Table 5. Two of its items are *not* just wording — see A2/A3
-below, which are still live.
+- PhD supervision double-counting, teaching-breakdown-aggregation-missing (both claimed by
+  `architecture_improvements_v2.md`) — checked live, both already correct.
+- Most of `BUGS_AND_FIXES.md` (archived doc, 5/7 bugs already marked FIXED, including the regex-
+  parsing concern — `output_generator.py` has zero `re.search`/`re.match` calls now).
+- Most of `DISCREPANCIES.md`'s doc-text fixes — already incorporated into `Work Allocation
+  Model.docx` (1,642h nominal hours, project setting under Supervision, 7.5× multiplier
+  documented in Table 5).
 
 ---
 
-## Section A — Do now (low-risk, high-value, no further sign-off needed)
+## Section A — DONE
 
-Small, additive, or purely corrective. None change existing displayed numbers for anyone not
-directly affected, and none redesign anything.
+| # | Item | Status |
+|---|------|--------|
+| A1 | Add `ECR representative` / `ART staff representative` to `workload_parameters.yaml` (0%) + `_WAW_ROLE_MAPPING` | **Done.** Verified: Joe Cutting's admin breakdown now correctly shows `ECR representative: 0.0` instead of being unmapped. |
+| A2 | Verify baseline docs for min admin teaching hours (30h) / service points (175h) | **Still open.** `Work Allocation Model.docx` names these baseline categories but I couldn't find the numeric values written anywhere in its text. Needs your input: add the numbers, or confirm they're deliberately left to departmental discretion. |
+| A3 | Investigate flat 2h/week lecture-hours regardless of credits | **Still open**, raised for your domain input — not auto-implemented since it needs a judgment call about what's actually correct. `module.contact_hours` (computed from credits) remains genuinely unused/dead code in the calculator. |
+| A4 | `--validate-only` CLI mode | **Done.** `python main.py --validate-only` runs load → calculate → validate and stops before output generation. Verified working. |
 
-| # | Item | Source | Effort | Notes |
-|---|------|--------|--------|-------|
-| A1 | Add missing `ECR representative` and `ART staff representative` roles to `workload_parameters.yaml` at 0% | DISCREPANCIES.md | S | Confirmed real gap — both roles exist in `Work Allocation Model.docx` Appendix A at 0%, and two real people (Joe Cutting, Richard Wilson) hold them in `WAW.csv` today but are currently unmapped. Additive only — 0% allocation, so no hours change, but their admin-role listing will go from "unmapped/missing" to correctly shown. |
-| A2 | Verify baseline documentation for min admin teaching hours (30h) and service points (175h) | DISCREPANCIES.md | S | Spot-checked: `Work Allocation Model.docx` names these baseline categories (§2, "Set of baselines" / part-time FTE-scaling paragraph) but I did not find the numeric values (30h / 175h) written anywhere in the doc text. Needs a look — either add the numbers to the doc, or confirm they're intentionally left as departmental discretion. |
-| A3 | Investigate: lecture contact hours are a flat 2h/week × 11 weeks = 22h for **every** module, regardless of credits | BUGS_AND_FIXES.md (Bug #2, never marked fixed) | S (investigate) | New finding, not fully resolved in any doc. `module.contact_hours` (computed from credits) is calculated during data loading but **never read anywhere** in `workload_calculator.py` or `output_generator.py` — it's dead code. Every module's lecture hours use the same fixed rate. Needs your call: is a flat 2h/week correct for every module regardless of size, or should larger/smaller modules get proportionally more/less lecture time? If the latter, this is a real calculation gap, not just doc cleanup. |
-| A4 | `--validate-only` CLI mode | architecture_improvements.md | S | Small, self-contained, no dependencies beyond the already-implemented validation pipeline. |
-
-**Recommended order:** A1 → A2 → A4 (all trivial, can be done together) → A3 (needs your
-domain input before any code change, so raise it and move on rather than blocking on it).
+Verified: full pipeline re-run, tests pass (same 4 pre-existing failures), baseline matches.
 
 ---
 
-## Section B — Testing & architecture foundation
+## Section B — Testing & architecture foundation (not started)
 
-This is the prerequisite work for doing the department-view rebuild (Section D) and the
-individual-report refactor (Section E) safely. Ordered so risk is front-loaded into cheap,
-reversible steps.
+Prerequisite work for the gated B10 refactor. Nothing here has been built yet.
 
-| # | Item | Source(s) | Effort | Depends on |
-|---|------|-----------|--------|------------|
-| B1 | Structured JSON calculation baseline (`baseline/expected_results.json` via `--export-baseline`) | architecture_improvements.md + v2 | M | — |
-| B2 | Format-only HTML regression tests (whitespace-normalized diff against saved baseline HTML) | architecture_improvements.md + v2 | M | B1 (conceptually paired — separates "is the math right" from "does it look the same") |
-| B3 | Unit test suite for calculation logic (`test_calculations.py`) | architecture_improvements.md + v2, test_strategy.md | M | B1 |
-| B4 | Integration test suite for full pipeline (`test_integration.py`) | architecture_improvements.md + v2, test_strategy.md | M | B3 |
-| B5 | Confirm validation-pipeline status in current `main.py`/`validation.py` | architecture_improvements.md + v2 | S | — |
-| B6 | Unit tests: data loader & schema (name normalization, module merge logic, input validation) | test_strategy.md | S | — |
-| B7 | Integration test: all output artifacts produced and non-empty (CSV/XLSX/PNGs/both HTML report types) | test_strategy.md | S | B4 |
-| B8 | Integration test: Excel formula & chart reference validation | test_strategy.md | S | — |
-| B9 | Property-based invariant testing (Hypothesis) | test_strategy.md | M | **Blocked** — assumes `_calculate_teaching_workload` has been split into named helpers that don't exist. CLAUDE.md explicitly flags this ~880-line function as a Phase 5 target and says "do not add more logic to these functions." Re-scope or defer until that refactor happens, don't force it now. |
-| B10 | **`output_generator.py` pure-rendering refactor** (approved, gated per your decision) | architecture_improvements.md, test_strategy.md | L | B1 + B2 must be green first; B2 is the safety net that proves zero visible output changed |
-| B11 | Visual regression: matplotlib chart artifact checks (size/dimensions, headless render) | test_strategy.md | S | — |
+| # | Item | Effort | Depends on |
+|---|------|--------|------------|
+| B1 | Structured JSON calculation baseline (`baseline/expected_results.json` via `--export-baseline`) | M | — |
+| B2 | Format-only HTML regression tests (whitespace-normalized diff against saved baseline) | M | B1 |
+| B3 | Unit test suite for calculation logic (`test_calculations.py`) | M | B1 |
+| B4 | Integration test suite for full pipeline (`test_integration.py`) | M | B3 |
+| B5 | Validation pipeline wired into `main.py` | — | **Already done** — confirmed live: `main.py` calls `run_validation_pipeline(results)` and exits on failure. No action needed. |
+| B6 | Unit tests: data loader & schema (name normalization, module merge, input validation) | S | — |
+| B7 | Integration test: all output artifacts produced and non-empty | S | B4 |
+| B8 | Integration test: Excel formula & chart reference validation | S | — |
+| B9 | Property-based invariant testing (Hypothesis) | M | **Blocked** — needs `_calculate_teaching_workload` decomposed into named helpers, which CLAUDE.md explicitly says not to do yet (Phase 5 target). Parked. |
+| B10 | **`output_generator.py` pure-rendering refactor** (approved, gated) | L | B1 + B2 green first |
+| B11 | Visual regression: matplotlib chart artifact checks | S | — |
+| B12 | Dead-code cleanup: remove unused `_create_boxplot()` function (`output_generator.py` ~line 222) | S | New finding — confirmed via grep that this function is never called anywhere; `generate_boxplots()` is the actual live path and already does its own category-aware chart drawing. |
 
-**Recommended order:** B1 → B2 → B5 (quick status check, do anytime) → B6 → B3 → B4 → B7 → B8 →
-B11 → **B10 (the gated refactor)** → B9 (only if/when the calc-engine decomposition happens
-separately).
-
-Note: B9's dependency on a large function decomposition isn't in scope of this plan unless you
-want it — flagging it as blocked rather than silently dropping it.
+**Recommended order:** B1 → B2 → B6 → B3 → B4 → B7 → B8 → B11 → B12 → **B10** → B9 (parked).
 
 ---
 
-## Section C — Individual Report changes (menu — nothing here is scheduled, pick what you want)
+## Section C — Individual Report changes — DONE
 
-You said you're happy with the current individual reports and asked to see the specific list
-rather than have me decide. Each is independent and small; none require the others.
+Built as `scripts/new_individual_reports.py`, a wholly separate module that does **not** modify
+`output_generator.py`'s individual-report code at all (only one small, backward-compatible
+optional parameter was added to `_format_module_practicals_section` for C7 — default value
+reproduces the exact existing behaviour). Existing `Individual Reports/` output is untouched:
+verified byte-identical to baseline after this work.
 
-| # | Proposal | What it does | Effort |
-|---|----------|---------------|--------|
-| C1 | Computed headline summary sentence | One sentence at the top: "Total workload is 1,847h against a nominal 1,642h for 1.0 FTE — 12.5% over, mostly from teaching." Needs the category/normative-split plumbing (C-prereq below) to generate the "mostly from X" clause. | S |
-| C2 | Normative-split comparison (table or inline SVG bars) | Per-category (teaching/research/admin) actual % vs. target % for the person's contract type, flagging >~10pp deviations. Needs C-prereq. | M |
-| C3 | Header block shows total hours + delta vs nominal | Replaces the FTE/Nominal side-by-side with FTE, nominal, total, and the +/- delta computed directly instead of left for you to subtract. | S |
-| C4 | Fix hardcoded footer date | Footer currently has a literal string `Generated on 2026-07-14...` instead of the real generation date — this is a plain bug, listed here only because it's in the same output file; happy to just fix it regardless of the rest of C. | S |
-| C5 | Positive confirmation message when no data-quality issues | When assumptions/missing-data are both empty, show "No data-quality issues flagged" instead of silently showing nothing. | S |
-| C6 | Sort detail-section items by hours descending | Biggest time contributors shown first within each category. | S |
-| C7 | Standardize practicals-section wording ("First session" vs "First time delivery") | Note: this proposal's suggested wording conflicts with what CLAUDE.md currently documents as the standard ("First time delivery") — needs reconciling either way, not a free pick. | S |
+Reports are written to **`output/New Individual Reports/`**, one per staff member, generated
+automatically every time you run `python main.py` (added as one extra line in `main.py`,
+alongside the existing `generate_all_outputs()` call — doesn't touch or gate it).
 
-*C-prereq (shared plumbing, only needed if you pick C1 or C2): add `category` field to
-`WorkloadResult` + `config.get_normative_split()` helper. M effort, tested separately (see D-prereq
-below — same piece of work, shared with the department view).*
+| # | Proposal | Flag in `NEW_REPORT_FEATURES` | Status |
+|---|----------|-------------------------------|--------|
+| C1 | Computed headline summary sentence | `headline_summary` | Built. Degrades gracefully to just the raw over/under % (no "mostly from X" clause) when category is unmapped — currently true for everyone, see the data-gap note above. |
+| C2 | Normative-split comparison table | `normative_comparison` | Built. Shows actual-hours-only with an explicit "no normative split available" note when unmapped (currently everyone). |
+| C3 | Header block: total hours + delta vs nominal | `header_delta` | Built. |
+| C4 | Fix hardcoded footer date | `fixed_footer_date` | Built (`datetime.now()`). |
+| C5 | Positive confirmation when no data-quality issues | `positive_confirmation` | Built. |
+| C6 | Sort by hours descending | `sort_by_hours` | Built for teaching (modules ordered by their subtotal, largest first, instead of alphabetically). Research/admin sections were **already** sorting by value in the existing report code — reused as-is. |
+| C7 | Standardized wording ("First session" used consistently) | `standardized_wording` | Built — the one small shared parameter change mentioned above. |
 
-**My read, given you said your priority is departmental views:** C4 (trivial bug fix) is worth
-doing regardless. The rest (C1/C2/C3/C5/C6/C7) can wait indefinitely with zero cost — say which
-ones, if any, you want and I'll slot them in; otherwise they stay parked here.
+**To keep some and drop others:** edit the `NEW_REPORT_FEATURES` dict at the top of
+`scripts/new_individual_reports.py` (each flag is independent — turning one off makes that
+specific piece match the current report's behaviour, not blank/broken) and re-run
+`python main.py`. With every flag off, the new report matches the current report's content
+almost exactly (verified — only trivial whitespace/comment differences remain).
+
+Once you've decided what to keep, the natural next step is **E2** (extract the shared
+normative-comparison/deviation-threshold logic so the kept pieces and the department report use
+one implementation, not two) — not done yet, deliberately deferred until you've picked.
 
 ---
 
-## Section D — Departmental view improvements (your stated priority)
+## Section D — Departmental view improvements — mostly ALREADY BUILT (discovered, not built by me)
 
-This is what you said you actually want: reports/graphs to manage departmental workload and see
-where time is going. Ordered to build the shared data plumbing first, then the highest-value
-manager-facing addition, then the rest.
+**Correction to the original version of this plan:** I had assumed this section needed building
+from scratch, based on the planning docs describing a "before" state. While building Section C I
+actually inspected `generate_html_report()` and `generate_boxplots()` directly for the first time
+this session and found most of this already exists in the live code — presumably from earlier
+work that predates this conversation, without the planning docs being updated to match.
 
-| # | Item | Why it matters for you | Effort | Depends on |
-|---|------|------------------------|--------|------------|
-| D-prereq | Add `category` field to `WorkloadResult` + `config.get_normative_split()` mapping | Foundation for everything below — without it there's no way to compare anyone's actual split to their contract-type target. Shared with C1/C2 if you pick those later. | M | — |
-| D1 | **"Needs attention" triage section** | The source doc calls this "the single most useful addition for a manager" — a section before the main table listing staff >~10% over/under nominal hours, plus anyone with non-empty assumptions/missing-data (actual message text shown). This is probably your fastest path to "where is time going / who needs a conversation." | M | D-prereq |
-| D2 | Department summary block | Headcount, total FTE, total hours, average teaching/research/admin per FTE, one generated sentence comparing dept-wide average split to normative target. | M | D-prereq |
-| D3 | Fix boxplot charts: unplotted "expected" line + flat normative split | Two known bugs: the "expected" comparison line is computed but never actually drawn, and both boxplot charts currently compare everyone against one flat split regardless of their real contract category. Fixing this makes the charts actually show what they're supposed to. | M | D-prereq |
-| D4 | Replace truncated free-text detail columns with structured hours + per-category deviation indicator | Main table currently has 80-char-truncated tooltip text; replace with FTE/total/teaching/research/admin hours and a compact "how far from target" indicator per category. | M | D-prereq |
-| D5 | Link staff names to their individual report | Click through from the summary table to the full per-staff breakdown. | S | Stable individual-report filenames (already the case) |
-| D6 | Group/sort main table by contract category | See T&R vs T&S patterns together rather than arbitrary order. | S | D-prereq |
-| D7 | Unit tests for department summary stats + needs-attention filter | Tested independent of HTML generation. | S | D1, D2 |
+| # | Item | Status |
+|---|------|--------|
+| D-prereq | `category` field on `WorkloadResult` + `config.get_normative_split()` | **Already built.** (Its data source is broken for the current roster — see the data-gap note above — but the plumbing itself exists and works correctly when category data is present.) |
+| D1 | "Needs attention" triage section | **Already built.** Live in `workload_report.html` — staff >10% off nominal, plus anyone with assumptions/missing-data, sorted by deviation size. |
+| D2 | Department summary block | **Already built.** Headcount, total FTE, total hours, average hours, nominal total, per-category splits with normative-comparison line. |
+| D3 | Fix boxplot charts (unplotted expected line, flat split) | **Already built** — `generate_boxplots()` already draws category-aware expected lines per staff member. The `_create_boxplot()` function the old bug report was describing is dead code, never called (see B12 above). |
+| D4 | Replace truncated detail columns | **Already built.** The staff table shows FTE/total/teaching/research/admin hours plus a normative-deviation indicator (On target / Moderate / High), not truncated free text. |
+| D5 | Link staff names to individual reports | **Already built.** Table rows link to `Individual Reports/{name}_workload.html`. |
+| D6 | Group/sort by contract category | **Already built.** Table is sorted by category then name. |
+| D7 | Unit tests for department summary stats + needs-attention filter | **Not done** — genuinely missing, confirmed via search (no test file references `needs_attention` or `category_stats`). This is the one real remaining piece of Section D. |
 
-**Recommended order:** D-prereq → **D1** (highest value, do this first) → D3 (fixes visibly
-broken charts) → D2 → D4 → D5 → D6 → D7.
+**Remaining Section D work: just D7**, plus B12 (dead-code cleanup) from Section B above.
 
 ---
 
 ## Section E — Integration & final pass
 
-| # | Item | Depends on |
-|---|------|------------|
-| E1 | Confirm `generate_all_outputs()` runs per-staff reports before the department report (department report links to individual filenames) | D5 |
-| E2 | Extract shared reporting-helper logic (normative-comparison, over/under framing, colour/threshold conventions) so the two report types don't diverge | Whichever of C/D items land |
-| E3 | Run full test suite together, not just per-change | All of B/D/E |
-| E4 | Full-run visual sanity check, incl. graceful handling of an unmapped category (no crash) | E3 |
+| # | Item | Status |
+|---|------|--------|
+| E1 | `generate_per_staff_reports()` runs before `generate_html_report()` | **Already correct** — confirmed in `generate_all_outputs()`. |
+| E2 | Extract shared reporting-helper logic between department report and individual reports | **Not done** — genuinely useful now that Section C exists with its own independent normative-comparison implementation; do this once you've decided which C items to keep. |
+| E3 | Run full test suite together | Ongoing — done after every change so far, same 4 pre-existing failures throughout, no regressions introduced. |
+| E4 | Full-run visual sanity check, incl. graceful unmapped-category handling | Done for Section A/C changes — no crashes, graceful degradation confirmed for the current all-unmapped-category state. |
 
 ---
 
-## Suggested overall sequence
+## What's left, in order
 
-1. **Section A** (A1, A2, A4 now; A3 raised for your input)
-2. **Section B1–B2** (JSON baseline + format-diff tests — the safety net everything else leans on)
-3. **Section D-prereq + D1** (category/normative plumbing, then the "needs attention" view — your stated priority, unblocked as soon as the safety net exists)
-4. **Section D3–D7** (rest of the departmental view)
-5. **Section B3–B8, B11** (remaining test coverage, can run in parallel with step 4 — independent)
-6. **Section B10** (the gated `output_generator.py` refactor — only once B1/B2 are solid)
-7. **Section C** — only the items you actually pick, whenever you pick them; C4 (footer date bug) can happen any time
-8. **Section E** (integration/consistency pass, once whichever of C/D was built)
+1. **You:** point me at a data source for staff contract category (or confirm there isn't one
+   yet), and weigh in on A2 (baseline hour docs) and A3 (flat lecture-hours question).
+2. **You:** review `output/New Individual Reports/` and decide which of C1–C7 to keep.
+3. **Me, once you're ready:** B1 → B2 (JSON baseline + format-diff safety net) → B6 → B3 → B4 →
+   B7 → B8 → B11 → B12 (cleanup) → D7 → **B10** (the gated refactor) → E2 (once C is decided).
 
-B9 stays explicitly parked (blocked on a large function decomposition not otherwise in scope).
+B9 stays parked (blocked on a large function decomposition not otherwise in scope).
 
 ---
 
 ## Once this is reviewed
 
-- Archive `architecture_improvements.md`, `architecture_improvements_v2.md`,
-  `academic_workload_test_strategy.md`, `BUGS_AND_FIXES.md`, `DISCREPANCIES.md`, and
-  `WORKLOAD_OUTPUT_REDESIGN_PROMPTS.md` (e.g. move to a `docs/archive/` folder) since this file
-  supersedes them — keeping all six around invites them drifting out of sync with this plan the
-  way they'd drifted out of sync with the code and each other.
+Archive the six original planning docs (`architecture_improvements.md`,
+`architecture_improvements_v2.md`, `academic_workload_test_strategy.md`, `BUGS_AND_FIXES.md`,
+`DISCREPANCIES.md`, `WORKLOAD_OUTPUT_REDESIGN_PROMPTS.md`) — this file supersedes them, and two
+rounds of "the docs described a state the code had already moved past" is a good sign they should
+stop being treated as current.
