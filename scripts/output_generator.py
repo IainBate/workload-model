@@ -1669,7 +1669,7 @@ def format_teaching_section(r: WorkloadResult, title: str, hours: float, css_cla
 
             # Calculate number of lectures (2h each based on standard format)
             num_lectures = int(total_lecture_hours / 22) if total_lecture_hours > 0 else 1
-            lecture_desc = f"{num_lectures} lecture({'s' if num_lectures > 1 else ''})"
+            lecture_desc = f"{num_lectures} lecture{'s' if num_lectures > 1 else ''}"
 
             # Practical sessions description
             if total_groups is not None and total_groups > 0:
