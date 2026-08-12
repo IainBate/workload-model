@@ -1367,6 +1367,7 @@ def load_all_data(data_dir: str = None,
     fte_data = _load_fte_data()
     waw_roles = _load_waw_roles()
     part_time_data = _load_part_time()
+    art_ts_data = _load_art_ts_categories()
 
     # Build staff roster from all data sources
     staff = {}
