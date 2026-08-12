@@ -78,6 +78,7 @@ class ModuleData:
     practical_groups: int = 0  # Number of parallel groups for practicals
     practical_weeks: Tuple[int, ...] = field(default_factory=tuple)  # Weeks when practicals occur (immutable)
     student_count: int = 0  # From CS Module Numbers.csv - set during loading
+    student_count_by_code: Dict[str, int] = field(default_factory=dict)  # Per-code counts (e.g. H vs M variant), from CS Module Numbers.csv
     assessment_count: int = 1  # From CS Module Assessment Numbers.csv - set during loading
     source_year: str = ""  # e.g., "2026-7"
     marking_type: str = "manual"  # "automated" or "manual"
