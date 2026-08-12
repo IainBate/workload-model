@@ -1202,9 +1202,9 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
                     <li><strong>Teaching:</strong> {r.teaching_hours:.1f}h</li>
                     <li><strong>Research (protected baseline):</strong> {config.PROTECTED_RESEARCH_BASELINE * r.fte:.1f}h</li>
                     <li><strong>Research (additional - grants, supervision):</strong> {max(0, r.research_hours - config.PROTECTED_RESEARCH_BASELINE * r.fte):.1f}h</li>
-                    <li><strong>Admin:</strong> {r.admin_hours:.1f}h</li>
+                    <li><strong>Admin:</strong> {r.admin_hours:,.1f}h</li>
                 </ul>
-                <p style="margin-top:20px;"><em>Total: {total_for_display:.1f} hours = {r.teaching_hours:.1f} + {config.PROTECTED_RESEARCH_BASELINE * r.fte:.1f} + {max(0, r.research_hours - config.PROTECTED_RESEARCH_BASELINE * r.fte):.1f} + {r.admin_hours:.1f}</em></p>
+                <p style="margin-top:20px;"><em>Total: {total_for_display:,.1f} hours = {r.teaching_hours:,.1f} + {config.PROTECTED_RESEARCH_BASELINE * r.fte:.1f} + {max(0, r.research_hours - config.PROTECTED_RESEARCH_BASELINE * r.fte):.1f} + {r.admin_hours:,.1f}</em></p>
             </div>
         </div>
 
@@ -1953,9 +1953,9 @@ def _format_teaching_section_for_staff(result: WorkloadResult, title: str, hours
                     <li><strong>Teaching:</strong> {r.teaching_hours:.1f}h</li>
                     <li><strong>Research (protected baseline):</strong> {config.PROTECTED_RESEARCH_BASELINE * r.fte:.1f}h</li>
                     <li><strong>Research (additional - grants, supervision):</strong> {max(0, r.research_hours - config.PROTECTED_RESEARCH_BASELINE * r.fte):.1f}h</li>
-                    <li><strong>Admin:</strong> {r.admin_hours:.1f}h</li>
+                    <li><strong>Admin:</strong> {r.admin_hours:,.1f}h</li>
                 </ul>
-                <p style="margin-top:20px;"><em>Total: {total_for_display:.1f} hours = {r.teaching_hours:.1f} + {config.PROTECTED_RESEARCH_BASELINE * r.fte:.1f} + {max(0, r.research_hours - config.PROTECTED_RESEARCH_BASELINE * r.fte):.1f} + {r.admin_hours:.1f}</em></p>
+                <p style="margin-top:20px;"><em>Total: {total_for_display:,.1f} hours = {r.teaching_hours:,.1f} + {config.PROTECTED_RESEARCH_BASELINE * r.fte:.1f} + {max(0, r.research_hours - config.PROTECTED_RESEARCH_BASELINE * r.fte):.1f} + {r.admin_hours:,.1f}</em></p>
             </div>
         </div>
 
