@@ -1705,7 +1705,8 @@ def format_teaching_section(r: WorkloadResult, title: str, hours: float, css_cla
                     practical_desc = "practical sessions"
 
             # Build the detailed header
-            module_desc_parts = [f"{stage} Module - {lecture_desc} (2h) and {practical_desc} (each 2h) per week split between {n_teachers} lecturer{'s' if n_teachers > 1 else ''}"]
+            n_teachers_word = _format_number_as_word(n_teachers)
+            module_desc_parts = [f"{stage} Module - {lecture_desc} (2h) and {practical_desc} (each 2h) per week split between {n_teachers_word} lecturer{'s' if n_teachers > 1 else ''}"]
 
             # Join all modules in stage with their descriptions
             for i, m in enumerate(modules_in_stage):
