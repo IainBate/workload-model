@@ -97,7 +97,7 @@ def generate_baseline(data_dir: str = None):
 
     # Load all data
     print("\nLoading data...")
-    year_data = load_all_data(data_dir=str(data_dir), unknown_callback=None)
+    year_data = load_all_data(data_dir=str(data_dir), unknown_callback=None, category_callback=None)
     print(f"  Modules loaded: {len(year_data.modules)}")
     print(f"  Staff in roster: {len(year_data.staff)}")
 
