@@ -1740,11 +1740,11 @@ def format_teaching_section(r: WorkloadResult, title: str, hours: float, css_cla
         past_hours_total = pastoral_breakdown.get('total', 0.0)
         past_students_total = pastoral_breakdown.get('student_count', 0)
         items_html_parts.append(f"""<div style="margin-bottom:25px;">
-            <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #2196F3;padding-left:10px;">Pastoral Supervision ({past_hours_total:.1f}h)</h4>
+            <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #2196F3;padding-left:10px;">Pastoral Supervision ({_format_hours(past_hours_total)})</h4>
             <div style="margin-left:20px;">
                 <div class="detail-item teaching-item">
                     <span class="detail-name">Students</span>
-                    <span class="detail-hours">{past_students_total} students x {config.SUPERVISION_MULTIPLIERS['pastoral']}h each = {past_hours_total:.1f}h</span>
+                    <span class="detail-hours">{past_students_total} students x {config.SUPERVISION_MULTIPLIERS['pastoral']}h each = {_format_hours(past_hours_total)}</span>
                     <span class="detail-activity teaching-activity"></span>
                 </div>
             </div>
@@ -1755,11 +1755,11 @@ def format_teaching_section(r: WorkloadResult, title: str, hours: float, css_cla
         proj_projects_total = project_breakdown.get('project_count', 0)
         proj_level = project_breakdown.get('level', 'UG')
         items_html_parts.append(f"""<div style="margin-bottom:25px;">
-            <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #2196F3;padding-left:10px;">Project Supervision ({proj_hours_total:.1f}h)</h4>
+            <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #2196F3;padding-left:10px;">Project Supervision ({_format_hours(proj_hours_total)})</h4>
             <div style="margin-left:20px;">
                 <div class="detail-item teaching-item">
                     <span class="detail-name">Projects</span>
-                    <span class="detail-hours">{proj_projects_total} projects x {proj_level} = {proj_hours_total:.1f}h</span>
+                    <span class="detail-hours">{proj_projects_total} projects x {proj_level} = {_format_hours(proj_hours_total)}</span>
                     <span class="detail-activity teaching-activity"></span>
                 </div>
             </div>
@@ -1770,10 +1770,10 @@ def format_teaching_section(r: WorkloadResult, title: str, hours: float, css_cla
     return f"""<div class="section-card {css_class}">
         <div class="card-header">
             <span class="card-title">{title}</span>
-            <span class="card-total">{hours:.1f}h</span>
+            <span class="card-total">{_format_hours(hours)}</span>
         </div>
         {items_html}
-        <p style="font-size:0.85em;color:#666;padding-top:10px;">Subtotal: {hours:.1f}h</p>
+        <p style="font-size:0.85em;color:#666;padding-top:10px;">Subtotal: {_format_hours(hours)}</p>
     </div>"""
 
 
