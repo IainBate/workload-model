@@ -1450,7 +1450,8 @@ def _format_module_practicals_section(
     module_breakdown: Dict[str, Any],
     css_class: str,
     module_code: Optional[str] = None,
-    is_new_lecturer: bool = False
+    is_new_lecturer: bool = False,
+    standardized_wording: bool = False
 ) -> List[str]:
     """Format practical sessions section for a module."""
     parts = []

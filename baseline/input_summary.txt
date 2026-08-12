@@ -72,7 +72,7 @@ Staff:
   - James Walker [FTE: 1.0, Roles: none]
   - Jen Beeston [FTE: 1.0, Roles: Chair of the Department Education Committee]
   - Jo Iacovides [FTE: 1.0, Roles: Progression Panel]
-  - Joe Cutting [FTE: 1.0, Roles: ECR rep]
+  - Joe Cutting [FTE: 1.0, Roles: ECR representative]
   - Katrina Attwood [FTE: 1.0, Roles: Director of Students]
   - Kofi Appiah [FTE: 1.0, Roles: Deputy Director of Admissions (UG Admissions)]
   - Kostas Barmpis [FTE: 1.0, Roles: PhD Training Officer]
