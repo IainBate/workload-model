@@ -1652,18 +1652,66 @@ def format_teaching_section(r: WorkloadResult, title: str, hours: float, css_cla
     for stage in sorted(stages.keys()):
         modules_in_stage = stages[stage]
         module_word = "Module" if len(modules_in_stage) == 1 else "Modules"
-        items_html_parts.append(f"""<div style="margin-bottom:25px;">
-            <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #2196F3;padding-left:10px;">{stage} {module_word} ({len(modules_in_stage)} module(s))</h4>""")
 
         for mod in modules_in_stage:
             code = mod['code']
             module_breakdown = mod['module_breakdown']
-            is_new_lecturer = False  # This would need to be determined from context
-            items_html_parts.extend(_format_module_delivery_section(module_breakdown, is_new_lecturer, css_class, code))
-            items_html_parts.extend(_format_module_practicals_section(module_breakdown, css_class, code, is_new_lecturer))
-            items_html_parts.extend(_format_module_assessment_section(module_breakdown, css_class, code))
 
-        items_html_parts.append("</div>")
+            # Build detailed module description
+            ps = module_breakdown.get('practicals_structured', {})
+            n_teachers = ps.get('n_teachers', 1)
+            total_groups = ps.get('total_groups')  # None if not parallel groups
+            groups_per_teacher = ps.get('groups_per_teacher', 0)
+
+            # Get lecture info
+            total_lecture_hours = module_breakdown.get('total_lecture_hours', 0)
+            lecture_contact = module_breakdown.get('lecture_contact_hours', 0)
+
+            # Calculate number of lectures (2h each based on standard format)
+            num_lectures = int(total_lecture_hours / 22) if total_lecture_hours > 0 else 1
+            lecture_desc = f"{num_lectures} lecture({'s' if num_lectures > 1 else ''})"
+
+            # Practical sessions description
+            if total_groups is not None and total_groups > 0:
+                practical_desc = f"{total_groups} practical sessions"
+            else:
+                # For non-parallel, calculate from groups_per_teacher
+                if n_teachers > 0:
+                    # Each teacher gets at least 1 session, plus repeats
+                    total_sessions = int(n_teachers + (groups_per_teacher - n_teachers) if groups_per_teacher > n_teachers else 1)
+                    practical_desc = f"{n_teachers} practical session{'s' if n_teachers > 1 else ''}"
+                else:
+                    practical_desc = "practical sessions"
+
+            # Build the detailed header
+            module_desc_parts = [f"{stage} Module - {lecture_desc} (2h) and {practical_desc} (each 2h) per week split between {n_teachers} lecturer{'s' if n_teachers > 1 else ''}"]
+
+            # Join all modules in stage with their descriptions
+            for i, m in enumerate(modules_in_stage):
+                m_code = m['code']
+                items_html_parts.append(f"""<div style="margin-bottom:25px;">
+                    <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #2196F3;padding-left:10px;">{module_desc_parts[0]}</h4>""")
+
+                is_new_lecturer = False  # This would need to be determined from context
+                items_html_parts.extend(_format_module_delivery_section(m['module_breakdown'], is_new_lecturer, css_class, m_code))
+                items_html_parts.extend(_format_module_practicals_section(m['module_breakdown'], css_class, m_code, is_new_lecturer))
+                items_html_parts.extend(_format_module_assessment_section(m['module_breakdown'], css_class, m_code))
+
+                items_html_parts.append("</div>")
+
+        # Calculate and display total for this stage's modules
+        stage_total = 0.0
+        for mod in modules_in_stage:
+            mb = mod.get('module_breakdown', {})
+            # Sum up the main teaching components from the module breakdown
+            for key in ['teaching', 'practicals', 'assessment_setting', 'marking']:
+                if key in mb and isinstance(mb[key], (int, float)):
+                    stage_total += mb[key]
+
+        if stage_total > 0:
+            items_html_parts.append(f"""<div style="margin-bottom:15px;">
+                <p style="font-size:1.1em;color:#4CAF50;margin:0 0 5px 20px;font-weight:bold;">- Total = {stage_total:.1f}h</p>
+            </div>""")
 
         # Calculate and display total for this stage's modules
         stage_total = 0.0
