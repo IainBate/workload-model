@@ -1524,7 +1524,7 @@ def _format_module_practicals_section(
 
             parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
                 <span class="detail-name" style="color:#333;">Calculation</span>
-                <span class="detail-hours">{contact_hrs:.1f}h/week × {config.TEACHING_WEEKS_PER_SEMESTER} weeks / {n_teachers} teachers × {actual_multiplier:.0f}x = {chris_total_practicals:.1f}h</span>
+                <span class="detail-hours">{contact_hrs:.1f}h/week × {config.TEACHING_WEEKS_PER_SEMESTER} weeks / {n_teachers} teachers × {actual_multiplier:.1f}x = {chris_total_practicals:.1f}h</span>
             </div>""")
     else:
         # Fallback to default rates if structured data not available
