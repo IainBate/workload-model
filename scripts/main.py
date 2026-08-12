@@ -131,12 +131,12 @@ def main():
 
     # Load all data (data_dir is passed, defaults to DATA_DIR inside load_all_data)
     print("\nLoading data...")
-    unknown_callback = prompt_name_match if args.interactive else None
     if not args.interactive:
-        # In non-interactive mode, pass None so unknown names are kept as-is
-        year_data = load_all_data(data_dir=base_dir, unknown_callback=None)
+        # In non-interactive mode, pass None so unknown names/categories are
+        # kept as-is / left unresolved rather than blocking on input
+        year_data = load_all_data(data_dir=base_dir, unknown_callback=None, category_callback=None)
     else:
-        year_data = load_all_data(data_dir=base_dir, unknown_callback=prompt_name_match)
+        year_data = load_all_data(data_dir=base_dir, unknown_callback=prompt_name_match, category_callback=_prompt_category_match)
 
     # Print summary
     print_data_summary(year_data)
