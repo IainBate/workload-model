@@ -1360,6 +1360,13 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
         # Administration
         admin_hours, admin_breakdown, admin_detail = _calculate_admin_workload(staff, nominal_hours)
 
+        # Add marking admin overhead hours (from assessment processing) to admin workload
+        # These are administrative hours for marking coordination, not teaching time
+        if canonical_name in staff_teaching and "marking_admin_hours" in staff_teaching[canonical_name]:
+            marking_admin = staff_teaching[canonical_name]["marking_admin_hours"]
+            admin_hours += marking_admin
+            admin_breakdown["marking_admin"] = marking_admin
+
         # Admin hours already include service_points (engagement + personal_dev)
         # So we don't add them separately to avoid double-counting
         # Total: teaching + research (protected + additional) + admin
