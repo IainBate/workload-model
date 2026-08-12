@@ -618,6 +618,46 @@ def _calculate_assessment_setting_hours(module: ModuleData, teachers: List[str],
     return result
 
 
+def _classify_marking_levels(module: ModuleData) -> List[dict]:
+    """Split a module's students into UG ("H") and MSc ("M") marking cohorts.
+
+    Some modules are taught as a single shared class to two cohorts, recorded
+    as two module codes on one WTW row (e.g. AURO: COM00052H + COM00186M).
+    The "H"/"M" code suffix - not module.stage - is the reliable signal for
+    level here: these shared modules are all recorded at stage 3 in WTW
+    (matching CLAUDE.md's "1-3 UG, 4+ MSc" convention), so module.stage alone
+    can't tell a UG-only stage-3 module apart from a shared UG/MSc one, or a
+    MSc-only module that happens to keep its WTW stage at 3.
+
+    Returns a list of {'label', 'student_count', 'is_msc'} - one entry per
+    level. A single-level module gets one entry with label=None.
+    """
+    by_code = getattr(module, 'student_count_by_code', {}) or {}
+    h_count = sum(c for code, c in by_code.items() if code.endswith('H'))
+    m_count = sum(c for code, c in by_code.items() if code.endswith('M'))
+
+    if h_count > 0 and m_count > 0:
+        return [
+            {'label': 'H level', 'student_count': h_count, 'is_msc': False},
+            {'label': 'M level', 'student_count': m_count, 'is_msc': True},
+        ]
+
+    student_count = module.student_count
+    if student_count == 0:
+        return []
+
+    if m_count > 0 and h_count == 0:
+        is_msc = True
+    elif h_count > 0 and m_count == 0:
+        is_msc = False
+    else:
+        # No H/M-coded students at all (e.g. stage 1-2 modules) - fall back
+        # to the module's own stage.
+        is_msc = config.is_msc_level(getattr(module, 'stage', 1))
+
+    return [{'label': None, 'student_count': student_count, 'is_msc': is_msc}]
+
+
 def _calculate_assessment_marking_hours(module: ModuleData, teachers: List[str]) -> dict:
     """Calculate assessment marking hours per teacher.
 
@@ -634,28 +674,39 @@ def _calculate_assessment_marking_hours(module: ModuleData, teachers: List[str])
         'admin_flat': config.MARKING_MANUAL_ADMIN,  # Default
     }
 
-    student_count = module.student_count
-
-    if student_count == 0:
+    levels = _classify_marking_levels(module)
+    if not levels:
         return result
 
     # Determine marking type and rates
     is_automated = getattr(module, 'marking_type', 'manual') == 'automated'
     resit_fraction = 0.2  # 20% resits, applied to both automated and manual marking
+    result['admin_flat'] = config.MARKING_AUTO_ADMIN if is_automated else config.MARKING_MANUAL_ADMIN
 
-    if is_automated:
-        result['admin_flat'] = config.MARKING_AUTO_ADMIN
-        rate_per_script = config.MARKING_AUTO_MSC if config.is_msc_level(getattr(module, 'stage', 1)) else config.MARKING_AUTO_UG
-    else:
-        result['admin_flat'] = config.MARKING_MANUAL_ADMIN
-        stage = getattr(module, 'stage', 1)
-        rate_per_script = config.MARKING_MANUAL_MSC if config.is_msc_level(stage) else config.MARKING_MANUAL_UG
+    level_breakdowns = []
+    total_marking_hours = 0.0
+    for level in levels:
+        if is_automated:
+            rate_per_script = config.MARKING_AUTO_MSC if level['is_msc'] else config.MARKING_AUTO_UG
+        else:
+            rate_per_script = config.MARKING_MANUAL_MSC if level['is_msc'] else config.MARKING_MANUAL_UG
 
-    first_mark_hrs = rate_per_script * student_count
-    resit_student_count = student_count * resit_fraction
-    resit_hrs = rate_per_script * resit_student_count
+        student_count = level['student_count']
+        main_hrs = rate_per_script * student_count
+        resit_student_count = student_count * resit_fraction
+        resit_hrs = rate_per_script * resit_student_count
+        level_total = main_hrs + resit_hrs
+        total_marking_hours += level_total
 
-    total_marking_hours = first_mark_hrs + resit_hrs
+        level_breakdowns.append({
+            'label': level['label'],
+            'rate_per_script': rate_per_script,
+            'main_student_count': student_count,
+            'main_hours': main_hrs,
+            'resit_student_count': resit_student_count,
+            'resit_hours': resit_hrs,
+            'total_hours': level_total,
+        })
 
     # Split equally among teachers
     per_teacher_hours = total_marking_hours / len(teachers) if teachers else 0.0
@@ -669,11 +720,7 @@ def _calculate_assessment_marking_hours(module: ModuleData, teachers: List[str])
     # Structured breakdown for display (module-level totals, before splitting among teachers)
     result['marking_structured'] = {
         'is_automated': is_automated,
-        'rate_per_script': rate_per_script,
-        'main_student_count': student_count,
-        'main_hours': first_mark_hrs,
-        'resit_student_count': resit_student_count,
-        'resit_hours': resit_hrs,
+        'levels': level_breakdowns,
         'total_hours': total_marking_hours,
         'n_teachers': len(teachers),
         'hours_per_teacher': per_teacher_hours,
