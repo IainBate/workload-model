@@ -351,7 +351,11 @@ def _calculate_practical_hours_and_breakdown(
                     result['individual_practical_hours'][t] += total_for_teacher
 
                 # Store structured breakdown (per teacher, per group) - shows base rates without multipliers
-                # week_count = sessions per group (always 1), total_groups = parallel groups count
+                # The 'total' field is the module's total at standard rates (no teacher multipliers)
+                # First session base at standard rate = first_session_base * first_session_rate
+                # Repeat base at repetition rate = repeat_base * repeat_rate
+                module_total_at_standard_rates = (first_session_base * first_session_rate) + (repeat_base * repeat_rate)
+
                 result['practicals_breakdown'] = {
                     "first_session_hours": round(weekly_hrs, 2),
                     "repeat_hours": round(repeat_sessions * weekly_hrs, 2),  # Base repeat hours without rates
@@ -359,7 +363,7 @@ def _calculate_practical_hours_and_breakdown(
                     "total_groups": n_parallel_groups,
                     "first_session_rate": first_session_rate,
                     "repeat_rate": repeat_rate,
-                    "total": round(first_session_with_mult + repeat_base, 2),
+                    "total": round(module_total_at_standard_rates, 2),
                     "n_teachers": n_teachers,
                     # Store per-teacher values for display
                     "groups_per_teacher": groups_per_teacher,
