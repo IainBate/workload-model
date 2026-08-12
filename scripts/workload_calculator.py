@@ -943,8 +943,6 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
             "practicals_breakdown": teacher_practicals_structured,
             "detail_text": "; ".join(module_detail_parts),
             "supervision_details": [],
-            # Admin overhead from marking (not included in teaching hours, added to admin)
-            "marking_admin_hours": admin_hours_per_teacher if module.assessment_count > 0 else 0.0,
         }
 
     return result
