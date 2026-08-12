@@ -99,7 +99,7 @@ This project provides an automated system for calculating academic staff workloa
 ## Architecture & Data Flow
 
 ### Source of truth
-- **`workload_parameters.yaml`** — Extracted from `Workload ModelFull Description.docx`. Human-readable reference spec.
+- **`workload_parameters.yaml`** — Extracted from `Work Allocation Model.docx`. Human-readable reference spec.
 - **`config.py`** — Runtime source of truth. Flat Python constants loaded from YAML. Imported by `calculator.py`.
 - **`workload_model_parameters.py`** — Legacy intermediate Python dict (superseded by YAML).
 
