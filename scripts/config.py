@@ -73,7 +73,7 @@ MARKING_AUTO_UG = MARKING["automated"]["ug"]  # 0.166
 MARKING_AUTO_CHECKING = MARKING["automated"]["checking"]  # 0.1
 MARKING_AUTO_ADMIN = MARKING["automated"]["admin_flat_rate_per_assessment"]  # 3
 MARKING_MANUAL_MSC = MARKING["manual"]["msc"]  # 0.5
-MARKING_MANUAL_UG = MARKING["manual"]["ug"]  # 0.33
+MARKING_MANUAL_UG = MARKING["manual"]["ug"]  # 1/3 (20 min/script)
 MARKING_MANUAL_CHECKING = MARKING["manual"]["checking"]  # 0.1
 MARKING_MANUAL_ADMIN = MARKING["manual"]["admin_flat_rate_per_assessment"]  # 3
 
