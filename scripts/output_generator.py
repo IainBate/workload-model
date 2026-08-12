@@ -1616,6 +1616,54 @@ def _format_module_assessment_section(module_breakdown: Dict[str, Any], css_clas
     return parts
 
 
+def _format_module_header(stage: str, modules_in_stage: List[Dict[str, Any]]) -> str:
+    """Build a descriptive module header from pre-computed breakdown fields, e.g.
+    "SYS2 Module - 1 lecture (2h) and 5 practical sessions (each 2h) per week split between three lecturers".
+    """
+    weeks = config.TEACHING_WEEKS_PER_SEMESTER
+
+    total_lecture_hours = 0.0
+    lecture_contact_hours = 0.0
+    practical_sessions = 0
+    practical_session_hours = 0.0
+    teacher_count = 1
+
+    for mod in modules_in_stage:
+        mb = mod.get('module_breakdown', {})
+        total_lecture_hours += mb.get('total_lecture_hours', 0.0)
+        module_contact_hours = mb.get('lecture_contact_hours', 0.0)
+        if module_contact_hours > 0:
+            lecture_contact_hours = module_contact_hours
+            teacher_count = max(teacher_count, int(round(mb.get('total_lecture_hours', 0.0) / module_contact_hours)))
+
+        ps = mb.get('practicals_structured') or {}
+        groups = ps.get('total_groups')
+        if groups:
+            practical_sessions += groups
+        elif ps.get('groups_per_teacher') and ps.get('n_teachers'):
+            practical_sessions += max(1, int(round(ps['groups_per_teacher'] * ps['n_teachers'])))
+        if ps.get('first_session_hours'):
+            practical_session_hours = ps['first_session_hours']
+        if ps.get('n_teachers'):
+            teacher_count = max(teacher_count, ps['n_teachers'])
+
+    num_lectures = int(round(total_lecture_hours / (weeks * 2))) if total_lecture_hours > 0 else 0
+
+    schedule_bits = []
+    if num_lectures > 0:
+        schedule_bits.append(f"{num_lectures} lecture{'s' if num_lectures != 1 else ''} (2h)")
+    if practical_sessions > 0:
+        hrs = practical_session_hours if practical_session_hours else 2.0
+        hrs_label = f"{hrs:.0f}h" if hrs == int(hrs) else f"{hrs:.1f}h"
+        schedule_bits.append(f"{practical_sessions} practical session{'s' if practical_sessions != 1 else ''} (each {hrs_label})")
+
+    header = f"{stage} Module"
+    if schedule_bits:
+        teacher_word = _format_number_as_word(teacher_count)
+        header += f" - {' and '.join(schedule_bits)} per week split between {teacher_word} lecturer{'s' if teacher_count != 1 else ''}"
+    return header
+
+
 def _format_module_items(modules_in_stage: List[Dict], css_class: str,
                          known_lecturers_per_module: Optional[Dict[str, frozenset]],
                          staff_name: str) -> List[str]:

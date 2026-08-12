@@ -3,7 +3,7 @@ Workload Model Baseline Generation Summary
 
 Year: 2026-7
 Modules: 39
-Staff: 55
+Staff: 56
 
 Modules:
   - ARIA (COM00072H) [20cr, Stage 3] - Tommy, Peter
@@ -83,6 +83,7 @@ Staff:
   - Pedro Ribeiro [FTE: 1.0, Roles: Progression Panel]
   - Pengcheng Liu [FTE: 1.0, Roles: Graduate School Board (GSB) Chair]
   - Peter Nightingale [FTE: 1.0, Roles: UG PL]
+  - Phoebe [FTE: 1.0, Roles: none]
   - Poonam Yadav [FTE: 1.0, Roles: Progression Panel]
   - Pourya Shamsolmoali [FTE: 1.0, Roles: Graduate School Board (Ordinary member), Other PLs]
   - Radu Calinescu [FTE: 1.0, Roles: none]
