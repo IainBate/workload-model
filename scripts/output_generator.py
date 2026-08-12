@@ -1732,7 +1732,7 @@ def format_teaching_section(r: WorkloadResult, title: str, hours: float, css_cla
 
         if stage_total > 0:
             items_html_parts.append(f"""<div style="margin-bottom:15px;">
-                <p style="font-size:1.1em;color:#4CAF50;margin:0 0 5px 20px;font-weight:bold;">- Total = {stage_total:.1f}h</p>
+                <p style="font-size:1.1em;color:#4CAF50;margin:0 0 5px 20px;font-weight:bold;">- Total = {_format_hours(stage_total)}</p>
             </div>""")
 
     # Format supervision if present
@@ -1834,7 +1834,7 @@ def _format_teaching_section_for_staff(result: WorkloadResult, title: str, hours
 
         if stage_total > 0:
             items_html_parts.append(f"""<div style="margin-bottom:15px;">
-                <p style="font-size:1.1em;color:#4CAF50;margin:0 0 5px 20px;font-weight:bold;">- Total = {stage_total:.1f}h</p>
+                <p style="font-size:1.1em;color:#4CAF50;margin:0 0 5px 20px;font-weight:bold;">- Total = {_format_hours(stage_total)}</p>
             </div>""")
 
         # Phase 3b: Use structured supervision breakdowns instead of regex parsing
