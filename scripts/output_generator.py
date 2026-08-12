@@ -1609,10 +1609,39 @@ def _format_module_assessment_section(module_breakdown: Dict[str, Any], css_clas
             <span class="detail-hours">{marking_per_module:.1f}h</span>
             <span class="detail-activity teaching-activity"></span>
         </div>""")
-        parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
-            <span class="detail-name" style="color:#333;">Calculation</span>
-            <span class="detail-hours">{marking_per_module:.1f}h total (main + resit)</span>
-        </div>""")
+
+        marking_structured = module_breakdown.get('marking_structured', {})
+        if marking_structured:
+            def _fmt_num(n: float) -> str:
+                return f"{n:.0f}" if abs(n - round(n)) < 0.05 else f"{n:.1f}"
+
+            marking_type_label = "automated" if marking_structured.get('is_automated') else "manual"
+            rate_mins = marking_structured.get('rate_per_script', 0) * 60
+            main_count = marking_structured.get('main_student_count', 0)
+            main_hours = marking_structured.get('main_hours', 0)
+            resit_count = marking_structured.get('resit_student_count', 0)
+            resit_hours = marking_structured.get('resit_hours', 0)
+            total_hours = marking_structured.get('total_hours', 0)
+            n_teachers = marking_structured.get('n_teachers', 1)
+            hours_per_teacher = marking_structured.get('hours_per_teacher', marking_per_module)
+
+            parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+                <span class="detail-name" style="color:#333;">Main</span>
+                <span class="detail-hours">{_fmt_num(main_count)} scripts @ {_fmt_num(rate_mins)} mins/script ({marking_type_label}) = {main_hours:.1f}h</span>
+            </div>""")
+            parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+                <span class="detail-name" style="color:#333;">Resit</span>
+                <span class="detail-hours">{_fmt_num(resit_count)} scripts @ {_fmt_num(rate_mins)} mins/script ({marking_type_label}) = {resit_hours:.1f}h</span>
+            </div>""")
+            parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+                <span class="detail-name" style="color:#333;">Total</span>
+                <span class="detail-hours">{main_hours:.1f}h + {resit_hours:.1f}h = {total_hours:.1f}h &divide; {n_teachers} teacher{'s' if n_teachers != 1 else ''} = {hours_per_teacher:.1f}h each</span>
+            </div>""")
+        else:
+            parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+                <span class="detail-name" style="color:#333;">Calculation</span>
+                <span class="detail-hours">{marking_per_module:.1f}h total (main + resit)</span>
+            </div>""")
     return parts
 
 
