@@ -438,7 +438,7 @@ def _create_new_style_report_html(r: WorkloadResult, year_data: YearData, featur
                         <span style="color:white;font-size:0.9em;">Research</span>
                         <strong style="color:#fff3e0;font-size:1.1em;">{r.research_hours:,.1f}h</strong>
                     </div>
-                    <div style="display:flex;justify-content:space-between;align-items:center;padding-left:20px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding-left:20px;border-bottom:1px solid rgba(255,255,255,0.1);">
                         <span style="color:white;font-size:0.9em;">Admin</span>
                         <strong style="color:#fce4ec;font-size:1.1em;">{r.admin_hours:,.1f}h</strong>
                     </div>
