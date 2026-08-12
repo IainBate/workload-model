@@ -1212,7 +1212,8 @@ def allocate_supervision(staff_data: Dict[str, StaffData]) -> SupervisionAllocat
 _UNSET = object()
 
 def load_all_data(data_dir: str = None,
-                  unknown_callback=_UNSET) -> YearData:
+                  unknown_callback=_UNSET,
+                  category_callback=_UNSET) -> YearData:
     """Load all data sources and merge into a YearData object.
 
     This is the main entry point for data loading. It reads WTW files, student
@@ -1224,6 +1225,13 @@ def load_all_data(data_dir: str = None,
         unknown_callback: Callback for unknown names, or _UNSET for auto-detect.
                           Pass None for non-interactive mode (keep names as-is).
                           Pass _UNSET or omit to auto-detect (use interactive prompt).
+        category_callback: Callback(canonical_name) -> Optional[str] for staff
+                          whose contract category can't be deduced from the ART
+                          Performance sheet, Part time.csv, or a previously saved
+                          answer. Pass None for non-interactive mode (leave
+                          unresolved). Pass _UNSET or omit to auto-detect (use
+                          interactive prompt). Answers are persisted to
+                          staff_category_lookup.json so future runs don't re-ask.
 
     Returns:
         YearData containing all loaded and merged data for the academic year.
@@ -1238,6 +1246,12 @@ def load_all_data(data_dir: str = None,
     if unknown_callback is _UNSET:
         # Create callback with mappings for alias suggestions
         unknown_callback = functools.partial(_prompt_name_match, mappings=mappings)
+
+    if category_callback is _UNSET:
+        category_callback = _prompt_category_match
+
+    category_overrides = _load_category_overrides()
+    category_overrides_dirty = False
 
     # Print any warnings about duplicate aliases
     for warning in name_warnings:
