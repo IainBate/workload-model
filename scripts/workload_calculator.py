@@ -332,7 +332,8 @@ def _calculate_practical_hours_and_breakdown(
                 repeat_sessions = max(0, groups_per_teacher - 1)
 
                 # Base hours without any rates applied
-                first_session_base = groups_per_teacher * weekly_hrs * contact_weeks
+                # Each teacher gets exactly 1 "first session" at their rate (first delivery of content)
+                first_session_base = 1.0 * weekly_hrs * contact_weeks
                 repeat_base = repeat_sessions * weekly_hrs * contact_weeks
 
                 for t in teachers:
