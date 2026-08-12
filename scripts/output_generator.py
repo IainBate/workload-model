@@ -1611,7 +1611,7 @@ def _format_module_assessment_section(module_breakdown: Dict[str, Any], css_clas
         </div>""")
         parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
             <span class="detail-name" style="color:#333;">Calculation</span>
-            <span class="detail-hours">{marking_per_module:.1f}h total (initial + resit)</span>
+            <span class="detail-hours">{marking_per_module:.1f}h total (main + resit)</span>
         </div>""")
     return parts
 
