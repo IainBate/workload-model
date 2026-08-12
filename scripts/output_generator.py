@@ -1713,20 +1713,6 @@ def format_teaching_section(r: WorkloadResult, title: str, hours: float, css_cla
                 <p style="font-size:1.1em;color:#4CAF50;margin:0 0 5px 20px;font-weight:bold;">- Total = {stage_total:.1f}h</p>
             </div>""")
 
-        # Calculate and display total for this stage's modules
-        stage_total = 0.0
-        for mod in modules_in_stage:
-            mb = mod.get('module_breakdown', {})
-            # Sum up the main teaching components from the module breakdown
-            for key in ['teaching', 'practicals', 'assessment_setting', 'marking']:
-                if key in mb and isinstance(mb[key], (int, float)):
-                    stage_total += mb[key]
-
-        if stage_total > 0:
-            items_html_parts.append(f"""<div style="margin-bottom:15px;">
-                <p style="font-size:1.1em;color:#4CAF50;margin:0 0 5px 20px;font-weight:bold;">- Total = {stage_total:.1f}h</p>
-            </div>""")
-
     # Format supervision if present
     if pastoral_breakdown:
         past_hours_total = pastoral_breakdown.get('total', 0.0)
