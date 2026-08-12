@@ -1674,7 +1674,7 @@ def format_teaching_section(r: WorkloadResult, title: str, hours: float, css_cla
         for mod in modules_in_stage:
             mb = mod.get('module_breakdown', {})
             # Sum up the main teaching components from the module breakdown
-            for key in ['delivery', 'practicals', 'assessment_setting', 'marking']:
+            for key in ['teaching', 'practicals', 'assessment_setting', 'marking']:
                 if key in mb and isinstance(mb[key], (int, float)):
                     stage_total += mb[key]
 
@@ -1776,7 +1776,7 @@ def _format_teaching_section_for_staff(result: WorkloadResult, title: str, hours
         for mod in modules_in_stage:
             mb = mod.get('module_breakdown', {})
             # Sum up the main teaching components from the module breakdown
-            for key in ['delivery', 'practicals', 'assessment_setting', 'marking']:
+            for key in ['teaching', 'practicals', 'assessment_setting', 'marking']:
                 if key in mb and isinstance(mb[key], (int, float)):
                     stage_total += mb[key]
 
