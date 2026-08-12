@@ -1168,19 +1168,19 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
                 <div style="display:flex;flex-direction:column;gap:8px;">
                     <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.2);">
                         <span style="color:white;font-size:1em;">Total Workload</span>
-                        <strong style="color:white;font-size:1.3em;">{total_for_display:.1f}h</strong>
+                        <strong style="color:white;font-size:1.3em;">{total_for_display:,.1f}h</strong>
                     </div>
                     <div style="display:flex;justify-content:space-between;align-items:center;padding-left:20px;border-bottom:1px solid rgba(255,255,255,0.1);">
                         <span style="color:white;font-size:0.9em;">Teaching</span>
-                        <strong style="color:#e3f2fd;font-size:1.1em;">{r.teaching_hours:.1f}h</strong>
+                        <strong style="color:#e3f2fd;font-size:1.1em;">{r.teaching_hours:,.1f}h</strong>
                     </div>
                     <div style="display:flex;justify-content:space-between;align-items:center;padding-left:20px;border-bottom:1px solid rgba(255,255,255,0.1);">
                         <span style="color:white;font-size:0.9em;">Research</span>
-                        <strong style="color:#fff3e0;font-size:1.1em;">{r.research_hours:.1f}h</strong>
+                        <strong style="color:#fff3e0;font-size:1.1em;">{r.research_hours:,.1f}h</strong>
                     </div>
                     <div style="display:flex;justify-content:space-between;align-items:center;padding-left:20px;border-bottom:1px solid rgba(255,255,255,0.1);">
                         <span style="color:white;font-size:0.9em;">Admin</span>
-                        <strong style="color:#fce4ec;font-size:1.1em;">{r.admin_hours:.1f}h</strong>
+                        <strong style="color:#fce4ec;font-size:1.1em;">{r.admin_hours:,.1f}h</strong>
                     </div>
                 </div>
             </div>
@@ -1919,19 +1919,19 @@ def _format_teaching_section_for_staff(result: WorkloadResult, title: str, hours
                 <div style="display:flex;flex-direction:column;gap:8px;">
                     <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.2);">
                         <span style="color:white;font-size:1em;">Total Workload</span>
-                        <strong style="color:white;font-size:1.3em;">{total_for_display:.1f}h</strong>
+                        <strong style="color:white;font-size:1.3em;">{total_for_display:,.1f}h</strong>
                     </div>
                     <div style="display:flex;justify-content:space-between;align-items:center;padding-left:20px;border-bottom:1px solid rgba(255,255,255,0.1);">
                         <span style="color:white;font-size:0.9em;">Teaching</span>
-                        <strong style="color:#e3f2fd;font-size:1.1em;">{r.teaching_hours:.1f}h</strong>
+                        <strong style="color:#e3f2fd;font-size:1.1em;">{r.teaching_hours:,.1f}h</strong>
                     </div>
                     <div style="display:flex;justify-content:space-between;align-items:center;padding-left:20px;border-bottom:1px solid rgba(255,255,255,0.1);">
                         <span style="color:white;font-size:0.9em;">Research</span>
-                        <strong style="color:#fff3e0;font-size:1.1em;">{r.research_hours:.1f}h</strong>
+                        <strong style="color:#fff3e0;font-size:1.1em;">{r.research_hours:,.1f}h</strong>
                     </div>
                     <div style="display:flex;justify-content:space-between;align-items:center;padding-left:20px;border-bottom:1px solid rgba(255,255,255,0.1);">
                         <span style="color:white;font-size:0.9em;">Admin</span>
-                        <strong style="color:#fce4ec;font-size:1.1em;">{r.admin_hours:.1f}h</strong>
+                        <strong style="color:#fce4ec;font-size:1.1em;">{r.admin_hours:,.1f}h</strong>
                     </div>
                 </div>
             </div>
