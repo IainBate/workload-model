@@ -331,25 +331,24 @@ def _calculate_practical_hours_and_breakdown(
                 groups_per_teacher = n_parallel_groups / n_teachers if n_teachers > 0 else 0
                 repeat_sessions = max(0, groups_per_teacher - 1)
 
-                # First session: each teacher delivers their share of groups as "first time" delivery
-                # At standard rate (TEACHING_PROBLEM_CLASS), then apply lecturer's multiplier
+                # Base hours without any rates applied
                 first_session_base = groups_per_teacher * weekly_hrs * contact_weeks
-                first_session_with_mult = first_session_base * first_session_rate
-
-                # Repeat sessions: only apply REPETITION_MULTIPLIER to the base repeat hours
-                # (the repetition rate accounts for teaching same content to multiple groups)
                 repeat_base = repeat_sessions * weekly_hrs * contact_weeks
-                repeat_with_rate = repeat_base * repeat_rate
-
-                # Total per teacher = first session (with lecturer multiplier) + repeats (with rep rate only)
-                total_per_teacher = first_session_with_mult + repeat_with_rate
 
                 for t in teachers:
                     multiplier = teacher_multiplier.get(t, 1.0)
                     if t not in result['individual_practical_hours']:
                         result['individual_practical_hours'][t] = 0.0
-                    # Apply lecturer's multiplier to the entire per-teacher total
-                    result['individual_practical_hours'][t] += total_per_teacher * multiplier
+
+                    # First session: apply lecturer's full multiplier to base hours
+                    first_session_with_mult = first_session_base * multiplier
+
+                    # Repeat sessions: only apply REPETITION_MULTIPLIER (not the lecturer's rate)
+                    repeat_with_rate = repeat_base * repeat_rate
+
+                    # Total for this teacher
+                    total_for_teacher = first_session_with_mult + repeat_with_rate
+                    result['individual_practical_hours'][t] += total_for_teacher
 
                 # Store structured breakdown (per teacher, per group) - shows base rates without multipliers
                 # week_count = sessions per group (always 1), total_groups = parallel groups count
