@@ -177,6 +177,7 @@ def main():
             joined = os.path.join(PROJECT_ROOT, args.output_dir)
             output_dir = os.path.abspath(joined)
     generate_all_outputs(results, year_data, output_dir)
+    generate_new_style_individual_reports(results, year_data, output_dir)
 
     print(f"\nOutput files in {output_dir}:")
     for f in os.listdir(output_dir):
