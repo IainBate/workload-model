@@ -1862,11 +1862,10 @@ def _format_teaching_section_for_staff(result: WorkloadResult, title: str, hours
     for stage in sorted(stages.keys()):
         modules_in_stage = stages[stage]
 
-        # Determine singular/plural form
-        module_word = "Module" if len(modules_in_stage) == 1 else "Modules"
+        header_text = _format_module_header(stage, modules_in_stage)
 
         items_html_parts.append(f"""<div style="margin-bottom:25px;">
-            <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #2196F3;padding-left:10px;">{stage} {module_word} ({len(modules_in_stage)} module(s))</h4>""")
+            <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #2196F3;padding-left:10px;">{header_text}</h4>""")
 
         items_html_parts.extend(_format_module_items(modules_in_stage, css_class, known_lecturers_per_module or {}, result.name))
         items_html_parts.append("</div>")
