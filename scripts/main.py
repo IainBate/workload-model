@@ -20,7 +20,7 @@ PROJECT_ROOT = os.path.dirname(SCRIPTS_DIR)
 # Add project root to path for imports
 sys.path.insert(0, SCRIPTS_DIR)
 
-from data_loader import load_all_data, normalize_name, _load_name_lookup, _build_reverse_lookup
+from data_loader import load_all_data, normalize_name, _load_name_lookup, _build_reverse_lookup, _prompt_category_match
 from workload_calculator import calculate_workload
 from validation import validate_all_results, run_validation_pipeline
 from output_generator import OUTPUT_DIR, generate_all_outputs
