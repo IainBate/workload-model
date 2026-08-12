@@ -397,11 +397,17 @@ def _calculate_practical_hours_and_breakdown(
                 # First session rate: each teacher's multiplier (standard or new lecturer rate)
                 # Repeat sessions: apply REPETITION_MULTIPLIER only (not the lecturer's rate)
 
-                groups_per_teacher = n_parallel_groups / n_teachers if n_teachers > 0 else 0
-                repeat_sessions = max(0, groups_per_teacher - 1) if n_parallel_groups else max(0, practicals_count / n_teachers - 1)
+                # Each teacher gets at least 1 "first session" unit, plus their share of repeats
+                # Total practicals per week = n_teachers + repeat_sessions_total
+                # Per teacher: first_session = 1, repeat = (practicals_count - n_teachers) / n_teachers
+
+                groups_per_teacher = practicals_count / n_teachers if n_teachers > 0 else 0
+                repeat_sessions = max(0, groups_per_teacher - 1)
 
                 # Base hours without any rates applied (just sessions * hours * weeks)
-                first_session_base = practicals_count * std_first_session_weekly * contact_weeks
+                # First session base: 1 session/unit per teacher
+                first_session_base = std_first_session_weekly * contact_weeks
+                # Repeat base: additional sessions beyond the first per week
                 repeat_base = repeat_sessions * std_first_session_weekly * contact_weeks
 
                 for t in teachers:
@@ -410,10 +416,10 @@ def _calculate_practical_hours_and_breakdown(
                         result['individual_practical_hours'][t] = 0.0
 
                     # First session: apply lecturer's full multiplier to base hours
-                    first_session_with_mult = first_session_base * multiplier / n_teachers
+                    first_session_with_mult = first_session_base * multiplier
 
                     # Repeat sessions: only apply REPETITION_MULTIPLIER (not the lecturer's rate)
-                    repeat_with_rate = repeat_base * repeat_rate / n_teachers
+                    repeat_with_rate = repeat_base * repeat_rate
 
                     # Total for this teacher
                     total_for_teacher = first_session_with_mult + repeat_with_rate
@@ -421,18 +427,24 @@ def _calculate_practical_hours_and_breakdown(
 
                 # Store structured breakdown - shows per-teacher values with rates applied
                 # The 'total' field is the module's total at standard rates (no teacher multipliers)
-                total_at_standard_rates = first_session_base * config.TEACHING_PROBLEM_CLASS / n_teachers + repeat_base * repeat_rate / n_teachers
+                # First session: n_teachers × 1 × rate × weeks, Repeat: repeat_sessions_total × rate × weeks
+                first_session_base_total = n_teachers * first_session_base
+                repeat_base_total = repeat_sessions * n_teachers * std_first_session_weekly * contact_weeks
+                total_at_standard_rates = (
+                    first_session_base_total * config.TEACHING_PROBLEM_CLASS / n_teachers +
+                    repeat_base_total * repeat_rate / n_teachers
+                )
 
                 result['practicals_breakdown'] = {
                     "first_session_hours": round(std_first_session_weekly, 2),
                     "repeat_hours": round(repeat_sessions * std_first_session_weekly, 2),
                     "week_count": practicals_count,
-                    "total_groups": n_parallel_groups if n_parallel_groups else practicals_count,
+                    "total_groups": practicals_count,
                     "first_session_rate": config.TEACHING_PROBLEM_CLASS,
                     "repeat_rate": repeat_rate,
                     "total": round(total_at_standard_rates, 2),
                     "n_teachers": n_teachers,
-                    "groups_per_teacher": groups_per_teacher if n_parallel_groups else practicals_count / n_teachers,
+                    "groups_per_teacher": groups_per_teacher,
                     "repeat_sessions_per_teacher": repeat_sessions
                 }
 
