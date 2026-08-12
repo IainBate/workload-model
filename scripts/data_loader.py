@@ -1215,6 +1215,13 @@ def load_all_data(data_dir: str = None,
         if total_students > 0:
             module.student_count = total_students
 
+        # Per-code counts (unmerged), so callers can tell H-variant and M-variant
+        # cohorts apart for modules that share a WTW row but have separate codes
+        # (e.g. AURO: COM00052H + COM00186M)
+        module.student_count_by_code = {
+            code: student_counts[code] for code in module.codes if code in student_counts
+        }
+
         # Apply assessment counts
         for code in module.codes:
             if code in assessment_counts:
