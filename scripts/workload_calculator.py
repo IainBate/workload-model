@@ -1292,22 +1292,8 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
         # Get project load for this teacher from supervision allocation (already ceiling'd)
         teacher_project_load = supervision.project_loads.get(canonical_name, 0)
 
-        # Project setting allowance - only for staff who actually supervise projects
-        if teacher_project_load > 0:
-            project_setting_hours = config.PROJECT_SETTING_ALLOWANCE
-            teaching_hours += project_setting_hours
-            if canonical_name not in staff_teaching:
-                staff_teaching[canonical_name] = {"hours": 0.0, "details": [], "teaching_breakdown": {}}
-            else:
-                # Ensure teaching_breakdown exists
-                if "teaching_breakdown" not in staff_teaching[canonical_name]:
-                    staff_teaching[canonical_name]["teaching_breakdown"] = {}
-                # Add project setting to details for display
-                staff_teaching[canonical_name]["details"].append(
-                    f"Project setting (fixed): {project_setting_hours}h"
-                )
-            staff_teaching[canonical_name]["hours"] += project_setting_hours
-            staff_teaching[canonical_name]["teaching_breakdown"]["project_setting"] = project_setting_hours
+        # Project setting allowance - removed from teaching hours calculation
+        # Per the workload model, project setting is not included in teaching total
 
         if teacher_project_load > 0:
             proj_mult = config.SUPERVISION_MULTIPLIERS["ug_project"]
