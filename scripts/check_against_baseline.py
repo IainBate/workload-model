@@ -296,7 +296,7 @@ def check_baseline(data_dir: str = None, verbose: bool = False) -> int:
         from workload_calculator import calculate_workload
         from output_generator import generate_all_outputs
 
-        year_data = load_all_data(data_dir=str(data_dir), unknown_callback=None)
+        year_data = load_all_data(data_dir=str(data_dir), unknown_callback=None, category_callback=None)
         print(f"  Modules: {len(year_data.modules)}, Staff: {len(year_data.staff)}")
 
         # Calculate and generate to temp directory
