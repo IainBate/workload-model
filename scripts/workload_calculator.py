@@ -908,7 +908,6 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
             teacher_practical_hrs +
             teacher_assessment_hours +
             marking_hours_per_teacher +
-            admin_hours_per_teacher +
             teacher_supervision_hours.get(teacher, 0.0) +
             teacher_hw_lab +
             teacher_drop_in
