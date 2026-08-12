@@ -21,128 +21,136 @@
                 </div>
             </div>
 
-            <!-- Total workload in green band at top of staff header -->
-            <div style="margin-top:20px;padding-top:15px;border-top:1px solid rgba(255,255,255,0.3);">
-                <span class="label" style="color:white;font-size:1.2em;font-weight:bold;">Total Workload:</span>
-                <span class="value" style="color:white;font-size:2em;font-weight:bold;">983.6 hours</span>
+            <!-- Overall Workload Summary - hierarchical tree format -->
+            <div style="margin-top:25px;padding-top:20px;border-top:1px solid rgba(255,255,255,0.3);">
+                <h4 style="color:white;margin:0 0 15px 0;font-size:1em;">Overall Workload Summary</h4>
+                <div style="display:flex;flex-direction:column;gap:8px;">
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.2);">
+                        <span style="color:white;font-size:1em;">Total Workload</span>
+                        <strong style="color:white;font-size:1.3em;">978.6h</strong>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding-left:20px;border-bottom:1px solid rgba(255,255,255,0.1);">
+                        <span style="color:white;font-size:0.9em;">Teaching</span>
+                        <strong style="color:#e3f2fd;font-size:1.1em;">223.8h</strong>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding-left:20px;border-bottom:1px solid rgba(255,255,255,0.1);">
+                        <span style="color:white;font-size:0.9em;">Research</span>
+                        <strong style="color:#fff3e0;font-size:1.1em;">579.8h</strong>
+                    </div>
+                    <div style="display:flex;justify-content:space-between;align-items:center;padding-left:20px;border-bottom:1px solid rgba(255,255,255,0.1);">
+                        <span style="color:white;font-size:0.9em;">Admin</span>
+                        <strong style="color:#fce4ec;font-size:1.1em;">175.0h</strong>
+                    </div>
+                </div>
             </div>
         </div>
 
         <div class="section-card teaching-item">
             <div class="card-header">
                 <span class="card-title">Teaching Activities</span>
-                <span class="card-total">228.8h</span>
+                <span class="card-total">223.8h</span>
             </div>
             <div style="margin-bottom:25px;">
-                <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #2196F3;padding-left:10px;">LPTC Modules (1 module(s))</h4><div class="detail-item teaching-item">
-                <span class="detail-name">[LAW00062H] Delivery (Lectures)</span>
-                <span class="detail-hours">25.0h @ New lecturer (5x)</span>
-                <span class="detail-activity teaching-activity"></span>
-            </div><div class="detail-item teaching-item" style="padding-left:40px;font-size:0.85em;color:#666;">
-                <span class="detail-name" style="color:#333;">Calculation</span>
-                <span class="detail-hours">20.0h contact @ 2 teachers = 10.0 each × 5x = 25.0h</span>
-            </div><div class="detail-item teaching-item">
-                <span class="detail-name">[LAW00062H] Practical Sessions</span>
-                <span class="detail-hours">0.0h</span>
-                <span class="detail-activity teaching-activity"></span>
-            </div><div class="detail-item teaching-item" style="padding-left:40px;font-size:0.85em;color:#666;">
-                <span class="detail-name" style="color:#333;">Calculation</span>
-                <span class="detail-hours">2.5x first session (standard), 1.5x repeats</span>
-            </div><div class="detail-item teaching-item">
-                <span class="detail-name">[LAW00062H] Assessment Setting</span>
-                <span class="detail-hours">7.5h</span>
-                <span class="detail-activity teaching-activity"></span>
-            </div><div class="detail-item teaching-item" style="padding-left:40px;font-size:0.85em;color:#666;">
-                <span class="detail-name" style="color:#333;">Calculation</span>
-                <span class="detail-hours">7.5h total (main + resit)</span>
-            </div><div class="detail-item teaching-item">
-                <span class="detail-name">[LAW00062H] Assessment Marking</span>
-                <span class="detail-hours">19.8h</span>
-                <span class="detail-activity teaching-activity"></span>
-            </div><div class="detail-item teaching-item" style="padding-left:40px;font-size:0.85em;color:#666;">
-                <span class="detail-name" style="color:#333;">Calculation</span>
-                <span class="detail-hours">19.8h total (initial + resit)</span>
-            </div></div></div><div style="margin-bottom:25px;">
-                <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #FF9800;padding-left:10px;">Pastoral Supervision (57.0h)</h4>
+            <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #2196F3;padding-left:10px;">LPTC Module (1 module(s))</h4><div class="detail-item teaching-item">
+            <span class="detail-name">[LAW00062H] Delivery (Lectures)</span>
+            <span class="detail-hours">22.0h contact @ 2 teachers = 11.0 each × 2.5x = 27.5h</span>
+            <span class="detail-activity teaching-activity"></span>
+        </div><div class="detail-item teaching-item">
+            <span class="detail-name">[LAW00062H] Practical Sessions</span>
+            <span class="detail-hours">0.0h</span>
+            <span class="detail-activity teaching-activity"></span>
+        </div><div class="detail-item teaching-item" style="padding-left:40px;font-size:0.85em;color:#666;">
+            <span class="detail-name" style="color:#333;">Calculation</span>
+            <span class="detail-hours">2.5x first session (standard), 1.5x repeats (standard)</span>
+        </div><div class="detail-item teaching-item">
+            <span class="detail-name">[LAW00062H] Assessment Setting</span>
+            <span class="detail-hours">7.5h</span>
+            <span class="detail-activity teaching-activity"></span>
+        </div><div class="detail-item teaching-item" style="padding-left:40px;font-size:0.85em;color:#666;">
+            <span class="detail-name" style="color:#333;">Calculation</span>
+            <span class="detail-hours">7.5h total (main + resit)</span>
+        </div><div class="detail-item teaching-item">
+            <span class="detail-name">[LAW00062H] Assessment Marking</span>
+            <span class="detail-hours">19.8h</span>
+            <span class="detail-activity teaching-activity"></span>
+        </div><div class="detail-item teaching-item" style="padding-left:40px;font-size:0.85em;color:#666;">
+            <span class="detail-name" style="color:#333;">Calculation</span>
+            <span class="detail-hours">19.8h total (main + resit)</span>
+        </div></div><div style="margin-bottom:15px;">
+                <p style="font-size:1.1em;color:#4CAF50;margin:0 0 5px 20px;font-weight:bold;">- Total = 54.8h</p>
+            </div><div style="margin-bottom:25px;">
+                <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #2196F3;padding-left:10px;">Pastoral Supervision (57.0h)</h4>
                 <div style="margin-left:20px;">
                     <div class="detail-item teaching-item">
                         <span class="detail-name">Students</span>
                         <span class="detail-hours">19 students x 3h each = 57.0h</span>
-                        <span class="detail-activity admin-activity"></span>
+                        <span class="detail-activity teaching-activity"></span>
                     </div>
                 </div>
             </div><div style="margin-bottom:25px;">
-                <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #FF9800;padding-left:10px;">Project Supervision (112.0h)</h4>
+                <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #2196F3;padding-left:10px;">Project Supervision (112.0h)</h4>
                 <div style="margin-left:20px;">
                     <div class="detail-item teaching-item">
                         <span class="detail-name">Projects</span>
                         <span class="detail-hours">7 projects x UG = 112.0h</span>
-                        <span class="detail-activity admin-activity"></span>
+                        <span class="detail-activity teaching-activity"></span>
                     </div>
                 </div>
-            </div><div class="detail-item teaching-item">
-                <span class="detail-name">Project Setting (fixed)</span>
-                <span class="detail-hours">6.0h</span>
-                <span class="detail-activity teaching-activity"></span>
             </div>
-            <p style="font-size:0.85em;color:#666;padding-top:10px;">Subtotal: 228.8h</p>
+            <p style="font-size:0.85em;color:#666;padding-top:10px;">Subtotal: 223.8h</p>
         </div>
         <div class="section-card research-item">
-            <div class="card-header">
-                <span class="card-title">Research Activities</span>
-                <span class="card-total">579.8h</span>
-            </div>
-            <div style="margin-bottom:20px;">
-                <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #4CAF50;padding-left:10px;">PhD Supervision (120.0h)</h4><div class="detail-item research-item">
-                        <span class="detail-name">Co Supervisor</span>
-                        <span class="detail-hours">96.0h</span>
-                        <span class="detail-activity research-activity"></span>
-                    </div><div class="detail-item research-item">
-                        <span class="detail-name">Assessor</span>
-                        <span class="detail-hours">24.0h</span>
-                        <span class="detail-activity research-activity"></span>
-                    </div></div><div style="margin-bottom:20px;">
-                <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #4CAF50;padding-left:10px;">Research Allowances (164.2h)</h4><div class="detail-item research-item">
-                    <span class="detail-name">Protected research baseline</span>
-                    <span class="detail-hours">164.2h</span>
+        <div class="card-header">
+            <span class="card-title">Research Activities</span>
+            <span class="card-total">579.8h</span>
+        </div>
+        <div class="detail-item research-item">
+                <span class="detail-name">Protected research baseline</span>
+                <span class="detail-hours">164.2h</span>
+                <span class="detail-activity research-activity"></span>
+            </div><h4 style="color:#333;margin:25px 0 10px 0;border-left:4px solid #4CAF50;padding-left:10px;">Research Grants (295.6h)</h4><div class="detail-item research-item" style="padding-left:40px;">
+                    <span class="detail-name">KTP with Advai</span>
+                    <span class="detail-hours">82.1h</span>
                     <span class="detail-activity research-activity"></span>
-                </div></div><div style="margin-bottom:20px;">
-                <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #4CAF50;padding-left:10px;">Research Grants (295.6h)</h4><div class="detail-item research-item">
-                        <span class="detail-name">KTP with Advai</span>
-                        <span class="detail-hours">82.1h</span>
-                        <span class="detail-activity research-activity"></span>
-                    </div><div class="detail-item research-item">
-                        <span class="detail-name">A STAR TO STEER BY</span>
-                        <span class="detail-hours">82.1h</span>
-                        <span class="detail-activity research-activity"></span>
-                    </div><div class="detail-item research-item">
-                        <span class="detail-name">The Centre for Assuring Autonomy</span>
-                        <span class="detail-hours">82.1h</span>
-                        <span class="detail-activity research-activity"></span>
-                    </div><div class="detail-item research-item">
-                        <span class="detail-name">KTP with Advai (Industry)</span>
-                        <span class="detail-hours">49.3h</span>
-                        <span class="detail-activity research-activity"></span>
-                    </div></div>
-            <p style="font-size:0.85em;color:#666;padding-top:10px;">Subtotal: 579.8h</p>
-        </div>
+                </div><div class="detail-item research-item" style="padding-left:40px;">
+                    <span class="detail-name">A STAR TO STEER BY</span>
+                    <span class="detail-hours">82.1h</span>
+                    <span class="detail-activity research-activity"></span>
+                </div><div class="detail-item research-item" style="padding-left:40px;">
+                    <span class="detail-name">The Centre for Assuring Autonomy</span>
+                    <span class="detail-hours">82.1h</span>
+                    <span class="detail-activity research-activity"></span>
+                </div><div class="detail-item research-item" style="padding-left:40px;">
+                    <span class="detail-name">KTP with Advai (Industry)</span>
+                    <span class="detail-hours">49.3h</span>
+                    <span class="detail-activity research-activity"></span>
+                </div><h4 style="color:#333;margin:25px 0 10px 0;border-left:4px solid #4CAF50;padding-left:10px;">PhD Supervision (120.0h)</h4><div class="detail-item research-item" style="padding-left:40px;">
+                    <span class="detail-name">Co-supervision</span>
+                    <span class="detail-hours">96.0h</span>
+                    <span class="detail-activity research-activity"></span>
+                </div><div class="detail-item research-item" style="padding-left:40px;">
+                    <span class="detail-name">Assessor</span>
+                    <span class="detail-hours">24.0h</span>
+                    <span class="detail-activity research-activity"></span>
+                </div>
+        <p style="font-size:0.85em;color:#666;padding-top:10px;">Subtotal: 579.8h</p>
+    </div>
         <div class="section-card admin-item">
-            <div class="card-header">
-                <span class="card-title">Admin Activities</span>
-                <span class="card-total">175.0h</span>
-            </div>
-            <div style="margin-bottom:20px;">
-                <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #4CAF50;padding-left:10px;">Other (175.0h)</h4><div class="detail-item admin-item">
-                        <span class="detail-name">Engagement</span>
-                        <span class="detail-hours">100.0h</span>
-                        <span class="detail-activity admin-activity"></span>
-                    </div><div class="detail-item admin-item">
-                        <span class="detail-name">Personal Development</span>
-                        <span class="detail-hours">75.0h</span>
-                        <span class="detail-activity admin-activity"></span>
-                    </div></div>
-            <p style="font-size:0.85em;color:#666;padding-top:10px;">Subtotal: 175.0h</p>
+        <div class="card-header">
+            <span class="card-title">Admin Activities</span>
+            <span class="card-total">175.0h</span>
         </div>
+        <div class="detail-item admin-item">
+                <span class="detail-name">Engagement</span>
+                <span class="detail-hours">100.0h</span>
+                <span class="detail-activity admin-activity"></span>
+            </div><div class="detail-item admin-item">
+                <span class="detail-name">Personal Development</span>
+                <span class="detail-hours">75.0h</span>
+                <span class="detail-activity admin-activity"></span>
+            </div>
+        <p style="font-size:0.85em;color:#666;padding-top:10px;">Subtotal: 175.0h</p>
+    </div>
 
         <h2>Calculation Breakdown</h2>
         <div class="section-card">
@@ -153,12 +161,12 @@
             <div class="calc-breakdown">
                 <h3>Summary Totals</h3>
                 <ul>
-                    <li><strong>Teaching:</strong> 228.8h</li>
+                    <li><strong>Teaching:</strong> 223.8h</li>
                     <li><strong>Research (protected baseline):</strong> 164.2h</li>
                     <li><strong>Research (additional - grants, supervision):</strong> 415.6h</li>
                     <li><strong>Admin:</strong> 175.0h</li>
                 </ul>
-                <p style="margin-top:20px;"><em>Total: 983.6 hours = 228.8 + 164.2 + 415.6 + 175.0</em></p>
+                <p style="margin-top:20px;"><em>Total: 978.6 hours = 223.8 + 164.2 + 415.6 + 175.0</em></p>
             </div>
         </div>
 
