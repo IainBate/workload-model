@@ -1819,14 +1819,6 @@ def _format_teaching_section_for_staff(result: WorkloadResult, title: str, hours
                 </div>
             </div>""")
 
-        project_setting = breakdown.get('project_setting', 0)
-        if project_setting > 0:
-            items_html_parts.append(f"""<div class="detail-item {css_class}">
-                <span class="detail-name">Project Setting (fixed)</span>
-                <span class="detail-hours">{project_setting:.1f}h</span>
-                <span class="detail-activity teaching-activity"></span>
-            </div>""")
-
         min_teaching = breakdown.get('minimum_admin_load', 0)
         if min_teaching > 0:
             items_html_parts.append(f"""<div class="detail-item {css_class}">
