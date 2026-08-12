@@ -1,6 +1,6 @@
 # Workload Model Parameters
-# Extracted from Workload ModelFull Description.docx (Iain Bate, June 2026)
-# Last verified: 2026-07-03
+# Extracted from Work Allocation Model.docx (Iain Bate, June 2026 - updated August 2026)
+# Last verified: 2026-08-12
 
 global_parameters:
   nominal_working_hours_per_year: 1642
