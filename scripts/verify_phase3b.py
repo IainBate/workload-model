@@ -5,7 +5,7 @@ from data_loader import load_all_data, WorkloadResult
 from workload_calculator import calculate_workload
 
 # Load data and run calculation (non-interactive mode)
-year_data = load_all_data(data_dir='../data', unknown_callback=None)
+year_data = load_all_data(data_dir='../data', unknown_callback=None, category_callback=None)
 results = calculate_workload(year_data)
 
 print("=== Phase 3b Verification: Structured Supervision Breakdown ===\n")
