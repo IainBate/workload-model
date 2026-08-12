@@ -1431,6 +1431,27 @@ def load_all_data(data_dir: str = None,
         phd_info = _find_data(raw_name, canonical, phd_data)
         fte_info = _find_data(raw_name, canonical, fte_data)
         pt_info = _find_data(raw_name, canonical, part_time_data)
+        art_ts_category = _find_data(raw_name, canonical, art_ts_data)
+
+        # Resolve contract category (ART / T and S), in priority order:
+        # 1. ART Performance data capture sheet (most direct/authoritative source)
+        # 2. Part time.csv's Staff Category column
+        # 3. A previously-saved answer (staff_category_lookup.json)
+        # 4. Ask the user (if a callback is provided) and persist the answer
+        if canonical not in staff:
+            if art_ts_category:
+                resolved_category = art_ts_category
+            elif pt_info and pt_info.get("staff_category"):
+                resolved_category = pt_info["staff_category"]
+            elif canonical in category_overrides:
+                resolved_category = category_overrides[canonical]
+            elif category_callback:
+                resolved_category = category_callback(canonical) or ""
+                if resolved_category:
+                    category_overrides[canonical] = resolved_category
+                    category_overrides_dirty = True
+            else:
+                resolved_category = ""
 
         # Assign roles from WAW (apply name mapping to resolve WAW→YAML differences)
         staff_roles = []
