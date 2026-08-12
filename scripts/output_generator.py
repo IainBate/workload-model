@@ -1501,7 +1501,7 @@ def _format_module_practicals_section(
 
         parts.append(f"""<div class="detail-item {css_class}">
             <span class="detail-name">{label_prefix}Practical Sessions</span>
-            <span class="detail-hours">{chris_total_practicals:.1f}h total</span>
+            <span class="detail-hours">{_format_hours(chris_total_practicals)} total</span>
             <span class="detail-activity teaching-activity"></span>
         </div>""")
 
