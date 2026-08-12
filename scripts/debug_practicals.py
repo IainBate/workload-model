@@ -18,7 +18,7 @@ else:
 from data_loader import load_all_data, normalize_name, allocate_supervision
 from workload_calculator import calculate_workload, _calculate_teaching_workload
 
-year_data = load_all_data(data_dir='../data')
+year_data = load_all_data(data_dir='../data', unknown_callback=None, category_callback=None)
 
 # Find SYS2 module
 sys2_module = None
