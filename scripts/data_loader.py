@@ -423,6 +423,23 @@ def _prompt_name_match(user_name: str, canonical_name: Optional[str],
     return response == "y"
 
 
+def _prompt_category_match(canonical_name: str) -> Optional[str]:
+    """
+    Callback for staff whose contract category (ART / T and S) can't be
+    deduced from the ART Performance sheet, Part time.csv, or a previously
+    saved answer. Returns the chosen category, or None to skip (leave
+    unresolved for this run - will be asked again next time).
+    """
+    print(f"\nCannot determine contract category for '{canonical_name}' "
+          f"(not found in the ART Performance sheet or Part time.csv).")
+    response = input("Category? [1] ART  [2] T and S  [Enter to skip]: ").strip()
+    if response == "1":
+        return "ART"
+    if response == "2":
+        return "T and S"
+    return None
+
+
 # --- WTW CSV Loading ---
 
 def _detect_year_from_filename(filename: str) -> str:
