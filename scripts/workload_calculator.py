@@ -471,7 +471,7 @@ def _calculate_practical_hours_and_breakdown(
                     "first_session_hours": round(std_first_session_weekly, 2),
                     "repeat_hours": 0,
                     "week_count": practicals_count,
-                    "first_session_rate": std_first_session_weekly,
+                    "first_session_rate": config.TEACHING_PROBLEM_CLASS,
                     "repeat_rate": repeat_rate,
                     "total": round(total_practical_hours, 2),
                     "n_teachers": n_teachers,
