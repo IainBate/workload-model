@@ -641,19 +641,19 @@ def _calculate_assessment_marking_hours(module: ModuleData, teachers: List[str])
 
     # Determine marking type and rates
     is_automated = getattr(module, 'marking_type', 'manual') == 'automated'
+    resit_fraction = 0.2  # 20% resits, applied to both automated and manual marking
 
     if is_automated:
         result['admin_flat'] = config.MARKING_AUTO_ADMIN
-        first_mark_hrs = config.MARKING_AUTO_MSC * student_count if config.is_msc_level(getattr(module, 'stage', 1)) else config.MARKING_AUTO_UG * student_count
-        resit_hrs = first_mark_hrs * 0.2  # 20% resits for automated
+        rate_per_script = config.MARKING_AUTO_MSC if config.is_msc_level(getattr(module, 'stage', 1)) else config.MARKING_AUTO_UG
     else:
         result['admin_flat'] = config.MARKING_MANUAL_ADMIN
         stage = getattr(module, 'stage', 1)
-        if config.is_msc_level(stage):
-            first_mark_hrs = config.MARKING_MANUAL_MSC * student_count
-        else:
-            first_mark_hrs = config.MARKING_MANUAL_UG * student_count
-        resit_hrs = first_mark_hrs * 0.2  # 20% resits for manual
+        rate_per_script = config.MARKING_MANUAL_MSC if config.is_msc_level(stage) else config.MARKING_MANUAL_UG
+
+    first_mark_hrs = rate_per_script * student_count
+    resit_student_count = student_count * resit_fraction
+    resit_hrs = rate_per_script * resit_student_count
 
     total_marking_hours = first_mark_hrs + resit_hrs
 
@@ -665,6 +665,19 @@ def _calculate_assessment_marking_hours(module: ModuleData, teachers: List[str])
         result['total_hours'] += per_teacher_hours
 
     result['details'] = f"{'Automated' if is_automated else 'Manual'}: {per_teacher_hours:.1f}h total (initial + resit)"
+
+    # Structured breakdown for display (module-level totals, before splitting among teachers)
+    result['marking_structured'] = {
+        'is_automated': is_automated,
+        'rate_per_script': rate_per_script,
+        'main_student_count': student_count,
+        'main_hours': first_mark_hrs,
+        'resit_student_count': resit_student_count,
+        'resit_hours': resit_hrs,
+        'total_hours': total_marking_hours,
+        'n_teachers': len(teachers),
+        'hours_per_teacher': per_teacher_hours,
+    }
 
     return result
 
