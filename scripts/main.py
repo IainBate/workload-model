@@ -155,6 +155,10 @@ def main():
         sys.exit(1)
     print("  All validations passed.")
 
+    if args.validate_only:
+        print("\n(Validate-only run - no output generation performed)")
+        return
+
     # Print results
     print_data_summary(year_data, results)
 
