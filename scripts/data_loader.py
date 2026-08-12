@@ -1617,13 +1617,35 @@ def load_all_data(data_dir: str = None,
                 if norm_member == hod_name_from_waw:
                     hod_roles.append(yaml_role)
 
+        # Resolve contract category using the same priority order as regular staff
+        art_ts_category_hod = None
+        for key, val in art_ts_data.items():
+            norm_key = normalize_name(key, reverse_lookup, unknown_callback=None)
+            if norm_key == hod_name_from_waw:
+                art_ts_category_hod = val
+                break
+
+        if art_ts_category_hod:
+            resolved_category_hod = art_ts_category_hod
+        elif pt_info_hod and pt_info_hod.get("staff_category"):
+            resolved_category_hod = pt_info_hod["staff_category"]
+        elif hod_name_from_waw in category_overrides:
+            resolved_category_hod = category_overrides[hod_name_from_waw]
+        elif category_callback:
+            resolved_category_hod = category_callback(hod_name_from_waw) or ""
+            if resolved_category_hod:
+                category_overrides[hod_name_from_waw] = resolved_category_hod
+                category_overrides_dirty = True
+        else:
+            resolved_category_hod = ""
+
         staff[hod_name_from_waw] = StaffData(
             canonical_name=hod_name_from_waw,
             aliases=tuple(mappings.get(hod_name_from_waw, [hod_name_from_waw])),
             fte=hod_fte,
             employment_start=proj_data_hod["employment_start"] if proj_data_hod else 0,
             active=proj_data_hod["active"] if proj_data_hod else True,
-            category=pt_info_hod["staff_category"] if pt_info_hod else "",
+            category=resolved_category_hod,
             project_load=proj_data_hod["project_load"] if proj_data_hod else 0,
             pastoral_load=proj_data_hod["pastoral_load"] if proj_data_hod else 0,
             adjusted_project_load=proj_data_hod["adjusted_project_load"] if proj_data_hod else 0,
