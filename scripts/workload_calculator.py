@@ -1195,6 +1195,11 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
         for teacher, breakdown in module_teaching.items():
             if teacher in staff_teaching:
                 staff_teaching[teacher]["hours"] += breakdown["hours"]
+                # Track marking admin hours (added to admin workload, not teaching)
+                marking_admin = breakdown.get("marking_admin_hours", 0.0)
+                if "marking_admin_hours" not in staff_teaching[teacher]:
+                    staff_teaching[teacher]["marking_admin_hours"] = 0.0
+                staff_teaching[teacher]["marking_admin_hours"] += marking_admin
                 staff_teaching[teacher]["details"].append(
                     f"{module.name} ({module.credits}cr): {breakdown['detail_text']}"
                 )
