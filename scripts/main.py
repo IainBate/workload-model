@@ -108,6 +108,7 @@ def main():
     parser.add_argument("--output-dir", type=str, default=".", help="Output directory")
     parser.add_argument("--data-dir", type=str, default=None, help="Data directory (default: data/)")
     parser.add_argument("--dry-run", action="store_true", help="Show data summary only")
+    parser.add_argument("--validate-only", action="store_true", help="Run calculation and validation only, no output generation")
     parser.add_argument("--interactive", action="store_true", help="Prompt for unknown names")
     parser.add_argument("--google-sheets", action="store_true", help="Upload results to Google Sheets after calculation")
     args = parser.parse_args()
