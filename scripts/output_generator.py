@@ -1276,7 +1276,7 @@ def format_detail_section(r: WorkloadResult, title: str, hours: float, breakdown
         </div>"""
 
     if is_teaching:
-        return format_teaching_section(r, title, hours, css_class, supervision_details,
+        return _format_teaching_section_for_staff(r, title, hours, breakdown, css_class, supervision_details,
                                         known_lecturers_per_module, pastoral_breakdown, project_breakdown)
 
     items_html_parts = []
