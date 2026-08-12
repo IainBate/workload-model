@@ -1480,14 +1480,18 @@ def load_all_data(data_dir: str = None,
             # 1. ART Performance data capture sheet (most direct/authoritative source)
             # 2. Part time.csv's Staff Category column
             # 3. A previously-saved answer (staff_category_lookup.json)
-            # 4. Ask the user (if a callback is provided) and persist the answer
+            # 4. Ask the user (if a callback is provided) and persist the answer -
+            #    only for currently-active staff, since inactive/historical names
+            #    (e.g. previous-year teachers, extra markers) don't affect any
+            #    report and would otherwise flood the prompt with irrelevant asks.
+            is_active = proj_data["active"] if proj_data else True
             if art_ts_category:
                 resolved_category = art_ts_category
             elif pt_info and pt_info.get("staff_category"):
                 resolved_category = pt_info["staff_category"]
             elif canonical in category_overrides:
                 resolved_category = category_overrides[canonical]
-            elif category_callback:
+            elif category_callback and is_active:
                 resolved_category = category_callback(canonical) or ""
                 if resolved_category:
                     category_overrides[canonical] = resolved_category
