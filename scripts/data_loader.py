@@ -972,6 +972,85 @@ def _load_part_time(filepath: str = "Part time.csv") -> Dict[str, dict]:
     return data
 
 
+# One-off spelling correction for a known typo in the ART Performance data
+# capture sheet ("Banerjee, Soumua" - should be "Soumya"), so it resolves to
+# the correct canonical name instead of silently failing to match.
+_ART_TS_NAME_CORRECTIONS = {
+    "Soumua": "Soumya",
+}
+
+
+def _load_art_ts_categories(filepath: str = "CS Data Collection on ART Performance 2026 - MASTER Overall Data Capture.csv") -> Dict[str, str]:
+    """Load staff contract category (ART / T and S) from the ART Performance
+    data capture sheet. Returns {parsed_name: category}, where parsed_name is
+    a best-effort "Firstname Lastname" reconstruction of the sheet's
+    "Lastname, Firstname" column, intended to be resolved against the normal
+    canonical-name system (aliases/normalize_name) by the caller - this
+    function does no name normalization itself.
+    """
+    path = DATA_DIR / filepath
+    if not path.exists():
+        return {}
+
+    data = {}
+    with open(path, "r", encoding="utf-8-sig") as f:
+        reader = csv.reader(f)
+        for row in reader:
+            if len(row) < 2:
+                continue
+            raw_name = row[0].strip()
+            category = row[1].strip()
+            if category == "T&S":
+                category = "T and S"
+            elif category != "ART":
+                continue
+            if not raw_name:
+                continue
+
+            if "," in raw_name:
+                lastname, _, firstname = raw_name.partition(",")
+            else:
+                # A few rows in the source sheet are missing the comma
+                # (e.g. "O'Dea Mike", "Wilson Richard") - the last
+                # whitespace-separated token is the first name.
+                parts = raw_name.rsplit(" ", 1)
+                if len(parts) != 2:
+                    continue
+                lastname, firstname = parts
+
+            firstname = firstname.strip()
+            lastname = lastname.strip()
+            firstname = _ART_TS_NAME_CORRECTIONS.get(firstname, firstname)
+            if not firstname or not lastname:
+                continue
+
+            data[f"{firstname} {lastname}"] = category
+    return data
+
+
+def _load_category_overrides(filepath: str = "staff_category_lookup.json") -> Dict[str, str]:
+    """Load previously-resolved staff categories (e.g. answered via an
+    interactive prompt for a name not covered by any other source).
+    Returns {canonical_name: category}.
+    """
+    path = DATA_DIR / filepath
+    if not path.exists():
+        return {}
+    try:
+        with open(path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except (json.JSONDecodeError, OSError):
+        return {}
+
+
+def _save_category_overrides(overrides: Dict[str, str], filepath: str = "staff_category_lookup.json") -> None:
+    """Persist resolved staff categories so future runs don't need to re-ask."""
+    path = DATA_DIR / filepath
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(dict(sorted(overrides.items())), f, indent=2)
+        f.write("\n")
+
+
 def load_wtw_files(base_dir: str = None) -> Tuple[List[ModuleData], str]:
     """Load the current year's WTW file and return modules with year label.
 
