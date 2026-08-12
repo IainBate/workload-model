@@ -1319,11 +1319,7 @@ def load_all_data(data_dir: str = None,
         proj_data = _find_data(raw_name, canonical, project_load_data)
         phd_info = _find_data(raw_name, canonical, phd_data)
         fte_info = _find_data(raw_name, canonical, fte_data)
-        pt_info = None
-        for key, val in part_time_data.items():
-            if key.upper() == raw_name.upper() or key.lower() == raw_name.lower():
-                pt_info = val
-                break
+        pt_info = _find_data(raw_name, canonical, part_time_data)
 
         # Assign roles from WAW (apply name mapping to resolve WAW→YAML differences)
         staff_roles = []
