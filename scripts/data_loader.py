@@ -1678,6 +1678,9 @@ def load_all_data(data_dir: str = None,
     # Sort staff by canonical name for deterministic output
     sorted_staff = dict(sorted(staff.items()))
 
+    if category_overrides_dirty:
+        _save_category_overrides(category_overrides)
+
     return YearData(
         year_label=year_label,
         modules=tuple(sorted_modules),
