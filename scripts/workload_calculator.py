@@ -1226,6 +1226,11 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
                     staff_teaching[teacher]["teaching_module_breakdowns"][module.name].update({
                         "practicals_structured": breakdown["practicals_breakdown"]
                     })
+                # Store structured marking breakdown per module if available (separate from teaching_breakdown)
+                if "marking_breakdown" in breakdown and breakdown["marking_breakdown"]:
+                    staff_teaching[teacher]["teaching_module_breakdowns"][module.name].update({
+                        "marking_structured": breakdown["marking_breakdown"]
+                    })
                 # Store module code as structured data (Phase 3: avoid regex parsing)
                 if module.codes:
                     staff_teaching[teacher]["teaching_module_breakdowns"][module.name].update({
