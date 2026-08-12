@@ -1524,7 +1524,7 @@ def _format_module_practicals_section(
 
             parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
                 <span class="detail-name" style="color:#333;">First session</span>
-                <span class="detail-hours">{fs_weekly_sessions:.2f} first session(s)/week × {first_session_weekly:.1f}h per session @ {fs_rate_for_display:.1f}x × {week_count} weeks = {fs_total:.0f}h</span>
+                <span class="detail-hours">{int(fs_weekly_sessions)} first session(s)/week × {first_session_weekly:.1f}h per session @ {_format_rate(fs_rate_for_display)} × {week_count} weeks = {int(fs_total)}h</span>
             </div>""")
 
             # Repeat sessions calculation:
@@ -1535,7 +1535,7 @@ def _format_module_practicals_section(
 
                 parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
                     <span class="detail-name" style="color:#333;">Repeat sessions</span>
-                    <span class="detail-hours">{repeat_sessions_per_teacher:.2f} repeat sessions/week @ {first_session_weekly:.1f}h each × {rep_rate_for_display:.1f}x rate × {week_count} weeks = {rep_total:.1f}h</span>
+                    <span class="detail-hours">{repeat_sessions_per_teacher:.2f} repeat sessions/week @ {first_session_weekly:.1f}h each × {_format_rate(rep_rate_for_display)} rate × {week_count} weeks = {_format_hours(rep_total)}</span>
                 </div>""")
         else:
             # Non-parallel groups: use simple calculation
