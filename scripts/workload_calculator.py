@@ -360,7 +360,7 @@ def _calculate_practical_hours_and_breakdown(
                 result['practicals_breakdown'] = {
                     "first_session_hours": round(weekly_hrs, 2),
                     "repeat_hours": round(repeat_sessions * weekly_hrs, 2),  # Base repeat hours without rates
-                    "week_count": group_sessions,
+                    "week_count": contact_weeks,
                     "total_groups": n_parallel_groups,
                     "first_session_rate": first_session_rate,
                     "repeat_rate": repeat_rate,
