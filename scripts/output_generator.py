@@ -1448,12 +1448,12 @@ def _format_module_practicals_section(
         # Structured practicals data available (from Phase 3)
         first_session_rate = practicals_structured.get('first_session_rate', config.TEACHING_MULTIPLIERS.get('problem_class_seminar_practical', 2.5))
         rep_rate = practicals_structured.get('repeat_rate', config.REPETITION_MULTIPLIER)
-        week_count = practicals_structured.get('week_count', 0)
+        week_count = practicals_structured.get('week_count', config.TEACHING_WEEKS_PER_SEMESTER)
 
         # Extract structured values for calculation display
         # first_session_hours: hours per session (not per week total - each session has this many hours)
         # repeat_hours: additional hours for repeated sessions (per week, includes session count)
-        first_session_weekly = practicals_structured.get('first_session_hours', first_session_rate)
+        first_session_weekly = practicals_structured.get('first_session_hours', 0)
         repeat_weekly = practicals_structured.get('repeat_hours', 0)
 
         label_prefix = ""
@@ -1464,83 +1464,83 @@ def _format_module_practicals_section(
         has_total_groups = 'total_groups' in practicals_structured
         n_teachers = practicals_structured.get('n_teachers', 1)
 
+        # Determine the lecturer's multiplier for display
+        # For parallel groups, we need to calculate what rate was applied to get Chris's hours
         if has_total_groups:
-            # Parallel groups: use the total module hours directly from structured breakdown
-            # The 'total' field is the module's base hours at standard rates (no teacher multipliers)
-            # Per teacher share = total / n_teachers, then apply Chris's actual multiplier
-
-            # Get Chris's actual multiplier from his teaching hours
             total_module_base = practicals_structured.get('total', 0)
             base_per_teacher = total_module_base / n_teachers if n_teachers > 0 else 0
-            actual_multiplier = practicals_per_module / base_per_teacher if base_per_teacher > 0 else 2.5
+            actual_multiplier = practicals_per_module / base_per_teacher if base_per_teacher > 0 else first_session_rate
+        else:
+            # Non-parallel: calculate based on groups per teacher
+            total_at_standard_rates = practicals_structured.get('total', 0)
+            base_per_teacher = total_at_standard_rates / n_teachers if n_teachers > 0 else 0
+            actual_multiplier = practicals_per_module / base_per_teacher if base_per_teacher > 0 else first_session_rate
 
-            # Chris's final hours = base per teacher × actual multiplier
-            chris_total_practicals = practicals_per_module  # Already contains the correct value!
+        chris_total_practicals = practicals_per_module  # Use actual value from breakdown
 
-            parts.append(f"""<div class="detail-item {css_class}">
-                <span class="detail-name">{label_prefix}Practical Sessions</span>
-                <span class="detail-hours">{chris_total_practicals:.1f}h total</span>
-                <span class="detail-activity teaching-activity"></span>
-            </div>""")
+        parts.append(f"""<div class="detail-item {css_class}">
+            <span class="detail-name">{label_prefix}Practical Sessions</span>
+            <span class="detail-hours">{chris_total_practicals:.1f}h total</span>
+            <span class="detail-activity teaching-activity"></span>
+        </div>""")
 
-            # Display the calculation breakdown
+        if has_total_groups:
+            # Parallel groups: show First session and Repeat sessions separately
+            # Calculate per teacher values
+            groups_per_teacher = practicals_structured.get('groups_per_teacher', n_teachers)
+            repeat_sessions_per_teacher = practicals_structured.get('repeat_sessions_per_teacher', 0)
+
+            # First session calculation:
+            # "1 first session(s)/week × 2.0h per session @ 5x × 11 weeks = 110h"
+            fs_rate_for_display = actual_multiplier  # Chris's actual rate
+            fs_weekly_sessions = max(1, groups_per_teacher)  # At least 1 first session
+            if repeat_sessions_per_teacher > 0:
+                # Adjust: if we have repeat sessions, the "first session" count is the whole groups_per_teacher
+                # But we show it as: first_session_count = 1, repeated_count = (groups-1)
+                fs_weekly_sessions = 1
+
+            fs_total = fs_weekly_sessions * first_session_weekly * fs_rate_for_display * week_count
+
             parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
-                <span class="detail-name" style="color:#333;">Base hours (module)</span>
-                <span class="detail-hours">{total_module_base:.1f}h total at standard rates</span>
+                <span class="detail-name" style="color:#333;">First session</span>
+                <span class="detail-hours">{fs_weekly_sessions:.2f} first session(s)/week × {first_session_weekly:.1f}h per session @ {fs_rate_for_display:.1f}x × {week_count} weeks = {fs_total:.0f}h</span>
             </div>""")
 
-            parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
-                <span class="detail-name" style="color:#333;">Per teacher share</span>
-                <span class="detail-hours">{total_module_base:.1f}h / {n_teachers} teachers = {base_per_teacher:.1f}h each</span>
-            </div>""")
+            # Repeat sessions calculation:
+            # "0.67 repeat sessions/week @ 2.0h each × 1.5x rate × 11 weeks = 22.0h"
+            if repeat_sessions_per_teacher > 0:
+                rep_rate_for_display = rep_rate
+                rep_total = repeat_sessions_per_teacher * first_session_weekly * rep_rate_for_display * week_count
 
-            parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
-                <span class="detail-name" style="color:#333;">Multiplier applied</span>
-                <span class="detail-hours">{actual_multiplier:.1f}x = {chris_total_practicals:.1f}h</span>
-            </div>""")
+                parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+                    <span class="detail-name" style="color:#333;">Repeat sessions</span>
+                    <span class="detail-hours">{repeat_sessions_per_teacher:.2f} repeat sessions/week @ {first_session_weekly:.1f}h each × {rep_rate_for_display:.1f}x rate × {week_count} weeks = {rep_total:.1f}h</span>
+                </div>""")
         else:
             # Non-parallel groups: use simple calculation
-            # Total hours per teacher = (total_practicals / n_teachers) × actual_multiplier
-            total_module_practicals = practicals_structured.get('total', 0)
-            base_per_teacher = total_module_practicals / n_teachers if n_teachers > 0 else 0
-            actual_multiplier = practicals_per_module / base_per_teacher if base_per_teacher > 0 else 2.5
-
+            # "1 first session(s)/week × 2.0h per session @ 2.5x × 11 weeks @ 3 teachers = 18.3h"
             contact_hrs = first_session_weekly
 
-            # Simple calculation: base share × multiplier
-            # For non-parallel, first session rate is already baked into total
-            # The display shows the rate that was applied to reach this value
-            chris_total_practicals = practicals_per_module  # Use actual value from breakdown
+            # For non-parallel, calculate sessions per teacher directly
+            if n_teachers > 0:
+                sessions_per_teacher = practicals_structured.get('total', 0) / n_teachers / (contact_hrs * week_count) if contact_hrs and week_count else 1
+            else:
+                sessions_per_teacher = 1
 
-            parts.append(f"""<div class="detail-item {css_class}">
-                <span class="detail-name">{label_prefix}Practical Sessions</span>
-                <span class="detail-hours">{chris_total_practicals:.1f}h total</span>
-                <span class="detail-activity teaching-activity"></span>
-            </div>""")
+            # Use the actual multiplier for display
+            total_calc = contact_hrs * actual_multiplier * week_count / n_teachers if n_teachers > 0 else 0
 
             parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
                 <span class="detail-name" style="color:#333;">Calculation</span>
-                <span class="detail-hours">{contact_hrs:.1f}h/week × {config.TEACHING_WEEKS_PER_SEMESTER} weeks / {n_teachers} teachers × {actual_multiplier:.1f}x = {chris_total_practicals:.1f}h</span>
+                <span class="detail-hours">{sessions_per_teacher:.2f} first session(s)/week × {contact_hrs:.1f}h per session @ {actual_multiplier:.1f}x × {week_count} weeks @ {n_teachers} teachers = {chris_total_practicals:.1f}h</span>
             </div>""")
     else:
         # Fallback to default rates if structured data not available
-        # Calculate practicals from breakdown values if total isn't available
-        # Use lecturer type to determine the rate to display
         first_session_rate = config.TEACHING_MULTIPLIERS.get('problem_class_seminar_practical', 2.5)
         rep_rate = config.REPETITION_MULTIPLIER
 
-        # If we have is_new_lecturer info, show the appropriate rate
-        display_rate = first_session_rate
-        if is_new_lecturer:
-            # For new lecturers, their actual multiplier is 5x (not 2.5x)
-            # But the base rate for problem classes is still 2.5x - they just get 5x overall
-            # So we show the standard rate but note it's applied to a new lecturer
-            pass
-
-        # Try to get total from structured breakdown, or calculate from components
         practicals_per_module = practicals_structured.get('total', 0) if isinstance(practicals_structured, dict) and practicals_structured else 0
         if practicals_per_module == 0:
-            # Calculate from components: first_session_total + repeat_session_total
             fs_total = practicals_structured.get('first_session_total', 0) if isinstance(practicals_structured, dict) else 0
             rs_total = practicals_structured.get('repeat_session_total', 0) if isinstance(practicals_structured, dict) else 0
             practicals_per_module = fs_total + rs_total
