@@ -1837,58 +1837,58 @@ def _format_teaching_section_for_staff(result: WorkloadResult, title: str, hours
                 <p style="font-size:1.1em;color:#4CAF50;margin:0 0 5px 20px;font-weight:bold;">- Total = {_format_hours(stage_total)}</p>
             </div>""")
 
-        # Phase 3b: Use structured supervision breakdowns instead of regex parsing
-        # Pastoral supervision
-        if pastoral_breakdown:
-            past_hours_total = pastoral_breakdown.get('total', 0.0)
-            past_students_total = pastoral_breakdown.get('student_count', 0)
+    # Phase 3b: Use structured supervision breakdowns instead of regex parsing
+    # Pastoral supervision
+    if pastoral_breakdown:
+        past_hours_total = pastoral_breakdown.get('total', 0.0)
+        past_students_total = pastoral_breakdown.get('student_count', 0)
 
-            items_html_parts.append(f"""<div style="margin-bottom:25px;">
-                <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #2196F3;padding-left:10px;">Pastoral Supervision ({past_hours_total:.1f}h)</h4>
-                <div style="margin-left:20px;">
-                    <div class="detail-item teaching-item">
-                        <span class="detail-name">Students</span>
-                        <span class="detail-hours">{past_students_total} students x {config.SUPERVISION_MULTIPLIERS['pastoral']}h each = {past_hours_total:.1f}h</span>
-                        <span class="detail-activity teaching-activity"></span>
-                    </div>
+        items_html_parts.append(f"""<div style="margin-bottom:25px;">
+            <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #2196F3;padding-left:10px;">Pastoral Supervision ({past_hours_total:.1f}h)</h4>
+            <div style="margin-left:20px;">
+                <div class="detail-item teaching-item">
+                    <span class="detail-name">Students</span>
+                    <span class="detail-hours">{past_students_total} students x {config.SUPERVISION_MULTIPLIERS['pastoral']}h each = {past_hours_total:.1f}h</span>
+                    <span class="detail-activity teaching-activity"></span>
                 </div>
-            </div>""")
-
-        # Project supervision
-        if project_breakdown:
-            proj_hours_total = project_breakdown.get('total', 0.0)
-            proj_projects_total = project_breakdown.get('project_count', 0)
-            proj_level = project_breakdown.get('level', 'UG')
-
-            items_html_parts.append(f"""<div style="margin-bottom:25px;">
-                <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #2196F3;padding-left:10px;">Project Supervision ({proj_hours_total:.1f}h)</h4>
-                <div style="margin-left:20px;">
-                    <div class="detail-item teaching-item">
-                        <span class="detail-name">Projects</span>
-                        <span class="detail-hours">{proj_projects_total} projects x {proj_level} = {proj_hours_total:.1f}h</span>
-                        <span class="detail-activity teaching-activity"></span>
-                    </div>
-                </div>
-            </div>""")
-
-        min_teaching = breakdown.get('minimum_admin_load', 0)
-        if min_teaching > 0:
-            items_html_parts.append(f"""<div class="detail-item {css_class}">
-                <span class="detail-name">Minimum Admin Teaching Load</span>
-                <span class="detail-hours">{min_teaching:.1f}h</span>
-                <span class="detail-activity teaching-activity"></span>
-            </div>""")
-
-        items_html = ''.join(items_html_parts)
-
-        return f"""<div class="section-card {css_class}">
-            <div class="card-header">
-                <span class="card-title">{title}</span>
-                <span class="card-total">{hours:.1f}h</span>
             </div>
-            {items_html}
-            <p style="font-size:0.85em;color:#666;padding-top:10px;">Subtotal: {hours:.1f}h</p>
-        </div>"""
+        </div>""")
+
+    # Project supervision
+    if project_breakdown:
+        proj_hours_total = project_breakdown.get('total', 0.0)
+        proj_projects_total = project_breakdown.get('project_count', 0)
+        proj_level = project_breakdown.get('level', 'UG')
+
+        items_html_parts.append(f"""<div style="margin-bottom:25px;">
+            <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #2196F3;padding-left:10px;">Project Supervision ({proj_hours_total:.1f}h)</h4>
+            <div style="margin-left:20px;">
+                <div class="detail-item teaching-item">
+                    <span class="detail-name">Projects</span>
+                    <span class="detail-hours">{proj_projects_total} projects x {proj_level} = {proj_hours_total:.1f}h</span>
+                    <span class="detail-activity teaching-activity"></span>
+                </div>
+            </div>
+        </div>""")
+
+    min_teaching = breakdown.get('minimum_admin_load', 0)
+    if min_teaching > 0:
+        items_html_parts.append(f"""<div class="detail-item {css_class}">
+            <span class="detail-name">Minimum Admin Teaching Load</span>
+            <span class="detail-hours">{min_teaching:.1f}h</span>
+            <span class="detail-activity teaching-activity"></span>
+        </div>""")
+
+    items_html = ''.join(items_html_parts)
+
+    return f"""<div class="section-card {css_class}">
+        <div class="card-header">
+            <span class="card-title">{title}</span>
+            <span class="card-total">{hours:.1f}h</span>
+        </div>
+        {items_html}
+        <p style="font-size:0.85em;color:#666;padding-top:10px;">Subtotal: {hours:.1f}h</p>
+    </div>"""
 
 
 
