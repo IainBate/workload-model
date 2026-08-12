@@ -1552,8 +1552,9 @@ def _format_module_practicals_section(
             # Use the actual multiplier for display
             total_calc = contact_hrs * actual_multiplier * week_count / n_teachers if n_teachers > 0 else 0
 
+            calc_label = "First session" if standardized_wording else "Calculation"
             parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
-                <span class="detail-name" style="color:#333;">Calculation</span>
+                <span class="detail-name" style="color:#333;">{calc_label}</span>
                 <span class="detail-hours">{int(sessions_per_teacher)} first session(s)/week × {contact_hrs:.1f}h per session @ {_format_rate(actual_multiplier)} × {week_count} weeks @ {n_teachers} teachers = {_format_hours(chris_total_practicals)}</span>
             </div>""")
     else:
