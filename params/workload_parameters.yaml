@@ -73,7 +73,7 @@ task_multipliers:
       admin_flat_rate_per_assessment: 3
     manual:
       msc: 0.5
-      ug: 0.33
+      ug: 0.3333333333333333  # 1/3h = 20 min/script
       checking: 0.1
       admin_flat_rate_per_assessment: 3
 
