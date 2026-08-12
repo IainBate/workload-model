@@ -1040,6 +1040,8 @@ _WAW_ROLE_MAPPING = {
     "Chair of the Research Progression Panel": "Progression Panel Chair",
     "Chair of the Ethics Committee": "Ethics",
     "Ethics Committee members": "Ethics Committee Member",
+    "ECR rep": "ECR representative",
+    "ART staff rep": "ART staff representative",
     # Deputy CBoE roles
     "Deputy CBoE (paper checking for on-campus)": "Deputy CBoEs",
     "Deputy CBoE (marking for on-campus) and student prizes": "Deputy CBoEs",
