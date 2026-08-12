@@ -1000,7 +1000,7 @@ def generate_html_report(results: List[WorkloadResult], year_data: YearData,
         <div class="footer">
             <p><strong>Note:</strong> This dashboard was generated automatically from the Workload Model calculator.</p>
             <p>Click on staff names to view detailed individual reports. Staff in "Needs Attention" have >10% variance from nominal hours or noted assumptions/missing data.</p>
-            <p>The model is based on the Workload ModelFull Description (Iain Bate, June 2026).</p>
+            <p>The model is based on the Work Allocation Model (Iain Bate, June 2026 - updated August 2026).</p>
         </div>
     </div>
 </body>
