@@ -936,6 +936,9 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
         if 'practicals_breakdown' in practical_result:
             teacher_practicals_structured = practical_result['practicals_breakdown'].copy()
 
+        # Build structured marking breakdown from helper result
+        teacher_marking_structured = marking_result.get('marking_structured', {}).copy()
+
         result[teacher] = {
             "hours": total_teacher_hours,
             "teaching_breakdown": {
@@ -953,6 +956,7 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
                 "total_lecture_hours": lecture_result.get('total_lecture_hours', 0.0),
             },
             "practicals_breakdown": teacher_practicals_structured,
+            "marking_breakdown": teacher_marking_structured,
             "detail_text": "; ".join(module_detail_parts),
             "supervision_details": [],
         }
