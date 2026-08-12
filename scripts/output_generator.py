@@ -115,6 +115,27 @@ INDIVIDUAL_DIR = OUTPUT_DIR / "Individual Reports"
 DEPARTMENT_DIR = OUTPUT_DIR / "Department Summary"
 
 
+def _format_number_as_word(n: int) -> str:
+    """Convert small numbers (1-9) to words, return digits otherwise."""
+    words = {1: 'one', 2: 'two', 3: 'three', 4: 'four', 5: 'five',
+             6: 'six', 7: 'seven', 8: 'eight', 9: 'nine'}
+    return words.get(n, str(n))
+
+
+def _format_hours(hours: float) -> str:
+    """Format hours value - no decimal if integer, .1f otherwise."""
+    if hours == int(hours):
+        return f"{int(hours)}h"
+    return f"{hours:.1f}h"
+
+
+def _format_rate(rate: float) -> str:
+    """Format rate multiplier - no decimal if whole number, .1f otherwise."""
+    if rate == int(rate):
+        return f"{int(rate)}x"
+    return f"{rate:.1f}x"
+
+
 def _fix_category_references(chart: BarChart) -> None:
     """
     Fix category axis references from numRef to strRef.
