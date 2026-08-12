@@ -1182,10 +1182,6 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
                         <span style="color:white;font-size:0.9em;">Admin</span>
                         <strong style="color:#fce4ec;font-size:1.1em;">{r.admin_hours:.1f}h</strong>
                     </div>
-                    <div style="display:flex;justify-content:space-between;align-items:center;padding-left:20px;">
-                        <span style="color:white;font-size:0.9em;">Nominal Hours (reference)</span>
-                        <span style="color:#bbb;font-size:1em;">{nominal_hours:.0f}h</span>
-                    </div>
                 </div>
             </div>
         </div>
@@ -1936,10 +1932,6 @@ def _format_teaching_section_for_staff(result: WorkloadResult, title: str, hours
                     <div style="display:flex;justify-content:space-between;align-items:center;padding-left:20px;border-bottom:1px solid rgba(255,255,255,0.1);">
                         <span style="color:white;font-size:0.9em;">Admin</span>
                         <strong style="color:#fce4ec;font-size:1.1em;">{r.admin_hours:.1f}h</strong>
-                    </div>
-                    <div style="display:flex;justify-content:space-between;align-items:center;padding-left:20px;">
-                        <span style="color:white;font-size:0.9em;">Nominal Hours (reference)</span>
-                        <span style="color:#bbb;font-size:1em;">{nominal_hours:.0f}h</span>
                     </div>
                 </div>
             </div>
