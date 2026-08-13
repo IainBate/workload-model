@@ -124,8 +124,19 @@ class TestPracticalInvariants:
         breakdown = _calculate_practical_hours_and_breakdown(module, teachers)["practicals_breakdown"]
         if not breakdown or "repeat_sessions_per_teacher" not in breakdown:
             return
-        expected = breakdown["repeat_sessions_per_teacher"] * breakdown["first_session_hours"]
-        assert breakdown["repeat_hours"] == pytest.approx(expected, abs=0.01)
+        sessions = breakdown["repeat_sessions_per_teacher"]
+        expected = sessions * breakdown["first_session_hours"]
+        # Both stored values are rounded to 2dp, and repeat_hours rounds the
+        # product while `expected` multiplies an already-rounded operand - so
+        # allow for that rounding, scaled by the session count. The point of the
+        # property is that no *rate* has been applied (which would be a 1.5x
+        # discrepancy), not bit-exact arithmetic.
+        tolerance = 0.005 * (abs(sessions) + 1) + 0.005
+        assert breakdown["repeat_hours"] == pytest.approx(expected, abs=tolerance)
+        # And explicitly: the repetition rate must NOT already be baked in.
+        if expected > 0.1:
+            rate_applied = expected * config.REPETITION_MULTIPLIER
+            assert abs(breakdown["repeat_hours"] - rate_applied) > tolerance
 
     @given(
         n_teachers=st.integers(min_value=1, max_value=4),
