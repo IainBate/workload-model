@@ -90,8 +90,8 @@ Yan, Felix Ulrich-Oltean, James Stovold, Pourya Shamsolmoali, Robbert Jongeling 
 | # | Item | Status |
 |---|------|--------|
 | A1 | Add `ECR representative` / `ART staff representative` to `workload_parameters.yaml` (0%) + `_WAW_ROLE_MAPPING` | **Done.** Verified: Joe Cutting's admin breakdown now correctly shows `ECR representative: 0.0` instead of being unmapped. |
-| A2 | Verify baseline docs for min admin teaching hours (30h) / service points (175h) | **Still open.** `Work Allocation Model.docx` names these baseline categories but I couldn't find the numeric values written anywhere in its text. Needs your input: add the numbers, or confirm they're deliberately left to departmental discretion. |
-| A3 | Investigate flat 2h/week lecture-hours regardless of credits | **Still open**, raised for your domain input — not auto-implemented since it needs a judgment call about what's actually correct. `module.contact_hours` (computed from credits) remains genuinely unused/dead code in the calculator. |
+| A2 | Verify baseline docs for min admin teaching hours (30h) / service points (175h) | **Awaiting your decision** — see "A2 explained" below. |
+| A3 | Investigate flat 2h/week lecture-hours regardless of credits | **Awaiting your decision** — see "A3 explained" below. Confirmed a real inconsistency; needs a domain judgement before any code change. |
 | A4 | `--validate-only` CLI mode | **Done.** `python main.py --validate-only` runs load → calculate → validate and stops before output generation. Verified working. |
 
 Verified: full pipeline re-run, tests pass (same 4 pre-existing failures), baseline matches.
