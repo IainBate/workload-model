@@ -1531,21 +1531,20 @@ def _format_module_header(stage: str, modules_in_stage: List[Dict[str, Any]]) ->
     """Build a descriptive module header from pre-computed breakdown fields, e.g.
     "SYS2 Module - 1 lecture (2h) and 5 practical sessions (each 2h) per week split between three lecturers".
     """
-    weeks = config.TEACHING_WEEKS_PER_SEMESTER
-
-    total_lecture_hours = 0.0
-    lecture_contact_hours = 0.0
+    lectures_per_week = 0.0
     practical_sessions = 0
     practical_session_hours = 0.0
     teacher_count = 1
 
     for mod in modules_in_stage:
         mb = mod.get('module_breakdown', {})
-        total_lecture_hours += mb.get('total_lecture_hours', 0.0)
-        module_contact_hours = mb.get('lecture_contact_hours', 0.0)
-        if module_contact_hours > 0:
-            lecture_contact_hours = module_contact_hours
-            teacher_count = max(teacher_count, int(round(mb.get('total_lecture_hours', 0.0) / module_contact_hours)))
+
+        # Lecture shape and teacher count come from the calculator's structured
+        # delivery breakdown rather than being inferred from hour totals.
+        delivery = mb.get('delivery_structured') or {}
+        if delivery:
+            lectures_per_week += delivery.get('lectures_per_week', 0.0)
+            teacher_count = max(teacher_count, delivery.get('teacher_count', 1))
 
         ps = mb.get('practicals_structured') or {}
         groups = ps.get('total_groups')
