@@ -363,9 +363,9 @@ work that predates this conversation, without the planning docs being updated to
 | D4 | Replace truncated detail columns | **Already built.** The staff table shows FTE/total/teaching/research/admin hours plus a normative-deviation indicator (On target / Moderate / High), not truncated free text. |
 | D5 | Link staff names to individual reports | **Already built.** Table rows link to `Individual Reports/{name}_workload.html`. |
 | D6 | Group/sort by contract category | **Already built.** Table is sorted by category then name. |
-| D7 | Unit tests for department summary stats + needs-attention filter | **Not done** — genuinely missing, confirmed via search (no test file references `needs_attention` or `category_stats`). This is the one real remaining piece of Section D. |
+| D7 | Unit tests for department summary stats + needs-attention filter | **Done** — `test_reporting_helpers.py` (41 tests), testing the extracted helpers independently of HTML generation. |
 
-**Remaining Section D work: just D7**, plus B12 (dead-code cleanup) from Section B above.
+**Section D is complete.**
 
 ---
 
