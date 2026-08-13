@@ -1093,15 +1093,26 @@ class TestNewLecturerDetectionRegression:
 
         # John Smith should be found via COM00088Y lookup and get standard 2.5x rate
         assert "John Smith" in result
-        # Standard lecturer: 40 contact hours / 1 teacher * 2.5x = 100h teaching
-        # (plus assessment, marking, admin components)
         teaching_breakdown = result["John Smith"]["teaching_breakdown"]
         teaching_hours = teaching_breakdown.get("teaching", 0)
 
-        # With standard rate: ~40h contact * 2.5x = 100h base teaching
-        # New lecturer would be ~40h * 5x = 200h (significantly more)
-        assert teaching_hours >= 80, f"Expected >= 80h teaching for standard rate, got {teaching_hours}"
-        assert teaching_hours < 150, f"Expected < 150h to distinguish from new lecturer rate, got {teaching_hours}"
+        # Lecture hours come from the flat weekly rate (DEFAULT_LECURE_HOURS_PER_WEEK
+        # × TEACHING_WEEKS_PER_SEMESTER), NOT from module.contact_hours - which is
+        # computed during loading but never consumed by the calculator. Derive the
+        # expectations from the model so this test tracks the rates rather than
+        # hard-coding hour values that silently rot when the model changes.
+        base_lecture_hours = config.DEFAULT_LECURE_HOURS_PER_WEEK * config.TEACHING_WEEKS_PER_SEMESTER
+        standard_expected = base_lecture_hours * config.TEACHING_MULTIPLIERS["lecture_standard"]
+        new_lecturer_expected = base_lecture_hours * config.TEACHING_MULTIPLIERS["lecture_new_content_or_lecturer"]
+
+        assert teaching_hours == pytest.approx(standard_expected, abs=0.5), (
+            f"Expected the standard {config.TEACHING_MULTIPLIERS['lecture_standard']}x rate "
+            f"({standard_expected}h), got {teaching_hours}h"
+        )
+        assert teaching_hours != pytest.approx(new_lecturer_expected, abs=0.5), (
+            "Lecturer was charged the new-lecturer rate despite teaching the module "
+            "last year under its second module code"
+        )
 
 
 class TestHoDFallbackRegression:
