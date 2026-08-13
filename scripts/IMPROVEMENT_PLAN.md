@@ -333,9 +333,10 @@ regression it was written for.
 
 ## What's left, in order
 
-1. **You:** weigh in on A2 (undocumented 30h/175h baselines) and A3 (flat lecture-hours question)
-   — both explained in full in Section A above. A3 now has a second piece of evidence: a unit
-   test was written against the `contact_hours` assumption the calculator doesn't follow.
+1. **You:** weigh in on A3 (flat lecture-hours question) — explained in full in Section A above.
+   A3 now has a second piece of evidence: a unit test was written against the `contact_hours`
+   assumption the calculator doesn't follow. Also, optionally, the leftover "Service points 175"
+   row in the docx baselines table (see A2 resolved).
 2. **Me, next:** B6 → B3 → B4 → B8 → B11 → D7 (department-stats tests) → **B10** (the gated
    refactor — now unblocked, since B1+B2 provide the required safety net) → E2 (unify the two
    reports' normative-comparison logic).
