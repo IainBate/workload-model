@@ -214,10 +214,6 @@ def validate_module_data(module) -> ValidationResult:
     if credits <= 0:
         result = result.add_issue(ValidationLevel.ERROR, "Credits must be positive", "credits", credits)
 
-    # Validate contact hours
-    contact_hours = getattr(module, 'contact_hours', 0)
-    result = result.merge(validatecontacthours(contact_hours))
-
     # Validate student count
     student_count = getattr(module, 'student_count', 0)
     result = result.merge(validatestudentcount(student_count))

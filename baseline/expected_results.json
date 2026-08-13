@@ -3824,9 +3824,9 @@
       },
       "project_breakdown": {
         "level": "UG",
-        "project_count": 1,
+        "project_count": 2,
         "rate": 16,
-        "total": 16
+        "total": 32
       },
       "research_breakdown": {
         "grants": {
@@ -3848,11 +3848,11 @@
         "marking": 43.0,
         "pastoral_supervision": 15,
         "practicals": 121.0,
-        "project_supervision": 16,
+        "project_supervision": 32,
         "supervision": 0.0,
         "teaching": 45.8333
       },
-      "teaching_hours": 258.3333,
+      "teaching_hours": 274.3333,
       "teaching_module_breakdowns": {
         "GODS": {
           "assessment_setting": 7.5,
@@ -3944,7 +3944,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1610.1333
+      "total_hours": 1626.1333
     },
     "Pedro Ribeiro": {
       "admin_breakdown": {

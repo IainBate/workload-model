@@ -73,7 +73,6 @@ class ModuleData:
     general_checker: str = ""
     practicals: int = 0
     has_h_m_variants: bool = False
-    contact_hours: float = 0.0  # Estimated contact hours (from credits)
     practical_contact_hours: float = 0.0  # Actual contact hours per practical session (from CSV)
     practical_groups: int = 0  # Number of parallel groups for practicals
     practical_weeks: Tuple[int, ...] = field(default_factory=tuple)  # Weeks when practicals occur (immutable)
@@ -593,9 +592,6 @@ def _parse_wtw_csv(filepath: str, known_lecturers: Set[str] = None,
                 val = row[14].strip().upper()
                 has_h_m_variants = "TRUE" in val
 
-            # Estimate contact hours from credits (1 hour per credit as standard)
-            contact_hours = credits * config.DEFAULT_CONTACT_HOURS_PER_CREDIT
-
             # Read practicals count from column 13 (new column)
             practicals = 0
             if len(row) > 13 and row[13].strip():
@@ -619,7 +615,6 @@ def _parse_wtw_csv(filepath: str, known_lecturers: Set[str] = None,
                 general_checker=general_checker,
                 practicals=practicals,
                 has_h_m_variants=has_h_m_variants,
-                contact_hours=contact_hours,
                 student_count=config.DEFAULT_STUDENT_COUNT,
                 assessment_count=1,
                 source_year=year_label,
