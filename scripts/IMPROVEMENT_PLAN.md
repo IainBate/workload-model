@@ -96,6 +96,72 @@ Yan, Felix Ulrich-Oltean, James Stovold, Pourya Shamsolmoali, Robbert Jongeling 
 
 Verified: full pipeline re-run, tests pass (same 4 pre-existing failures), baseline matches.
 
+### A2 explained — two numbers the code applies that the spec never states
+
+The code hardcodes two baselines, both in `workload_parameters.yaml`:
+
+| Constant | Value | What it does |
+|---|---|---|
+| `MIN_ADMIN_TEACHING_HOURS` | 30h | A floor on teaching hours for HoD/admin staff who teach no modules — without it they'd show 0h teaching. |
+| `SERVICE_POINTS_DEFAULT` | 175h | Committee-work allowance for the same population. |
+
+`Work Allocation Model.docx` *names* both concepts — §2's part-time paragraph lists "minimum admin
+teaching" and "service points" among the baselines that scale by FTE — but **never states the
+numbers**. So nothing is calculating wrong, but there's no documented figure to audit 30h/175h
+against, and no way for anyone else to check they're still right or update them from a stated
+source.
+
+**Decision needed:** either (a) add "30 hours" and "175 hours" to the docx's baselines section so
+the code can be checked against it, or (b) if these are meant to be discretionary rather than
+fixed departmental policy, say so explicitly in the doc — so it's clear the code is applying a
+default rather than implementing a rule.
+
+Low urgency, but it's the only remaining place where a live number has no documented origin.
+
+### A3 explained — every module gets identical lecture hours regardless of size
+
+`_calculate_lecture_hours_and_multipliers()` computes lecture time as:
+
+```python
+lecture_hours = DEFAULT_LECURE_HOURS_PER_WEEK * contact_weeks   # 2.0 × 11 = 22h, always
+```
+
+This value never varies by module. Concrete evidence — **GPIG is a 40-credit module**, double
+every other module in the dataset (the only two credit values present are 20 and 40), yet its
+report reads:
+
+```
+GPIG Module - 1 lecture (2h) per week split between two lecturers
+[COM00138M] Delivery (Lectures): 22.0h contact @ 2 teachers = 11.0 each × 2.5x = 27.5h
+```
+
+— exactly the same 22.0h a 20-credit module gets.
+
+Meanwhile `ModuleData.contact_hours` **is** computed from credits during loading
+(`credits × DEFAULT_CONTACT_HOURS_PER_CREDIT`, which would give GPIG 40h) and is then **never
+read anywhere** in the calculator or output code. Confirmed dead: `grep` for `.contact_hours`
+excluding `practical_contact_hours` returns no consumers. So the codebase contains a
+credit-proportional contact-hours figure sitting unused next to a flat rate that overrides it.
+
+Note the docx frames all teaching multipliers as "hours per hour of contact" (Table 5) — i.e. the
+model expects *actual contact hours* as its input, with the multiplier converting contact time to
+workload. It doesn't specify how many contact hours a given module has; that's meant to come from
+data. The flat 2h/week is the code substituting a constant for that data.
+
+**Decision needed:** is a flat 2h/week actually right for every module regardless of size (i.e.
+GPIG genuinely has one 2-hour lecture slot a week like everything else, and its 40 credits reflect
+project/independent-study time rather than extra lectures)? Or should lecture hours scale with
+credits / come from a real timetable column?
+
+- If flat is correct → the fix is to delete the unused `contact_hours` field so it stops looking
+  like a live input, and note in the docx that lecture contact is assumed at 2h/week.
+- If it should scale → this is a genuine calculation gap affecting every 40-credit module's
+  teaching hours, and we'd need either a contact-hours column in the WTW data or an agreed
+  credits→contact-hours rule.
+
+I've deliberately not changed anything here: both options are defensible and only you know how
+GPIG is actually timetabled.
+
 ---
 
 ## Section B — Testing & architecture foundation (not started)
