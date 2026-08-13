@@ -1500,10 +1500,6 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
                 # Fallback: parse from details string for backward compatibility
                 if "teaching_breakdown" in staff_data and staff_data["teaching_breakdown"]:
                     teaching_breakdown = _sum_breakdown_dict(staff_data["teaching_breakdown"])
-        else:
-            # For admin staff with only minimum teaching load
-            if min_teaching > 0:
-                teaching_breakdown["minimum_admin_load"] = min_teaching
 
         # Extract structured supervision breakdowns (pastoral and project)
         pastoral_breakdown = {}
