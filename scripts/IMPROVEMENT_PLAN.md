@@ -195,8 +195,8 @@ No hours changed — verified via calculation baseline and the full 61-test suit
 | B6 | Unit tests: data loader & schema | Outstanding. |
 | B7 | Integration test: all artifacts produced and non-empty | **Done** — `test_all_expected_artifacts_produced` in `test_format_baseline.py`. |
 | B8 | Integration test: Excel formula & chart reference validation | Outstanding. |
-| B9 | Property-based invariant testing (Hypothesis) | **Parked** — needs `_calculate_teaching_workload` decomposed, which CLAUDE.md says not to do yet. |
-| B10 | **`output_generator.py` pure-rendering refactor** (approved, gated) | **Now unblocked** — B1+B2 are green, so the safety net the gate required exists. |
+| B9 | Property-based invariant testing (Hypothesis) | **Done** — `test_invariants.py`, 11 property tests. The "blocker" was stale; see below. |
+| B10 | **`output_generator.py` pure-rendering refactor** (approved, gated) | **Done** — see below. |
 | B11 | Visual regression: matplotlib chart artifact checks | Outstanding. |
 | B12 | Dead-code cleanup | **Done** — see below. |
 
