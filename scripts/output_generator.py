@@ -608,45 +608,26 @@ def generate_html_report(results: List[WorkloadResult], year_data: YearData,
     summary_path = os.path.join(output_dir, "workload_summary_boxplot.png")
     detailed_path = os.path.join(output_dir, "workload_detailed_boxplot.png")
 
-    # Calculate department summary statistics
-    total_fte = sum(r.fte for r in results)
-    total_hours = sum(r.total_hours for r in results)
-    avg_hours = total_hours / len(results) if results else 0
+    # Department summary statistics and triage lists come from the shared
+    # reporting helpers, so this report and the per-staff reports use the same
+    # thresholds and normative-comparison logic rather than two independent ones.
+    _summary = reporting_helpers.department_summary(results)
+    total_fte = _summary["total_fte"]
+    total_hours = _summary["total_hours"]
+    avg_hours = _summary["average_hours"]
 
-    # Group by category and calculate averages
-    category_stats: Dict[str, Dict[str, Any]] = {}
-    for r in results:
-        cat = r.category or "Unknown"
-        if cat not in category_stats:
-            category_stats[cat] = {"count": 0, "fte_sum": 0.0, "hours_sum": 0.0}
-        category_stats[cat]["count"] += 1
-        category_stats[cat]["fte_sum"] += r.fte
-        category_stats[cat]["hours_sum"] += r.total_hours
+    category_stats: Dict[str, Dict[str, Any]] = reporting_helpers.category_statistics(results)
 
-    # Calculate needs attention staff (off-target >10% or has assumptions/missing data)
-    needs_attention = []
-    for r in results:
-        off_target = False
-        if r.nominal_hours and r.total_hours:
-            variance = abs(r.total_hours - r.nominal_hours) / r.nominal_hours
-            if variance > 0.10:
-                off_target = True
-
-        has_issues = bool(r.assumptions or r.missing_data)
-
-        if off_target or has_issues:
-            target = r.nominal_hours or 0
-            deviation = ((r.total_hours - target) / target * 100) if target else 0
-            needs_attention.append({
-                "name": r.name,
-                "category": r.category or "Unknown",
-                "fte": r.fte,
-                "total": r.total_hours,
-                "target": target,
-                "deviation_pct": deviation,
-                "issues": ("Assumptions" if r.assumptions else "") +
-                          (", " if (r.assumptions and r.missing_data) else "") +
-                          ("Missing Data" if r.missing_data else "")
+    needs_attention = reporting_helpers.needs_attention(results)
+    if False:  # retained structure below is superseded by the helper
+        needs_attention.append({
+                "name": "",
+                "category": "",
+                "fte": 0,
+                "total": 0,
+                "target": 0,
+                "deviation_pct": 0,
+                "issues": (""
             })
 
     # Build individual report links
