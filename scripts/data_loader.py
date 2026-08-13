@@ -1615,19 +1615,9 @@ def load_all_data(data_dir: str = None,
                 art_ts_category_hod = val
                 break
 
-        if art_ts_category_hod:
-            resolved_category_hod = art_ts_category_hod
-        elif pt_info_hod and pt_info_hod.get("staff_category"):
-            resolved_category_hod = pt_info_hod["staff_category"]
-        elif hod_name_from_waw in category_overrides:
-            resolved_category_hod = category_overrides[hod_name_from_waw]
-        elif category_callback:
-            resolved_category_hod = category_callback(hod_name_from_waw) or ""
-            if resolved_category_hod:
-                category_overrides[hod_name_from_waw] = resolved_category_hod
-                category_overrides_dirty = True
-        else:
-            resolved_category_hod = ""
+        resolved_category_hod = _resolve_category_from_data(
+            hod_name_from_waw, art_ts_category_hod, pt_info_hod, category_overrides
+        )
 
         staff[hod_name_from_waw] = StaffData(
             canonical_name=hod_name_from_waw,
