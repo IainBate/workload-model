@@ -374,7 +374,7 @@ work that predates this conversation, without the planning docs being updated to
 | # | Item | Status |
 |---|------|--------|
 | E1 | `generate_per_staff_reports()` runs before `generate_html_report()` | **Already correct** — confirmed in `generate_all_outputs()`. |
-| E2 | Extract shared reporting-helper logic between department report and individual reports | **Not done** — genuinely useful now that Section C exists with its own independent normative-comparison implementation; do this once you've decided which C items to keep. |
+| E2 | Extract shared reporting-helper logic between department report and individual reports | **Done** — new `reporting_helpers.py`; see below. |
 | E3 | Run full test suite together | Ongoing — done after every change so far, same 4 pre-existing failures throughout, no regressions introduced. |
 | E4 | Full-run visual sanity check, incl. graceful unmapped-category handling | Done for Section A/C changes — no crashes, graceful degradation confirmed for the current all-unmapped-category state. |
 
