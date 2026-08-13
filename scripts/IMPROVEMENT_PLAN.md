@@ -189,12 +189,12 @@ No hours changed — verified via calculation baseline and the full 61-test suit
 |---|------|--------|
 | B1 | Structured JSON calculation baseline | **Done.** `calculation_baseline.py` + `main.py --export-baseline` writes `baseline/expected_results.json` (56 staff, numbers only — no wording). `test_calculation_baseline.py` asserts against it (7 tests). |
 | B2 | Format-only HTML regression tests | **Done.** `test_format_baseline.py` (7 tests) — whitespace- and date-normalized comparison of all 56 individual reports + the department report, plus structural checks and a dangling-operator guard. Also covers B7. |
-| B3 | Unit test suite for calculation logic | Partly covered by B1's invariant tests (category totals, non-negative hours, teaching/research breakdown sums). Dedicated per-function tests still outstanding. |
-| B4 | Integration test suite for full pipeline | Partly covered by B2's fixture (full load → calculate → generate_all_outputs). Dedicated file still outstanding. |
+| B3 | Unit test suite for calculation logic | **Done** — B1 invariants + `test_invariants.py` (11 property tests) + the pre-existing `test_workload_calculator.py`. |
+| B4 | Integration test suite for full pipeline | **Done** — `test_integration.py` (19 tests): load → calculate → generate, artifact checks, Excel and chart validation. |
 | B5 | Validation pipeline wired into `main.py` | **Already done** (pre-existing) — `main.py` calls `run_validation_pipeline(results)` and exits on failure. |
-| B6 | Unit tests: data loader & schema | Outstanding. |
-| B7 | Integration test: all artifacts produced and non-empty | **Done** — `test_all_expected_artifacts_produced` in `test_format_baseline.py`. |
-| B8 | Integration test: Excel formula & chart reference validation | Outstanding. |
+| B6 | Unit tests: data loader & schema | **Done** — `test_data_loader.py` (29 tests). Also closed a real validation gap; see below. |
+| B7 | Integration test: all artifacts produced and non-empty | **Done** — in both `test_format_baseline.py` and `test_integration.py`. |
+| B8 | Integration test: Excel formula & chart reference validation | **Done** — `TestExcelOutput` in `test_integration.py`: no `#REF!`/`#VALUE!` cells, formulas reference real ranges, chart category axes resolve. |
 | B9 | Property-based invariant testing (Hypothesis) | **Done** — `test_invariants.py`, 11 property tests. The "blocker" was stale; see below. |
 | B10 | **`output_generator.py` pure-rendering refactor** (approved, gated) | **Done** — see below. |
 | B11 | Visual regression: matplotlib chart artifact checks | Outstanding. |
