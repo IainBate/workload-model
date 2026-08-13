@@ -49,8 +49,6 @@ def patch_module_paths():
         try:
             mod = importlib.import_module(module_name)
             mod.OUTPUT_DIR = BASELINE_DIR
-            mod.INDIVIDUAL_DIR = BASELINE_DIR / "Individual Reports"
-            mod.DEPARTMENT_DIR = BASELINE_DIR / "Department Summary"
         except ImportError:
             pass
 
