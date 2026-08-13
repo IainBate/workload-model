@@ -169,19 +169,17 @@ model expects *actual contact hours* as its input, with the multiplier convertin
 workload. It doesn't specify how many contact hours a given module has; that's meant to come from
 data. The flat 2h/week is the code substituting a constant for that data.
 
-**Decision needed:** is a flat 2h/week actually right for every module regardless of size (i.e.
-GPIG genuinely has one 2-hour lecture slot a week like everything else, and its 40 credits reflect
-project/independent-study time rather than extra lectures)? Or should lecture hours scale with
-credits / come from a real timetable column?
+**Ruling (Iain, 2026-08-13): flat 2h/week is correct.** A module's extra credits reflect project
+and independent-study time, not extra lecture contact. Actions taken:
 
-- If flat is correct → the fix is to delete the unused `contact_hours` field so it stops looking
-  like a live input, and note in the docx that lecture contact is assumed at 2h/week.
-- If it should scale → this is a genuine calculation gap affecting every 40-credit module's
-  teaching hours, and we'd need either a contact-hours column in the WTW data or an agreed
-  credits→contact-hours rule.
+- Removed `ModuleData.contact_hours` entirely — the field, its assignment in `data_loader.py`, its
+  now-orphaned `validatecontacthours()` validator, and 25 constructor arguments across the two
+  test files. It computed a credit-derived number that nothing consumed, which had already misled
+  one unit test into asserting the wrong hours (see Test suite health).
+- Documented the rule in `Work Allocation Model.docx` §2: lecture contact is 2h/week over 11 weeks
+  (22h) for every module regardless of credit weighting, with the reasoning stated.
 
-I've deliberately not changed anything here: both options are defensible and only you know how
-GPIG is actually timetabled.
+No hours changed — verified via calculation baseline and the full 61-test suite.
 
 ---
 
