@@ -1879,14 +1879,6 @@ def _format_teaching_section_for_staff(result: WorkloadResult, title: str, hours
             </div>
         </div>""")
 
-    min_teaching = breakdown.get('minimum_admin_load', 0)
-    if min_teaching > 0:
-        items_html_parts.append(f"""<div class="detail-item {css_class}">
-            <span class="detail-name">Minimum Admin Teaching Load</span>
-            <span class="detail-hours">{min_teaching:.1f}h</span>
-            <span class="detail-activity teaching-activity"></span>
-        </div>""")
-
     items_html = ''.join(items_html_parts)
 
     return f"""<div class="section-card {css_class}">
