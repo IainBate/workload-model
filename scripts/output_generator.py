@@ -1320,46 +1320,24 @@ def _format_module_delivery_section(module_breakdown: Dict[str, Any], is_new_lec
     delivery_per_module = module_breakdown.get('teaching', 0)
 
     if delivery_per_module > 0:
-        # Get the stored contact hours (before multiplier was applied)
-        lecture_contact_hours = module_breakdown.get('lecture_contact_hours', 0.0)
-        total_lecture_hours = module_breakdown.get('total_lecture_hours', 0.0)
+        # Pure rendering: every value below is read from the calculator's
+        # delivery_structured breakdown, never re-derived from displayed totals.
+        delivery = module_breakdown.get('delivery_structured', {})
+        total_lecture_hours = delivery.get('total_lecture_hours', module_breakdown.get('total_lecture_hours', 0.0))
+        teacher_count = delivery.get('teacher_count', 1) or 1
+        base_per_teacher = delivery.get('base_per_teacher', 0.0)
+        applied_multiplier = delivery.get('multiplier', config.TEACHING_MULTIPLIERS['lecture_standard'])
 
-        # Calculate weeks of teaching (typically 11 weeks per semester)
-        weeks = config.TEACHING_WEEKS_PER_SEMESTER
+        # The displayed rate is the standard lecture rate for everyone except
+        # new lecturers, who are shown at their higher rate.
+        standard_rate = config.TEACHING_MULTIPLIERS['lecture_standard']
+        new_lecturer_rate = config.TEACHING_MULTIPLIERS['lecture_new_content_or_lecturer']
+        shown_rate = new_lecturer_rate if applied_multiplier >= new_lecturer_rate else standard_rate
 
-        # Derive actual multiplier from delivery hours and contact hours
-        # actual_multiplier = delivery_per_module / lecture_contact_hours when there's one teacher
-        # For multiple teachers, we need to account for the share
-        # The breakdown stores total_lecture_hours (module-level) and teaching (per-teacher with multiplier)
-        if lecture_contact_hours > 0:
-            # Calculate what multiplier was applied based on actual hours vs contact hours
-            # If total_lecture_hours equals delivery_per_module, there's one teacher
-            # Otherwise, we have multiple teachers sharing the load
-            teacher_count = int(round(total_lecture_hours / lecture_contact_hours)) if lecture_contact_hours > 0 else 1
-            if teacher_count < 1:
-                teacher_count = 1
-            base_per_teacher = total_lecture_hours / teacher_count
-            actual_multiplier = delivery_per_module / base_per_teacher if base_per_teacher > 0 else 2.5
-        else:
-            actual_multiplier = 2.5
-
-        # Use actual multiplier instead of is_new_lecturer for display
-        if actual_multiplier >= 4.5:  # Approximately 5x (allowing some floating point tolerance)
-            lecturer_type = "New lecturer (5x)"
-
-            # For new lecturers, calculate teacher count from total contact hours and per-teacher base
-            teacher_count = int(round(total_lecture_hours / lecture_contact_hours)) if lecture_contact_hours > 0 else 1
-            if teacher_count < 1:
-                teacher_count = 1
-            base_per_teacher = total_lecture_hours / teacher_count
-            # Chris's actual delivery includes his multiplier (5x for new lecturer)
-            description = f"{total_lecture_hours:.1f}h contact @ {teacher_count} teachers = {base_per_teacher:.1f} each × 5.0x = {delivery_per_module:.1f}h"
-        else:
-            lecturer_type = "Standard (2.5x)"
-            # For standard lecturers: show the contact hours calculation
-            teacher_count = int(round(total_lecture_hours / lecture_contact_hours)) if lecture_contact_hours > 0 else 1
-            base_per_teacher = total_lecture_hours / teacher_count if teacher_count > 0 else lecture_contact_hours
-            description = f"{total_lecture_hours:.1f}h contact @ {teacher_count} teachers = {base_per_teacher:.1f} each × 2.5x = {delivery_per_module:.1f}h"
+        description = (
+            f"{total_lecture_hours:.1f}h contact @ {teacher_count} teachers = "
+            f"{base_per_teacher:.1f} each × {shown_rate:.1f}x = {delivery_per_module:.1f}h"
+        )
 
         # Include module code in label for clarity, but only if it looks like a valid code
         # Skip codes that are empty or look like placeholders (contain < or >)
