@@ -1476,28 +1476,14 @@ def load_all_data(data_dir: str = None,
                 except (ValueError, TypeError):
                     pastoral_students = 0
 
-            # Resolve contract category (ART / T and S), in priority order:
-            # 1. ART Performance data capture sheet (most direct/authoritative source)
-            # 2. Part time.csv's Staff Category column
-            # 3. A previously-saved answer (staff_category_lookup.json)
-            # 4. Ask the user (if a callback is provided) and persist the answer -
-            #    only for currently-active staff, since inactive/historical names
-            #    (e.g. previous-year teachers, extra markers) don't affect any
-            #    report and would otherwise flood the prompt with irrelevant asks.
-            is_active = proj_data["active"] if proj_data else True
-            if art_ts_category:
-                resolved_category = art_ts_category
-            elif pt_info and pt_info.get("staff_category"):
-                resolved_category = pt_info["staff_category"]
-            elif canonical in category_overrides:
-                resolved_category = category_overrides[canonical]
-            elif category_callback and is_active:
-                resolved_category = category_callback(canonical) or ""
-                if resolved_category:
-                    category_overrides[canonical] = resolved_category
-                    category_overrides_dirty = True
-            else:
-                resolved_category = ""
+            # Resolve contract category (ART / T and S) from the available data
+            # sources, in priority order. Anything still unresolved here is left
+            # blank for now and asked about later (after the roster is filtered
+            # down to this year's staff) so we never prompt about someone who
+            # won't appear in any report.
+            resolved_category = _resolve_category_from_data(
+                canonical, art_ts_category, pt_info, category_overrides
+            )
 
             staff[canonical] = StaffData(
                 canonical_name=canonical,
