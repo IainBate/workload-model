@@ -90,13 +90,23 @@ The immutable DTO passed from calculator to output. Contains all pre-computed nu
 
 ### Function Size Hotspots (Refactor Targets)
 
-| Function | Approximate Lines | Refactor Phase |
-|----------|-------------------|----------------|
-| `_calculate_teaching_workload()` | ~880 lines | Phase 5 |
-| `generate_per_staff_reports()` / `format_teaching_section()` | ~574 lines | Phase 5 (output_generator.py) |
-| `load_all_data()` | ~350 lines | Not in scope |
+Measured with `ast` on 2026-08-13 (re-measure before trusting these — the previous version of
+this table was badly out of date, listing `_calculate_teaching_workload()` at ~880 lines when it
+is 219, and naming `format_teaching_section()`, which no longer exists):
 
-**Do not add more logic to these functions.** They are refactor targets for Phase 5.
+| Function | File | Lines |
+|----------|------|-------|
+| `load_all_data()` | data_loader.py | 477 |
+| `calculate_workload()` | workload_calculator.py | 400 |
+| `generate_html_report()` | output_generator.py | 339 |
+| `_calculate_practical_hours_and_breakdown()` | workload_calculator.py | 261 |
+| `generate_excel_with_formulas()` | output_generator.py | 228 |
+| `_calculate_teaching_workload()` | workload_calculator.py | 219 |
+
+`_calculate_teaching_workload()` has already been decomposed — it delegates to
+`_calculate_lecture_hours_and_multipliers()`, `_calculate_practical_hours_and_breakdown()`,
+`_calculate_assessment_setting_hours()`, `_calculate_assessment_marking_hours()` and
+`_build_module_detail_parts()`. Prefer adding to those helpers over the parent.
 
 ## Project Overview
 This project provides an automated system for calculating academic staff workloads based on a specified model. It processes module data from CSV files and applies a set of predefined multipliers to determine "calculation points" (workload units) that are shared among the teaching team for each module.

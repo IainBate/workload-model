@@ -200,7 +200,59 @@ No hours changed — verified via calculation baseline and the full 61-test suit
 | B11 | Visual regression: matplotlib chart artifact checks | Outstanding. |
 | B12 | Dead-code cleanup | **Done** — see below. |
 
-**Remaining order:** B6 → B3 → B4 → B8 → B11 → **B10** → B9 (parked).
+**Remaining order:** B6 → B3 → B4 → B8 → B11 → D7 → E2.
+
+### B10 — `output_generator.py` is now a pure rendering layer (2026-08-13)
+
+The regex parsing named in `CLAUDE.md` was already gone, but the renderer was still
+**reverse-engineering numbers by dividing displayed totals** — recovering teacher counts from
+`total_lecture_hours / lecture_contact_hours`, and the applied multiplier from
+`this_teacher_hours / base_per_teacher`. Fragile (it inferred "new lecturer" from
+`multiplier >= 4.5`) and a direct breach of the calculator-owns-the-numbers rule.
+
+Fixed by emitting the values from the calculator and reading them in the renderer:
+
+| New structured field | Replaces renderer arithmetic |
+|---|---|
+| `delivery_structured.teacher_count` | `round(total_lecture_hours / lecture_contact_hours)` |
+| `delivery_structured.base_per_teacher` | `total_lecture_hours / teacher_count` |
+| `delivery_structured.multiplier` / `.lecturer_type` | inferring the rate from an hours ratio, then thresholding at 4.5 |
+| `delivery_structured.lectures_per_week` | `round(total_lecture_hours / (weeks * 2))` |
+| `practicals_structured.applied_rate` | `practicals_per_module / base_per_teacher` |
+| `practicals_structured.first_session_total` / `.repeat_total` | rate × hours × weeks, recomputed at render time |
+| `practicals_structured.sessions_per_teacher` | `total / n_teachers / (contact_hrs * week_count)` |
+
+Also removed the dead `format_teaching_section()` wrapper (139 lines) — never called, and it
+carried a stale duplicate of the module-header logic with a hardcoded "(each 2h)".
+
+**Verification — this is what the gate was for.** `test_format_baseline.py` passed *unchanged*
+throughout, i.e. zero visible output difference. On the calculation side the change was provably
+additive: a key-by-key walk of every staff member's `teaching_module_breakdowns` found
+**0 existing values changed or removed** and exactly 6 new keys added. `CLAUDE.md`'s "Known
+Violations" section has been updated to record that none remain.
+
+### B9 — the blocker was stale
+
+B9 was parked because the test-strategy doc said it needed `_calculate_teaching_workload` split
+into named helpers, and `CLAUDE.md` describes that function as **~880 lines** and off-limits.
+Measured with `ast`, it is **219 lines** and the decomposition already exists — the exact helpers
+the doc wanted (`_calculate_lecture_hours_and_multipliers`,
+`_calculate_practical_hours_and_breakdown`) are present, as are the `ModuleData` fields it assumed
+missing. No refactor was required; the approved decomposition work was already done.
+
+`test_invariants.py` adds 11 Hypothesis properties over those helpers and the full pipeline:
+total = teaching + research + admin; no negative categories; per-teacher practical hours summing
+exactly to the module total ("group distribution neutrality"); adding staff never increasing an
+individual's share; nominal hours monotonic in FTE; marking monotonic in student count; every
+applied multiplier being a configured value; and `repeat_hours` staying rate-free.
+
+Both new suites were mutation-tested: pre-applying `REPETITION_MULTIPLIER` into `repeat_hours`,
+and perturbing `total_hours`, each produced exactly the expected failure.
+
+**Note for `CLAUDE.md`:** its "Function Size Hotspots" table is out of date — it lists
+`_calculate_teaching_workload` at ~880 lines and `generate_per_staff_reports` /
+`format_teaching_section` at ~574. Current largest is `calculate_workload` at 400 lines; the
+`format_teaching_section` entry refers to a function that no longer exists.
 
 ### B12 — dead code removed (2026-08-13)
 
