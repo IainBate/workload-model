@@ -312,6 +312,33 @@ work that predates this conversation, without the planning docs being updated to
 
 ---
 
+## Data sources and housekeeping (2026-08-13)
+
+**Switched project/pastoral loads to `Project and Pastoral Group Loads - Loadings.csv`.** It has
+identical columns and row count to the old `project_load.csv` but fresher computed values, and was
+sitting unused in `data/`. Impact was one person: **Paul Cairns' project load 0.40 → 1.62**, which
+ceilings to 2 projects instead of 1 — exactly +16h teaching (one UG project), total 1,610.1h →
+1,626.1h. Nobody else changed; pastoral loads were unaffected because they come from
+`pastoral_load.csv` in preference. `project_load.csv` then deleted as superseded.
+
+**CSV audit.** Every file in `data/` was checked against actual code usage:
+
+| File | Status |
+|---|---|
+| `project_load.csv` | **Deleted** — superseded by Loadings.csv (recoverable from git). |
+| `WTW 2025-6.csv` | **Kept — do not delete.** A filename grep shows it as unused, but it is loaded by `glob("WTW *.csv")` in `load_previous_wtw()` and supplies **52 known lecturers / 46 per-module entries** for new-lecturer detection. Deleting it would silently flip every returning lecturer to the 5× new-lecturer rate and massively inflate teaching hours. |
+| `Part time.csv` | **Kept, but currently inert.** None of its 4 people (Carrington, Pumfrey, Sujan, Wilson) are in the active roster, and every roster member is 1.0 FTE — so it contributes nothing today. It is still the *mechanism* for part-time FTE, so deleting it would silently give any future part-time member 1.0 FTE. Flagged rather than removed. |
+| All others | In active use. |
+
+**Chris Smith** (left the department) — confirmed no workload report is produced for him: he is
+`Active=FALSE` and absent from this year's WTW, so the roster filter already excludes him.
+
+**Other housekeeping:** the `'Chris'` alias now resolves to Christopher Crispin-Bailey (it
+previously resolved to the inactive Chris Smith, printing a warning on every run and risking a
+silent misattribution if a bare "Chris" ever appeared); the empty vestigial
+`baseline/Department Summary/` directory and its `mkdir` calls removed; the six superseded planning
+docs moved to `docs/archive/`.
+
 ## Test suite health
 
 **61/61 passing.** For most of this work the suite sat at "43 passed, 4 failed", with the four
