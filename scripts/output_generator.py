@@ -19,6 +19,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import List, Optional, Dict, Any, Tuple
 
+import reporting_helpers
+
 # Get project root directory (parent of scripts folder)
 SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
 PROJECT_ROOT = Path(os.path.dirname(SCRIPTS_DIR))
@@ -728,26 +730,20 @@ def generate_html_report(results: List[WorkloadResult], year_data: YearData,
 
     # Generate category split rows
     for cat, stats in sorted(category_stats.items()):
-        avg_teaching = (sum(r.teaching_hours for r in results if r.category == cat) / stats["count"]) if stats["count"] > 0 else 0
-        avg_research = (sum(r.research_hours for r in results if r.category == cat) / stats["count"]) if stats["count"] > 0 else 0
-        avg_admin = (sum(r.admin_hours for r in results if r.category == cat) / stats["count"]) if stats["count"] > 0 else 0
-        total_cat_avg = avg_teaching + avg_research + avg_admin
+        # Averages, actual split and normative target all pre-computed by
+        # reporting_helpers.category_statistics() - rendering only formats them.
+        actual_split = stats["actual_split_pct"]
+        t_pct = actual_split["teaching"]
+        r_pct = actual_split["research"]
+        a_pct = actual_split["admin"]
 
-        # Calculate percentages
-        t_pct = (avg_teaching / total_cat_avg * 100) if total_cat_avg > 0 else 0
-        r_pct = (avg_research / total_cat_avg * 100) if total_cat_avg > 0 else 0
-        a_pct = (avg_admin / total_cat_avg * 100) if total_cat_avg > 0 else 0
-
-        # Get normative comparison for this category
-        normative_split = config.get_normative_split(cat)
+        normative_pct = stats["normative_split_pct"]
         normative_html = ""
-        if normative_split:
-            norm_teaching = normative_split.get("teaching_hours", 0) * 100
-            norm_research = normative_split.get("research_hours", 0) * 100
-            norm_admin = normative_split.get("admin_hours", 0) * 100
+        if normative_pct:
             normative_html = (
                 f'<div style="margin-top:5px;font-size:0.8em;color:#666">'
-                f'Expected: T{norm_teaching:.0f}% / R{norm_research:.0f}% / A{norm_admin:.0f}%'
+                f'Expected: T{normative_pct["teaching"]:.0f}% / '
+                f'R{normative_pct["research"]:.0f}% / A{normative_pct["admin"]:.0f}%'
                 f'</div>'
             )
 
