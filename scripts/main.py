@@ -157,6 +157,12 @@ def main():
         sys.exit(1)
     print("  All validations passed.")
 
+    if args.export_baseline:
+        path = export_baseline(results, year_data.year_label)
+        print(f"\nCalculation baseline written to {path}")
+        print(f"  {len(results)} staff recorded")
+        return
+
     if args.validate_only:
         print("\n(Validate-only run - no output generation performed)")
         return
