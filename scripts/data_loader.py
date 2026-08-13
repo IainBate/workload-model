@@ -1664,6 +1664,22 @@ def load_all_data(data_dir: str = None,
             saint_modules=(),
         )
 
+    # Ask about any remaining unresolved contract categories. Deliberately done
+    # here - after the roster has been filtered to this year's staff and the HoD
+    # added - so the user is only asked about people who actually appear in the
+    # reports, rather than every historical name in the data files. Inactive
+    # staff are skipped for the same reason.
+    if category_callback:
+        for name in sorted(staff.keys()):
+            data = staff[name]
+            if data.category or not data.active:
+                continue
+            answer = category_callback(name)
+            if answer:
+                category_overrides[name] = answer
+                category_overrides_dirty = True
+                staff[name] = replace(data, category=answer)
+
     # Convert modules to tuple for frozen YearData
     modules_tuple = tuple(modules)
 
