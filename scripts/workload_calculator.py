@@ -983,6 +983,38 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
         if 'practicals_breakdown' in practical_result:
             teacher_practicals_structured = practical_result['practicals_breakdown'].copy()
 
+            # Per-teacher display values. The renderer previously derived these by
+            # dividing this teacher's practical hours by the module base to recover
+            # the rate that had been applied; compute them here instead so the
+            # output layer only formats.
+            if teacher_practicals_structured:
+                _ps = teacher_practicals_structured
+                _n_teachers = _ps.get('n_teachers', 1) or 1
+                _week_count = _ps.get('week_count', contact_weeks)
+                _first_session_hours = _ps.get('first_session_hours', 0)
+                _base_per_teacher = _ps.get('total', 0) / _n_teachers
+                _applied_rate = (
+                    teacher_practical_hrs / _base_per_teacher if _base_per_teacher > 0
+                    else _ps.get('first_session_rate', config.TEACHING_PROBLEM_CLASS)
+                )
+                _repeat_per_teacher = _ps.get('repeat_sessions_per_teacher', 0)
+                # Parallel-group modules show one "first session" plus repeats;
+                # single-session modules show only the combined calculation line.
+                _fs_sessions = 1 if _repeat_per_teacher > 0 else max(1, _ps.get('groups_per_teacher', 1))
+                _ps['applied_rate'] = _applied_rate
+                _ps['first_session_sessions'] = _fs_sessions
+                _ps['first_session_total'] = (
+                    _fs_sessions * _first_session_hours * _applied_rate * _week_count
+                )
+                _ps['repeat_total'] = (
+                    _repeat_per_teacher * _first_session_hours
+                    * _ps.get('repeat_rate', config.REPETITION_MULTIPLIER) * _week_count
+                )
+                _ps['sessions_per_teacher'] = (
+                    _ps.get('total', 0) / _n_teachers / (_first_session_hours * _week_count)
+                    if _first_session_hours and _week_count else 1
+                )
+
         # Build structured marking breakdown from helper result
         teacher_marking_structured = marking_result.get('marking_structured', {}).copy()
 
