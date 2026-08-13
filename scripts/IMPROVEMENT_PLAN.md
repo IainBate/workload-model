@@ -444,27 +444,34 @@ regression it was written for.
 
 ## What's left, in order
 
-All queries are now resolved — nothing is blocked on a decision.
+**All planned work is complete.** Sections A, B, C, D and E are done; every query has been
+resolved. Test suite: **161 passing, 0 failing** (from 43 passing / 4 failing at the start).
 
-**Remaining build work, in order:**
+### Test suite composition
 
-1. **B10** — `output_generator.py` pure-rendering refactor (*approved: proceed now*). Guarded by
-   the B1/B2 safety net; success criterion is those tests passing unchanged across it.
-2. **Decomposition of `_calculate_teaching_workload`** (~880 lines) into named helpers
-   (*approved*), then **B9** property-based invariant tests on top. Note this contradicts
-   `CLAUDE.md`'s current "do not add more logic to these functions / Phase 5 target" guidance —
-   that note should be updated when the split lands.
-3. **B6** data-loader/schema unit tests, **B3** per-function calculation tests, **B4** dedicated
-   integration suite, **B8** Excel formula/chart validation, **B11** chart artifact checks,
-   **D7** department summary + needs-attention tests.
-4. **E2** — unify the normative-comparison/threshold logic so the individual and department
-   reports share one implementation.
+| File | Tests | Covers |
+|---|---|---|
+| `test_workload_calculator.py` | 30 | Pre-existing calculation unit tests |
+| `test_reporting_helpers.py` | 41 | Shared comparison logic, department stats, needs-attention (D7, E2) |
+| `test_data_loader.py` | 29 | Name normalization, H/M merging, category resolution, validation (B6) |
+| `test_integration.py` | 19 | Full pipeline, artifacts, Excel, charts (B4, B8, B11) |
+| `test_invariants.py` | 11 | Hypothesis property tests (B9) |
+| `test_calculation_baseline.py` | 7 | Calculation regression vs JSON baseline (B1) |
+| `test_format_baseline.py` | 7 | Display-format regression vs HTML baseline (B2) |
+| `test_practical_display.py` | 5 | Practical-session display semantics |
 
-**Still worth your attention (not blocking):** `Part time.csv` is inert but retained (see Data
-sources above), and the five staff defaulted to ART — Fang Yan, Felix Ulrich-Oltean, James
-Stovold, Pourya Shamsolmoali, Robbert Jongeling — have not been explicitly confirmed; they are
-currently recorded as ART in `data/staff_category_lookup.json` and a one-line edit changes any of
-them.
+### Open items for you (none blocking)
+
+1. **`FOAM` and `Projects` have placeholder module codes** and are silently using the default
+   student count of 100 rather than real numbers (newly surfaced by the B6 validation check).
+2. **`Part time.csv` is inert** — none of its four people are on the active roster and everyone is
+   1.0 FTE. Retained because it is the part-time FTE mechanism; deleting it would silently give a
+   future part-time member 1.0 FTE.
+3. **Five staff were defaulted to ART** — Fang Yan, Felix Ulrich-Oltean, James Stovold, Pourya
+   Shamsolmoali, Robbert Jongeling — and never explicitly confirmed. They sit in
+   `data/staff_category_lookup.json`; a one-line edit changes any of them.
+4. **Repo hygiene:** the auto-commit hook is producing a commit per tool call (~180 on this
+   branch, all titled "chore: auto-commit before tool use"). Worth squashing before pushing.
 
 **Decided and done:** staff contract category resolved (47 ART / 9 T&S / 0 unresolved) with
 interactive prompting for future new names; all of C1–C7 kept and live in
