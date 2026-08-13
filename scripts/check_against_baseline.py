@@ -269,8 +269,14 @@ def check_baseline(data_dir: str = None, verbose: bool = False) -> int:
         baseline_files = get_all_baseline_files(baseline_dir)
         baseline_names = set(baseline_files.keys())
 
-        # Remove input_summary.txt from comparison - it's only in baseline for reference
+        # Remove baseline-only reference/fixture files from comparison - these
+        # live in baseline/ but are not produced by generate_all_outputs():
+        #   input_summary.txt     - human-readable record of the input data
+        #   expected_results.json - structured calculation baseline, written by
+        #                           'main.py --export-baseline' and asserted
+        #                           against by test_calculation_baseline.py
         baseline_names.discard("input_summary.txt")
+        baseline_names.discard("expected_results.json")
 
         if not baseline_names:
             print(f"\nERROR: Baseline directory is empty!")
