@@ -110,9 +110,10 @@ from openpyxl.chart.label import DataLabelList
 import config
 from data_loader import WorkloadResult, YearData
 
-# Output directory constants (moved here to avoid circular dependency)
-INDIVIDUAL_DIR = OUTPUT_DIR / "Individual Reports"
-DEPARTMENT_DIR = OUTPUT_DIR / "Department Summary"
+# Note: report subdirectories are derived from the output_dir argument passed to
+# generate_all_outputs() (see generate_per_staff_reports / generate_html_report),
+# not from module-level constants - so redirecting output is done by passing a
+# different output_dir, not by patching a path constant here.
 
 
 def _format_number_as_word(n: int) -> str:
@@ -219,79 +220,6 @@ def generate_csv(results: List[WorkloadResult], filepath: str = "Staff workload 
     print(f"CSV output written to {filepath}")
 
 
-def _create_boxplot(results: List[WorkloadResult], title: str, components: List[str],
-                    component_labels: List[str], output_path: str):
-    """
-    Create a stacked horizontal bar chart for workload components.
-
-    Args:
-        results: List of WorkloadResult objects containing workload data
-        title: Chart title to display at the top
-        components: List of attribute names to plot (e.g., ["teaching_hours", "research_hours"])
-        component_labels: Display labels corresponding to each component
-        output_path: File path where the PNG chart will be saved
-
-    Side Effects:
-        Creates and saves a matplotlib figure as a PNG file; prints confirmation message
-    """
-    names = [r.name for r in results]
-    data = [[getattr(r, comp) for r in results] for comp in components]
-
-    # Dynamic figure size based on staff count
-    fig, ax = plt.subplots(figsize=(16, max(8, len(names) * 0.4)))
-    fig.suptitle(title, fontsize=14, fontweight="bold")
-
-    bottom = [0.0] * len(names)
-    colors = ["#4CAF50", "#2196F3", "#FF9800", "#9C27B0", "#F44336", "#795548"]
-
-    for i, (comp, label) in enumerate(zip(components, component_labels)):
-        values = data[i]
-        bars = ax.barh(names, values, left=bottom, color=colors[i % len(colors)],
-                       label=label, edgecolor="white", height=0.6)
-        for j, (bar, val) in enumerate(zip(bars, values)):
-            if val > 10:  # Only label significant values
-                ax.text(bar.get_x() + bar.get_width() / 2, bar.get_y() + bar.get_height() / 2,
-                        f"{val:.0f}", ha="center", va="center", fontsize=7, color="white")
-        bottom = [b + v for b, v in zip(bottom, data[i])]
-
-    # Add expected workload lines AFTER bars so they're visible on top
-    # Use TR_staff as default fallback since we don't have category info here
-    fte_values = [r.fte for r in results]
-    for comp, label, color in zip(components, component_labels, colors):
-        # Map component name to key for CONTRACT_NORMATIVE_DIVISIONS
-        comp_key = comp.lower().replace(" hours", "").replace(" ", "_")
-        expected_division = config.CONTRACT_NORMATIVE_DIVISIONS.get("TR_staff", {}).get(comp_key, 0)
-        expected = [r.nominal_hours * expected_division for r in results]
-        # Plot vertical lines at each staff position
-        for j, (name, exp) in enumerate(zip(names, expected)):
-            ax.axvline(x=exp, color=color, alpha=0.4, linestyle="--", linewidth=1.5,
-                       label=f"Expected {label}" if j == 0 else None)
-
-    ax.set_xlabel("Hours")
-    ax.set_ylabel("Staff")
-    ax.legend(loc="lower right", fontsize=9)
-    ax.grid(axis="x", alpha=0.3)
-    plt.tight_layout()
-    plt.savefig(output_path, dpi=150, bbox_inches="tight")
-    plt.close(fig)
-    print(f"Boxplot saved to {output_path}")
-
-
-"""
-Generate both summary and detailed stacked boxplots.
-
-Creates two PNG files showing workload breakdowns:
-1. Summary boxplot: Teaching, Research, Administration as stacked bars
-2. Detailed boxplot: Expanded view with subcategories
-
-Args:
-    results: List of WorkloadResult objects from calculate_workload()
-    output_dir: Output directory for PNG files (default: OUTPUT_DIR)
-
-Output Files:
-    - workload_summary_boxplot.png: Three-component stacked bar chart
-    - workload_detailed_boxplot.png: Multi-category breakdown chart
-"""
 def generate_boxplots(results: List[WorkloadResult], year_data: YearData, output_dir: str = None):
     """
     Generate summary and detailed boxplot PNG charts.
