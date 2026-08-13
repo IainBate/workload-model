@@ -375,8 +375,26 @@ work that predates this conversation, without the planning docs being updated to
 |---|------|--------|
 | E1 | `generate_per_staff_reports()` runs before `generate_html_report()` | **Already correct** — confirmed in `generate_all_outputs()`. |
 | E2 | Extract shared reporting-helper logic between department report and individual reports | **Done** — new `reporting_helpers.py`; see below. |
-| E3 | Run full test suite together | Ongoing — done after every change so far, same 4 pre-existing failures throughout, no regressions introduced. |
-| E4 | Full-run visual sanity check, incl. graceful unmapped-category handling | Done for Section A/C changes — no crashes, graceful degradation confirmed for the current all-unmapped-category state. |
+| E3 | Run full test suite together | **Done** — 161 tests, all passing. |
+| E4 | Full-run visual sanity check, incl. graceful unmapped-category handling | **Done** — full pipeline runs clean; unmapped categories degrade to "no comparison available" rather than crashing (asserted in `test_reporting_helpers.py`). |
+
+### E2 — one implementation of the comparison logic, not two
+
+The department report and the per-staff reports were independently answering the same two
+questions ("how far from the contract-type target?" and "is that far enough to flag?"), each with
+its own copy of the 5pp / 10pp thresholds — free to drift apart silently.
+
+New `reporting_helpers.py` owns those definitions: `deviation_band()`, `category_deviations()`,
+`nominal_variance()` / `is_over_or_under_nominal()`, `needs_attention()`, `department_summary()`
+and `category_statistics()`. It contains no workload calculation — it only compares and classifies
+numbers the calculator already produced. Both reports were refactored onto it, removing the
+duplicate thresholds and the inline recomputation of category averages inside
+`generate_html_report()`.
+
+**Verified by mutation:** changing `DEVIATION_ON_TARGET_PP` from 5 to 99 in the shared module
+moved the department report's "On target" count from 1 to 57 *and* the individual reports' from
+0 to 3 — proving a single constant now drives both surfaces. `test_reporting_helpers.py` also
+asserts structurally that the old per-report constants are gone rather than merely unused.
 
 ---
 
