@@ -986,6 +986,22 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
         # Build structured marking breakdown from helper result
         teacher_marking_structured = marking_result.get('marking_structured', {}).copy()
 
+        # Structured delivery (lecture) breakdown. These are values the renderer
+        # previously reverse-engineered by dividing displayed totals (teacher
+        # count, applied multiplier, per-teacher base). Emitting them here keeps
+        # the output layer to pure formatting.
+        teacher_lecture_count = lecture_result.get('teacher_count', 0) or 1
+        teacher_lecture_base = lecture_result.get('total_lecture_hours', 0.0) / teacher_lecture_count
+        teacher_delivery_structured = {
+            "teacher_count": teacher_lecture_count,
+            "total_lecture_hours": lecture_result.get('total_lecture_hours', 0.0),
+            "base_per_teacher": round(teacher_lecture_base, 4),
+            "multiplier": lecture_result['lecture_multipliers'].get(teacher, 0.0),
+            "lecturer_type": dict(lecture_result.get('lecturer_types', [])).get(teacher, 'standard'),
+            "lectures_per_week": DEFAULT_LECURE_HOURS_PER_WEEK / 2.0,
+            "week_count": contact_weeks,
+        }
+
         result[teacher] = {
             "hours": total_teacher_hours,
             "teaching_breakdown": {
