@@ -473,7 +473,15 @@ class TestResearchWorkload:
             1 * config.SUPERVISION_MULTIPLIERS["pgr_assessor"]
         )
         assert total == expected_hours
-        assert breakdown.get("phd_supervision", 0) == expected_hours
+        # PhD hours live in a nested 'phd_students' dict with one entry per
+        # supervision type (there is deliberately no flat 'phd_supervision'
+        # total key - having both caused a double-counting bug historically).
+        phd_students = breakdown.get("phd_students", {})
+        assert phd_students.get("supervision") == 2 * config.SUPERVISION_MULTIPLIERS["pgr_primary_supervisor_per_fte"]
+        assert phd_students.get("co_supervision") == 1 * config.SUPERVISION_MULTIPLIERS["pgr_co_supervisor_per_fte"]
+        assert phd_students.get("assessor") == 1 * config.SUPERVISION_MULTIPLIERS["pgr_assessor"]
+        assert sum(phd_students.values()) == expected_hours
+        assert "phd_supervision" not in breakdown
 
     def test_grant_hours(self):
         """Test research grant hours are calculated correctly."""
