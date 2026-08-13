@@ -59,31 +59,10 @@ NEW_REPORT_FEATURES = {
     "standardized_wording": True,   # C7
 }
 
-# Same deviation thresholds used by the department report's "Needs Attention"
-# section (generate_html_report in output_generator.py), so an individual
-# report and the department view agree on what counts as "on target".
-_DEVIATION_OK = 5
-_DEVIATION_MODERATE = 10
-
-
-def _compute_category_deviations(r: WorkloadResult) -> Optional[Dict[str, Dict[str, float]]]:
-    """Return per-category {actual_pct, target_pct, deviation_pct} or None if
-    the staff member's category has no normative split to compare against."""
-    normative_split = config.get_normative_split(r.category)
-    if not normative_split or r.total_hours <= 0:
-        return None
-
-    result = {}
-    for key, label in [("teaching_hours", "teaching"), ("research_hours", "research"), ("admin_hours", "admin")]:
-        actual_hours = getattr(r, f"{label}_hours")
-        actual_pct = (actual_hours / r.total_hours) * 100
-        target_pct = normative_split.get(key, 0) * 100
-        result[label] = {
-            "actual_pct": actual_pct,
-            "target_pct": target_pct,
-            "deviation_pct": actual_pct - target_pct,
-        }
-    return result
+# Deviation comparison and thresholds are owned by reporting_helpers, shared
+# with the department report, so the two surfaces cannot drift apart on what
+# counts as "on target".
+_compute_category_deviations = reporting_helpers.category_deviations
 
 
 def _build_headline_summary(r: WorkloadResult, nominal_hours: float) -> str:
