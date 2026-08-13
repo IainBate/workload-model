@@ -47,6 +47,7 @@ from output_generator import (
 )
 from data_loader import WorkloadResult, YearData
 import config
+import reporting_helpers
 
 
 NEW_REPORT_FEATURES = {
