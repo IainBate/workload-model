@@ -118,7 +118,8 @@ class TestExcelOutput:
     """Excel formula and chart-reference validation (B8)."""
 
     @pytest.fixture(scope="class")
-    def workbook(self, generated):
+    @classmethod
+    def workbook(cls, generated):
         openpyxl = pytest.importorskip("openpyxl")
         return openpyxl.load_workbook(str(generated / "Staff workload model.xlsx"))
 
