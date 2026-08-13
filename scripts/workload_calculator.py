@@ -1482,10 +1482,6 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
             if "project_setting" in staff_data.get("teaching_breakdown", {}):
                 aggregated["project_setting"] = staff_data["teaching_breakdown"]["project_setting"]
 
-            # Include minimum admin load if present
-            if "minimum_admin_load" in staff_data.get("teaching_breakdown", {}):
-                aggregated["minimum_admin_load"] = staff_data["teaching_breakdown"]["minimum_admin_load"]
-
             return aggregated
 
         # Build structured teaching breakdown from per-module data
