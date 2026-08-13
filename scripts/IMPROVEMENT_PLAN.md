@@ -358,15 +358,27 @@ regression it was written for.
 
 ## What's left, in order
 
-1. **You:** weigh in on A3 (flat lecture-hours question) — explained in full in Section A above.
-   A3 now has a second piece of evidence: a unit test was written against the `contact_hours`
-   assumption the calculator doesn't follow. Also, optionally, the leftover "Service points 175"
-   row in the docx baselines table (see A2 resolved).
-2. **Me, next:** B6 → B3 → B4 → B8 → B11 → D7 (department-stats tests) → **B10** (the gated
-   refactor — now unblocked, since B1+B2 provide the required safety net) → E2 (unify the two
-   reports' normative-comparison logic).
+All queries are now resolved — nothing is blocked on a decision.
 
-B9 stays parked (blocked on a large function decomposition not otherwise in scope).
+**Remaining build work, in order:**
+
+1. **B10** — `output_generator.py` pure-rendering refactor (*approved: proceed now*). Guarded by
+   the B1/B2 safety net; success criterion is those tests passing unchanged across it.
+2. **Decomposition of `_calculate_teaching_workload`** (~880 lines) into named helpers
+   (*approved*), then **B9** property-based invariant tests on top. Note this contradicts
+   `CLAUDE.md`'s current "do not add more logic to these functions / Phase 5 target" guidance —
+   that note should be updated when the split lands.
+3. **B6** data-loader/schema unit tests, **B3** per-function calculation tests, **B4** dedicated
+   integration suite, **B8** Excel formula/chart validation, **B11** chart artifact checks,
+   **D7** department summary + needs-attention tests.
+4. **E2** — unify the normative-comparison/threshold logic so the individual and department
+   reports share one implementation.
+
+**Still worth your attention (not blocking):** `Part time.csv` is inert but retained (see Data
+sources above), and the five staff defaulted to ART — Fang Yan, Felix Ulrich-Oltean, James
+Stovold, Pourya Shamsolmoali, Robbert Jongeling — have not been explicitly confirmed; they are
+currently recorded as ART in `data/staff_category_lookup.json` and a one-line edit changes any of
+them.
 
 **Decided and done:** staff contract category resolved (47 ART / 9 T&S / 0 unresolved) with
 interactive prompting for future new names; all of C1–C7 kept and live in
