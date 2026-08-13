@@ -13,7 +13,9 @@ baselines_hours:
   personal_development: 75 # Mandated by university for all researchers
 
   # Teaching-related baselines (project_setting is now per-staff based on project_load.csv)
-  min_admin_teaching: 30   # Minimum teaching load for admin staff
+  # Note: there is deliberately no minimum/baseline teaching allowance. Staff not
+  # associated with any module get 0 teaching hours; they still receive the
+  # engagement and personal_development baselines above (counted under admin).
   teaching_weeks_per_semester: 11  # Number of teaching weeks per semester
 
 lecture_contact_hours:
