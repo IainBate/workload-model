@@ -45,7 +45,6 @@ def patch_module_paths(output_dir: Path):
     separate path constants to patch.)
     """
     (output_dir / "Individual Reports").mkdir(parents=True, exist_ok=True)
-    (output_dir / "Department Summary").mkdir(parents=True, exist_ok=True)
 
     def patch_module(module_name):
         """Patch a module's path constants."""

@@ -42,7 +42,6 @@ def patch_module_paths():
     """
     # Create the directories if they don't exist
     (BASELINE_DIR / "Individual Reports").mkdir(parents=True, exist_ok=True)
-    (BASELINE_DIR / "Department Summary").mkdir(parents=True, exist_ok=True)
 
     def patch_module(module_name):
         """Patch a module's path constants."""

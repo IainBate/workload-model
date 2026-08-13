@@ -771,8 +771,13 @@ def _load_pastoral_load(filepath: str = "pastoral_load.csv") -> Dict[str, int]:
     return data
 
 
-def _load_project_load(filepath: str = "project_load.csv") -> Dict[str, dict]:
-    """Load project load data from project_load.csv. Returns {canonical_name: data_dict}."""
+def _load_project_load(filepath: str = "Project and Pastoral Group Loads - Loadings.csv") -> Dict[str, dict]:
+    """Load project/pastoral load data. Returns {canonical_name: data_dict}.
+
+    Source is 'Project and Pastoral Group Loads - Loadings.csv' - the current
+    export. It supersedes the older 'project_load.csv', which had identical
+    columns but slightly stale computed load values.
+    """
     path = DATA_DIR / filepath
     if not path.exists():
         return {}
