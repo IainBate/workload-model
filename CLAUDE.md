@@ -24,9 +24,20 @@ Output files must be pure rendering — they format already-computed numbers, ne
 
 ### Known Violations to Fix
 
-**The following contain regex/string parsing that should be removed once Phase 3 is complete:**
+**None outstanding.** `output_generator.py` is now a pure rendering layer (completed 2026-08-13):
 
-- **output_generator.py**: Lines ~1084, ~1102, ~1205, ~1210, ~1314, ~1354, ~1359 — regex-parses free-text detail strings and re-reads config constants for display labels
+- The regex parsing of free-text detail strings is gone — the module contains no `re` usage at all.
+- The renderer no longer *re-derives* numbers by dividing displayed totals. Values it previously
+  reverse-engineered (teacher counts, applied multipliers, per-teacher bases, first-session and
+  repeat session totals, lectures per week) are emitted by `workload_calculator.py` in the
+  `delivery_structured` / `practicals_structured` / `marking_structured` per-module breakdowns and
+  simply read by the output layer.
+- Dead render paths removed: `_create_boxplot()` and the unused `format_teaching_section()`
+  wrapper (which also carried a stale duplicate of the module-header logic).
+
+When adding a display that needs a new number, add it to the relevant `*_structured` breakdown in
+`workload_calculator.py` — do not compute it in `output_generator.py`. `test_format_baseline.py`
+guards against visible drift; `test_calculation_baseline.py` guards the numbers.
 
 **Phase 2 (completed):** `role_based_reports.py` has been removed. Its functionality (`generate_individual_reports`, `generate_department_summary`) was consolidated into `output_generator.py` (`generate_per_staff_reports`, and department summary via `generate_html_report`). The baseline outputs were updated to reflect this consolidation.
 

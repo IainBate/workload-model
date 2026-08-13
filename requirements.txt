@@ -3,5 +3,9 @@ matplotlib>=3.7
 pandas>=2.0
 pyyaml>=6.0
 
+# Testing
+pytest>=7.0
+hypothesis>=6.0   # property-based invariant tests (test_invariants.py)
+
 # Google Sheets integration (optional - for advanced features)
 gspread>=6.0
