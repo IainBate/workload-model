@@ -35,7 +35,6 @@ class TestPracticalDisplayCalculation:
             codes=["COM00029I"],
             credits=20,
             stage=2,
-            contact_hours=40,
             practicals=1,  # 1 session per group
             practical_contact_hours=2.0,  # 2 hours per session
             practical_groups=5,  # 5 parallel groups
@@ -121,7 +120,6 @@ class TestPracticalDisplayCalculation:
             codes=["TEST001"],
             credits=20,
             stage=5,
-            contact_hours=40,
             practicals=1,
             practical_contact_hours=2.0,
             practical_groups=3,  # 3 groups, 2 teachers = 1.5 groups per teacher
@@ -198,7 +196,6 @@ class TestPracticalDisplayText:
             codes=["TEST002"],
             credits=20,
             stage=5,
-            contact_hours=40,
             practicals=1,
             practical_contact_hours=2.0,
             practical_groups=2,  # 2 groups, 1 teacher = no repeats
@@ -277,7 +274,6 @@ class TestPracticalDisplayMath:
             codes=["TEST003"],
             credits=20,
             stage=5,
-            contact_hours=40,
             practicals=1,
             practical_contact_hours=2.0,
             practical_groups=5,  # 5 parallel groups
@@ -337,7 +333,6 @@ class TestPracticalDisplayMath:
             codes=["COM00029I"],
             credits=20,
             stage=2,
-            contact_hours=40,
             practicals=1,
             practical_contact_hours=2.0,
             practical_groups=5,

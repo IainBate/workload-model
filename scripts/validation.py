@@ -164,32 +164,6 @@ def validatestudentcount(student_count: int) -> ValidationResult:
     return ValidationResult(valid=True)
 
 
-def validatecontacthours(contact_hours: float) -> ValidationResult:
-    """
-    Validate contact hours value.
-
-    Args:
-        contact_hours: The contact hours to validate
-
-    Returns:
-        ValidationResult with any issues found
-    """
-    if contact_hours < 0:
-        return ValidationResult(
-            valid=False,
-            issues=[ValidationIssue(ValidationLevel.ERROR, "Contact hours cannot be negative", "contact_hours", contact_hours)]
-        )
-
-    # Typical module: 10-60 contact hours for 20 credits
-    if contact_hours > 100:
-        return ValidationResult(
-            valid=True,
-            issues=[ValidationIssue(ValidationLevel.WARNING, "Very high contact hours (> 100)", "contact_hours", contact_hours)]
-        )
-
-    return ValidationResult(valid=True)
-
-
 def validate_module_data(module) -> ValidationResult:
     """
     Validate a ModuleData object.
