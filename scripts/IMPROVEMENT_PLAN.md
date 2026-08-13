@@ -197,10 +197,26 @@ No hours changed — verified via calculation baseline and the full 61-test suit
 | B8 | Integration test: Excel formula & chart reference validation | **Done** — `TestExcelOutput` in `test_integration.py`: no `#REF!`/`#VALUE!` cells, formulas reference real ranges, chart category axes resolve. |
 | B9 | Property-based invariant testing (Hypothesis) | **Done** — `test_invariants.py`, 11 property tests. The "blocker" was stale; see below. |
 | B10 | **`output_generator.py` pure-rendering refactor** (approved, gated) | **Done** — see below. |
-| B11 | Visual regression: matplotlib chart artifact checks | Outstanding. |
+| B11 | Visual regression: matplotlib chart artifact checks | **Done** — `TestChartArtifacts` in `test_integration.py`: valid PNG magic bytes, size floor, height scaling with roster size (catches clipped charts), headless backend. |
 | B12 | Dead-code cleanup | **Done** — see below. |
 
-**Remaining order:** B6 → B3 → B4 → B8 → B11 → D7 → E2.
+**Section B is complete.** B9's "blocker" turned out to be stale (see below).
+
+### B6 — a real validation gap found and closed
+
+While writing the data-loader tests, `validate_module_data()` turned out never to check module
+codes at all. Codes are the join key for student numbers, assessment counts, practical data and
+previous-year lecturer lookups — so a module with a missing or placeholder code silently falls
+back to defaults instead of real data. Two live modules are affected:
+
+```
+FOAM      codes=('<new for one year>',)   -> silently using DEFAULT_STUDENT_COUNT (100)
+Projects  codes=('n/a',)                  -> silently using DEFAULT_STUDENT_COUNT (100)
+```
+
+That is exactly the "no guessed data" rule being broken quietly. `validate_module_data()` now
+emits a WARNING naming the placeholder codes. **Worth a look:** both modules' student numbers are
+currently fabricated defaults rather than real counts.
 
 ### B10 — `output_generator.py` is now a pure rendering layer (2026-08-13)
 
