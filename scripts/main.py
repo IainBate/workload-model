@@ -25,6 +25,7 @@ from workload_calculator import calculate_workload
 from validation import validate_all_results, run_validation_pipeline
 from output_generator import OUTPUT_DIR, generate_all_outputs
 from new_individual_reports import generate_new_style_individual_reports
+from calculation_baseline import export_baseline
 
 # Try to import Google Sheets integration (optional)
 try:
