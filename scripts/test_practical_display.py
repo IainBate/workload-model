@@ -323,11 +323,12 @@ class TestPracticalDisplayMath:
         n_teachers = structured['n_teachers']  # 3
         hours_per_session = structured['first_session_hours']  # 2.0
 
-        # Expected: repeat_weekly = (groups/teachers - 1) × hours × rate × rep_rate
-        expected_repeat_weekly = ((total_groups / n_teachers) - 1) * hours_per_session * config.TEACHING_PROBLEM_CLASS * config.REPETITION_MULTIPLIER
+        # repeat_hours is BASE hours per week (no rates applied); the renderer
+        # multiplies by REPETITION_MULTIPLIER and week_count for display.
+        expected_repeat_base = ((total_groups / n_teachers) - 1) * hours_per_session
 
-        assert abs(structured.get('repeat_hours', 0) - expected_repeat_weekly) < 0.1, \
-            f"Repeat weekly mismatch: expected {expected_repeat_weekly}, got {structured.get('repeat_hours')}"
+        assert abs(structured.get('repeat_hours', 0) - expected_repeat_base) < 0.1, \
+            f"Repeat base mismatch: expected {expected_repeat_base}, got {structured.get('repeat_hours')}"
 
     def test_display_text_does_not_contain_invalid_math(self):
         """Verify display doesn't show mathematically incorrect formulas like '1.67 sessions/week × 2h × 11 = 275'."""
