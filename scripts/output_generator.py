@@ -619,16 +619,6 @@ def generate_html_report(results: List[WorkloadResult], year_data: YearData,
     category_stats: Dict[str, Dict[str, Any]] = reporting_helpers.category_statistics(results)
 
     needs_attention = reporting_helpers.needs_attention(results)
-    if False:  # retained structure below is superseded by the helper
-        needs_attention.append({
-                "name": "",
-                "category": "",
-                "fte": 0,
-                "total": 0,
-                "target": 0,
-                "deviation_pct": 0,
-                "issues": (""
-            })
 
     # Build individual report links
     staff_report_dir = os.path.join(output_dir, "Individual Reports")
