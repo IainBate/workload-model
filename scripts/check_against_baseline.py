@@ -53,8 +53,6 @@ def patch_module_paths(output_dir: Path):
         try:
             mod = importlib.import_module(module_name)
             mod.OUTPUT_DIR = output_dir
-            mod.INDIVIDUAL_DIR = output_dir / "Individual Reports"
-            mod.DEPARTMENT_DIR = output_dir / "Department Summary"
         except ImportError:
             pass
 
