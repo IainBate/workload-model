@@ -96,27 +96,48 @@ Yan, Felix Ulrich-Oltean, James Stovold, Pourya Shamsolmoali, Robbert Jongeling 
 
 Verified: full pipeline re-run, tests pass (same 4 pre-existing failures), baseline matches.
 
-### A2 explained — two numbers the code applies that the spec never states
+### A2 resolved — there is no baseline teaching
 
-The code hardcodes two baselines, both in `workload_parameters.yaml`:
+**Ruling (Iain, 2026-08-13):** "There is no baseline teaching so if you are not associated with a
+module then 0 hours. You still get the department baseline and professional development."
 
-| Constant | Value | What it does |
-|---|---|---|
-| `MIN_ADMIN_TEACHING_HOURS` | 30h | A floor on teaching hours for HoD/admin staff who teach no modules — without it they'd show 0h teaching. |
-| `SERVICE_POINTS_DEFAULT` | 175h | Committee-work allowance for the same population. |
+The 30h minimum admin teaching load has been removed end-to-end:
 
-`Work Allocation Model.docx` *names* both concepts — §2's part-time paragraph lists "minimum admin
-teaching" and "service points" among the baselines that scale by FTE — but **never states the
-numbers**. So nothing is calculating wrong, but there's no documented figure to audit 30h/175h
-against, and no way for anyone else to check they're still right or update them from a stated
-source.
+| Where | Change |
+|---|---|
+| `workload_calculator.py` | Removed the block that assigned `MIN_ADMIN_TEACHING_HOURS` to staff with no module teaching, plus the two downstream `minimum_admin_load` branches. |
+| `config.py` | Removed `MIN_ADMIN_TEACHING_HOURS`. |
+| `params/workload_parameters.yaml` | Removed `min_admin_teaching: 30`, replaced with a comment stating the rule explicitly so it can't be silently reintroduced. |
+| `output_generator.py`, `new_individual_reports.py` | Removed the "Minimum Admin Teaching Load" line from both report renderers. |
+| `Work Allocation Model.docx` | Removed the "Minimum administrative teaching load — 30" row from the baselines table; removed "minimum admin teaching" from the FTE-scaling list; **added an explicit statement of the rule**, which was A2's original problem (the model was never written down). |
 
-**Decision needed:** either (a) add "30 hours" and "175 hours" to the docx's baselines section so
-the code can be checked against it, or (b) if these are meant to be discretionary rather than
-fixed departmental policy, say so explicitly in the doc — so it's clear the code is applying a
-default rather than implementing a rule.
+**Impact: exactly one person, exactly as intended.** Iain Bate was the only staff member receiving
+it. Teaching 30h → 0h, total 2,435.6h → 2,405.6h, with engagement (100h) and personal development
+(75h) retained under admin. The B1 calculation baseline confirmed the diff touched nothing else:
 
-Low urgency, but it's the only remaining place where a live number has no documented origin.
+```
+Iain Bate.teaching_hours: expected 30, got 0.0
+Iain Bate.total_hours:    expected 2435.6, got 2405.6
+Iain Bate.teaching_breakdown: minimum_admin_load removed
+```
+
+This was the first real use of the B1/B2 safety net built earlier the same day, and it did its
+job: three tests failed, the diff named the exact fields, and re-baselining was a reviewed
+decision rather than a blind re-run.
+
+**Correction to an earlier version of this plan:** it claimed the code applies a
+`SERVICE_POINTS_DEFAULT = 175h` constant. That was taken from `DISCREPANCIES.md` without
+verifying against the code — **no such constant exists anywhere** in `config.py`,
+`workload_calculator.py`, or the YAML. The only trace is a comment noting that engagement (100h) +
+personal development (75h) = 175h, and another reading "Admin hours already include service_points
+(engagement + personal_dev)".
+
+**Still open (small):** the docx baselines table still lists *"Service points (committee work) —
+175"* as a separate row, alongside Engagement 100 and Personal development 75. Since the code
+treats "service points" as the collective name for those same two baselines (175 = 100 + 75), the
+table as written implies an admin staff member gets 350h of baselines when the model gives 175h.
+Worth either deleting that row or rewording it to make clear it's the total of the two above — but
+I've left it alone rather than guess, since it's a separate question from the teaching ruling.
 
 ### A3 explained — every module gets identical lecture hours regardless of size
 
