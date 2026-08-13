@@ -2107,18 +2107,10 @@
         "protected_research_baseline": 164.2
       },
       "research_hours": 588.6,
-      "teaching_breakdown": {
-        "minimum_admin_load": 30,
-        "pastoral_breakdown": {
-          "rate": 3,
-          "student_count": 0,
-          "total": 0
-        },
-        "pastoral_supervision": 0
-      },
-      "teaching_hours": 30,
+      "teaching_breakdown": {},
+      "teaching_hours": 0.0,
       "teaching_module_breakdowns": {},
-      "total_hours": 2435.6
+      "total_hours": 2405.6
     },
     "Ian Gray": {
       "admin_breakdown": {

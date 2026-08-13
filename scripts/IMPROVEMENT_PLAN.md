@@ -90,7 +90,7 @@ Yan, Felix Ulrich-Oltean, James Stovold, Pourya Shamsolmoali, Robbert Jongeling 
 | # | Item | Status |
 |---|------|--------|
 | A1 | Add `ECR representative` / `ART staff representative` to `workload_parameters.yaml` (0%) + `_WAW_ROLE_MAPPING` | **Done.** Verified: Joe Cutting's admin breakdown now correctly shows `ECR representative: 0.0` instead of being unmapped. |
-| A2 | Verify baseline docs for min admin teaching hours (30h) / service points (175h) | **Awaiting your decision** — see "A2 explained" below. |
+| A2 | Baseline teaching allowance | **Done (2026-08-13)** — see "A2 resolved" below. There is no baseline teaching; the 30h minimum has been removed from code and spec. |
 | A3 | Investigate flat 2h/week lecture-hours regardless of credits | **Awaiting your decision** — see "A3 explained" below. Confirmed a real inconsistency; needs a domain judgement before any code change. |
 | A4 | `--validate-only` CLI mode | **Done.** `python main.py --validate-only` runs load → calculate → validate and stops before output generation. Verified working. |
 
