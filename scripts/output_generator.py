@@ -1557,7 +1557,7 @@ def _format_module_header(stage: str, modules_in_stage: List[Dict[str, Any]]) ->
         if ps.get('n_teachers'):
             teacher_count = max(teacher_count, ps['n_teachers'])
 
-    num_lectures = int(round(total_lecture_hours / (weeks * 2))) if total_lecture_hours > 0 else 0
+    num_lectures = int(round(lectures_per_week))
 
     schedule_bits = []
     if num_lectures > 0:
