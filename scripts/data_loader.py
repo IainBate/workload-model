@@ -423,6 +423,23 @@ def _prompt_name_match(user_name: str, canonical_name: Optional[str],
     return response == "y"
 
 
+def _resolve_category_from_data(canonical_name: str,
+                                art_ts_category: Optional[str],
+                                pt_info: Optional[Dict],
+                                category_overrides: Dict[str, str]) -> str:
+    """Resolve a staff member's contract category from the available data
+    sources, in priority order: the ART Performance data capture sheet, then
+    Part time.csv's Staff Category column, then a previously-saved answer.
+    Returns "" if none of them cover this person (the caller decides whether
+    to ask the user).
+    """
+    if art_ts_category:
+        return art_ts_category
+    if pt_info and pt_info.get("staff_category"):
+        return pt_info["staff_category"]
+    return category_overrides.get(canonical_name, "")
+
+
 def _prompt_category_match(canonical_name: str) -> Optional[str]:
     """
     Callback for staff whose contract category (ART / T and S) can't be
