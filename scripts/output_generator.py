@@ -841,24 +841,25 @@ def generate_html_report(results: List[WorkloadResult], year_data: YearData,
     sorted_results = sorted(staff_reports_generated, key=lambda x: (x["category"], x["name"]))
 
     for r in sorted_results:
-        # Get normative comparison for this staff member's category
-        normative_split = config.get_normative_split(r["category"])
+        # Pure rendering: deviations and their severity band are supplied by
+        # reporting_helpers, not recomputed with local thresholds here.
+        deviations = r.get("deviations")
         normative_indicator = ""
 
-        if normative_split and r["total"] > 0:
-            total_pct = (r["total"] / config.NOMINAL_WORKING_HOURS_PER_YEAR) * 100
-            t_cmp = (r["teaching"] / r["total"] * 100) - (normative_split.get("teaching_hours", 0) * 100)
-            r_cmp = (r["research"] / r["total"] * 100) - (normative_split.get("research_hours", 0) * 100)
-            a_cmp = (r["admin"] / r["total"] * 100) - (normative_split.get("admin_hours", 0) * 100)
+        if deviations:
+            t_cmp = deviations["teaching"]["deviation_pct"]
+            r_cmp = deviations["research"]["deviation_pct"]
+            a_cmp = deviations["admin"]["deviation_pct"]
+            band = reporting_helpers.deviation_band(max(abs(t_cmp), abs(r_cmp), abs(a_cmp)))
 
-            # Determine status based on deviation from normative split
-            max_deviation = max(abs(t_cmp), abs(r_cmp), abs(a_cmp))
-            if max_deviation <= 5:
+            if band == "ok":
                 normative_indicator = '<span class="normative-indicator normative-ok">On target</span>'
-            elif max_deviation <= 10:
-                normative_indicator = f'<span class="normative-indicator normative-warning">{t_cmp:+.0f}/{r_cmp:+.0f}/{a_cmp:+.0f}% diff</span>'
             else:
-                normative_indicator = f'<span class="normative-indicator normative-over">{t_cmp:+.0f}/{r_cmp:+.0f}/{a_cmp:+.0f}% diff</span>'
+                css_state = "normative-warning" if band == "moderate" else "normative-over"
+                normative_indicator = (
+                    f'<span class="normative-indicator {css_state}">'
+                    f'{t_cmp:+.0f}/{r_cmp:+.0f}/{a_cmp:+.0f}% diff</span>'
+                )
 
         html += f"""
                     <tr>
