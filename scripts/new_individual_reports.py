@@ -111,15 +111,16 @@ def _build_normative_comparison_table(r: WorkloadResult) -> str:
             + "</div></div>"
         )
 
+    _BAND_STYLES = {
+        "ok": ("#2e7d32", "#e8f5e9", "On target"),
+        "moderate": ("#ef6c00", "#fff3e0", "Moderate"),
+        "high": ("#c62828", "#ffebee", "High"),
+    }
+
     rows = []
     for label, d in deviations.items():
-        abs_dev = abs(d["deviation_pct"])
-        if abs_dev <= _DEVIATION_OK:
-            badge_color, badge_bg, badge_text = "#2e7d32", "#e8f5e9", "On target"
-        elif abs_dev <= _DEVIATION_MODERATE:
-            badge_color, badge_bg, badge_text = "#ef6c00", "#fff3e0", "Moderate"
-        else:
-            badge_color, badge_bg, badge_text = "#c62828", "#ffebee", "High"
+        band = reporting_helpers.deviation_band(d["deviation_pct"])
+        badge_color, badge_bg, badge_text = _BAND_STYLES[band]
 
         rows.append(f"""
             <div class="detail-item" style="grid-template-columns:1.2fr 1fr 1fr 1fr;">
