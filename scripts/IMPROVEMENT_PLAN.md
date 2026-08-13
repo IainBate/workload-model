@@ -164,26 +164,52 @@ GPIG is actually timetabled.
 
 ---
 
-## Section B — Testing & architecture foundation (not started)
+## Section B — Testing & architecture foundation (B1, B2, B12 DONE)
 
-Prerequisite work for the gated B10 refactor. Nothing here has been built yet.
+| # | Item | Status |
+|---|------|--------|
+| B1 | Structured JSON calculation baseline | **Done.** `calculation_baseline.py` + `main.py --export-baseline` writes `baseline/expected_results.json` (56 staff, numbers only — no wording). `test_calculation_baseline.py` asserts against it (7 tests). |
+| B2 | Format-only HTML regression tests | **Done.** `test_format_baseline.py` (7 tests) — whitespace- and date-normalized comparison of all 56 individual reports + the department report, plus structural checks and a dangling-operator guard. Also covers B7. |
+| B3 | Unit test suite for calculation logic | Partly covered by B1's invariant tests (category totals, non-negative hours, teaching/research breakdown sums). Dedicated per-function tests still outstanding. |
+| B4 | Integration test suite for full pipeline | Partly covered by B2's fixture (full load → calculate → generate_all_outputs). Dedicated file still outstanding. |
+| B5 | Validation pipeline wired into `main.py` | **Already done** (pre-existing) — `main.py` calls `run_validation_pipeline(results)` and exits on failure. |
+| B6 | Unit tests: data loader & schema | Outstanding. |
+| B7 | Integration test: all artifacts produced and non-empty | **Done** — `test_all_expected_artifacts_produced` in `test_format_baseline.py`. |
+| B8 | Integration test: Excel formula & chart reference validation | Outstanding. |
+| B9 | Property-based invariant testing (Hypothesis) | **Parked** — needs `_calculate_teaching_workload` decomposed, which CLAUDE.md says not to do yet. |
+| B10 | **`output_generator.py` pure-rendering refactor** (approved, gated) | **Now unblocked** — B1+B2 are green, so the safety net the gate required exists. |
+| B11 | Visual regression: matplotlib chart artifact checks | Outstanding. |
+| B12 | Dead-code cleanup | **Done** — see below. |
 
-| # | Item | Effort | Depends on |
-|---|------|--------|------------|
-| B1 | Structured JSON calculation baseline (`baseline/expected_results.json` via `--export-baseline`) | M | — |
-| B2 | Format-only HTML regression tests (whitespace-normalized diff against saved baseline) | M | B1 |
-| B3 | Unit test suite for calculation logic (`test_calculations.py`) | M | B1 |
-| B4 | Integration test suite for full pipeline (`test_integration.py`) | M | B3 |
-| B5 | Validation pipeline wired into `main.py` | — | **Already done** — confirmed live: `main.py` calls `run_validation_pipeline(results)` and exits on failure. No action needed. |
-| B6 | Unit tests: data loader & schema (name normalization, module merge, input validation) | S | — |
-| B7 | Integration test: all output artifacts produced and non-empty | S | B4 |
-| B8 | Integration test: Excel formula & chart reference validation | S | — |
-| B9 | Property-based invariant testing (Hypothesis) | M | **Blocked** — needs `_calculate_teaching_workload` decomposed into named helpers, which CLAUDE.md explicitly says not to do yet (Phase 5 target). Parked. |
-| B10 | **`output_generator.py` pure-rendering refactor** (approved, gated) | L | B1 + B2 green first |
-| B11 | Visual regression: matplotlib chart artifact checks | S | — |
-| B12 | Dead-code cleanup: remove unused `_create_boxplot()` function (`output_generator.py` ~line 222) | S | New finding — confirmed via grep that this function is never called anywhere; `generate_boxplots()` is the actual live path and already does its own category-aware chart drawing. |
+**Remaining order:** B6 → B3 → B4 → B8 → B11 → **B10** → B9 (parked).
 
-**Recommended order:** B1 → B2 → B6 → B3 → B4 → B7 → B8 → B11 → B12 → **B10** → B9 (parked).
+### B12 — dead code removed (2026-08-13)
+
+- **`_create_boxplot()` (73 lines)** — defined but never called anywhere; `generate_boxplots()` is
+  the live path and already draws category-aware expected lines per staff member. This dead
+  function is also the one the old planning docs described as having the "expected line never
+  plotted / flat normative split" bugs, which is why those bugs never actually manifested in the
+  charts. Removed, along with an orphaned module-level docstring that had been left floating
+  between the two functions (a no-op string expression; `generate_boxplots()` has its own).
+- **`INDIVIDUAL_DIR` / `DEPARTMENT_DIR`** — module-level path constants in `output_generator.py`
+  that were only ever *assigned* (including being monkey-patched by both baseline scripts) and
+  **never read by anything**. Report subdirectories are derived from the `output_dir` argument
+  instead. These were an active trap: someone redirecting output by patching `INDIVIDUAL_DIR`
+  would see no effect. Removed from all three files and replaced with a comment stating where
+  paths actually come from.
+
+Verified after cleanup: 61/61 tests pass, full pipeline runs, baseline regenerates and matches,
+charts still produced.
+
+### Nested `output/Individual Reports/Individual Reports/` — explained and removed
+
+A stale duplicate set of 56 reports dated 12 Aug 11:36, one directory level too deep. Cause: not
+the current code — both report-writing functions correctly do `os.path.join(output_dir,
+"Individual Reports")` where `output_dir` is the *base* directory, and the same was true at that
+commit. It was produced by a one-off run that passed an already-nested path as `--output-dir`
+(e.g. `--output-dir "output/Individual Reports"`). Every file in it was superseded by the current
+outer set, and `output/` is gitignored so nothing was tracked. Deleted, then confirmed a fresh
+`python main.py` recreates only the correct two directories.
 
 ---
 
