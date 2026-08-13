@@ -293,19 +293,37 @@ work that predates this conversation, without the planning docs being updated to
 
 ---
 
+## Test suite health
+
+**61/61 passing.** For most of this work the suite sat at "43 passed, 4 failed", with the four
+failures carried as pre-existing. They have now been diagnosed and fixed — all four were **stale
+tests, not code bugs**; the code had changed semantics and the assertions were never updated:
+
+| Test | Why it failed | Fix |
+|---|---|---|
+| `test_phd_supervision_hours` | Asserted a flat `breakdown["phd_supervision"]` key. The code deliberately stores a nested `phd_students` dict instead — having both is what caused the historical double-counting bug. The test's *total* assertion passed. | Assert the nested per-type values, that they sum to the total, and that the flat key is absent. |
+| `test_new_lecturer_detection_with_reordered_module_codes` | Hard-coded thresholds (`>= 80h`) derived from `contact_hours (40) × 2.5 = 100h`. The calculator uses a flat 2h/week, giving 55h. **This is direct evidence for A3** — the test documents that someone once expected `contact_hours` to drive lecture hours. | Derive expectations from the model constants, and assert it got the standard rate and *not* the new-lecturer rate. Mutation-tested: breaking the per-module lookup makes it fail. |
+| `test_practical_display_matches_calculation_parallel_groups` | Expected `repeat_hours` to include rates. The code stores base hours with rates applied at render time (its comment says so). | Assert the documented base-hours semantics, plus that applying the rate reproduces the displayed total. |
+| `test_display_math_is_correct_for_parallel_groups` | Same `repeat_hours` semantics mismatch. | Same. |
+
+Care was taken not to "fix" these by deleting assertions — each test's original intent is
+preserved, and the new-lecturer one was mutation-tested to confirm it still catches the
+regression it was written for.
+
 ## What's left, in order
 
 1. **You:** weigh in on A2 (undocumented 30h/175h baselines) and A3 (flat lecture-hours question)
-   — both explained in full in Section A above.
-2. **Me, next:** B1 → B2 (JSON baseline + format-diff safety net) → B6 → B3 → B4 → B7 → B8 →
-   B11 → B12 (dead-code cleanup) → D7 (department-stats tests) → **B10** (the gated refactor) →
-   E2 (unify the two reports' normative-comparison logic).
+   — both explained in full in Section A above. A3 now has a second piece of evidence: a unit
+   test was written against the `contact_hours` assumption the calculator doesn't follow.
+2. **Me, next:** B6 → B3 → B4 → B8 → B11 → D7 (department-stats tests) → **B10** (the gated
+   refactor — now unblocked, since B1+B2 provide the required safety net) → E2 (unify the two
+   reports' normative-comparison logic).
 
 B9 stays parked (blocked on a large function decomposition not otherwise in scope).
 
 **Decided and done:** staff contract category resolved (47 ART / 9 T&S / 0 unresolved) with
 interactive prompting for future new names; all of C1–C7 kept and live in
-`output/New Individual Reports/`.
+`output/New Individual Reports/`; B1, B2, B7, B12 complete; test suite green.
 
 ---
 
