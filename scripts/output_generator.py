@@ -816,7 +816,10 @@ def generate_html_report(results: List[WorkloadResult], year_data: YearData,
             "total": r.total_hours,
             "teaching": r.teaching_hours,
             "research": r.research_hours,
-            "admin": r.admin_hours
+            "admin": r.admin_hours,
+            # Normative comparison computed once, by the shared helper, so this
+            # table and the per-staff reports classify deviation identically.
+            "deviations": reporting_helpers.category_deviations(r),
         })
 
     html += """
