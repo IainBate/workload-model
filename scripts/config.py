@@ -42,9 +42,6 @@ ART_STAFF_SPLIT: dict[str, float] = _params.get("art_staff_split", {"teaching": 
 ART_TEACHING_PERCENTAGE: float = ART_STAFF_SPLIT.get("teaching", 0.40)
 ART_RESEARCH_PERCENTAGE: float = ART_STAFF_SPLIT.get("research", 0.40)
 
-# Minimum teaching load for administrative staff who don't teach modules
-MIN_ADMIN_TEACHING_HOURS: float = BASELOADS.get("min_admin_teaching", 30.0)
-
 # Teaching weeks per semester (for practical schedule calculations)
 TEACHING_WEEKS_PER_SEMESTER: int = BASELOADS.get("teaching_weeks_per_semester", 11)
 
