@@ -21,35 +21,57 @@ Section B (testing foundation) and the gated B10 refactor still to do. Built fro
 4. **`output_generator.py` pure-rendering refactor:** Approved, gated behind B1–B2 landing first.
    **Not started yet** — still pending Section B.
 
-## IMPORTANT — a real, currently-blocking data gap found while building Section C
+## Staff contract category — RESOLVED (2026-08-13)
 
-`config.get_normative_split(category)` — the function every "actual % vs. target %" comparison
-depends on, in both the *already-existing* department report and the *new* individual reports —
-returns `None` for **every single one of the 56 currently active staff**. Not a display bug: I
-traced it to source.
+Previously every one of the 56 active staff had a blank category, so
+`config.get_normative_split()` returned `None` for everyone and every "actual % vs target %"
+comparison silently degraded to "no data" — in both the department report and the new individual
+reports. Now fixed.
 
-- `WorkloadResult.category` is populated from `StaffData.category`, which is populated from
-  `Part time.csv`'s "Staff Category" column.
-- `Part time.csv` is a small file — **only 4 people** (Sarah Carrington, David Pumfrey, Mark
-  Sujan, Richard Wilson), matching its purpose as documented in `CLAUDE.md` ("FTE multiplier per
-  staff"), not a general staff-category roster.
-- None of those 4 are in this year's active WTW/WAW roster at all.
-- No other CSV in `data/` has any category/contract-type column (checked all of them).
+**Source of truth:** `data/CS Data Collection on ART Performance 2026 - MASTER Overall Data
+Capture.csv`, column B, which explicitly labels 64 staff as `ART` or `T&S`. Loaded by
+`_load_art_ts_categories()` in `data_loader.py`.
 
-I also found and fixed a real bug in the lookup itself (`data_loader.py`, the `pt_info` match
-used a raw-name-only comparison instead of the same canonical-name fallback the other three
-per-staff data sources use) — that fix is correct and harmless, but doesn't solve the underlying
-problem: **there is currently no data source that tells the code anyone's contract category**
-(T&R / T&S / ART) for the active roster. Both the department report's "Expected: T%/R%/A%" line
-and normative-deviation column, and the new individual report's C1/C2 features, correctly degrade
-to "no data" for everyone right now — this is the graceful degradation working as designed
-(CLAUDE.md's "no guessed data" rule), not a crash or a silent wrong number.
+Resolution order (in `_resolve_category_from_data()`):
+1. ART Performance data capture sheet (authoritative)
+2. `Part time.csv`'s Staff Category column
+3. `data/staff_category_lookup.json` — previously-saved answers
+4. Ask the user interactively (`--interactive`), then persist the answer to (3)
 
-**I need your input:** is there a data source (a column in an existing CSV I mislabeled, an HR
-export, something not yet in `data/`) that has contract category for the full ~56-person roster?
-Without one, the normative-comparison features (already-built in Section D, and newly built in
-Section C) will keep showing "no target available" for almost everyone, which limits their value
-until this is resolved.
+**Result: 47 ART, 9 T&S, 0 unresolved** across the active roster.
+
+Supporting fixes made along the way:
+- `pt_info` lookup in `data_loader.py` used a raw-name-only match instead of the canonical-name
+  fallback the other three per-staff sources use — now uses the shared `_find_data()` helper.
+- Added `"Steven Dai"` alias to `staff_name_lookup.json` (the ART sheet lists "Dai, Steven",
+  which matched no existing alias for Steven Xiaotian Dai).
+- One-off spelling correction for a typo in the source sheet ("Banerjee, Soumua" → Soumya),
+  handled explicitly in `_ART_TS_NAME_CORRECTIONS` rather than by fuzzy matching.
+
+### New: interactive prompting for staff whose category can't be deduced
+
+Per your request, when a new name appears that isn't covered by any data source, the loader now
+asks rather than silently defaulting:
+
+```
+Cannot determine contract category for 'Jane Doe'
+(not found in the ART Performance sheet or Part time.csv).
+Category? [1] ART  [2] T and S  [Enter to skip]:
+```
+
+- Runs only under `python main.py --interactive`. Non-interactive runs (including
+  `generate_baseline.py` / `check_against_baseline.py`, both updated) leave it unresolved rather
+  than blocking or guessing.
+- Answers persist to `data/staff_category_lookup.json`, so you're asked once per person, ever.
+- Deliberately asks **only about active staff who made the final roster**. An earlier version
+  asked during roster construction and prompted 30 times, including historical names that never
+  appear in a report; the resolution pass now runs after filtering, so it asks exactly as many
+  times as there are genuinely-unresolved people (was 6, now 0).
+- Skipping (pressing Enter) is safe — that person shows "no target available" and is re-asked on
+  the next interactive run.
+
+The six staff not covered by any sheet were resolved by asking you directly: Phoebe → T&S; Fang
+Yan, Felix Ulrich-Oltean, James Stovold, Pourya Shamsolmoali, Robbert Jongeling → ART.
 
 ## Already verified as non-issues (no action needed)
 
