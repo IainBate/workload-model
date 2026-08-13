@@ -1302,30 +1302,12 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
         fte_value = staff.fte if staff.fte > 0 else 1.0
         nominal_hours = config.NOMINAL_WORKING_HOURS_PER_YEAR * fte_value
 
-        # Teaching - default to minimum teaching hours for administrative staff
+        # Teaching hours come solely from module involvement and supervision.
+        # There is deliberately no baseline/minimum teaching allowance: staff not
+        # associated with any module get 0 teaching hours. They still receive the
+        # departmental engagement baseline and personal development allowance,
+        # which are counted under admin, not teaching.
         teaching_hours = staff_teaching.get(canonical_name, {}).get("hours", 0.0)
-        min_teaching = 0.0
-
-        # Add minimum teaching load for HoD and other admin staff who don't teach modules
-        # Original model shows ~30h teaching for HoD (reduced from full teaching load)
-        has_module_teaching = canonical_name in staff_teaching and len(staff_teaching[canonical_name].get("details", [])) > 0
-
-        if not has_module_teaching:
-            # Administrative staff need a minimum teaching component
-            # HoD typically has reduced teaching - use default from config (from workload_parameters.yaml)
-            if "Head of Department" in staff.roles or len(staff.roles) > 1:
-                min_teaching = config.MIN_ADMIN_TEACHING_HOURS
-                if min_teaching > 0:
-                    teaching_hours = min_teaching
-                    # Add detail for minimum admin teaching - show source reference
-                    staff_teaching[canonical_name]["hours"] = min_teaching
-                    staff_teaching[canonical_name]["details"].append(
-                        f"Minimum administrative teaching load (from workload_parameters.yaml): {min_teaching:.0f}h"
-                    )
-                    # Also set up the teaching_breakdown for this entry
-                    if "teaching_breakdown" not in staff_teaching[canonical_name]:
-                        staff_teaching[canonical_name]["teaching_breakdown"] = {}
-                    staff_teaching[canonical_name]["teaching_breakdown"]["minimum_admin_load"] = min_teaching
 
         # Supervision - add once per staff member (not per module)
         # Get pastoral and project supervision from the allocation object
