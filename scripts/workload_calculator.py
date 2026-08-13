@@ -1020,6 +1020,7 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
             },
             "practicals_breakdown": teacher_practicals_structured,
             "marking_breakdown": teacher_marking_structured,
+            "delivery_breakdown": teacher_delivery_structured,
             "detail_text": "; ".join(module_detail_parts),
             "supervision_details": [],
         }
