@@ -188,6 +188,26 @@ def validate_module_data(module) -> ValidationResult:
     if credits <= 0:
         result = result.add_issue(ValidationLevel.ERROR, "Credits must be positive", "credits", credits)
 
+    # Validate module codes. Codes are the join key for student numbers,
+    # assessment counts, practical data and previous-year lecturer lookups, so a
+    # missing or placeholder code means the module silently falls back to
+    # defaults (e.g. DEFAULT_STUDENT_COUNT) instead of using real data.
+    codes = getattr(module, 'codes', ()) or ()
+    placeholder_codes = [
+        c for c in codes
+        if not c or '<' in c or '>' in c or c.strip().lower() in ('n/a', 'na', 'tbd', 'none')
+    ]
+    if not codes:
+        result = result.add_issue(
+            ValidationLevel.WARNING, "Module has no codes - student/assessment data cannot be matched",
+            "codes", codes)
+    elif placeholder_codes:
+        result = result.add_issue(
+            ValidationLevel.WARNING,
+            f"Module has placeholder code(s) {placeholder_codes} - student/assessment "
+            f"data cannot be matched and defaults will be used",
+            "codes", codes)
+
     # Validate student count
     student_count = getattr(module, 'student_count', 0)
     result = result.merge(validatestudentcount(student_count))
