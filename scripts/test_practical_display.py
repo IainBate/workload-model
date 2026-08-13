@@ -96,11 +96,23 @@ class TestPracticalDisplayCalculation:
 
         assert first_session_hours == 2.0, f"Expected first_session_hours=2.0, got {first_session_hours}"
 
-        # Expected repeat_hours per week = groups_per_teacher - 1 × hours × rate
-        # groups_per_teacher = 5/3 = 1.67, so repeats = 1.67 - 1 = 0.67 per teacher
-        # repeat_weekly = 0.67 × 2.0 × 2.5 × 1.5 = 5.0h (per week)
-        expected_repeat_weekly = ((total_groups / n_teachers) - 1) * first_session_hours * config.TEACHING_PROBLEM_CLASS * config.REPETITION_MULTIPLIER
-        assert abs(repeat_hours - expected_repeat_weekly) < 0.1, f"Expected repeat_hours≈{expected_repeat_weekly}, got {repeat_hours}"
+        # repeat_hours holds BASE hours per week (sessions × duration), with no
+        # rates applied - the renderer applies the repetition rate at display
+        # time. groups_per_teacher = 5/3 = 1.67, so repeats = 0.67 per teacher,
+        # giving 0.67 × 2.0 = 1.33h/week base.
+        expected_repeat_base = ((total_groups / n_teachers) - 1) * first_session_hours
+        assert abs(repeat_hours - expected_repeat_base) < 0.1, \
+            f"Expected repeat_hours≈{expected_repeat_base} (base, no rates), got {repeat_hours}"
+
+        # And applying the repetition rate to that base must reproduce the
+        # repeat hours the report actually displays.
+        week_count = practicals_structured['week_count']
+        displayed_repeat_total = repeat_hours * config.REPETITION_MULTIPLIER * week_count
+        expected_repeat_total = (
+            ((total_groups / n_teachers) - 1) * first_session_hours
+            * config.REPETITION_MULTIPLIER * week_count
+        )
+        assert abs(displayed_repeat_total - expected_repeat_total) < 0.1
 
     def test_practical_display_termination(self):
         """Test that display text terminates correctly without partial sentences."""
