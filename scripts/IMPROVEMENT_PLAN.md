@@ -257,13 +257,17 @@ work that predates this conversation, without the planning docs being updated to
 
 ## What's left, in order
 
-1. **You:** point me at a data source for staff contract category (or confirm there isn't one
-   yet), and weigh in on A2 (baseline hour docs) and A3 (flat lecture-hours question).
-2. **You:** review `output/New Individual Reports/` and decide which of C1–C7 to keep.
-3. **Me, once you're ready:** B1 → B2 (JSON baseline + format-diff safety net) → B6 → B3 → B4 →
-   B7 → B8 → B11 → B12 (cleanup) → D7 → **B10** (the gated refactor) → E2 (once C is decided).
+1. **You:** weigh in on A2 (undocumented 30h/175h baselines) and A3 (flat lecture-hours question)
+   — both explained in full in Section A above.
+2. **Me, next:** B1 → B2 (JSON baseline + format-diff safety net) → B6 → B3 → B4 → B7 → B8 →
+   B11 → B12 (dead-code cleanup) → D7 (department-stats tests) → **B10** (the gated refactor) →
+   E2 (unify the two reports' normative-comparison logic).
 
 B9 stays parked (blocked on a large function decomposition not otherwise in scope).
+
+**Decided and done:** staff contract category resolved (47 ART / 9 T&S / 0 unresolved) with
+interactive prompting for future new names; all of C1–C7 kept and live in
+`output/New Individual Reports/`.
 
 ---
 
