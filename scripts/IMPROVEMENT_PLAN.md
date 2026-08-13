@@ -209,15 +209,27 @@ alongside the existing `generate_all_outputs()` call — doesn't touch or gate i
 | C6 | Sort by hours descending | `sort_by_hours` | Built for teaching (modules ordered by their subtotal, largest first, instead of alphabetically). Research/admin sections were **already** sorting by value in the existing report code — reused as-is. |
 | C7 | Standardized wording ("First session" used consistently) | `standardized_wording` | Built — the one small shared parameter change mentioned above. |
 
-**To keep some and drop others:** edit the `NEW_REPORT_FEATURES` dict at the top of
+**Decision (2026-08-13): keep all seven.** All flags remain `True`.
+
+**To drop one later:** edit the `NEW_REPORT_FEATURES` dict at the top of
 `scripts/new_individual_reports.py` (each flag is independent — turning one off makes that
 specific piece match the current report's behaviour, not blank/broken) and re-run
 `python main.py`. With every flag off, the new report matches the current report's content
 almost exactly (verified — only trivial whitespace/comment differences remain).
 
-Once you've decided what to keep, the natural next step is **E2** (extract the shared
-normative-comparison/deviation-threshold logic so the kept pieces and the department report use
-one implementation, not two) — not done yet, deliberately deferred until you've picked.
+Now that staff categories resolve properly, C1 and C2 produce real output rather than degrading.
+Example (Christopher Crispin-Bailey, ART):
+
+> Total workload is 1,157h against a nominal 1,642h for 1.0 FTE — 29.6% under, mostly from research.
+
+| Category | Actual | Target | Flag |
+|---|---|---|---|
+| Teaching | 45.8% | 40.0% | Moderate |
+| Research | 14.2% | 40.0% | High |
+| Admin | 40.0% | 20.0% | High |
+
+Next step for this section is **E2** (extract the shared normative-comparison/deviation-threshold
+logic so the individual and department reports use one implementation, not two).
 
 ---
 
