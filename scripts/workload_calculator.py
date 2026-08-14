@@ -1334,6 +1334,101 @@ def _apply_adjustments(staff_member: StaffData, calculated: Dict[str, float],
     return adjusted_values, adjustments_breakdown
 
 
+def _apply_teaching_module_adjustments(staff_member: StaffData, teaching_module_breakdowns: Dict[str, Dict],
+                                        missing_data: List[str]) -> float:
+    """Apply module-scoped Teaching entries from workload_adjustments.csv (Teaching Module filled).
+
+    Args:
+        staff_member: StaffData carrying the parsed adjustments for this person.
+        teaching_module_breakdowns: this person's raw per-module teaching breakdown dicts
+            (the same dict object that a shallow copy later becomes
+            WorkloadResult.teaching_module_breakdowns from) - mutated IN PLACE so the caller
+            automatically sees the result with no further wiring.
+        missing_data: the in-progress missing_data list for this staff member - unresolved
+            module names, conflicts, and negative-result rejections are appended to it directly
+            (no guessed data - see CLAUDE.md).
+
+    Returns:
+        The total delta (adjusted - calculated) across all successfully-applied module-scoped
+        adjustments, to be added to the person's overall teaching_hours (0.0 if none applied).
+
+    Module-name resolution is a case-insensitive EXACT match against this person's
+    teaching_module_breakdowns keys (the section-heading names shown in their report) - no
+    fuzzy/substring matching, per the project's "no guessed data" rule. Conflict/negative-result
+    handling mirrors _apply_adjustments()'s category-level logic exactly, but scoped to
+    (category, module) instead of category alone - SYS2 and SYS3 adjustments for the same person
+    are completely independent of each other and of any category-wide (blank-module) adjustment.
+    """
+    teaching_module_entries = [
+        adj for adj in staff_member.adjustments
+        if adj.category == "teaching" and adj.module
+    ]
+    if not teaching_module_entries:
+        return 0.0
+
+    name_map = {name.casefold(): name for name in teaching_module_breakdowns}
+
+    groups: Dict[str, List[AdjustmentRecord]] = {}
+    for adj in teaching_module_entries:
+        canonical = name_map.get(adj.module.strip().casefold())
+        if canonical is None:
+            taught = sorted(teaching_module_breakdowns)
+            taught_desc = f"they teach: {', '.join(taught)}" if taught else "they teach no modules this year"
+            missing_data.append(
+                f"row {adj.source_row}: Teaching adjustment for module '{adj.module}' not applied - "
+                f"no exact match in {staff_member.canonical_name}'s modules ({taught_desc}).")
+            continue
+        groups.setdefault(canonical, []).append(adj)
+
+    total_delta = 0.0
+    for canonical, entries in groups.items():
+        module_breakdown = teaching_module_breakdowns[canonical]
+        module_calculated = sum(
+            v for k, v in module_breakdown.items()
+            if k in _TEACHING_MODULE_SUM_KEYS and isinstance(v, (int, float))
+        )
+
+        absolutes = [e for e in entries if e.mode == "absolute"]
+        deltas = [e for e in entries if e.mode == "delta"]
+
+        if len(absolutes) > 1 or (absolutes and deltas):
+            missing_data.append(
+                f"Teaching adjustment conflict for module '{canonical}': {len(absolutes)} absolute "
+                f"override(s) and {len(deltas)} delta(s) in workload_adjustments.csv - "
+                f"no adjustment applied; calculated value ({module_calculated:.1f}h) used.")
+            continue
+
+        if absolutes:
+            mode, adjusted_value, display_entries = "absolute", absolutes[0].value, absolutes
+        else:
+            mode = "delta"
+            adjusted_value = module_calculated + sum(e.value for e in deltas)
+            display_entries = deltas
+
+        if adjusted_value < 0:
+            missing_data.append(
+                f"Teaching adjustment for module '{canonical}' would result in negative hours "
+                f"({adjusted_value:.1f}h) - no adjustment applied; calculated value "
+                f"({module_calculated:.1f}h) used instead.")
+            continue
+
+        delta = round(adjusted_value - module_calculated, 2)
+        module_breakdown["manual_adjustment"] = delta
+        module_breakdown["adjustment_breakdown"] = {
+            "mode": mode,
+            "calculated_total": round(module_calculated, 2),
+            "adjusted_total": round(adjusted_value, 2),
+            "delta": delta,
+            "entries": tuple(
+                {"mode": e.mode, "amount": e.value, "rationale": e.rationale, "source_row": e.source_row}
+                for e in display_entries
+            ),
+        }
+        total_delta += delta
+
+    return total_delta
+
+
 # --- Main Calculation ---
 
 def calculate_workload(year_data: YearData, validate_input: bool = True) -> List[WorkloadResult]:
