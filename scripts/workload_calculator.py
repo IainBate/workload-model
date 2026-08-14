@@ -1565,6 +1565,20 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
         # Administration
         admin_hours, admin_breakdown, admin_detail = _calculate_admin_workload(staff, nominal_hours)
 
+        # Apply manual workload adjustments (data/workload_adjustments.csv), if any,
+        # on top of the calculated category totals. This is the ONLY place adjustments
+        # are applied - reassigning here means every downstream consumer (nominal-hours
+        # comparison, department "Needs Attention", normative split) automatically
+        # reflects the adjusted values with no changes needed elsewhere.
+        adjusted_totals, adjustments_breakdown = _apply_adjustments(
+            staff,
+            {"teaching": teaching_hours, "research": research_total, "admin": admin_hours},
+            missing_data,
+        )
+        teaching_hours = adjusted_totals["teaching"]
+        research_total = adjusted_totals["research"]
+        admin_hours = adjusted_totals["admin"]
+
         # Admin hours already include service_points (engagement + personal_dev)
         # So we don't add them separately to avoid double-counting
         # Total: teaching + research (protected + additional) + admin
