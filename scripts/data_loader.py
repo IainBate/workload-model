@@ -1590,6 +1590,27 @@ def load_all_data(data_dir: str = None,
                 return val
         return None
 
+    def _find_all_matches(raw_name: str, canonical: str, data_source: Dict[str, list]) -> list:
+        """Find and concatenate matching data from EVERY key that matches raw_name,
+        instead of stopping at the first (unlike _find_data). Used for adjustments,
+        where a person can legitimately have multiple rows/entries that must all be
+        collected rather than only the first key-match found."""
+        matches = []
+        matched_keys = set()
+        for key, val in data_source.items():
+            if key.upper() == raw_name.upper() or key.lower() == raw_name.lower():
+                if key not in matched_keys:
+                    matches.extend(val)
+                    matched_keys.add(key)
+        for key, val in data_source.items():
+            if key in matched_keys:
+                continue
+            norm_key = normalize_name(key, reverse_lookup, unknown_callback, mappings)
+            if norm_key == canonical:
+                matches.extend(val)
+                matched_keys.add(key)
+        return matches
+
     for raw_name in sorted_names:
         canonical = normalize_name(raw_name, reverse_lookup, unknown_callback, mappings)
         if not canonical:
