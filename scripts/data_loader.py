@@ -1938,12 +1938,16 @@ def _deduplicate_staff(staff: Dict[str, StaffData], mappings: Dict[str, List[str
             all_roles = set()
             all_research_projects = []
             all_saint_modules = []
+            all_adjustments = []
+            all_adjustment_warnings = []
 
             for _, data in sorted(entries):
                 all_aliases.update(data.aliases)
                 all_roles.update(data.roles)
                 all_research_projects.extend(data.research_projects)
                 all_saint_modules.extend(data.saint_modules)
+                all_adjustments.extend(data.adjustments)
+                all_adjustment_warnings.extend(data.adjustment_warnings)
 
             # Take the max values for numeric fields
             merged_fte = max((e[1].fte for e in entries if e[1].fte), default=0.0)
