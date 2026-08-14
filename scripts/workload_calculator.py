@@ -1273,6 +1273,8 @@ def _apply_adjustments(staff_member: StaffData, calculated: Dict[str, float],
 
     by_category: Dict[str, List[AdjustmentRecord]] = {}
     for adj in staff_member.adjustments:
+        if adj.category == "teaching" and adj.module:
+            continue  # handled by _apply_teaching_module_adjustments()
         by_category.setdefault(adj.category, []).append(adj)
 
     for category, calculated_value in calculated.items():
