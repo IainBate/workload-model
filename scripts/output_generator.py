@@ -1219,7 +1219,8 @@ def format_detail_section(r: WorkloadResult, title: str, hours: float, breakdown
         supervision_details, known_lecturers_per_module, pastoral_breakdown, project_breakdown:
             Additional parameters for teaching sections
     """
-    if not breakdown or all(v == 0 for v in breakdown.values()):
+    has_adjustment = bool((r.adjustments_breakdown or {}).get(_CSS_CLASS_TO_CATEGORY.get(css_class)))
+    if (not breakdown or all(v == 0 for v in breakdown.values())) and not has_adjustment:
         return f"""<div class="section-card {css_class}">
             <div class="card-header">
                 <span class="card-title">{title}</span>
