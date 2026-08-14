@@ -983,6 +983,85 @@ def _load_fte_data(filepath: str = "% FTE for CS.csv") -> Dict[str, list]:
     return data
 
 
+_ADJUSTMENT_ABSOLUTE_RE = re.compile(r'^SET\s+([+-]?\d+(?:\.\d+)?)$', re.IGNORECASE)
+_ADJUSTMENT_DELTA_RE = re.compile(r'^([+-]?\d+(?:\.\d+)?)$')
+
+
+def _parse_adjustment_cell(text: str) -> Tuple[str, float]:
+    """Parse a non-blank adjustment cell. Raises ValueError if malformed.
+
+    Grammar: 'SET N' -> absolute; '+N'/'-N'/bare 'N' -> delta. A leading '='
+    is deliberately NOT accepted (Excel/Sheets evaluates '=250' as a formula
+    and drops the '=' on CSV re-save, which would make absolute overrides
+    indistinguishable from deltas after a spreadsheet round-trip).
+    """
+    stripped = text.strip()
+    m = _ADJUSTMENT_ABSOLUTE_RE.match(stripped)
+    if m:
+        return ("absolute", float(m.group(1)))
+    m = _ADJUSTMENT_DELTA_RE.match(stripped)
+    if m:
+        return ("delta", float(m.group(1)))
+    raise ValueError(f"'{text}' is not a valid adjustment (expected +N, -N, N, or SET N)")
+
+
+def _load_adjustments(filepath: str = "workload_adjustments.csv"):
+    """Load manual workload adjustments.
+
+    Returns (adjustments_by_raw_name, warnings_by_raw_name, unattributed_warnings):
+        - adjustments_by_raw_name: Dict[str, List[AdjustmentRecord]]
+        - warnings_by_raw_name: Dict[str, List[str]]
+        - unattributed_warnings: List[str] (rows with adjustment data but no Person)
+
+    Missing file -> ({}, {}, []) (no-op), matching every other optional CSV loader
+    in this file.
+    """
+    path = DATA_DIR / filepath
+    if not path.exists():
+        return {}, {}, []
+
+    column_map = {
+        "teaching": ("Teaching Adjustment", "Teaching Rationale"),
+        "research": ("Research Adjustment", "Research Rationale"),
+        "admin": ("Admin Adjustment", "Admin Rationale"),
+    }
+    adjustments: Dict[str, list] = {}
+    warnings_by_name: Dict[str, list] = {}
+    unattributed: list = []
+
+    with open(path, "r", encoding="utf-8-sig") as f:
+        reader = csv.DictReader(f)
+        for row_num, row in enumerate(reader, start=2):  # row 1 = header
+            person = (row.get("Person") or "").strip()
+            any_cell_filled = any((row.get(c) or "").strip()
+                                   for cols in column_map.values() for c in cols)
+            if not person:
+                if any_cell_filled:
+                    unattributed.append(f"row {row_num}: adjustment data present but Person is blank - row skipped.")
+                continue
+
+            for category, (adj_col, rat_col) in column_map.items():
+                cell = (row.get(adj_col) or "").strip()
+                if not cell:
+                    continue
+                rationale = (row.get(rat_col) or "").strip()
+                try:
+                    mode, value = _parse_adjustment_cell(cell)
+                except ValueError as e:
+                    warnings_by_name.setdefault(person, []).append(
+                        f"row {row_num}, {adj_col} ('{cell}'): {e} - not applied.")
+                    continue
+                if not rationale:
+                    warnings_by_name.setdefault(person, []).append(
+                        f"row {row_num}, {adj_col} ('{cell}'): no rationale in {rat_col} - not applied.")
+                    continue
+                adjustments.setdefault(person, []).append(AdjustmentRecord(
+                    category=category, mode=mode, value=value, rationale=rationale,
+                    source_row=row_num, raw_person=person,
+                ))
+    return adjustments, warnings_by_name, unattributed
+
+
 def _load_waw_roles(filepath: str = "WAW.csv") -> Dict[str, list]:
     """Load departmental roles from WAW.csv. Returns {role_name: [(staff_name, percentage)]}."""
     path = DATA_DIR / filepath
