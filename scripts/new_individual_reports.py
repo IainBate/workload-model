@@ -310,10 +310,14 @@ def _create_new_style_report_html(r: WorkloadResult, year_data: YearData, featur
     project_breakdown = getattr(r, "project_breakdown", {}) or {}
 
     # Teaching section: custom orchestration (reuses per-module formatters) so
-    # C6/C7 can be applied; falls back to the plain "no activities" card if empty.
-    if not teaching_breakdown or all(
+    # C6/C7 can be applied; falls back to the plain "no activities" card if empty -
+    # unless a manual adjustment was applied to teaching, in which case that
+    # adjustment must still render (e.g. a SET override with zero other calculated
+    # teaching activity would otherwise be silently invisible).
+    has_teaching_adjustment = bool((r.adjustments_breakdown or {}).get("teaching"))
+    if (not teaching_breakdown or all(
         (v == 0 if isinstance(v, (int, float)) else False) for v in teaching_breakdown.values()
-    ):
+    )) and not has_teaching_adjustment:
         teaching_section = f"""<div class="section-card teaching-item">
             <div class="card-header"><span class="card-title">Teaching Activities</span><span class="card-total">{r.teaching_hours:.1f}h</span></div>
             <p>No activities recorded for this category.</p>
