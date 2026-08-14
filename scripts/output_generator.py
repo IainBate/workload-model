@@ -1756,7 +1756,9 @@ def _format_teaching_section_for_staff(result: WorkloadResult, title: str, hours
         for mod in modules_in_stage:
             mb = mod.get('module_breakdown', {})
             # Sum up the main teaching components from the module breakdown
-            for key in ['teaching', 'practicals', 'assessment_setting', 'marking']:
+            # ('manual_adjustment' included so this total agrees with the module-scoped
+            # "Manual adjustment" line item rendered above it whenever one is present)
+            for key in ['teaching', 'practicals', 'assessment_setting', 'marking', 'manual_adjustment']:
                 if key in mb and isinstance(mb[key], (int, float)):
                     stage_total += mb[key]
 
