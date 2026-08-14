@@ -439,9 +439,12 @@ def generate_excel_with_formulas(results: List[WorkloadResult], year_data: YearD
                                value="; ".join(r.missing_data) if r.missing_data else "None")
         missing_cell.alignment = Alignment(wrap_text=True)
 
+        adjustments_cell = ws.cell(row=row_idx, column=12, value=_format_adjustments_summary(r))
+        adjustments_cell.alignment = Alignment(wrap_text=True)
+
     # Apply border to all data cells
     for row in range(1, len(results) + 2):
-        for col in range(1, 12):
+        for col in range(1, 13):
             ws.cell(row=row, column=col).border = border_thin
 
     # Auto-fit column widths (rough approximation)
