@@ -113,6 +113,8 @@ def test_research_breakdown_sums_to_research_hours(results):
     """
     def _sum_nested(value):
         if isinstance(value, dict):
+            if "total" in value and isinstance(value["total"], (int, float)) and not isinstance(value["total"], bool):
+                return value["total"]
             return sum(_sum_nested(v) for v in value.values())
         return value if isinstance(value, (int, float)) and not isinstance(value, bool) else 0
 
