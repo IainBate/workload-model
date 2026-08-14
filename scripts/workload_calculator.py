@@ -1111,7 +1111,11 @@ def _calculate_research_workload(staff_member: StaffData, assumptions: List[str]
         sole_count = staff_member.phd_supervisions
         sole_hours = sole_count * config.SUPERVISION_MULTIPLIERS["pgr_primary_supervisor_per_fte"]
         phd_hours += sole_hours
-        phd_breakdown["supervision"] = sole_hours
+        phd_breakdown["supervision"] = {
+            "count": sole_count,
+            "rate": config.SUPERVISION_MULTIPLIERS["pgr_primary_supervisor_per_fte"],
+            "total": round(sole_hours, 2)
+        }
         phd_details.append(f"{sole_count}x full-time PhD student × {config.SUPERVISION_MULTIPLIERS['pgr_primary_supervisor_per_fte']}h/FTE")
 
     # Co-supervisors - part-time PhD students (60% of primary)
