@@ -866,6 +866,8 @@ def generate_html_report(results: List[WorkloadResult], year_data: YearData,
                     f'{t_cmp:+.0f}/{r_cmp:+.0f}/{a_cmp:+.0f}% diff</span>'
                 )
 
+        manual_adj_cell = '<span class="manual-adj-badge">Adjusted</span>' if r.get("has_adjustment") else "&mdash;"
+
         html += f"""
                     <tr>
                         <td><a href="Individual Reports/{r["filename"]}" class="staff-name-link" target="_blank">{r["name"]}</a></td>
@@ -876,6 +878,7 @@ def generate_html_report(results: List[WorkloadResult], year_data: YearData,
                         <td>{r["research"]:.1f}h</td>
                         <td>{r["admin"]:.1f}h</td>
                         <td>{normative_indicator}</td>
+                        <td>{manual_adj_cell}</td>
                     </tr>
 """
 
