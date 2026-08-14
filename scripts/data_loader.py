@@ -1887,6 +1887,16 @@ def load_all_data(data_dir: str = None,
     if category_overrides_dirty:
         _save_category_overrides(category_overrides)
 
+    # Orphan detection: warn about any workload_adjustments.csv Person that never
+    # resolved to a staff member in this year's final roster. There's no per-person
+    # report to attach a flag to for someone not in the roster, so this is
+    # console-only - matching the pattern used for unattributed_adjustment_warnings.
+    for raw_person, records in adjustments_data.items():
+        norm = normalize_name(raw_person, reverse_lookup, unknown_callback=None)
+        if not norm or norm not in sorted_staff:
+            print(f"Warning: workload_adjustments.csv Person '{raw_person}' does not match "
+                  f"any staff member in this year's roster - {len(records)} adjustment row(s) ignored.")
+
     return YearData(
         year_label=year_label,
         modules=tuple(sorted_modules),
