@@ -1135,7 +1135,11 @@ def _calculate_research_workload(staff_member: StaffData, assumptions: List[str]
         assessor_count = staff_member.phd_assessor_count
         assessor_hours = assessor_count * config.SUPERVISION_MULTIPLIERS["pgr_assessor"]
         phd_hours += assessor_hours
-        phd_breakdown["assessor"] = assessor_hours
+        phd_breakdown["assessor"] = {
+            "count": assessor_count,
+            "rate": config.SUPERVISION_MULTIPLIERS["pgr_assessor"],
+            "total": round(assessor_hours, 2)
+        }
         phd_details.append(f"{assessor_count}x assessor ({config.SUPERVISION_MULTIPLIERS['pgr_assessor']}h each)")
 
     if phd_hours > 0:
