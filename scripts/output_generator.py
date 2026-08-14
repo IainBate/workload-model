@@ -403,7 +403,7 @@ def generate_excel_with_formulas(results: List[WorkloadResult], year_data: YearD
     headers = [
         "Name", "FTE", "Total Hours", "Teaching Hours", "Research Hours",
         "Admin Hours", "Teaching Detail", "Research Detail", "Admin Detail",
-        "Assumptions", "Missing Data"
+        "Assumptions", "Missing Data", "Manual Adjustments"
     ]
 
     for col, header in enumerate(headers, start=1):
