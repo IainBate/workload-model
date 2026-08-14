@@ -1452,5 +1452,346 @@ class TestFormatAdjustmentItems:
         assert _format_adjustment_items(FakeResult(), "teaching-item") == []
 
 
+class TestModuleScopedTeachingAdjustments:
+    """Module-scoped Teaching adjustments (the "Teaching Module" column in
+    workload_adjustments.csv), run through the full calculate_workload()
+    pipeline with two real modules taught by one test person - mirroring
+    TestTeachingWorkload's fixture style. Research/Admin have no module
+    concept and are deliberately not covered here (see TestManualAdjustments)."""
+
+    STAFF_NAME = "Mod Test Person"
+
+    @classmethod
+    def _module(cls, name, teachers=None, **overrides):
+        defaults = dict(
+            name=name, codes=[f"{name}CODE"], credits=20, stage=5,
+            practicals=0, practical_contact_hours=0, practical_groups=0,
+            practical_weeks=None, assessment_count=1, student_count=100,
+            teachers=teachers or [cls.STAFF_NAME], lead_name=None,
+        )
+        defaults.update(overrides)
+        return ModuleData(**defaults)
+
+    @classmethod
+    def _staff(cls, adjustments=()):
+        return StaffData(canonical_name=cls.STAFF_NAME, fte=1.0, roles=(), active=True,
+                          adjustments=adjustments)
+
+    @classmethod
+    def _calc(cls, adjustments=(), modules=None):
+        modules = [cls._module("SYS2"), cls._module("SYS3")] if modules is None else modules
+        year_data = YearData.create(
+            year_label="2026-7", modules=modules, student_counts={}, assessment_counts={},
+            staff={cls.STAFF_NAME: cls._staff(adjustments)},
+            known_lecturers={cls.STAFF_NAME}, known_lecturers_per_module={},
+        )
+        results = calculate_workload(year_data, validate_input=False)
+        return next(r for r in results if r.name == cls.STAFF_NAME)
+
+    @staticmethod
+    def _calculated_total(module_breakdown):
+        return sum(v for k, v in module_breakdown.items()
+                   if k in _TEACHING_MODULE_SUM_KEYS and isinstance(v, (int, float)))
+
+    def test_case_insensitive_resolution_succeeds(self):
+        baseline = self._calc()
+        sys2_calculated = self._calculated_total(baseline.teaching_module_breakdowns["SYS2"])
+
+        adj = AdjustmentRecord(category="teaching", mode="absolute", value=200.0,
+                                rationale="SYS2 unconventional", source_row=2,
+                                raw_person=self.STAFF_NAME, module="sys2")
+        adjusted = self._calc(adjustments=(adj,))
+
+        sys2 = adjusted.teaching_module_breakdowns["SYS2"]
+        assert sys2["adjustment_breakdown"]["mode"] == "absolute"
+        assert sys2["adjustment_breakdown"]["calculated_total"] == pytest.approx(sys2_calculated)
+        assert sys2["manual_adjustment"] == pytest.approx(200.0 - sys2_calculated)
+
+    def test_unresolved_module_not_taught_flagged_nothing_applied(self):
+        baseline = self._calc()
+        adj = AdjustmentRecord(category="teaching", mode="delta", value=50.0,
+                                rationale="typo'd module name", source_row=2,
+                                raw_person=self.STAFF_NAME, module="SYS9")
+        adjusted = self._calc(adjustments=(adj,))
+
+        assert adjusted.teaching_hours == pytest.approx(baseline.teaching_hours)
+        assert "manual_adjustment" not in adjusted.teaching_module_breakdowns["SYS2"]
+        assert "manual_adjustment" not in adjusted.teaching_module_breakdowns["SYS3"]
+        assert any("SYS9" in m for m in adjusted.missing_data)
+
+    def test_no_modules_taught_at_all_flagged(self):
+        adj = AdjustmentRecord(category="teaching", mode="delta", value=50.0,
+                                rationale="no modules this year", source_row=2,
+                                raw_person=self.STAFF_NAME, module="SYS2")
+        result = self._calc(adjustments=(adj,), modules=[])
+
+        assert result.teaching_hours == pytest.approx(0.0)
+        assert any("SYS2" in m for m in result.missing_data)
+
+    def test_absolute_override_leaves_other_module_untouched(self):
+        baseline = self._calc()
+        sys3_calculated = self._calculated_total(baseline.teaching_module_breakdowns["SYS3"])
+
+        adj = AdjustmentRecord(category="teaching", mode="absolute", value=200.0,
+                                rationale="SYS2 override", source_row=2,
+                                raw_person=self.STAFF_NAME, module="SYS2")
+        adjusted = self._calc(adjustments=(adj,))
+
+        assert "adjustment_breakdown" not in adjusted.teaching_module_breakdowns["SYS3"]
+        assert self._calculated_total(adjusted.teaching_module_breakdowns["SYS3"]) == pytest.approx(sys3_calculated)
+        # Overall teaching_hours = the override plus the other module's calculated total.
+        assert adjusted.teaching_hours == pytest.approx(200.0 + sys3_calculated)
+
+    def test_module_delta_stacks_with_independent_category_wide_delta(self):
+        baseline = self._calc()
+
+        module_adj = AdjustmentRecord(category="teaching", mode="delta", value=15.0,
+                                       rationale="SYS2 extra", source_row=2,
+                                       raw_person=self.STAFF_NAME, module="SYS2")
+        category_adj = AdjustmentRecord(category="teaching", mode="delta", value=8.0,
+                                         rationale="general teaching cover", source_row=3,
+                                         raw_person=self.STAFF_NAME)  # module="" (category-wide)
+        adjusted = self._calc(adjustments=(module_adj, category_adj))
+
+        assert adjusted.teaching_hours == pytest.approx(baseline.teaching_hours + 15.0 + 8.0)
+        assert adjusted.adjustments_breakdown["teaching"]["delta"] == pytest.approx(8.0)
+        assert adjusted.teaching_module_breakdowns["SYS2"]["manual_adjustment"] == pytest.approx(15.0)
+
+    def test_two_different_modules_coexist_without_conflict(self):
+        baseline = self._calc()
+        sys2_calculated = self._calculated_total(baseline.teaching_module_breakdowns["SYS2"])
+        sys3_calculated = self._calculated_total(baseline.teaching_module_breakdowns["SYS3"])
+
+        sys2_adj = AdjustmentRecord(category="teaching", mode="absolute", value=200.0,
+                                     rationale="SYS2 override", source_row=2,
+                                     raw_person=self.STAFF_NAME, module="SYS2")
+        sys3_adj = AdjustmentRecord(category="teaching", mode="delta", value=10.0,
+                                     rationale="SYS3 extra", source_row=3,
+                                     raw_person=self.STAFF_NAME, module="SYS3")
+        adjusted = self._calc(adjustments=(sys2_adj, sys3_adj))
+
+        assert not any("conflict" in m.lower() for m in adjusted.missing_data)
+        assert adjusted.teaching_module_breakdowns["SYS2"]["manual_adjustment"] == pytest.approx(200.0 - sys2_calculated)
+        assert adjusted.teaching_module_breakdowns["SYS3"]["manual_adjustment"] == pytest.approx(10.0)
+        assert adjusted.teaching_hours == pytest.approx(200.0 + sys3_calculated + 10.0)
+
+    def test_same_module_absolute_and_delta_conflict_scoped_to_that_module(self):
+        baseline = self._calc()
+        sys3_calculated = self._calculated_total(baseline.teaching_module_breakdowns["SYS3"])
+
+        adjs = (
+            AdjustmentRecord(category="teaching", mode="absolute", value=200.0,
+                              rationale="a", source_row=2, raw_person=self.STAFF_NAME, module="SYS2"),
+            AdjustmentRecord(category="teaching", mode="delta", value=10.0,
+                              rationale="b", source_row=3, raw_person=self.STAFF_NAME, module="SYS2"),
+        )
+        adjusted = self._calc(adjustments=adjs)
+
+        assert "manual_adjustment" not in adjusted.teaching_module_breakdowns["SYS2"]
+        assert any("conflict" in m.lower() for m in adjusted.missing_data)
+        # SYS3 (a different module) is completely unaffected by SYS2's conflict.
+        assert self._calculated_total(adjusted.teaching_module_breakdowns["SYS3"]) == pytest.approx(sys3_calculated)
+        assert adjusted.teaching_hours == pytest.approx(baseline.teaching_hours)
+
+    def test_breakdown_sum_equals_teaching_hours_with_module_adjustment(self):
+        adj = AdjustmentRecord(category="teaching", mode="absolute", value=200.0,
+                                rationale="SYS2 override", source_row=2,
+                                raw_person=self.STAFF_NAME, module="SYS2")
+        adjusted = self._calc(adjustments=(adj,))
+
+        numeric_sum = sum(v for v in adjusted.teaching_breakdown.values() if isinstance(v, (int, float)))
+        assert numeric_sum == pytest.approx(adjusted.teaching_hours, abs=0.05)
+
+
+class TestApplyTeachingModuleAdjustmentsDirect:
+    """Direct unit tests of _apply_teaching_module_adjustments(), isolated from
+    the full calculate_workload() pipeline, against a hand-built breakdown dict."""
+
+    @staticmethod
+    def _breakdown():
+        return {
+            "SYS2": {"teaching": 100.0, "practicals": 20.0, "assessment_setting": 5.0, "marking": 10.0},
+            "SYS3": {"teaching": 50.0, "practicals": 0.0, "assessment_setting": 5.0, "marking": 5.0},
+        }
+
+    def test_absolute_override_mutates_module_in_place(self):
+        breakdown = self._breakdown()
+        staff = StaffData(canonical_name="X", adjustments=(
+            AdjustmentRecord(category="teaching", mode="absolute", value=200.0,
+                              rationale="override", source_row=2, raw_person="X", module="SYS2"),
+        ))
+        missing_data = []
+
+        delta = _apply_teaching_module_adjustments(staff, breakdown, missing_data)
+
+        assert delta == pytest.approx(200.0 - 135.0)  # 100+20+5+10 = 135
+        assert breakdown["SYS2"]["manual_adjustment"] == pytest.approx(65.0)
+        assert breakdown["SYS2"]["adjustment_breakdown"]["mode"] == "absolute"
+        assert breakdown["SYS2"]["adjustment_breakdown"]["calculated_total"] == pytest.approx(135.0)
+        assert breakdown["SYS2"]["adjustment_breakdown"]["adjusted_total"] == pytest.approx(200.0)
+        assert "manual_adjustment" not in breakdown["SYS3"]  # untouched
+        assert missing_data == []
+
+    def test_delta_adds_to_module(self):
+        breakdown = self._breakdown()
+        staff = StaffData(canonical_name="X", adjustments=(
+            AdjustmentRecord(category="teaching", mode="delta", value=10.0,
+                              rationale="extra", source_row=2, raw_person="X", module="SYS3"),
+        ))
+        missing_data = []
+
+        delta = _apply_teaching_module_adjustments(staff, breakdown, missing_data)
+
+        assert delta == pytest.approx(10.0)
+        assert breakdown["SYS3"]["manual_adjustment"] == pytest.approx(10.0)
+        assert missing_data == []
+
+    def test_unresolved_module_flagged_nothing_applied(self):
+        breakdown = self._breakdown()
+        staff = StaffData(canonical_name="X", adjustments=(
+            AdjustmentRecord(category="teaching", mode="delta", value=10.0,
+                              rationale="typo", source_row=2, raw_person="X", module="SYS 2"),
+        ))
+        missing_data = []
+
+        delta = _apply_teaching_module_adjustments(staff, breakdown, missing_data)
+
+        assert delta == 0.0
+        assert "manual_adjustment" not in breakdown["SYS2"]
+        assert any("SYS 2" in m for m in missing_data)
+
+    def test_no_modules_taught_flagged(self):
+        staff = StaffData(canonical_name="X", adjustments=(
+            AdjustmentRecord(category="teaching", mode="delta", value=10.0,
+                              rationale="x", source_row=2, raw_person="X", module="SYS2"),
+        ))
+        missing_data = []
+
+        delta = _apply_teaching_module_adjustments(staff, {}, missing_data)
+
+        assert delta == 0.0
+        assert any("SYS2" in m for m in missing_data)
+
+    def test_same_module_conflict_flagged(self):
+        breakdown = self._breakdown()
+        staff = StaffData(canonical_name="X", adjustments=(
+            AdjustmentRecord(category="teaching", mode="absolute", value=200.0,
+                              rationale="a", source_row=2, raw_person="X", module="SYS2"),
+            AdjustmentRecord(category="teaching", mode="delta", value=10.0,
+                              rationale="b", source_row=3, raw_person="X", module="SYS2"),
+        ))
+        missing_data = []
+
+        delta = _apply_teaching_module_adjustments(staff, breakdown, missing_data)
+
+        assert delta == 0.0
+        assert "manual_adjustment" not in breakdown["SYS2"]
+        assert any("conflict" in m.lower() for m in missing_data)
+
+    def test_negative_result_rejected(self):
+        breakdown = self._breakdown()
+        staff = StaffData(canonical_name="X", adjustments=(
+            AdjustmentRecord(category="teaching", mode="delta", value=-1000.0,
+                              rationale="huge negative delta", source_row=2, raw_person="X", module="SYS3"),
+        ))
+        missing_data = []
+
+        delta = _apply_teaching_module_adjustments(staff, breakdown, missing_data)
+
+        assert delta == 0.0
+        assert "manual_adjustment" not in breakdown["SYS3"]
+        assert any("negative" in m.lower() for m in missing_data)
+
+    def test_two_modules_coexist_returns_summed_delta(self):
+        breakdown = self._breakdown()
+        staff = StaffData(canonical_name="X", adjustments=(
+            AdjustmentRecord(category="teaching", mode="absolute", value=200.0,
+                              rationale="a", source_row=2, raw_person="X", module="SYS2"),
+            AdjustmentRecord(category="teaching", mode="delta", value=10.0,
+                              rationale="b", source_row=3, raw_person="X", module="SYS3"),
+        ))
+        missing_data = []
+
+        delta = _apply_teaching_module_adjustments(staff, breakdown, missing_data)
+
+        assert delta == pytest.approx((200.0 - 135.0) + 10.0)
+        assert breakdown["SYS2"]["manual_adjustment"] == pytest.approx(65.0)
+        assert breakdown["SYS3"]["manual_adjustment"] == pytest.approx(10.0)
+        assert missing_data == []
+
+    def test_no_module_scoped_entries_returns_zero(self):
+        breakdown = self._breakdown()
+        staff = StaffData(canonical_name="X", adjustments=(
+            AdjustmentRecord(category="teaching", mode="delta", value=10.0,
+                              rationale="category-wide", source_row=2, raw_person="X"),  # module=""
+        ))
+        missing_data = []
+
+        delta = _apply_teaching_module_adjustments(staff, breakdown, missing_data)
+
+        assert delta == 0.0
+        assert "manual_adjustment" not in breakdown["SYS2"]
+        assert "manual_adjustment" not in breakdown["SYS3"]
+        assert missing_data == []
+
+
+class TestFormatModuleAdjustmentSection:
+    """_format_module_adjustment_section() (output_generator.py) - pure
+    rendering of an already-computed adjustment_breakdown. No arithmetic."""
+
+    def test_no_adjustment_breakdown_renders_nothing(self):
+        from output_generator import _format_module_adjustment_section
+
+        assert _format_module_adjustment_section({}, "teaching-item") == []
+
+    def test_absolute_renders_headline_and_calculation_subrow(self):
+        from output_generator import _format_module_adjustment_section
+
+        module_breakdown = {
+            "adjustment_breakdown": {
+                "mode": "absolute",
+                "calculated_total": 96.5,
+                "adjusted_total": 200.0,
+                "delta": 103.5,
+                "entries": ({"mode": "absolute", "amount": 200.0,
+                             "rationale": "SYS2 unconventional", "source_row": 2},),
+            }
+        }
+
+        parts = _format_module_adjustment_section(module_breakdown, "teaching-item", "COM00029I")
+
+        assert len(parts) == 2
+        assert "manual-override-block" in parts[0]
+        assert "Manual adjustment" in parts[0]
+        assert "200.0h" in parts[0]
+        assert "[COM00029I]" in parts[0]
+        assert "Calculation" in parts[1]
+        assert "Calculated: 96.5h" in parts[1]
+        assert "Adjusted: 200.0h" in parts[1]
+        assert "Rationale: SYS2 unconventional" in parts[1]
+
+    def test_delta_renders_headline_and_calculation_subrow(self):
+        from output_generator import _format_module_adjustment_section
+
+        module_breakdown = {
+            "adjustment_breakdown": {
+                "mode": "delta",
+                "calculated_total": 60.0,
+                "adjusted_total": 70.0,
+                "delta": 10.0,
+                "entries": ({"mode": "delta", "amount": 10.0,
+                             "rationale": "extra cover", "source_row": 3},),
+            }
+        }
+
+        parts = _format_module_adjustment_section(module_breakdown, "teaching-item")
+
+        assert len(parts) == 2
+        assert "manual-adjustment-line" in parts[0]
+        assert "+10.0h" in parts[0]
+        assert "Calculation" in parts[1]
+        assert "Rationale: extra cover" in parts[1]
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
