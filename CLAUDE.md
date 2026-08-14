@@ -57,6 +57,7 @@ The immutable DTO passed from calculator to output. Contains all pre-computed nu
 | **teaching_module_breakdowns** | Dict[str, Dict[str, float]] | Per-module teaching breakdowns |
 | **research_breakdown** | Dict[str, float] | Research components (baseline, grants, PhD supervision) |
 | **admin_breakdown** | Dict[str, float] | Admin components (departmental roles) |
+| **adjustments_breakdown** | Dict[str, Dict] | Manual overrides/deltas from `workload_adjustments.csv`, keyed by `'teaching'/'research'/'admin'` — present only for a category that actually had an adjustment applied |
 | `teaching_detail`, `research_detail`, `admin_detail` | str | Human-readable strings for display only |
 
 **Note:** The breakdown dicts (`teaching_breakdown`, `research_breakdown`, `admin_breakdown`) contain structured numeric data. **Read directly from these, never parse numbers out of the detail strings.**
