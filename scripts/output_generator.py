@@ -132,6 +132,15 @@ def _format_hours(hours: float) -> str:
     return f"{hours:.1f}h"
 
 
+def _pluralize(word: str, count: float) -> str:
+    """Singularize a plural noun (strip trailing 's') when count == 1, else leave as-is.
+    Used for supervision-style "N word(s) x rate ..." lines (pastoral/project/PhD) so
+    they read naturally at both count == 1 and count > 1."""
+    if count == 1 and word.endswith('s'):
+        return word[:-1]
+    return word
+
+
 def _format_rate(rate: float) -> str:
     """Format rate multiplier - no decimal if whole number, .1f otherwise."""
     if rate == int(rate):
