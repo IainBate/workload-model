@@ -20,6 +20,8 @@ from workload_calculator import (
     _calculate_research_workload,
     _calculate_admin_workload,
     _apply_adjustments,
+    _apply_teaching_module_adjustments,
+    _TEACHING_MODULE_SUM_KEYS,
     calculate_workload,
 )
 import config
