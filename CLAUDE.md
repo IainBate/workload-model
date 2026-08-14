@@ -175,6 +175,9 @@ workload_adjustments.csv (optional, auto-synced) → Manual Teaching/Research/Ad
 - **`staff_name_lookup.json`**: Canonical name → aliases mapping for staff name normalization.
 - **`module_mapping.json`**: Module H/M merges, unified project modules, dropped/new modules between years.
 - **`workload_parameters.yaml`**: All workload parameters extracted from the .docx.
+- **`workload_adjustments.csv`**: Optional manual Teaching/Research/Admin adjustments (delta or
+  absolute override) per staff member, with mandatory rationale. Auto-synced with a blank row per
+  active staff member on every run — see "Manual Workload Adjustments" above.
 
 ## Development & Execution
 ### Running the Calculator
