@@ -122,6 +122,19 @@ class StaffData:
     saint_modules: Tuple[str, ...] = field(default_factory=tuple)
     unallocated_students: int = 0  # Remaining students after allocation
     pastoral_students: int = 0  # Number of pastoral students assigned
+    adjustments: Tuple["AdjustmentRecord", ...] = field(default_factory=tuple)  # Parsed workload_adjustments.csv rows for this person
+    adjustment_warnings: Tuple[str, ...] = field(default_factory=tuple)  # Malformed/incomplete adjustment rows for this person (not applied)
+
+
+@dataclass(frozen=True)
+class AdjustmentRecord:
+    """One parsed, validated adjustment cell from workload_adjustments.csv."""
+    category: str        # "teaching" | "research" | "admin"
+    mode: str             # "delta" | "absolute"
+    value: float           # signed delta amount, or absolute override target hours
+    rationale: str
+    source_row: int        # 1-based row as it appears in a spreadsheet (header = row 1)
+    raw_person: str        # Person cell text as written, for diagnostics
 
 
 @dataclass(frozen=True)
