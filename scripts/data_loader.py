@@ -1813,6 +1813,20 @@ def load_all_data(data_dir: str = None,
             hod_name_from_waw, art_ts_category_hod, pt_info_hod, category_overrides
         )
 
+        # Collect adjustment rows/warnings for the HoD (if available). This uses the
+        # same every-matching-key-collected logic as _find_all_matches above, kept
+        # inline here since this block operates outside that closure's scope.
+        adj_records_hod = []
+        for key, val in adjustments_data.items():
+            norm_key = normalize_name(key, reverse_lookup, unknown_callback=None)
+            if key.lower() == hod_name_from_waw.lower() or norm_key == hod_name_from_waw:
+                adj_records_hod.extend(val)
+        adj_warnings_hod = []
+        for key, val in adjustment_warnings.items():
+            norm_key = normalize_name(key, reverse_lookup, unknown_callback=None)
+            if key.lower() == hod_name_from_waw.lower() or norm_key == hod_name_from_waw:
+                adj_warnings_hod.extend(val)
+
         staff[hod_name_from_waw] = StaffData(
             canonical_name=hod_name_from_waw,
             aliases=tuple(mappings.get(hod_name_from_waw, [hod_name_from_waw])),
