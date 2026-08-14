@@ -40,6 +40,7 @@ from output_generator import (
     _determine_lecturer_type,
     _format_adjustment_items,
     _format_hours,
+    _format_module_adjustment_section,
     _format_module_assessment_section,
     _format_module_delivery_section,
     _format_module_header,
