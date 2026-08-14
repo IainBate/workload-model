@@ -524,7 +524,7 @@ class TestSyncAdjustmentNames:
         # The Alice row itself, not just some prefix, is untouched.
         rows = list(csv.reader(after_content.splitlines()))
         alice_row = next(r for r in rows if r and r[0] == "Alice Adams")
-        assert alice_row == ["Alice Adams", "+10", "extra marking cover", "", "", "", ""]
+        assert alice_row == ["Alice Adams", "", "+10", "extra marking cover", "", "", "", ""]
 
     def test_inactive_staff_never_added(self, tmp_path, monkeypatch):
         monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
