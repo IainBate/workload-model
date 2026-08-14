@@ -1993,6 +1993,8 @@ def _deduplicate_staff(staff: Dict[str, StaffData], mappings: Dict[str, List[str
                 saint_modules=tuple(sorted(set(all_saint_modules))),
                 unallocated_students=0,
                 pastoral_students=0,
+                adjustments=tuple(all_adjustments),
+                adjustment_warnings=tuple(all_adjustment_warnings),
             )
 
     return merged
