@@ -1069,7 +1069,7 @@ def _load_adjustments(filepath: str = "workload_adjustments.csv"):
     return adjustments, warnings_by_name, unattributed
 
 
-_ADJUSTMENTS_HEADER = ["Person", "Teaching Adjustment", "Teaching Rationale",
+_ADJUSTMENTS_HEADER = ["Person", "Teaching Module", "Teaching Adjustment", "Teaching Rationale",
                        "Research Adjustment", "Research Rationale",
                        "Admin Adjustment", "Admin Rationale"]
 
