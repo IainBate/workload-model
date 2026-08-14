@@ -75,6 +75,7 @@ def result_to_dict(r) -> Dict[str, Any]:
         "admin_breakdown": dict(r.admin_breakdown or {}),
         "pastoral_breakdown": dict(r.pastoral_breakdown or {}),
         "project_breakdown": dict(r.project_breakdown or {}),
+        "adjustments_breakdown": dict(r.adjustments_breakdown or {}),
         "assumptions": list(r.assumptions or ()),
         "missing_data": list(r.missing_data or ()),
     })
