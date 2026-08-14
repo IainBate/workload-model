@@ -10,7 +10,9 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
-      "missing_data": [],
+      "missing_data": [
+        "NLPG: no student numbers in CS Module Numbers.csv - marking hours estimated from a default of 100 students"
+      ],
       "name": "Adrian Bors",
       "nominal_hours": 1642.0,
       "pastoral_breakdown": {
@@ -606,7 +608,8 @@
       "category": "ART",
       "fte": 1.0,
       "missing_data": [
-        "No administrative roles assigned"
+        "No administrative roles assigned",
+        "ELLA: no student numbers in CS Module Numbers.csv - marking hours estimated from a default of 100 students"
       ],
       "name": "Antonio Garcia-Dominguez",
       "nominal_hours": 1642.0,
@@ -1340,7 +1343,8 @@
       "category": "ART",
       "fte": 1.0,
       "missing_data": [
-        "No administrative roles assigned"
+        "No administrative roles assigned",
+        "LPTC: no student numbers in CS Module Numbers.csv - marking hours estimated from a default of 100 students"
       ],
       "name": "Colin Paterson",
       "nominal_hours": 1642.0,
@@ -1853,7 +1857,9 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
-      "missing_data": [],
+      "missing_data": [
+        "NLPG: no student numbers in CS Module Numbers.csv - marking hours estimated from a default of 100 students"
+      ],
       "name": "Dimitar Kazakov",
       "nominal_hours": 1642.0,
       "pastoral_breakdown": {
@@ -2348,7 +2354,9 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
-      "missing_data": [],
+      "missing_data": [
+        "LLMA: no student numbers in CS Module Numbers.csv - marking hours estimated from a default of 100 students"
+      ],
       "name": "Frank Soboczenski",
       "nominal_hours": 1642.0,
       "pastoral_breakdown": {
@@ -2703,7 +2711,9 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
-      "missing_data": [],
+      "missing_data": [
+        "LLMA: no student numbers in CS Module Numbers.csv - marking hours estimated from a default of 100 students"
+      ],
       "name": "James Stovold",
       "nominal_hours": 1642.0,
       "pastoral_breakdown": {
@@ -4910,7 +4920,9 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
-      "missing_data": [],
+      "missing_data": [
+        "ARIA: no student numbers in CS Module Numbers.csv - marking hours estimated from a default of 100 students"
+      ],
       "name": "Peter Nightingale",
       "nominal_hours": 1642.0,
       "pastoral_breakdown": {
@@ -5670,7 +5682,8 @@
       "category": "ART",
       "fte": 1.0,
       "missing_data": [
-        "No administrative roles assigned"
+        "No administrative roles assigned",
+        "ELLA: no student numbers in CS Module Numbers.csv - marking hours estimated from a default of 100 students"
       ],
       "name": "Robbert Jongeling",
       "nominal_hours": 1642.0,
@@ -6575,7 +6588,8 @@
       "category": "ART",
       "fte": 1.0,
       "missing_data": [
-        "No administrative roles assigned"
+        "No administrative roles assigned",
+        "ELLA: no student numbers in CS Module Numbers.csv - marking hours estimated from a default of 100 students"
       ],
       "name": "Soumya Banerjee",
       "nominal_hours": 1642.0,
@@ -7169,7 +7183,9 @@
       "assumptions": [],
       "category": "T and S",
       "fte": 1.0,
-      "missing_data": [],
+      "missing_data": [
+        "ARIA: no student numbers in CS Module Numbers.csv - marking hours estimated from a default of 100 students"
+      ],
       "name": "Tommy Yuan",
       "nominal_hours": 1642.0,
       "pastoral_breakdown": {

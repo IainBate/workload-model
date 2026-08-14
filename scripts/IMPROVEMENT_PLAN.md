@@ -460,18 +460,72 @@ resolved. Test suite: **161 passing, 0 failing** (from 43 passing / 4 failing at
 | `test_format_baseline.py` | 7 | Display-format regression vs HTML baseline (B2) |
 | `test_practical_display.py` | 5 | Practical-session display semantics |
 
-### Open items for you (none blocking)
+## Follow-up decisions (2026-08-14)
 
-1. **`FOAM` and `Projects` have placeholder module codes** and are silently using the default
-   student count of 100 rather than real numbers (newly surfaced by the B6 validation check).
-2. **`Part time.csv` is inert** — none of its four people are on the active roster and everyone is
+**FOAM — resolved to 30 students, at the MSc rate.** FOAM's WTW row carries the placeholder code
+`<new for one year>`, so the code-keyed lookup failed and it silently used the default of 100. Its
+real numbers were already in `CS Module Numbers.csv` (`COM00196M,FOAM,30`). Fixed by adding an
+acronym fallback for student counts, mirroring the one assessment counts already had — so the 30
+comes from existing data rather than being hardcoded.
+
+That fallback also uncovered a second, quieter problem: with no resolvable code, FOAM had no `M`
+suffix to classify on, so it fell back to `stage=3` and was **marked at the UG rate (20 min/script)
+despite being an MSc module** — the same class of bug found earlier with PRAD and GPIG. The
+fallback now records the real code (`COM00196M`) as well as the count, so the level classifies
+correctly. Net effect: Tommy Yuan and Peter Nightingale each −11h.
+
+**`Projects` — excluded from teaching workload.** Supervision of taught projects is credited via
+the Taught Project Coordinator admin role (Jacob Rigby already holds it in WAW), so counting the
+module as teaching double-counted the same work. Configured in `module_mapping.json` under
+`excluded_modules` with a recorded reason, not hardcoded; the loader prints the exclusion and its
+reason on every run. Jacob Rigby: teaching 345.9h → 235.9h, admin role unchanged.
+
+**Five staff confirmed ART** — Fang Yan, Felix Ulrich-Oltean, James Stovold, Pourya Shamsolmoali,
+Robbert Jongeling. Explicitly confirmed 2026-08-14; recorded in `data/staff_category_lookup.json`.
+None appear in the ART Performance sheet, so that file is the only record — worth adding them to
+the source sheet when it is next revised.
+
+**Five modules keep estimated student numbers** — ARIA, ELLA, LLMA, LPTC, NLPG have real codes but
+no entry in `CS Module Numbers.csv`, so they use the default of 100. Decision: leave as estimates,
+but make that visible. This required real work, because the input-validation warnings were being
+computed and then **discarded** (`pass  # Warnings are captured in results` — they were not). Now:
+
+- warnings print on every run,
+- each of the **10 affected staff** gets a `missing_data` entry naming the module,
+- which surfaces in the "Missing Data" box of both report types.
+
+### Remaining open items
+
+1. **`Part time.csv` is inert** — none of its four people are on the active roster and everyone is
    1.0 FTE. Retained because it is the part-time FTE mechanism; deleting it would silently give a
    future part-time member 1.0 FTE.
-3. **Five staff were defaulted to ART** — Fang Yan, Felix Ulrich-Oltean, James Stovold, Pourya
-   Shamsolmoali, Robbert Jongeling — and never explicitly confirmed. They sit in
-   `data/staff_category_lookup.json`; a one-line edit changes any of them.
-4. **Repo hygiene:** the auto-commit hook is producing a commit per tool call (~180 on this
-   branch, all titled "chore: auto-commit before tool use"). Worth squashing before pushing.
+2. **Repo hygiene** — see below.
+
+## Git auto-commit hook
+
+`~/.claude/settings.json` defines a global `PreToolUse` hook on `Write|Edit` that runs
+`git add -A && git commit` before every edit. Current state of this branch: **884 commits, of
+which 858 are auto-commits and 26 are meaningful; 221 unpushed.**
+
+It genuinely earns its keep as a safety net — it allowed a clean recovery twice during this work
+(a bad regex that corrupted two test files, and two deliberate mutation tests). The problems are:
+
+| Issue | Consequence |
+|---|---|
+| `git add -A` stages *everything* | Untracked junk gets committed — it captured a Word lock file (`~$rk Allocation Model.docx`) earlier in this work |
+| Message is a timestamp, never the change | `git log` is unusable for finding anything across 858 entries |
+| Commits the state *before* the edit | Each commit holds the previous state, so bisecting reads off-by-one |
+| Global scope | Applies to every repo, not just this one |
+
+**Recommended, in order of value:**
+
+1. **`git add -A` → `git add -u`** (one word). Stages only already-tracked files, so generated
+   output, lock files and anything untracked stay out. Keeps the whole safety benefit.
+2. **Squash before pushing.** 221 unpushed auto-commits would be noisy on a shared remote. Squash
+   to the 26 meaningful ones, or a handful of themed commits.
+3. **Optional — snapshot instead of commit.** Writing to a side ref (or `git stash create` plus a
+   tag) preserves full recoverability with zero branch-history pollution. More invasive; only
+   worth it if the history noise is actually bothering you.
 
 **Decided and done:** staff contract category resolved (47 ART / 9 T&S / 0 unresolved) with
 interactive prompting for future new names; all of C1–C7 kept and live in
