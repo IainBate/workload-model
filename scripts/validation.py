@@ -189,9 +189,7 @@ def validate_module_data(module) -> ValidationResult:
         result = result.add_issue(ValidationLevel.ERROR, "Credits must be positive", "credits", credits)
 
     # Validate module codes. Codes are the join key for student numbers,
-    # assessment counts, practical data and previous-year lecturer lookups, so a
-    # missing or placeholder code means the module silently falls back to
-    # defaults (e.g. DEFAULT_STUDENT_COUNT) instead of using real data.
+    # assessment counts, practical data and previous-year lecturer lookups.
     codes = getattr(module, 'codes', ()) or ()
     placeholder_codes = [
         c for c in codes
@@ -199,14 +197,25 @@ def validate_module_data(module) -> ValidationResult:
     ]
     if not codes:
         result = result.add_issue(
-            ValidationLevel.WARNING, "Module has no codes - student/assessment data cannot be matched",
+            ValidationLevel.WARNING, "Module has no codes - data lookups will fall back to the module acronym",
             "codes", codes)
     elif placeholder_codes:
         result = result.add_issue(
             ValidationLevel.WARNING,
-            f"Module has placeholder code(s) {placeholder_codes} - student/assessment "
-            f"data cannot be matched and defaults will be used",
+            f"Module has placeholder code(s) {placeholder_codes} - data lookups fall back "
+            f"to the module acronym",
             "codes", codes)
+
+    # The check that actually matters: is this module using a fabricated default
+    # student count because no real numbers were found for it? That silently
+    # skews marking hours for everyone teaching it.
+    import config as _config
+    if student_count == _config.DEFAULT_STUDENT_COUNT:
+        result = result.add_issue(
+            ValidationLevel.WARNING,
+            f"Student count is the default ({student_count}) - no real numbers found "
+            f"for this module in CS Module Numbers.csv; marking hours are estimated",
+            "student_count", student_count)
 
     # Validate student count
     student_count = getattr(module, 'student_count', 0)
