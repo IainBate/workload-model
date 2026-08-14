@@ -1591,6 +1591,51 @@ def _format_module_assessment_section(module_breakdown: Dict[str, Any], css_clas
     return parts
 
 
+def _format_module_adjustment_section(module_breakdown: Dict[str, Any], css_class: str,
+                                      module_code: Optional[str] = None) -> List[str]:
+    """Format a module-scoped manual Teaching adjustment (the "Teaching Module" column
+    in workload_adjustments.csv), in the same two-line shape as Assessment Setting: a
+    headline row, then an indented, smaller "Calculation" sub-row.
+
+    Reads only module_breakdown.get('adjustment_breakdown') - pure formatting, no
+    computation, matching the project's golden rule (workload_calculator.py is the
+    only place that computes this). Returns [] if this module has no adjustment.
+    """
+    info = module_breakdown.get('adjustment_breakdown')
+    if not info:
+        return []
+
+    parts = []
+    label_prefix = ""
+    if module_code and not module_code.startswith('<') and not module_code.endswith('>'):
+        label_prefix = f"[{module_code}] "
+
+    if info['mode'] == 'absolute':
+        entry = info['entries'][0]
+        parts.append(f"""<div class="detail-item {css_class} manual-override-block">
+            <span class="detail-name">{label_prefix}Manual adjustment</span>
+            <span class="detail-hours">{info['adjusted_total']:.1f}h</span>
+            <span class="detail-activity teaching-activity"></span>
+        </div>""")
+        parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+            <span class="detail-name" style="color:#333;">Calculation</span>
+            <span class="detail-hours">Calculated: {info['calculated_total']:.1f}h &rarr; Adjusted: {info['adjusted_total']:.1f}h. Rationale: {entry['rationale']}</span>
+        </div>""")
+    else:
+        for entry in info['entries']:
+            sign = "+" if entry['amount'] >= 0 else ""
+            parts.append(f"""<div class="detail-item {css_class} manual-adjustment-line">
+                <span class="detail-name">{label_prefix}Manual adjustment</span>
+                <span class="detail-hours">{sign}{entry['amount']:.1f}h</span>
+                <span class="detail-activity teaching-activity"></span>
+            </div>""")
+            parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+                <span class="detail-name" style="color:#333;">Calculation</span>
+                <span class="detail-hours">Rationale: {entry['rationale']}</span>
+            </div>""")
+    return parts
+
+
 def _format_module_header(stage: str, modules_in_stage: List[Dict[str, Any]]) -> str:
     """Build a descriptive module header from pre-computed breakdown fields, e.g.
     "SYS2 Module - 1 lecture (2h) and 5 practical sessions (each 2h) per week split between three lecturers".
