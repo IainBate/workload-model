@@ -39,6 +39,19 @@ from data_loader import (
     _load_module_mapping,
 )
 
+# Per-module teaching breakdown keys that are numeric and get summed across a
+# staff member's modules to produce the aggregated (category-level) teaching_breakdown.
+# Shared between _aggregate_teaching_breakdown() (the roll-up) and
+# _apply_teaching_module_adjustments() (which computes a module's pre-adjustment
+# calculated total using this same list) so the two can never drift apart -
+# if a key is added to one but not the other, a module-scoped adjustment would
+# either double-count or silently vanish from the rolled-up category total.
+# "manual_adjustment" is included so a module-scoped adjustment (written into a
+# module's breakdown dict by _apply_teaching_module_adjustments()) automatically
+# rolls into the aggregated teaching_breakdown total.
+_TEACHING_MODULE_SUM_KEYS = ["teaching", "practicals", "assessment_setting", "marking",
+                             "admin", "supervision", "hw_lab", "drop_in", "manual_adjustment"]
+
 
 def _get_prev_year_module_names(module: ModuleData) -> List[str]:
     """Get all possible module names from previous year that could map to this module.
