@@ -1351,6 +1351,7 @@ def load_all_data(data_dir: str = None,
 
     # Load student counts, assessment counts, and practical data (DATA_DIR is used internally)
     student_counts = _load_student_counts()
+    codes_by_acronym = _load_codes_by_acronym()
     assessment_counts = _load_assessment_counts()
     practical_data = _load_practical_data()
 
