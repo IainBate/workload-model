@@ -200,7 +200,7 @@ def generate_csv(results: List[WorkloadResult], filepath: str = "Staff workload 
             "Name", "FTE", "Total Hours",
             "Teaching Hours", "Research Hours", "Admin Hours", "Category",
             "Teaching Detail", "Research Detail", "Admin Detail",
-            "Assumptions", "Missing Data",
+            "Assumptions", "Missing Data", "Manual Adjustments",
         ])
 
         for r in results:
@@ -217,6 +217,7 @@ def generate_csv(results: List[WorkloadResult], filepath: str = "Staff workload 
                 r.admin_detail,
                 "; ".join(r.assumptions) if r.assumptions else "None",
                 "; ".join(r.missing_data) if r.missing_data else "None",
+                _format_adjustments_summary(r),
             ])
 
     print(f"CSV output written to {filepath}")
