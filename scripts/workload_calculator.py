@@ -1732,6 +1732,20 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
                         module_code=detail.split(":")[0].strip() if ":" in detail else None
                     ).description)
 
+        # Reconcile manual adjustments into the finalized breakdown dicts: add a single
+        # scalar "manual_adjustment" key (the delta actually applied) into each adjusted
+        # category's breakdown. This keeps the calculated sub-items (Delivery, Practicals,
+        # Marking, grants, PhD supervision, departmental roles, ...) untouched and visible,
+        # while keeping sum(breakdown.values()) == the category total in both delta and
+        # absolute-override modes (delta = adjusted_total - calculated_total by
+        # construction either way).
+        if "teaching" in adjustments_breakdown:
+            teaching_breakdown["manual_adjustment"] = adjustments_breakdown["teaching"]["delta"]
+        if "research" in adjustments_breakdown:
+            structured_research_breakdown["manual_adjustment"] = adjustments_breakdown["research"]["delta"]
+        if "admin" in adjustments_breakdown:
+            admin_breakdown["manual_adjustment"] = adjustments_breakdown["admin"]["delta"]
+
         result = WorkloadResult(
             name=canonical_name,
             fte=staff.fte,
