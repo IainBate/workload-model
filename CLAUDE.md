@@ -81,6 +81,29 @@ The immutable DTO passed from calculator to output. Contains all pre-computed nu
 
 **Consumer rule:** If you need a number for display that isn't already on `WorkloadResult` or its breakdown dicts, add a field to the breakdown in `workload_calculator.py` and populate it there — never compute it in an output/report file, and never parse it back out of a display string.
 
+### Manual Workload Adjustments
+
+`data/workload_adjustments.csv` (optional) lets a human apply a reviewed correction to a
+person's Teaching, Research, or Admin total, with a mandatory rationale, for cases the model
+doesn't capture. Columns: `Person, Teaching Adjustment, Teaching Rationale, Research Adjustment,
+Research Rationale, Admin Adjustment, Admin Rationale`.
+
+- **Grammar** (case-insensitive): `+N`, `-N`, or a bare `N` = **delta**; `SET N` = **absolute
+  override**. Never a leading `=` — Excel/Sheets evaluates `=250` as a formula and drops the `=`
+  on CSV re-save, which would make overrides indistinguishable from deltas after a spreadsheet
+  round-trip. A filled adjustment cell with a blank rationale is rejected, not applied.
+- **Multiple rows per person stack** within a category (deltas sum). An absolute override mixed
+  with a delta for the *same* category, two absolute overrides for the same category, or any
+  adjustment that would drive a category negative — none of these get resolved by guessing;
+  nothing is applied and it's flagged in `WorkloadResult.missing_data` instead.
+- **Display**: a delta renders as an extra line inside the category's breakdown; an absolute
+  override renders as a highlighted "Calculated: Xh → Adjusted: Yh" block *alongside* the
+  unchanged calculated breakdown — the detail is never hidden, per the golden rule above.
+- **Auto-sync**: `sync_adjustment_names()` in `data_loader.py` runs on every `main.py` invocation
+  (including `--dry-run`), right after `load_all_data()`, and appends a blank row for any active
+  staff member missing from the file — strictly additive, it never modifies or removes an
+  existing row (including ones a human has already filled in).
+
 ### Dead Code Removed in Phase 2
 
 | Function | Location | Status |
