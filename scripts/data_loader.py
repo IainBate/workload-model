@@ -135,6 +135,7 @@ class AdjustmentRecord:
     rationale: str
     source_row: int        # 1-based row as it appears in a spreadsheet (header = row 1)
     raw_person: str        # Person cell text as written, for diagnostics
+    module: str = ""        # Teaching Module cell text, as written; only ever set for category == "teaching"
 
 
 @dataclass(frozen=True)
