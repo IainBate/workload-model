@@ -154,12 +154,13 @@ This project provides an automated system for calculating academic staff workloa
 WTW 2026-7.csv + WTW 2025-6.csv  →  Module data + known lecturers
 CS Module Numbers.csv              →  Student counts per module
 CS Module Assessment Numbers.csv   →  Assessment counts
-pastoral_load.csv                  →  Pastoral supervision defaults
-project_load.csv                   →  FTE, project loads, citizenship levels
+pastoral_load.csv                  →  Pastoral supervision defaults (preferred over the Loadings.csv fallback below)
+Project and Pastoral Group Loads - Loadings.csv → Project loads (sole source) + pastoral fallback
 PhD Supervision Data.csv           →  PhD supervisor/co-supervisor counts
 % FTE for CS.csv                   →  Research grant FTE allocation
 WAW.csv                            →  Departmental roles (on-campus only)
 Part time.csv                      →  FTE multiplier per staff
+workload_adjustments.csv (optional, auto-synced) → Manual Teaching/Research/Admin overrides
 ```
 
 ### Key Modules
