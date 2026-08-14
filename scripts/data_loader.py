@@ -1704,6 +1704,8 @@ def load_all_data(data_dir: str = None,
                 research_projects=tuple(fte_info) if fte_info else (),
                 saint_modules=tuple(sorted(set(saint_modules))),
                 pastoral_students=pastoral_students,
+                adjustments=tuple(adj_records),
+                adjustment_warnings=tuple(adj_warnings),
             )
 
     # Deduplicate staff roster
