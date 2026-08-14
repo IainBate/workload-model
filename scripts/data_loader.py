@@ -1534,6 +1534,9 @@ def load_all_data(data_dir: str = None,
     waw_roles = _load_waw_roles()
     part_time_data = _load_part_time()
     art_ts_data = _load_art_ts_categories()
+    adjustments_data, adjustment_warnings, unattributed_adjustment_warnings = _load_adjustments()
+    for w in unattributed_adjustment_warnings:
+        print(f"Warning: workload_adjustments.csv {w}")
 
     # Build staff roster from all data sources
     staff = {}
