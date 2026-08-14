@@ -413,6 +413,67 @@ class TestAdjustmentParsing:
         assert categories["admin"].mode == "delta"
         assert categories["admin"].value == 20.0
 
+    # --- Teaching Module column (module-scoped Teaching adjustments) ---
+
+    def test_teaching_module_populates_module_field_on_teaching_only(self, tmp_path, monkeypatch):
+        """A row with Teaching Module filled, plus both a Teaching and an Admin
+        adjustment, must attach the module only to the teaching record - the
+        Admin record from the same row is never module-scoped."""
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        _write_adjustments_csv(tmp_path / "workload_adjustments.csv", [
+            {"Person": "Test Person", "Teaching Module": "SYS2",
+             "Teaching Adjustment": "SET 200", "Teaching Rationale": "SYS2 unconventional",
+             "Admin Adjustment": "+5", "Admin Rationale": "extra committee work"},
+        ])
+        adjustments, warnings, unattributed = dl._load_adjustments()
+        records = adjustments["Test Person"]
+        categories = {r.category: r for r in records}
+        assert categories["teaching"].module == "SYS2"
+        assert categories["admin"].module == ""
+
+    def test_teaching_module_case_preserved_as_written(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        _write_adjustments_csv(tmp_path / "workload_adjustments.csv", [
+            {"Person": "Test Person", "Teaching Module": "  sys2  ",
+             "Teaching Adjustment": "+10", "Teaching Rationale": "extra cover"},
+        ])
+        adjustments, warnings, unattributed = dl._load_adjustments()
+        # Loader only strips whitespace - it does not case-fold or otherwise
+        # normalize; resolution against the person's modules happens later,
+        # in workload_calculator.py.
+        assert adjustments["Test Person"][0].module == "sys2"
+
+    def test_teaching_module_without_teaching_adjustment_warns_and_ignored(self, tmp_path, monkeypatch):
+        """Teaching Module filled but Teaching Adjustment blank has nothing to
+        attach the module to - flagged, not silently dropped."""
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        _write_adjustments_csv(tmp_path / "workload_adjustments.csv", [
+            {"Person": "Test Person", "Teaching Module": "SYS2"},
+        ])
+        adjustments, warnings, unattributed = dl._load_adjustments()
+        assert adjustments == {}
+        assert "Test Person" in warnings
+        assert any("Teaching Module 'SYS2'" in w and "Teaching Adjustment is blank" in w
+                   for w in warnings["Test Person"])
+
+    def test_no_teaching_module_column_at_all_behaves_as_blank(self, tmp_path, monkeypatch):
+        """A workload_adjustments.csv written under the pre-migration 7-column
+        header (no 'Teaching Module' column at all) must load identically to an
+        explicit blank cell - row.get() returns None, and module ends up ""."""
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        path = tmp_path / "workload_adjustments.csv"
+        with open(path, "w", newline="", encoding="utf-8") as f:
+            writer = csv.writer(f)
+            writer.writerow(["Person", "Teaching Adjustment", "Teaching Rationale",
+                              "Research Adjustment", "Research Rationale",
+                              "Admin Adjustment", "Admin Rationale"])
+            writer.writerow(["Test Person", "+10", "extra marking cover", "", "", "", ""])
+        adjustments, warnings, unattributed = dl._load_adjustments()
+        assert warnings == {}
+        record = adjustments["Test Person"][0]
+        assert record.module == ""
+        assert record.value == 10.0
+
 
 def _make_year_data(staff_list, mappings=None):
     """Build a minimal YearData with a real reverse_lookup for sync_adjustment_names
