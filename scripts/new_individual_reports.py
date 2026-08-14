@@ -217,6 +217,7 @@ def _format_teaching_section_sorted(
                 standardized_wording=standardized_wording,
             ))
             items_html_parts.extend(_format_module_assessment_section(module_breakdown, css_class, code))
+            items_html_parts.extend(_format_module_adjustment_section(module_breakdown, css_class, code))
 
         items_html_parts.append("</div>")
 
