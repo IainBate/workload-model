@@ -140,6 +140,13 @@ def main():
     else:
         year_data = load_all_data(data_dir=base_dir, unknown_callback=prompt_name_match, category_callback=_prompt_category_match)
 
+    # Keep workload_adjustments.csv in sync: append a blank row for any active
+    # staff member missing from it, so a human always has a ready-to-fill row.
+    # Strictly additive - runs unconditionally, including under --dry-run.
+    newly_added = sync_adjustment_names(year_data)
+    if newly_added:
+        print(f"\nAdded {len(newly_added)} new staff to workload_adjustments.csv: {', '.join(newly_added)}")
+
     # Print summary
     print_data_summary(year_data)
 
