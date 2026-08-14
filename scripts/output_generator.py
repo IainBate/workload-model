@@ -1206,21 +1206,32 @@ def format_detail_section(r: WorkloadResult, title: str, hours: float, breakdown
                 </div>""")
 
         # PhD students (nested under "PhD Supervision" heading if present)
+        # Each entry is a structured breakdown dict (count/rate/total), matching the
+        # pastoral_breakdown / project_breakdown convention used for teaching supervision.
         phd_students = breakdown.get('phd_students', {})
-        phd_supervision_items = [(k, v) for k, v in phd_students.items() if v > 0]
-        phd_total = sum(v for _, v in phd_supervision_items)
+        phd_supervision_items = [(k, v) for k, v in phd_students.items() if v.get('total', 0) > 0]
+        phd_total = sum(v.get('total', 0) for _, v in phd_supervision_items)
         if phd_supervision_items:
             items_html_parts.append(f"""<h4 style="color:#333;margin:25px 0 10px 0;border-left:4px solid #4CAF50;padding-left:10px;">PhD Supervision ({phd_total:.1f}h)</h4>""")
-            for phd_key, phd_value in sorted(phd_supervision_items, key=lambda x: -x[1]):
+            for phd_key, phd_value in sorted(phd_supervision_items, key=lambda x: -x[1].get('total', 0)):
                 display_names = {
                     'supervision': 'Supervision (primary)',
                     'co_supervision': 'Co-supervision',
                     'assessor': 'Assessor'
                 }
+                unit_labels = {
+                    'supervision': 'students',
+                    'co_supervision': 'students',
+                    'assessor': 'assessments'
+                }
                 display_name = display_names.get(phd_key, phd_key.replace('_', ' ').title())
+                unit_label = unit_labels.get(phd_key, 'items')
+                count = phd_value.get('count', 0)
+                rate = phd_value.get('rate', 0)
+                total = phd_value.get('total', 0)
                 items_html_parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;">
                     <span class="detail-name">{display_name}</span>
-                    <span class="detail-hours">{phd_value:.1f}h</span>
+                    <span class="detail-hours">{count} {unit_label} x {rate}h each = {total:.1f}h</span>
                     <span class="detail-activity research-activity"></span>
                 </div>""")
 
