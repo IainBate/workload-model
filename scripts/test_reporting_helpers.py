@@ -156,6 +156,24 @@ class TestNeedsAttention:
         assert len(flagged) == 1
         assert flagged[0]["issues"] == "Missing Data"
 
+    def test_flags_adjustment_conflict_even_when_on_target(self):
+        """A workload_adjustments.csv conflict (e.g. an absolute override mixed
+        with a delta for the same person+category) is recorded as missing_data
+        by _apply_adjustments() and must still surface here even when the
+        person's total_hours is otherwise right on nominal - the conflict is a
+        data-quality issue independent of whether hours look "fine"."""
+        r = FakeResult(
+            "Conflicted", teaching_hours=NOMINAL,
+            missing_data=("Teaching adjustment conflict: 1 absolute override(s) and "
+                          "1 delta(s) in workload_adjustments.csv - no adjustment applied; "
+                          "calculated value (500.0h) used.",),
+        )
+        flagged = rh.needs_attention([r])
+        assert len(flagged) == 1
+        assert flagged[0]["name"] == "Conflicted"
+        assert flagged[0]["issues"] == "Missing Data"
+        assert flagged[0]["deviation_pct"] == 0.0
+
     def test_reports_both_issue_types(self):
         r = FakeResult("Both", teaching_hours=NOMINAL,
                        assumptions=("a",), missing_data=("b",))
