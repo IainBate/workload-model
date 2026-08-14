@@ -1382,8 +1382,10 @@ def load_all_data(data_dir: str = None,
         # module still has real student numbers recorded under its acronym -
         # without this they would silently use DEFAULT_STUDENT_COUNT. Mirrors
         # the acronym fallback already used for assessment counts below.
+        matched_by_acronym = False
         if total_students == 0 and module.name in merged_student_counts:
             total_students = merged_student_counts[module.name]
+            matched_by_acronym = True
         if total_students > 0:
             module.student_count = total_students
 
@@ -1393,6 +1395,16 @@ def load_all_data(data_dir: str = None,
         module.student_count_by_code = {
             code: student_counts[code] for code in module.codes if code in student_counts
         }
+        # When the match came via the acronym, record the real code(s) too. The
+        # H/M suffix decides the marking rate, so without this a module whose WTW
+        # row has a placeholder code would be marked at the UG rate regardless of
+        # its actual level.
+        if matched_by_acronym and not module.student_count_by_code:
+            module.student_count_by_code = {
+                real_code: student_counts[real_code]
+                for real_code in codes_by_acronym.get(module.name, [])
+                if real_code in student_counts
+            }
 
         # Apply assessment counts
         for code in module.codes:
