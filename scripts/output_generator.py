@@ -1701,6 +1701,7 @@ def _format_module_items(modules_in_stage: List[Dict], css_class: str,
         parts.extend(_format_module_delivery_section(module_breakdown, is_new_lecturer, css_class, code))
         parts.extend(_format_module_practicals_section(module_breakdown, css_class, code, is_new_lecturer))
         parts.extend(_format_module_assessment_section(module_breakdown, css_class, code))
+        parts.extend(_format_module_adjustment_section(module_breakdown, css_class, code))
 
     return parts
 
