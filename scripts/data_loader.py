@@ -1853,6 +1853,8 @@ def load_all_data(data_dir: str = None,
             phd_assessor_count=phd_info["tap_member"] if phd_info else 0,
             research_projects=tuple(fte_info) if fte_info else (),
             saint_modules=(),
+            adjustments=tuple(adj_records_hod),
+            adjustment_warnings=tuple(adj_warnings_hod),
         )
 
     # Ask about any remaining unresolved contract categories. Deliberately done
