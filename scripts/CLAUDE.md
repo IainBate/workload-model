@@ -27,6 +27,7 @@ Workload Model/
 │   ├── % FTE for CS.csv
 │   ├── WAW.csv
 │   ├── Part time.csv
+│   ├── workload_adjustments.csv  # optional, auto-synced each run - see below
 │   ├── staff_name_lookup.json
 │   └── module_mapping.json
 ├── params/            # Configuration parameters
