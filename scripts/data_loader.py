@@ -1116,7 +1116,7 @@ def sync_adjustment_names(year_data: "YearData", filepath: str = "workload_adjus
         if not file_exists:
             writer.writerow(_ADJUSTMENTS_HEADER)
         for name in missing:
-            writer.writerow([name, "", "", "", "", "", ""])
+            writer.writerow([name, "", "", "", "", "", "", ""])
 
     return tuple(missing)
 
