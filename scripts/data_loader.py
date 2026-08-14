@@ -182,6 +182,7 @@ class WorkloadResult:
     supervision_details: Tuple[str, ...] = ()  # Supervision details (to be shown separately)
     pastoral_breakdown: Dict[str, float] = field(default_factory=dict)  # Structured pastoral supervision breakdown
     project_breakdown: Dict[str, float] = field(default_factory=dict)  # Structured project supervision breakdown
+    adjustments_breakdown: Dict[str, Dict[str, Any]] = field(default_factory=dict)  # Manual workload_adjustments.csv overrides applied, keyed by 'teaching'/'research'/'admin'
 
 
 
