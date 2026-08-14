@@ -44,6 +44,7 @@ from output_generator import (
     _format_module_delivery_section,
     _format_module_header,
     _format_module_practicals_section,
+    _pluralize,
     format_detail_section,
 )
 from data_loader import WorkloadResult, YearData
