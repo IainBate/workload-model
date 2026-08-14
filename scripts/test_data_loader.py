@@ -160,6 +160,64 @@ class TestModuleVariantMerging:
         assert _classify_marking_levels(module) == []
 
 
+class TestPlaceholderCodeFallback:
+    """A WTW row with a placeholder code must still resolve real data.
+
+    FOAM's WTW code is '<new for one year>', but its real numbers are recorded
+    against acronym FOAM / code COM00196M. Without the acronym fallback it
+    silently used DEFAULT_STUDENT_COUNT *and* the UG marking rate, because the
+    missing 'M' suffix made it look like an undergraduate module.
+    """
+
+    @pytest.fixture(scope="class")
+    def year_data(self):
+        return dl.load_all_data(
+            data_dir=str(Path(__file__).parent.parent / "data"),
+            unknown_callback=None, category_callback=None,
+        )
+
+    def test_foam_resolves_real_student_count(self, year_data):
+        foam = next((m for m in year_data.modules if m.name == "FOAM"), None)
+        assert foam is not None, "FOAM module missing from roster"
+        assert foam.student_count == 30
+
+    def test_foam_resolves_its_real_module_code(self, year_data):
+        foam = next(m for m in year_data.modules if m.name == "FOAM")
+        assert "COM00196M" in foam.student_count_by_code
+
+    def test_foam_marked_at_msc_rate(self, year_data):
+        """The recovered 'M' suffix must drive the marking level."""
+        foam = next(m for m in year_data.modules if m.name == "FOAM")
+        levels = _classify_marking_levels(foam)
+        assert len(levels) == 1
+        assert levels[0]["is_msc"] is True, "FOAM should mark at the MSc rate"
+
+
+class TestModuleExclusions:
+    """Modules whose work is credited elsewhere are excluded from teaching."""
+
+    @pytest.fixture(scope="class")
+    def year_data(self):
+        return dl.load_all_data(
+            data_dir=str(Path(__file__).parent.parent / "data"),
+            unknown_callback=None, category_callback=None,
+        )
+
+    def test_projects_module_excluded(self, year_data):
+        """'Projects' is credited via the Taught Project Coordinator admin role."""
+        assert not any(m.name == "Projects" for m in year_data.modules)
+
+    def test_exclusions_are_configured_not_hardcoded(self):
+        mapping = dl._load_module_mapping()
+        assert "Projects" in mapping.get("excluded_modules", {})
+        assert mapping["excluded_modules"]["Projects"].get("reason")
+
+    def test_other_modules_unaffected(self, year_data):
+        """Exclusion must remove only the named module."""
+        names = {m.name for m in year_data.modules}
+        assert {"HCIN", "SYS2", "SYS3", "FOAM"} <= names
+
+
 class TestInputValidation:
     """Validation guards on incoming data."""
 
