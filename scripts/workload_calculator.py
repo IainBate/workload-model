@@ -1235,6 +1235,90 @@ def _calculate_admin_workload(staff_member: StaffData, nominal_hours: float) -> 
     return total, breakdown, "; ".join(details) if details else "No administrative roles"
 
 
+def _apply_adjustments(staff_member: StaffData, calculated: Dict[str, float],
+                        missing_data: List[str]) -> tuple:
+    """Apply workload_adjustments.csv entries on top of calculated category totals.
+
+    Args:
+        staff_member: StaffData carrying the parsed adjustments (and any warnings
+            from malformed/incomplete adjustment rows) for this person.
+        calculated: {"teaching": teaching_hours, "research": research_total, "admin": admin_hours}
+            - the calculated totals before any manual adjustment.
+        missing_data: The in-progress missing_data list for this staff member -
+            conflicts, negative-result rejections, and file-level parse warnings
+            are appended to it directly (no guessed data - see CLAUDE.md).
+
+    Returns:
+        (adjusted_values, adjustments_breakdown) where:
+            - adjusted_values: dict with the same keys as `calculated`, replaced by the
+              adjusted total for any category that had an adjustment applied.
+            - adjustments_breakdown: {category: {"mode", "calculated_total",
+              "adjusted_total", "delta", "entries": (...)}} for categories that
+              actually got an adjustment applied (conflicts/rejections are NOT
+              included here - they show up only via missing_data).
+
+    Conflict (multiple absolutes, or absolute+delta mixed for one category) or a
+    result that would go negative -> apply nothing for that category, flag via
+    missing_data. Otherwise the adjustment becomes the new authoritative total for
+    that category, consumed by every downstream total (this function's caller
+    reassigns teaching_hours/research_total/admin_hours from the returned dict
+    before total_hours is summed, so nominal-hours comparison, department "Needs
+    Attention", and normative-split logic all automatically reflect adjustments).
+    """
+    for warning in staff_member.adjustment_warnings:
+        missing_data.append(f"Adjustment file: {warning}")
+
+    adjusted_values = dict(calculated)
+    adjustments_breakdown: Dict[str, Dict] = {}
+
+    by_category: Dict[str, List[AdjustmentRecord]] = {}
+    for adj in staff_member.adjustments:
+        by_category.setdefault(adj.category, []).append(adj)
+
+    for category, calculated_value in calculated.items():
+        entries = by_category.get(category, [])
+        if not entries:
+            continue
+
+        absolutes = [e for e in entries if e.mode == "absolute"]
+        deltas = [e for e in entries if e.mode == "delta"]
+
+        if len(absolutes) > 1 or (absolutes and deltas):
+            missing_data.append(
+                f"{category.title()} adjustment conflict: {len(absolutes)} absolute "
+                f"override(s) and {len(deltas)} delta(s) in workload_adjustments.csv - "
+                f"no adjustment applied; calculated value ({calculated_value:.1f}h) used.")
+            continue
+
+        if absolutes:
+            mode, adjusted_value, display_entries = "absolute", absolutes[0].value, absolutes
+        else:
+            mode = "delta"
+            adjusted_value = calculated_value + sum(e.value for e in deltas)
+            display_entries = deltas
+
+        if adjusted_value < 0:
+            missing_data.append(
+                f"{category.title()} adjustment would result in negative hours "
+                f"({adjusted_value:.1f}h) - no adjustment applied; calculated value "
+                f"({calculated_value:.1f}h) used instead.")
+            continue
+
+        adjusted_values[category] = adjusted_value
+        adjustments_breakdown[category] = {
+            "mode": mode,
+            "calculated_total": round(calculated_value, 2),
+            "adjusted_total": round(adjusted_value, 2),
+            "delta": round(adjusted_value - calculated_value, 2),
+            "entries": tuple(
+                {"mode": e.mode, "amount": e.value, "rationale": e.rationale, "source_row": e.source_row}
+                for e in display_entries
+            ),
+        }
+
+    return adjusted_values, adjustments_breakdown
+
+
 # --- Main Calculation ---
 
 def calculate_workload(year_data: YearData, validate_input: bool = True) -> List[WorkloadResult]:
