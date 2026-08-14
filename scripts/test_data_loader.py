@@ -15,10 +15,25 @@ import pytest
 SCRIPTS_DIR = Path(__file__).parent
 sys.path.insert(0, str(SCRIPTS_DIR))
 
+import csv
+
 import data_loader as dl  # noqa: E402
 import validation  # noqa: E402
-from data_loader import ModuleData, StaffData  # noqa: E402
+from data_loader import ModuleData, StaffData, AdjustmentRecord  # noqa: E402
 from workload_calculator import _classify_marking_levels  # noqa: E402
+
+
+def _write_adjustments_csv(path, rows):
+    """Write a workload_adjustments.csv with the standard header + given rows
+    (each row a dict keyed by column name; missing columns default to '')."""
+    header = ["Person", "Teaching Adjustment", "Teaching Rationale",
+              "Research Adjustment", "Research Rationale",
+              "Admin Adjustment", "Admin Rationale"]
+    with open(path, "w", newline="", encoding="utf-8") as f:
+        writer = csv.DictWriter(f, fieldnames=header)
+        writer.writeheader()
+        for row in rows:
+            writer.writerow({col: row.get(col, "") for col in header})
 
 
 class TestNameNormalization:
