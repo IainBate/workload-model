@@ -1285,6 +1285,21 @@ def load_all_data(data_dir: str = None,
     # Load current year WTW (data_dir is passed to load_wtw_files)
     modules, year_label = load_wtw_files(data_dir)
 
+    # Drop modules explicitly excluded from teaching workload. These are modules
+    # whose work is credited elsewhere (e.g. "Projects" is covered by the Taught
+    # Project Coordinator admin role), so counting them here would double-count.
+    # Configured in module_mapping.json rather than hardcoded.
+    excluded_modules = module_mapping.get("excluded_modules", {}) or {}
+    if excluded_modules:
+        kept = []
+        for module in modules:
+            if module.name in excluded_modules:
+                reason = excluded_modules[module.name].get("reason", "no reason recorded")
+                print(f"Excluding module '{module.name}' from teaching workload: {reason}")
+            else:
+                kept.append(module)
+        modules = kept
+
     # Mark new content on modules that appear in new_modules
     for module in modules:
         if module.name in new_modules:
