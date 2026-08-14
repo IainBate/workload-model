@@ -206,6 +206,10 @@ def validate_module_data(module) -> ValidationResult:
             f"to the module acronym",
             "codes", codes)
 
+    # Validate student count
+    student_count = getattr(module, 'student_count', 0)
+    result = result.merge(validatestudentcount(student_count))
+
     # The check that actually matters: is this module using a fabricated default
     # student count because no real numbers were found for it? That silently
     # skews marking hours for everyone teaching it.
@@ -216,10 +220,6 @@ def validate_module_data(module) -> ValidationResult:
             f"Student count is the default ({student_count}) - no real numbers found "
             f"for this module in CS Module Numbers.csv; marking hours are estimated",
             "student_count", student_count)
-
-    # Validate student count
-    student_count = getattr(module, 'student_count', 0)
-    result = result.merge(validatestudentcount(student_count))
 
     # Validate practicals if present
     practicals = getattr(module, 'practicals', 0)
