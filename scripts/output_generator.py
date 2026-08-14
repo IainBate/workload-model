@@ -1305,8 +1305,8 @@ def format_detail_section(r: WorkloadResult, title: str, hours: float, breakdown
                     'assessor': 'assessments'
                 }
                 display_name = display_names.get(phd_key, phd_key.replace('_', ' ').title())
-                unit_label = unit_labels.get(phd_key, 'items')
                 count = phd_value.get('count', 0)
+                unit_label = _pluralize(unit_labels.get(phd_key, 'items'), count)
                 rate = phd_value.get('rate', 0)
                 total = phd_value.get('total', 0)
                 items_html_parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;">
