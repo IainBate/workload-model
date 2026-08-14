@@ -38,6 +38,7 @@ from typing import Any, Dict, List, Optional
 from output_generator import (
     OUTPUT_DIR,
     _determine_lecturer_type,
+    _format_adjustment_items,
     _format_hours,
     _format_module_assessment_section,
     _format_module_delivery_section,
