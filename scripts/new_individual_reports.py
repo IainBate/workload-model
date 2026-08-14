@@ -251,6 +251,8 @@ def _format_teaching_section_sorted(
             </div>
         </div>""")
 
+    items_html_parts.extend(_format_adjustment_items(result, css_class))
+
     items_html = "".join(items_html_parts)
     return f"""<div class="section-card {css_class}">
         <div class="card-header">
