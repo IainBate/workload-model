@@ -465,10 +465,13 @@ class TestResearchWorkload:
         # supervision type (there is deliberately no flat 'phd_supervision'
         # total key - having both caused a double-counting bug historically).
         phd_students = breakdown.get("phd_students", {})
-        assert phd_students.get("supervision") == 2 * config.SUPERVISION_MULTIPLIERS["pgr_primary_supervisor_per_fte"]
-        assert phd_students.get("co_supervision") == 1 * config.SUPERVISION_MULTIPLIERS["pgr_co_supervisor_per_fte"]
-        assert phd_students.get("assessor") == 1 * config.SUPERVISION_MULTIPLIERS["pgr_assessor"]
-        assert sum(phd_students.values()) == expected_hours
+        assert phd_students.get("supervision", {}).get("count") == 2
+        assert phd_students.get("supervision", {}).get("total") == 2 * config.SUPERVISION_MULTIPLIERS["pgr_primary_supervisor_per_fte"]
+        assert phd_students.get("co_supervision", {}).get("count") == 1
+        assert phd_students.get("co_supervision", {}).get("total") == 1 * config.SUPERVISION_MULTIPLIERS["pgr_co_supervisor_per_fte"]
+        assert phd_students.get("assessor", {}).get("count") == 1
+        assert phd_students.get("assessor", {}).get("total") == 1 * config.SUPERVISION_MULTIPLIERS["pgr_assessor"]
+        assert sum(v["total"] for v in phd_students.values()) == expected_hours
         assert "phd_supervision" not in breakdown
 
     def test_grant_hours(self):
