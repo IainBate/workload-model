@@ -1081,9 +1081,9 @@ def _calculate_research_workload(staff_member: StaffData, assumptions: List[str]
                 {
                     "grants": {"grant_ABC": 164.2, "grant_XYZ": 82.1},
                     "phd_students": {
-                        "supervision": 240.0,
-                        "co_supervision": 144.0,
-                        "assessor": 32.0
+                        "supervision": {"count": 3, "rate": 80.0, "total": 240.0},
+                        "co_supervision": {"count": 3, "rate": 48.0, "total": 144.0},
+                        "assessor": {"count": 4, "rate": 8.0, "total": 32.0}
                     }
                 }
             - detail_string: Human-readable summary
