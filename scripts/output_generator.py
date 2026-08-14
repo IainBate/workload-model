@@ -669,6 +669,7 @@ def generate_html_report(results: List[WorkloadResult], year_data: YearData,
         ".normative-ok { background: #e8f5e9; color: #2e7d32; } "
         ".normative-warning { background: #fff3e0; color: #ef6c00; } "
         ".normative-over { background: #ffebee; color: #c62828; } "
+        ".manual-adj-badge { display: inline-block; padding: 3px 10px; border-radius: 4px; font-size: 0.75em; font-weight: bold; background: #fff8e1; color: #f57f17; border: 1px dashed #f9a825; white-space: nowrap; } "
         ".chart-container { background: white; padding: 24px; margin: 15px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); border-radius: 8px; } "
         ".chart-container img { max-width: 100%; height: auto; display: block; margin: 0 auto; } "
         ".legend { display: flex; gap: 24px; margin: 16px 0; font-size: 13px; flex-wrap: wrap; } "
