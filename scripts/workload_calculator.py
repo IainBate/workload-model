@@ -32,6 +32,7 @@ from data_loader import (
     ModuleData,
     StaffData,
     WorkloadResult,
+    AdjustmentRecord,
     SupervisionAllocation,
     allocate_supervision,
     normalize_name,
