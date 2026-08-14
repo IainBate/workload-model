@@ -1861,8 +1861,16 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
         # while keeping sum(breakdown.values()) == the category total in both delta and
         # absolute-override modes (delta = adjusted_total - calculated_total by
         # construction either way).
+        # Teaching is additive, not an overwrite: _aggregate_teaching_breakdown() may have
+        # already rolled a module-scoped adjustment's "manual_adjustment" leaf up into
+        # teaching_breakdown from teaching_module_breakdowns (via _TEACHING_MODULE_SUM_KEYS).
+        # Overwriting here would silently erase that module-scoped contribution whenever a
+        # category-wide (blank Teaching Module) adjustment also exists. This is a no-op
+        # (adds 0.0) for anyone without a module-scoped adjustment.
         if "teaching" in adjustments_breakdown:
-            teaching_breakdown["manual_adjustment"] = adjustments_breakdown["teaching"]["delta"]
+            teaching_breakdown["manual_adjustment"] = (
+                teaching_breakdown.get("manual_adjustment", 0.0) + adjustments_breakdown["teaching"]["delta"]
+            )
         if "research" in adjustments_breakdown:
             structured_research_breakdown["manual_adjustment"] = adjustments_breakdown["research"]["delta"]
         if "admin" in adjustments_breakdown:
