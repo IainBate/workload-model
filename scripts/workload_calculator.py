@@ -1258,8 +1258,19 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
     if validate_input:
         validation_result = run_validation_pipeline_input(year_data)
         if validation_result["has_warnings"]:
-            # Store warnings in assumptions for reporting
-            pass  # Warnings are captured in results, not raised as errors
+            # Surface input warnings on the console. They are additionally
+            # attached to the affected staff below (see estimated_student_modules)
+            # so they appear in the reports rather than being silently dropped.
+            for issue in validation_result["issues"]:
+                print(f"  Data warning: {issue.message}")
+
+    # Modules whose student numbers are a fabricated default rather than real
+    # data. Anyone teaching one has estimated marking hours, so this is recorded
+    # against them as missing data and shown in their report.
+    estimated_student_modules = {
+        m.name for m in year_data.modules
+        if m.student_count == config.DEFAULT_STUDENT_COUNT
+    }
 
     # Convert tuples to dicts for internal use (YearData is immutable at the container level)
     staff_dict = {s.canonical_name: s for s in year_data.staff}

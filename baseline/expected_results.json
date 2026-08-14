@@ -2620,17 +2620,17 @@
       },
       "research_hours": 246.3,
       "teaching_breakdown": {
-        "assessment_setting": 25.0,
+        "assessment_setting": 10.0,
         "drop_in": 0.0,
         "hw_lab": 0.0,
-        "marking": 77.6,
+        "marking": 37.6,
         "pastoral_supervision": 24,
         "practicals": 66.0,
         "project_supervision": 80,
         "supervision": 0.0,
-        "teaching": 73.3333
+        "teaching": 18.3333
       },
-      "teaching_hours": 345.9333,
+      "teaching_hours": 235.9333,
       "teaching_module_breakdowns": {
         "HCIN": {
           "assessment_setting": 10.0,
@@ -2689,50 +2689,9 @@
           "supervision": 0.0,
           "teaching": 18.3333,
           "total_lecture_hours": 22.0
-        },
-        "Projects": {
-          "assessment_setting": 15.0,
-          "delivery_structured": {
-            "base_per_teacher": 22.0,
-            "lecturer_type": "standard",
-            "lectures_per_week": 1.0,
-            "multiplier": 2.5,
-            "teacher_count": 1,
-            "total_lecture_hours": 22.0,
-            "week_count": 11
-          },
-          "drop_in": 0.0,
-          "hw_lab": 0.0,
-          "lecture_contact_hours": 22.0,
-          "marking": 40.0,
-          "marking_structured": {
-            "hours_per_teacher": 40.0,
-            "is_automated": false,
-            "levels": [
-              {
-                "label": null,
-                "main_hours": 33.3333,
-                "main_student_count": 100,
-                "rate_per_script": 0.3333,
-                "resit_hours": 6.6667,
-                "resit_student_count": 20.0,
-                "total_hours": 40.0
-              }
-            ],
-            "n_teachers": 1,
-            "total_hours": 40.0
-          },
-          "module_codes": [
-            "n/a"
-          ],
-          "online_content_dev": 0.0,
-          "practicals": 0.0,
-          "supervision": 0.0,
-          "teaching": 55.0,
-          "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 931.4333
+      "total_hours": 821.4333
     },
     "James Stovold": {
       "admin_breakdown": {
@@ -4978,14 +4937,14 @@
         "assessment_setting": 22.5,
         "drop_in": 0.0,
         "hw_lab": 0.0,
-        "marking": 48.5,
+        "marking": 37.5,
         "pastoral_supervision": 54,
         "practicals": 137.5,
         "project_supervision": 80,
         "supervision": 0.0,
         "teaching": 137.5
       },
-      "teaching_hours": 480.0,
+      "teaching_hours": 469.0,
       "teaching_module_breakdowns": {
         "ARIA": {
           "assessment_setting": 7.5,
@@ -5057,23 +5016,23 @@
           "drop_in": 0.0,
           "hw_lab": 0.0,
           "lecture_contact_hours": 11.0,
-          "marking": 20.0,
+          "marking": 9.0,
           "marking_structured": {
-            "hours_per_teacher": 20.0,
+            "hours_per_teacher": 9.0,
             "is_automated": false,
             "levels": [
               {
                 "label": null,
-                "main_hours": 33.3333,
-                "main_student_count": 100,
-                "rate_per_script": 0.3333,
-                "resit_hours": 6.6667,
-                "resit_student_count": 20.0,
-                "total_hours": 40.0
+                "main_hours": 15.0,
+                "main_student_count": 30,
+                "rate_per_script": 0.5,
+                "resit_hours": 3.0,
+                "resit_student_count": 6.0,
+                "total_hours": 18.0
               }
             ],
             "n_teachers": 2,
-            "total_hours": 40.0
+            "total_hours": 18.0
           },
           "module_codes": [
             "<new for one year>"
@@ -5164,7 +5123,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1119.4
+      "total_hours": 1108.4
     },
     "Phoebe": {
       "admin_breakdown": {
@@ -7238,14 +7197,14 @@
         "assessment_setting": 25.0,
         "drop_in": 0.0,
         "hw_lab": 0.0,
-        "marking": 82.0,
+        "marking": 71.0,
         "pastoral_supervision": 54,
         "practicals": 176.0,
         "project_supervision": 144,
         "supervision": 0.0,
         "teaching": 128.3333
       },
-      "teaching_hours": 609.3333,
+      "teaching_hours": 598.3333,
       "teaching_module_breakdowns": {
         "ARIA": {
           "assessment_setting": 7.5,
@@ -7375,23 +7334,23 @@
           "drop_in": 0.0,
           "hw_lab": 0.0,
           "lecture_contact_hours": 11.0,
-          "marking": 20.0,
+          "marking": 9.0,
           "marking_structured": {
-            "hours_per_teacher": 20.0,
+            "hours_per_teacher": 9.0,
             "is_automated": false,
             "levels": [
               {
                 "label": null,
-                "main_hours": 33.3333,
-                "main_student_count": 100,
-                "rate_per_script": 0.3333,
-                "resit_hours": 6.6667,
-                "resit_student_count": 20.0,
-                "total_hours": 40.0
+                "main_hours": 15.0,
+                "main_student_count": 30,
+                "rate_per_script": 0.5,
+                "resit_hours": 3.0,
+                "resit_student_count": 6.0,
+                "total_hours": 18.0
               }
             ],
             "n_teachers": 2,
-            "total_hours": 40.0
+            "total_hours": 18.0
           },
           "module_codes": [
             "<new for one year>"
@@ -7417,7 +7376,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1312.7333
+      "total_hours": 1301.7333
     },
     "Vasileios Vasilakis": {
       "admin_breakdown": {

@@ -170,7 +170,8 @@ class TestPlaceholderCodeFallback:
     """
 
     @pytest.fixture(scope="class")
-    def year_data(self):
+    @classmethod
+    def year_data(cls):
         return dl.load_all_data(
             data_dir=str(Path(__file__).parent.parent / "data"),
             unknown_callback=None, category_callback=None,
@@ -197,7 +198,8 @@ class TestModuleExclusions:
     """Modules whose work is credited elsewhere are excluded from teaching."""
 
     @pytest.fixture(scope="class")
-    def year_data(self):
+    @classmethod
+    def year_data(cls):
         return dl.load_all_data(
             data_dir=str(Path(__file__).parent.parent / "data"),
             unknown_callback=None, category_callback=None,

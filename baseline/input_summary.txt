@@ -2,7 +2,7 @@ Workload Model Baseline Generation Summary
 ==================================================
 
 Year: 2026-7
-Modules: 39
+Modules: 38
 Staff: 56
 
 Modules:
@@ -31,7 +31,6 @@ Modules:
   - NLPG (COM00069H) [20cr, Stage 3] - Dimitar, Adrian
   - PLEI (COM00065H) [20cr, Stage 3] - Alena, Jo I
   - PRAD (COM00195M) [20cr, Stage 3] - Carlo, Joe
-  - Projects (n/a) [40cr, Stage 3] - Jacob
   - QUAL (COM00058H) [20cr, Stage 3] - Jen, Jo I
   - QUCO (COM00042H) [20cr, Stage 3] - Sam B, Stefano
   - ROCS (COM00066H) [20cr, Stage 3] - Yan, Will
