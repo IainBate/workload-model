@@ -1593,6 +1593,19 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
         if not staff.roles:
             missing_data.append("No administrative roles assigned")
 
+        # Flag estimated marking hours for anyone teaching a module with no real
+        # student numbers, so the report says so rather than presenting the
+        # default count as fact.
+        taught_estimated = sorted(
+            estimated_student_modules
+            & set(staff_teaching.get(canonical_name, {}).get("teaching_module_breakdowns", {}))
+        )
+        for module_name in taught_estimated:
+            missing_data.append(
+                f"{module_name}: no student numbers in CS Module Numbers.csv - "
+                f"marking hours estimated from a default of {config.DEFAULT_STUDENT_COUNT} students"
+            )
+
         # Add assumptions from validation
         validation_info = getattr(year_data, 'validation_info', {})
         if validation_info.get('has_warnings'):
