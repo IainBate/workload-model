@@ -186,7 +186,9 @@ def _format_teaching_section_sorted(
         total = 0.0
         for mod in modules_in_stage:
             mb = mod.get("module_breakdown", {})
-            for key in ["teaching", "practicals", "assessment_setting", "marking"]:
+            # 'manual_adjustment' included so this total agrees with the module-scoped
+            # "Manual adjustment" line item rendered above it whenever one is present.
+            for key in ["teaching", "practicals", "assessment_setting", "marking", "manual_adjustment"]:
                 if key in mb and isinstance(mb[key], (int, float)):
                     total += mb[key]
         return total
