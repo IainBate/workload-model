@@ -77,6 +77,7 @@ The immutable DTO passed from calculator to output. Contains all pre-computed nu
 | Research grant allocation | `_calculate_research_grants()` in `workload_calculator.py` | `research_breakdown['grant_X']` per grant |
 | PhD supervision (primary) | `_calculate_research_workload()` — 80h/FTE | `research_breakdown['primary_supervisor']` |
 | Admin role percentage | `_calculate_admin_workload()` in `workload_calculator.py` | `admin_breakdown[role_name]` |
+| Manual adjustment (override/delta) | `_apply_adjustments()` in `workload_calculator.py` — reads `StaffData.adjustments`, parsed from `workload_adjustments.csv` by `_load_adjustments()` in `data_loader.py` | `WorkloadResult.adjustments_breakdown[category]`; folded into `teaching_hours`/`research_hours`/`admin_hours` before `total_hours` is summed, so it's the new authoritative total, not a footnote |
 
 **Consumer rule:** If you need a number for display that isn't already on `WorkloadResult` or its breakdown dicts, add a field to the breakdown in `workload_calculator.py` and populate it there — never compute it in an output/report file, and never parse it back out of a display string.
 
