@@ -26,7 +26,7 @@ from workload_calculator import _classify_marking_levels  # noqa: E402
 def _write_adjustments_csv(path, rows):
     """Write a workload_adjustments.csv with the standard header + given rows
     (each row a dict keyed by column name; missing columns default to '')."""
-    header = ["Person", "Teaching Adjustment", "Teaching Rationale",
+    header = ["Person", "Teaching Module", "Teaching Adjustment", "Teaching Rationale",
               "Research Adjustment", "Research Rationale",
               "Admin Adjustment", "Admin Rationale"]
     with open(path, "w", newline="", encoding="utf-8") as f:
