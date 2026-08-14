@@ -92,6 +92,14 @@ Currently assumes manual marking unless specified otherwise.
 ### Supervision Defaults
 Based on current project parameters, each teacher accounts for 20 pastoral and 10 project students (scaled by the multiplier).
 
+### Manual Workload Adjustments
+`data/workload_adjustments.csv` lets a human apply a rationale-carrying delta (`+N`/`-N`) or
+absolute override (`SET N`) to a person's Teaching/Research/Admin total, for cases the model
+doesn't capture. A category with both an override and a delta (or two overrides) isn't guessed at
+— nothing is applied and it's flagged instead. Every run of `main.py` auto-appends a blank row for
+any active staff member missing from the file (never touching existing rows) — see the root
+`CLAUDE.md`'s "Manual Workload Adjustments" section for the full grammar and display behavior.
+
 ## Development & Execution
 
 ### Running the Calculator
