@@ -821,6 +821,10 @@ def generate_html_report(results: List[WorkloadResult], year_data: YearData,
             # Normative comparison computed once, by the shared helper, so this
             # table and the per-staff reports classify deviation identically.
             "deviations": reporting_helpers.category_deviations(r),
+            # A person can be simultaneously on-target AND manually adjusted -
+            # kept as its own column rather than folded into normative_indicator
+            # so one signal never hides the other.
+            "has_adjustment": bool(r.adjustments_breakdown),
         })
 
     html += """
