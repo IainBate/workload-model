@@ -1034,12 +1034,17 @@ def _load_adjustments(filepath: str = "workload_adjustments.csv"):
         reader = csv.DictReader(f)
         for row_num, row in enumerate(reader, start=2):  # row 1 = header
             person = (row.get("Person") or "").strip()
+            row_module = (row.get("Teaching Module") or "").strip()
             any_cell_filled = any((row.get(c) or "").strip()
                                    for cols in column_map.values() for c in cols)
             if not person:
                 if any_cell_filled:
                     unattributed.append(f"row {row_num}: adjustment data present but Person is blank - row skipped.")
                 continue
+
+            if row_module and not (row.get("Teaching Adjustment") or "").strip():
+                warnings_by_name.setdefault(person, []).append(
+                    f"row {row_num}: Teaching Module '{row_module}' specified but Teaching Adjustment is blank - ignored.")
 
             for category, (adj_col, rat_col) in column_map.items():
                 cell = (row.get(adj_col) or "").strip()
@@ -1059,6 +1064,7 @@ def _load_adjustments(filepath: str = "workload_adjustments.csv"):
                 adjustments.setdefault(person, []).append(AdjustmentRecord(
                     category=category, mode=mode, value=value, rationale=rationale,
                     source_row=row_num, raw_person=person,
+                    module=row_module if category == "teaching" else "",
                 ))
     return adjustments, warnings_by_name, unattributed
 
