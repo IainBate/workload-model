@@ -460,6 +460,7 @@ def generate_excel_with_formulas(results: List[WorkloadResult], year_data: YearD
         'I': 30,  # Admin Detail
         'J': 25,  # Assumptions
         'K': 25,  # Missing Data
+        'L': 35,  # Manual Adjustments
     }
 
     for col, width in column_widths.items():
