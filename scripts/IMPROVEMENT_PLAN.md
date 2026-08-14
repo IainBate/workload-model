@@ -519,8 +519,12 @@ It genuinely earns its keep as a safety net — it allowed a clean recovery twic
 
 **Recommended, in order of value:**
 
-1. **`git add -A` → `git add -u`** (one word). Stages only already-tracked files, so generated
-   output, lock files and anything untracked stay out. Keeps the whole safety benefit.
+1. **`git add -A` → `git add -u`** — **applied 2026-08-14.** Stages only already-tracked files, so
+   generated output, lock files and anything untracked stay out. Keeps the whole safety benefit.
+   The guard was changed too: `git status --porcelain | grep -q .` also counts *untracked* files,
+   so with `-u` it would have passed while nothing was staged and left `git commit` failing
+   silently on every edit. It now tests staged content directly with
+   `! git diff --cached --quiet`.
 2. **Squash before pushing.** 221 unpushed auto-commits would be noisy on a shared remote. Squash
    to the 26 meaningful ones, or a handful of themed commits.
 3. **Optional — snapshot instead of commit.** Writing to a side ref (or `git stash create` plus a
