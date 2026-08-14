@@ -1730,7 +1730,7 @@ def _format_teaching_section_for_staff(result: WorkloadResult, title: str, hours
             <div style="margin-left:20px;">
                 <div class="detail-item teaching-item">
                     <span class="detail-name">Students</span>
-                    <span class="detail-hours">{past_students_total} students x {config.SUPERVISION_MULTIPLIERS['pastoral']}h each = {past_hours_total:.1f}h</span>
+                    <span class="detail-hours">{past_students_total} {_pluralize('students', past_students_total)} x {config.SUPERVISION_MULTIPLIERS['pastoral']}h each = {past_hours_total:.1f}h</span>
                     <span class="detail-activity teaching-activity"></span>
                 </div>
             </div>
@@ -1747,7 +1747,7 @@ def _format_teaching_section_for_staff(result: WorkloadResult, title: str, hours
             <div style="margin-left:20px;">
                 <div class="detail-item teaching-item">
                     <span class="detail-name">Projects</span>
-                    <span class="detail-hours">{proj_projects_total} projects x {proj_level} = {proj_hours_total:.1f}h</span>
+                    <span class="detail-hours">{proj_projects_total} {_pluralize('projects', proj_projects_total)} x {proj_level} = {proj_hours_total:.1f}h</span>
                     <span class="detail-activity teaching-activity"></span>
                 </div>
             </div>
