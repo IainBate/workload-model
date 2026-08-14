@@ -460,9 +460,15 @@ def validate_workload_result(result, tolerance: float = 0.1) -> List[ValidationI
                 # Direct numeric value
                 result.append(v)
             elif isinstance(v, dict) and is_research:
-                # For research: grants and phd_students are nested but contain actual hours
-                # Recursively extract from these structure keys
-                result.extend(get_numeric_values(v, is_research=True))
+                # For research: grants and phd_students are nested but contain actual hours.
+                # A nested dict with a 'total' key (e.g. phd_students['supervision']) is a
+                # structured breakdown for display, not a bag of parts to sum - use its
+                # total directly, matching the convention in workload_calculator.py's
+                # _sum_breakdown_dict().
+                if "total" in v and isinstance(v["total"], (int, float)) and not isinstance(v["total"], bool):
+                    result.append(v["total"])
+                else:
+                    result.extend(get_numeric_values(v, is_research=True))
             elif isinstance(v, dict) and not is_research:
                 # For teaching/admin: skip nested dicts (they're metadata like pastoral_breakdown)
                 pass
