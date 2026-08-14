@@ -1339,6 +1339,8 @@ def format_detail_section(r: WorkloadResult, title: str, hours: float, breakdown
                     <span class="detail-activity {css_class.replace('-item', '-') + 'activity'}"></span>
                 </div>""")
 
+    items_html_parts.extend(_format_adjustment_items(r, css_class))
+
     items_html = ''.join(items_html_parts)
 
     return f"""<div class="section-card {css_class}">
