@@ -1341,6 +1341,13 @@ def load_all_data(data_dir: str = None,
         for code in module.codes:
             if code in merged_student_counts:
                 total_students += merged_student_counts[code]
+        # Fall back to the module acronym when no code matched. Some WTW rows
+        # carry a placeholder code (e.g. FOAM's "<new for one year>") but the
+        # module still has real student numbers recorded under its acronym -
+        # without this they would silently use DEFAULT_STUDENT_COUNT. Mirrors
+        # the acronym fallback already used for assessment counts below.
+        if total_students == 0 and module.name in merged_student_counts:
+            total_students = merged_student_counts[module.name]
         if total_students > 0:
             module.student_count = total_students
 
