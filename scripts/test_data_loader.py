@@ -285,3 +285,175 @@ class TestSupervisionAllocation:
         assert alloc.project_loads["A"] == 3
         assert alloc.pastoral_students["B"] == 0
         assert alloc.project_loads["B"] == 0
+
+
+class TestAdjustmentParsing:
+    """workload_adjustments.csv cell grammar and loader (_parse_adjustment_cell,
+    _load_adjustments)."""
+
+    # --- Cell grammar ---
+
+    @pytest.mark.parametrize("cell,expected_value", [
+        ("+100", 100.0),
+        ("-50", -50.0),
+        ("12.5", 12.5),
+        ("0", 0.0),
+    ])
+    def test_delta_forms_accepted(self, cell, expected_value):
+        mode, value = dl._parse_adjustment_cell(cell)
+        assert mode == "delta"
+        assert value == expected_value
+
+    @pytest.mark.parametrize("cell", [
+        "SET 250", "set 250", "Set 250", "SET   250", "  SET 250  ", "SET -10",
+    ])
+    def test_absolute_forms_accepted(self, cell):
+        mode, value = dl._parse_adjustment_cell(cell)
+        assert mode == "absolute"
+
+    def test_absolute_value_parsed_correctly(self):
+        mode, value = dl._parse_adjustment_cell("SET 250")
+        assert (mode, value) == ("absolute", 250.0)
+
+    def test_leading_equals_sign_rejected(self):
+        """Regression guard: '=250' must NOT be treated as an absolute override.
+        Excel/Sheets evaluates a leading '=' as a formula and drops it on CSV
+        re-save, which would make absolute overrides indistinguishable from
+        deltas after a spreadsheet round-trip - so it must be rejected outright,
+        not silently reinterpreted as anything."""
+        with pytest.raises(ValueError):
+            dl._parse_adjustment_cell("=250")
+
+    @pytest.mark.parametrize("cell", [
+        "abc", "SET", "SET abc", "N/A", "TBD", "++5", "SET SET 5", "",
+    ])
+    def test_other_malformed_cells_rejected(self, cell):
+        with pytest.raises(ValueError):
+            dl._parse_adjustment_cell(cell)
+
+    # --- File loader ---
+
+    def test_missing_file_returns_empty(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        result = dl._load_adjustments()
+        assert result == ({}, {}, [])
+
+    def test_stacking_rows_same_person_spelling(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        _write_adjustments_csv(tmp_path / "workload_adjustments.csv", [
+            {"Person": "Test Person", "Teaching Adjustment": "+10",
+             "Teaching Rationale": "extra marking"},
+            {"Person": "Test Person", "Teaching Adjustment": "+5",
+             "Teaching Rationale": "extra cover"},
+        ])
+        adjustments, warnings, unattributed = dl._load_adjustments()
+        assert unattributed == []
+        assert warnings == {}
+        records = adjustments["Test Person"]
+        assert len(records) == 2
+        assert all(isinstance(r, AdjustmentRecord) for r in records)
+        assert [r.value for r in records] == [10.0, 5.0]
+        assert [r.source_row for r in records] == [2, 3]
+
+    def test_rationale_blank_rejected(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        _write_adjustments_csv(tmp_path / "workload_adjustments.csv", [
+            {"Person": "Test Person", "Teaching Adjustment": "+10",
+             "Teaching Rationale": ""},
+        ])
+        adjustments, warnings, unattributed = dl._load_adjustments()
+        assert adjustments == {}
+        assert "Test Person" in warnings
+        assert "no rationale" in warnings["Test Person"][0]
+
+    def test_malformed_cell_produces_warning_not_record(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        _write_adjustments_csv(tmp_path / "workload_adjustments.csv", [
+            {"Person": "Test Person", "Research Adjustment": "=250",
+             "Research Rationale": "grant admin"},
+        ])
+        adjustments, warnings, unattributed = dl._load_adjustments()
+        assert adjustments == {}
+        assert "Test Person" in warnings
+        assert "not a valid adjustment" in warnings["Test Person"][0]
+
+    def test_blank_person_with_data_is_unattributed(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        _write_adjustments_csv(tmp_path / "workload_adjustments.csv", [
+            {"Person": "", "Admin Adjustment": "+5", "Admin Rationale": "extra committee work"},
+        ])
+        adjustments, warnings, unattributed = dl._load_adjustments()
+        assert adjustments == {}
+        assert warnings == {}
+        assert len(unattributed) == 1
+        assert "Person is blank" in unattributed[0]
+
+    def test_blank_row_entirely_skipped_silently(self, tmp_path, monkeypatch):
+        """A row with a blank Person AND no adjustment data (e.g. a stray blank
+        CSV line) should not be flagged at all."""
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        _write_adjustments_csv(tmp_path / "workload_adjustments.csv", [
+            {"Person": "", "Teaching Adjustment": "", "Teaching Rationale": ""},
+        ])
+        adjustments, warnings, unattributed = dl._load_adjustments()
+        assert (adjustments, warnings, unattributed) == ({}, {}, [])
+
+    def test_multiple_categories_on_one_row(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        _write_adjustments_csv(tmp_path / "workload_adjustments.csv", [
+            {"Person": "Test Person",
+             "Teaching Adjustment": "SET 100", "Teaching Rationale": "ENG1 unconventional",
+             "Admin Adjustment": "+20", "Admin Rationale": "extra committee work"},
+        ])
+        adjustments, warnings, unattributed = dl._load_adjustments()
+        records = adjustments["Test Person"]
+        categories = {r.category: r for r in records}
+        assert categories["teaching"].mode == "absolute"
+        assert categories["teaching"].value == 100.0
+        assert categories["admin"].mode == "delta"
+        assert categories["admin"].value == 20.0
+
+
+class TestAdjustmentDeduplicationMerge:
+    """_deduplicate_staff() must not drop adjustments/adjustment_warnings when
+    merging duplicate-name entries - it rebuilds StaffData from an explicit
+    field list with no catch-all, so a forgotten field silently vanishes for
+    anyone whose record gets merged (e.g. 'Chris CB' / 'Christopher Crispin-Bailey',
+    a real alias pair already in staff_name_lookup.json)."""
+
+    def test_merge_preserves_adjustments_from_both_entries(self):
+        mappings = {
+            "Christopher Crispin-Bailey": ["Chris CB", "Christopher", "Christopher Crispin-Bailey"],
+        }
+        adj_a = AdjustmentRecord(category="teaching", mode="delta", value=10.0,
+                                  rationale="cover", source_row=2, raw_person="Chris CB")
+        adj_b = AdjustmentRecord(category="research", mode="absolute", value=200.0,
+                                  rationale="override", source_row=3,
+                                  raw_person="Christopher Crispin-Bailey")
+
+        staff = {
+            "Chris CB": StaffData(canonical_name="Chris CB", fte=1.0,
+                                   adjustments=(adj_a,),
+                                   adjustment_warnings=("warn A",)),
+            "Christopher Crispin-Bailey": StaffData(
+                canonical_name="Christopher Crispin-Bailey", fte=1.0,
+                adjustments=(adj_b,),
+                adjustment_warnings=("warn B",)),
+        }
+
+        merged = dl._deduplicate_staff(staff, mappings)
+        assert len(merged) == 1
+        result = merged["Christopher Crispin-Bailey"]
+        assert set(result.adjustments) == {adj_a, adj_b}
+        assert set(result.adjustment_warnings) == {"warn A", "warn B"}
+
+    def test_merge_single_entry_group_keeps_adjustments_untouched(self):
+        """A canonical name with only one contributing entry (no merge needed)
+        must pass its adjustments through unchanged (entries[0][1] path)."""
+        adj = AdjustmentRecord(category="admin", mode="delta", value=5.0,
+                                rationale="extra", source_row=2, raw_person="Solo Person")
+        staff = {
+            "Solo Person": StaffData(canonical_name="Solo Person", fte=1.0, adjustments=(adj,)),
+        }
+        merged = dl._deduplicate_staff(staff, mappings={})
+        assert merged["Solo Person"].adjustments == (adj,)
