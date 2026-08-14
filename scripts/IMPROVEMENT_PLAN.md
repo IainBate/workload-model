@@ -444,21 +444,47 @@ regression it was written for.
 
 ## What's left, in order
 
-**All planned work is complete.** Sections A, B, C, D and E are done; every query has been
-resolved. Test suite: **161 passing, 0 failing** (from 43 passing / 4 failing at the start).
+**All originally-planned work (Sections A-E) is complete**, and further feature work has landed
+since (see "Post-plan feature work" below). Test suite as of 2026-08-14: **229 passing, 0
+failing** (from 43 passing / 4 failing at the start of this plan).
 
-### Test suite composition
+### Test suite composition (2026-08-14)
 
 | File | Tests | Covers |
 |---|---|---|
-| `test_workload_calculator.py` | 30 | Pre-existing calculation unit tests |
-| `test_reporting_helpers.py` | 41 | Shared comparison logic, department stats, needs-attention (D7, E2) |
-| `test_data_loader.py` | 29 | Name normalization, H/M merging, category resolution, validation (B6) |
+| `test_workload_calculator.py` | 67 | Calculation unit tests, incl. `TestManualAdjustments`/`TestApplyAdjustmentsDirect`/`TestFormatAdjustmentItems` |
+| `test_data_loader.py` | 71 | Name normalization, H/M merging, category resolution, validation (B6), `TestAdjustmentParsing`, `TestSyncAdjustmentNames` |
+| `test_reporting_helpers.py` | 42 | Shared comparison logic, department stats, needs-attention (D7, E2) |
 | `test_integration.py` | 19 | Full pipeline, artifacts, Excel, charts (B4, B8, B11) |
 | `test_invariants.py` | 11 | Hypothesis property tests (B9) |
 | `test_calculation_baseline.py` | 7 | Calculation regression vs JSON baseline (B1) |
 | `test_format_baseline.py` | 7 | Display-format regression vs HTML baseline (B2) |
 | `test_practical_display.py` | 5 | Practical-session display semantics |
+
+## Post-plan feature work (2026-08-14)
+
+Landed after this plan's original scope was declared complete:
+
+- **PhD supervision display uniformity** — `phd_students` breakdown entries changed from flat
+  hours floats to `{count, rate, total}` structured dicts (matching the `pastoral_breakdown`/
+  `project_breakdown` convention), so the report can show "N students × Rh each = Th" instead of
+  a bare hours number, consistent with Pastoral/Project Supervision. Uncovered and fixed a latent
+  bug in `validation.py`'s research-breakdown sum check as a proximate consequence.
+- **Manual Workload Adjustments** — new `data/workload_adjustments.csv` lets a human apply a
+  rationale-carrying delta or absolute override to a person's Teaching/Research/Admin total. See
+  the root `CLAUDE.md`'s "Manual Workload Adjustments" section for the full design (grammar,
+  conflict rules, display). `data/workload_adjustments.csv` is auto-synced with a blank row per
+  active staff member on every run (`sync_adjustment_names()`), strictly additive.
+- **Supervision-line pluralization fix** — "1 students"/"1 assessments" now correctly singularize
+  to "1 student"/"1 assessment" across Pastoral/Project/PhD Supervision (`_pluralize()` helper in
+  `output_generator.py`).
+- **Housekeeping** — removed `Remedial_Actions.md` (a 645-line architecture-migration proposal
+  that was never implemented), `docs/archive/` (six planning docs superseded by this file),
+  `output_test/` (a stray manual-test-run snapshot), and `scripts/MEMORY.md` (a broken index to
+  three nonexistent files). Confirmed `pastoral_load.csv` and `Project and Pastoral Group Loads -
+  Loadings.csv` are NOT redundant despite superficially overlapping content — their pastoral
+  numbers diverge substantially for 39 of 45 shared staff, and `pastoral_load.csv` is the sole
+  source for 9 staff absent from the Loadings file — both are kept, `pastoral_load.csv` preferred.
 
 ## Follow-up decisions (2026-08-14)
 
