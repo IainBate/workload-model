@@ -836,7 +836,7 @@ def generate_html_report(results: List[WorkloadResult], year_data: YearData,
                     <tr>
                         <th>Name</th><th>Category</th><th>FTE</th><th>Total</th>
                         <th>Teaching</th><th>Research</th><th>Admin</th>
-                        <th>Normative Comparison</th>
+                        <th>Normative Comparison</th><th>Manual Adj.</th>
                     </tr>
                 </thead>
                 <tbody>
