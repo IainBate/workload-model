@@ -414,6 +414,171 @@ class TestAdjustmentParsing:
         assert categories["admin"].value == 20.0
 
 
+def _make_year_data(staff_list, mappings=None):
+    """Build a minimal YearData with a real reverse_lookup for sync_adjustment_names
+    tests, without going through the full load_all_data() pipeline."""
+    mappings = mappings or {}
+    reverse_lookup, _ = dl._build_reverse_lookup(mappings)
+    return dl.YearData(
+        year_label="2026-7",
+        modules=(),
+        student_counts={},
+        assessment_counts={},
+        staff=tuple(staff_list),
+        known_lecturers=frozenset(),
+        known_lecturers_per_module={},
+        reverse_lookup=reverse_lookup,
+        canonical_lookup=mappings,
+    )
+
+
+class TestSyncAdjustmentNames:
+    """sync_adjustment_names() - additive, idempotent housekeeping that keeps
+    workload_adjustments.csv covering every active staff member."""
+
+    def test_missing_file_creates_header_and_all_active_staff(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        year_data = _make_year_data([
+            StaffData(canonical_name="Bob Brown", active=True),
+            StaffData(canonical_name="Alice Adams", active=True),
+        ])
+        path = tmp_path / "workload_adjustments.csv"
+        assert not path.exists()
+
+        added = dl.sync_adjustment_names(year_data)
+
+        assert added == ("Alice Adams", "Bob Brown")
+        assert path.exists()
+        with open(path, "r", newline="", encoding="utf-8") as f:
+            rows = list(csv.reader(f))
+        assert rows[0] == dl._ADJUSTMENTS_HEADER
+        assert rows[1] == ["Alice Adams", "", "", "", "", "", ""]
+        assert rows[2] == ["Bob Brown", "", "", "", "", "", ""]
+        assert len(rows) == 3
+
+    def test_all_covered_is_a_true_no_op(self, tmp_path, monkeypatch):
+        """When every active staff member is already present, the file must be
+        left completely untouched - not just 'no crash', byte-identical."""
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        year_data = _make_year_data([
+            StaffData(canonical_name="Alice Adams", active=True),
+            StaffData(canonical_name="Bob Brown", active=True),
+        ])
+        path = tmp_path / "workload_adjustments.csv"
+        _write_adjustments_csv(path, [
+            {"Person": "Alice Adams"},
+            {"Person": "Bob Brown"},
+        ])
+        before_bytes = path.read_bytes()
+        before_mtime = path.stat().st_mtime_ns
+
+        added = dl.sync_adjustment_names(year_data)
+
+        assert added == ()
+        assert path.read_bytes() == before_bytes
+        assert path.stat().st_mtime_ns == before_mtime
+
+    def test_partial_coverage_appends_only_missing_and_preserves_prefix(self, tmp_path, monkeypatch):
+        """Covers an alias spelling (not the exact canonical string) resolving
+        via normalize_name, plus a genuinely missing person."""
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        mappings = {
+            "Christopher Crispin-Bailey": ["Chris CB", "Christopher", "Christopher Crispin-Bailey"],
+        }
+        year_data = _make_year_data([
+            StaffData(canonical_name="Christopher Crispin-Bailey", active=True),
+            StaffData(canonical_name="Zara Zeta", active=True),
+        ], mappings=mappings)
+        path = tmp_path / "workload_adjustments.csv"
+        _write_adjustments_csv(path, [
+            {"Person": "Chris CB"},  # alias spelling, not the canonical string
+        ])
+        before_content = path.read_text(encoding="utf-8")
+
+        added = dl.sync_adjustment_names(year_data)
+
+        assert added == ("Zara Zeta",)
+        after_content = path.read_text(encoding="utf-8")
+        assert after_content.startswith(before_content)
+        assert "Zara Zeta" in after_content
+        assert after_content.count("Christopher") == 0  # not duplicated under canonical spelling
+
+    def test_existing_real_adjustment_data_preserved_exactly(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        year_data = _make_year_data([
+            StaffData(canonical_name="Alice Adams", active=True),
+            StaffData(canonical_name="Bob Brown", active=True),
+        ])
+        path = tmp_path / "workload_adjustments.csv"
+        _write_adjustments_csv(path, [
+            {"Person": "Alice Adams", "Teaching Adjustment": "+10",
+             "Teaching Rationale": "extra marking cover"},
+        ])
+        before_content = path.read_text(encoding="utf-8")
+
+        added = dl.sync_adjustment_names(year_data)
+
+        assert added == ("Bob Brown",)
+        after_content = path.read_text(encoding="utf-8")
+        assert after_content.startswith(before_content)
+        # The Alice row itself, not just some prefix, is untouched.
+        rows = list(csv.reader(after_content.splitlines()))
+        alice_row = next(r for r in rows if r and r[0] == "Alice Adams")
+        assert alice_row == ["Alice Adams", "+10", "extra marking cover", "", "", "", ""]
+
+    def test_inactive_staff_never_added(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        year_data = _make_year_data([
+            StaffData(canonical_name="Alice Adams", active=True),
+            StaffData(canonical_name="Retired Rachel", active=False),
+        ])
+        path = tmp_path / "workload_adjustments.csv"
+
+        added = dl.sync_adjustment_names(year_data)
+
+        assert added == ("Alice Adams",)
+        content = path.read_text(encoding="utf-8")
+        assert "Retired Rachel" not in content
+
+    def test_two_consecutive_calls_second_is_a_no_op(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        year_data = _make_year_data([
+            StaffData(canonical_name="Alice Adams", active=True),
+            StaffData(canonical_name="Bob Brown", active=True),
+        ])
+
+        first = dl.sync_adjustment_names(year_data)
+        assert first == ("Alice Adams", "Bob Brown")
+
+        path = tmp_path / "workload_adjustments.csv"
+        after_first = path.read_bytes()
+
+        second = dl.sync_adjustment_names(year_data)
+        assert second == ()
+        assert path.read_bytes() == after_first
+
+    def test_stale_unresolvable_person_cell_does_not_crash_or_duplicate(self, tmp_path, monkeypatch):
+        """A Person cell that doesn't match anyone via normalize_name (e.g. a
+        typo/former spelling) must not crash sync, and must not cause a second
+        row to be appended for the staff member it might actually refer to."""
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        year_data = _make_year_data([
+            StaffData(canonical_name="Alice Adams", active=True),
+        ])
+        path = tmp_path / "workload_adjustments.csv"
+        _write_adjustments_csv(path, [
+            {"Person": "Alicia Adamz"},  # stale/unresolvable spelling, unrelated to any alias
+        ])
+
+        added = dl.sync_adjustment_names(year_data)
+
+        # Best-effort heuristic: the unresolved raw spelling is treated as
+        # already "covering" someone, so no canonical-named row is appended.
+        assert added == ()
+        content = path.read_text(encoding="utf-8")
+        assert content.count("Alice Adams") == 0
+
+
 class TestAdjustmentDeduplicationMerge:
     """_deduplicate_staff() must not drop adjustments/adjustment_warnings when
     merging duplicate-name entries - it rebuilds StaffData from an explicit
