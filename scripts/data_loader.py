@@ -651,6 +651,27 @@ def _load_student_counts(filepath: str = "CS Module Numbers.csv") -> Dict[str, i
     return counts
 
 
+def _load_codes_by_acronym(filepath: str = "CS Module Numbers.csv") -> Dict[str, List[str]]:
+    """Map module acronym -> real module code(s) from CS Module Numbers.csv.
+
+    Needed because a WTW row may carry a placeholder code (e.g. FOAM's
+    "<new for one year>") which hides the real code - and the code's H/M suffix
+    is what decides whether marking uses the UG or MSc rate.
+    """
+    path = DATA_DIR / filepath
+    if not path.exists():
+        return {}
+
+    by_acronym: Dict[str, List[str]] = {}
+    with open(path, "r", encoding="utf-8-sig") as f:
+        for row in csv.DictReader(f):
+            code = row.get("Module Code", "").strip()
+            acronym = row.get("Acronym", "").strip()
+            if code and acronym:
+                by_acronym.setdefault(acronym, []).append(code)
+    return by_acronym
+
+
 def _load_assessment_counts(filepath: str = "CS Module Assessment Numbers.csv") -> Dict[str, int]:
     """Load assessment counts from CS Module Assessment Numbers.csv. Returns {module_code: count}."""
     path = DATA_DIR / filepath
