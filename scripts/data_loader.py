@@ -1622,6 +1622,8 @@ def load_all_data(data_dir: str = None,
         fte_info = _find_data(raw_name, canonical, fte_data)
         pt_info = _find_data(raw_name, canonical, part_time_data)
         art_ts_category = _find_data(raw_name, canonical, art_ts_data)
+        adj_records = _find_all_matches(raw_name, canonical, adjustments_data)
+        adj_warnings = _find_all_matches(raw_name, canonical, adjustment_warnings)
 
         # Assign roles from WAW (apply name mapping to resolve WAW→YAML differences)
         staff_roles = []
