@@ -29,8 +29,16 @@
       "research_breakdown": {
         "grants": {},
         "phd_students": {
-          "assessor": 8,
-          "supervision": 240
+          "assessor": {
+            "count": 1,
+            "rate": 8,
+            "total": 8
+          },
+          "supervision": {
+            "count": 3,
+            "rate": 80,
+            "total": 240
+          }
         },
         "protected_research_baseline": 164.2
       },
@@ -137,9 +145,21 @@
       "research_breakdown": {
         "grants": {},
         "phd_students": {
-          "assessor": 8,
-          "co_supervision": 192,
-          "supervision": 80
+          "assessor": {
+            "count": 1,
+            "rate": 8,
+            "total": 8
+          },
+          "co_supervision": {
+            "count": 4,
+            "rate": 48,
+            "total": 192
+          },
+          "supervision": {
+            "count": 1,
+            "rate": 80,
+            "total": 80
+          }
         },
         "protected_research_baseline": 164.2
       },
@@ -308,8 +328,16 @@
       "research_breakdown": {
         "grants": {},
         "phd_students": {
-          "assessor": 8,
-          "co_supervision": 96
+          "assessor": {
+            "count": 1,
+            "rate": 8,
+            "total": 8
+          },
+          "co_supervision": {
+            "count": 2,
+            "rate": 48,
+            "total": 96
+          }
         },
         "protected_research_baseline": 164.2
       },
@@ -630,8 +658,16 @@
           "grant_4792719": 164.2
         },
         "phd_students": {
-          "assessor": 8,
-          "co_supervision": 144
+          "assessor": {
+            "count": 1,
+            "rate": 8,
+            "total": 8
+          },
+          "co_supervision": {
+            "count": 3,
+            "rate": 48,
+            "total": 144
+          }
         },
         "protected_research_baseline": 164.2
       },
@@ -803,8 +839,16 @@
       "research_breakdown": {
         "grants": {},
         "phd_students": {
-          "assessor": 24,
-          "supervision": 80
+          "assessor": {
+            "count": 3,
+            "rate": 8,
+            "total": 24
+          },
+          "supervision": {
+            "count": 1,
+            "rate": 80,
+            "total": 80
+          }
         },
         "protected_research_baseline": 164.2
       },
@@ -1253,8 +1297,16 @@
       "research_breakdown": {
         "grants": {},
         "phd_students": {
-          "assessor": 16,
-          "co_supervision": 96
+          "assessor": {
+            "count": 2,
+            "rate": 8,
+            "total": 16
+          },
+          "co_supervision": {
+            "count": 2,
+            "rate": 48,
+            "total": 96
+          }
         },
         "protected_research_baseline": 164.2
       },
@@ -1367,8 +1419,16 @@
           "grant_4963830": 82.1
         },
         "phd_students": {
-          "assessor": 24,
-          "co_supervision": 96
+          "assessor": {
+            "count": 3,
+            "rate": 8,
+            "total": 24
+          },
+          "co_supervision": {
+            "count": 2,
+            "rate": 48,
+            "total": 96
+          }
         },
         "protected_research_baseline": 164.2
       },
@@ -1726,8 +1786,16 @@
       "research_breakdown": {
         "grants": {},
         "phd_students": {
-          "assessor": 16,
-          "supervision": 80
+          "assessor": {
+            "count": 2,
+            "rate": 8,
+            "total": 16
+          },
+          "supervision": {
+            "count": 1,
+            "rate": 80,
+            "total": 80
+          }
         },
         "protected_research_baseline": 164.2
       },
@@ -1876,9 +1944,21 @@
       "research_breakdown": {
         "grants": {},
         "phd_students": {
-          "assessor": 8,
-          "co_supervision": 48,
-          "supervision": 400
+          "assessor": {
+            "count": 1,
+            "rate": 8,
+            "total": 8
+          },
+          "co_supervision": {
+            "count": 1,
+            "rate": 48,
+            "total": 48
+          },
+          "supervision": {
+            "count": 5,
+            "rate": 80,
+            "total": 400
+          }
         },
         "protected_research_baseline": 164.2
       },
@@ -1986,9 +2066,21 @@
           "grant_5021919": 82.1
         },
         "phd_students": {
-          "assessor": 8,
-          "co_supervision": 288,
-          "supervision": 80
+          "assessor": {
+            "count": 1,
+            "rate": 8,
+            "total": 8
+          },
+          "co_supervision": {
+            "count": 6,
+            "rate": 48,
+            "total": 288
+          },
+          "supervision": {
+            "count": 1,
+            "rate": 80,
+            "total": 80
+          }
         },
         "protected_research_baseline": 164.2
       },
@@ -2259,7 +2351,11 @@
       "research_breakdown": {
         "grants": {},
         "phd_students": {
-          "co_supervision": 48
+          "co_supervision": {
+            "count": 1,
+            "rate": 48,
+            "total": 48
+          }
         },
         "protected_research_baseline": 164.2
       },
@@ -2371,8 +2467,16 @@
           "grant_5834943": 1313.6
         },
         "phd_students": {
-          "assessor": 40,
-          "co_supervision": 96
+          "assessor": {
+            "count": 5,
+            "rate": 8,
+            "total": 40
+          },
+          "co_supervision": {
+            "count": 2,
+            "rate": 48,
+            "total": 96
+          }
         },
         "protected_research_baseline": 164.2
       },
@@ -2472,8 +2576,16 @@
           "grant_2590694": 328.4
         },
         "phd_students": {
-          "assessor": 16,
-          "supervision": 80
+          "assessor": {
+            "count": 2,
+            "rate": 8,
+            "total": 16
+          },
+          "supervision": {
+            "count": 1,
+            "rate": 80,
+            "total": 80
+          }
         },
         "protected_research_baseline": 164.2
       },
@@ -2505,9 +2617,21 @@
       "research_breakdown": {
         "grants": {},
         "phd_students": {
-          "assessor": 8,
-          "co_supervision": 96,
-          "supervision": 80
+          "assessor": {
+            "count": 1,
+            "rate": 8,
+            "total": 8
+          },
+          "co_supervision": {
+            "count": 2,
+            "rate": 48,
+            "total": 96
+          },
+          "supervision": {
+            "count": 1,
+            "rate": 80,
+            "total": 80
+          }
         },
         "protected_research_baseline": 164.2
       },
@@ -2904,9 +3028,21 @@
           "grant_IGGI_PROJECT_002": 328.4
         },
         "phd_students": {
-          "assessor": 40,
-          "co_supervision": 144,
-          "supervision": 160
+          "assessor": {
+            "count": 5,
+            "rate": 8,
+            "total": 40
+          },
+          "co_supervision": {
+            "count": 3,
+            "rate": 48,
+            "total": 144
+          },
+          "supervision": {
+            "count": 2,
+            "rate": 80,
+            "total": 160
+          }
         },
         "protected_research_baseline": 164.2
       },
@@ -3012,8 +3148,16 @@
       "research_breakdown": {
         "grants": {},
         "phd_students": {
-          "assessor": 24,
-          "co_supervision": 144
+          "assessor": {
+            "count": 3,
+            "rate": 8,
+            "total": 24
+          },
+          "co_supervision": {
+            "count": 3,
+            "rate": 48,
+            "total": 144
+          }
         },
         "protected_research_baseline": 164.2
       },
@@ -3194,8 +3338,16 @@
       "research_breakdown": {
         "grants": {},
         "phd_students": {
-          "assessor": 40,
-          "co_supervision": 144
+          "assessor": {
+            "count": 5,
+            "rate": 8,
+            "total": 40
+          },
+          "co_supervision": {
+            "count": 3,
+            "rate": 48,
+            "total": 144
+          }
         },
         "protected_research_baseline": 164.2
       },
@@ -3373,8 +3525,16 @@
       "research_breakdown": {
         "grants": {},
         "phd_students": {
-          "assessor": 16,
-          "co_supervision": 48
+          "assessor": {
+            "count": 2,
+            "rate": 8,
+            "total": 16
+          },
+          "co_supervision": {
+            "count": 1,
+            "rate": 48,
+            "total": 48
+          }
         },
         "protected_research_baseline": 164.2
       },
@@ -3536,7 +3696,11 @@
       "research_breakdown": {
         "grants": {},
         "phd_students": {
-          "co_supervision": 48
+          "co_supervision": {
+            "count": 1,
+            "rate": 48,
+            "total": 48
+          }
         },
         "protected_research_baseline": 164.2
       },
@@ -3710,9 +3874,21 @@
       "research_breakdown": {
         "grants": {},
         "phd_students": {
-          "assessor": 16,
-          "co_supervision": 96,
-          "supervision": 80
+          "assessor": {
+            "count": 2,
+            "rate": 8,
+            "total": 16
+          },
+          "co_supervision": {
+            "count": 2,
+            "rate": 48,
+            "total": 96
+          },
+          "supervision": {
+            "count": 1,
+            "rate": 80,
+            "total": 80
+          }
         },
         "protected_research_baseline": 164.2
       },
@@ -3879,8 +4055,16 @@
           "grant_4792719": 164.2
         },
         "phd_students": {
-          "assessor": 8,
-          "co_supervision": 48
+          "assessor": {
+            "count": 1,
+            "rate": 8,
+            "total": 8
+          },
+          "co_supervision": {
+            "count": 1,
+            "rate": 48,
+            "total": 48
+          }
         },
         "protected_research_baseline": 164.2
       },
@@ -4371,9 +4555,21 @@
       "research_breakdown": {
         "grants": {},
         "phd_students": {
-          "assessor": 40,
-          "co_supervision": 144,
-          "supervision": 80
+          "assessor": {
+            "count": 5,
+            "rate": 8,
+            "total": 40
+          },
+          "co_supervision": {
+            "count": 3,
+            "rate": 48,
+            "total": 144
+          },
+          "supervision": {
+            "count": 1,
+            "rate": 80,
+            "total": 80
+          }
         },
         "protected_research_baseline": 164.2
       },
@@ -4483,9 +4679,21 @@
           "grant_IGGI_PROJECT_001": 328.4
         },
         "phd_students": {
-          "assessor": 56,
-          "co_supervision": 144,
-          "supervision": 320
+          "assessor": {
+            "count": 7,
+            "rate": 8,
+            "total": 56
+          },
+          "co_supervision": {
+            "count": 3,
+            "rate": 48,
+            "total": 144
+          },
+          "supervision": {
+            "count": 4,
+            "rate": 80,
+            "total": 320
+          }
         },
         "protected_research_baseline": 164.2
       },
@@ -4652,8 +4860,16 @@
           "grant_5042890": 328.4
         },
         "phd_students": {
-          "assessor": 8,
-          "co_supervision": 144
+          "assessor": {
+            "count": 1,
+            "rate": 8,
+            "total": 8
+          },
+          "co_supervision": {
+            "count": 3,
+            "rate": 48,
+            "total": 144
+          }
         },
         "protected_research_baseline": 164.2
       },
@@ -4829,9 +5045,21 @@
           "grant_5983081": 82.1
         },
         "phd_students": {
-          "assessor": 16,
-          "co_supervision": 96,
-          "supervision": 80
+          "assessor": {
+            "count": 2,
+            "rate": 8,
+            "total": 16
+          },
+          "co_supervision": {
+            "count": 2,
+            "rate": 48,
+            "total": 96
+          },
+          "supervision": {
+            "count": 1,
+            "rate": 80,
+            "total": 80
+          }
         },
         "protected_research_baseline": 164.2
       },
@@ -4939,8 +5167,16 @@
       "research_breakdown": {
         "grants": {},
         "phd_students": {
-          "assessor": 40,
-          "co_supervision": 96
+          "assessor": {
+            "count": 5,
+            "rate": 8,
+            "total": 40
+          },
+          "co_supervision": {
+            "count": 2,
+            "rate": 48,
+            "total": 96
+          }
         },
         "protected_research_baseline": 164.2
       },
@@ -5199,9 +5435,21 @@
           "grant_5967567": 82.1
         },
         "phd_students": {
-          "assessor": 8,
-          "co_supervision": 288,
-          "supervision": 160
+          "assessor": {
+            "count": 1,
+            "rate": 8,
+            "total": 8
+          },
+          "co_supervision": {
+            "count": 6,
+            "rate": 48,
+            "total": 288
+          },
+          "supervision": {
+            "count": 2,
+            "rate": 80,
+            "total": 160
+          }
         },
         "protected_research_baseline": 164.2
       },
@@ -5308,8 +5556,16 @@
       "research_breakdown": {
         "grants": {},
         "phd_students": {
-          "assessor": 16,
-          "co_supervision": 48
+          "assessor": {
+            "count": 2,
+            "rate": 8,
+            "total": 16
+          },
+          "co_supervision": {
+            "count": 1,
+            "rate": 48,
+            "total": 48
+          }
         },
         "protected_research_baseline": 164.2
       },
@@ -5478,9 +5734,21 @@
           "grant_5876296": 164.2
         },
         "phd_students": {
-          "assessor": 24,
-          "co_supervision": 240,
-          "supervision": 80
+          "assessor": {
+            "count": 3,
+            "rate": 8,
+            "total": 24
+          },
+          "co_supervision": {
+            "count": 5,
+            "rate": 48,
+            "total": 240
+          },
+          "supervision": {
+            "count": 1,
+            "rate": 80,
+            "total": 80
+          }
         },
         "protected_research_baseline": 164.2
       },
@@ -5585,8 +5853,16 @@
           "grant_3874036": 82.1
         },
         "phd_students": {
-          "assessor": 8,
-          "co_supervision": 144
+          "assessor": {
+            "count": 1,
+            "rate": 8,
+            "total": 8
+          },
+          "co_supervision": {
+            "count": 3,
+            "rate": 48,
+            "total": 144
+          }
         },
         "protected_research_baseline": 164.2
       },
@@ -5864,8 +6140,16 @@
       "research_breakdown": {
         "grants": {},
         "phd_students": {
-          "assessor": 8,
-          "co_supervision": 96
+          "assessor": {
+            "count": 1,
+            "rate": 8,
+            "total": 8
+          },
+          "co_supervision": {
+            "count": 2,
+            "rate": 48,
+            "total": 96
+          }
         },
         "protected_research_baseline": 164.2
       },
@@ -6263,9 +6547,21 @@
           "grant_4748293": 82.1
         },
         "phd_students": {
-          "assessor": 8,
-          "co_supervision": 144,
-          "supervision": 80
+          "assessor": {
+            "count": 1,
+            "rate": 8,
+            "total": 8
+          },
+          "co_supervision": {
+            "count": 3,
+            "rate": 48,
+            "total": 144
+          },
+          "supervision": {
+            "count": 1,
+            "rate": 80,
+            "total": 80
+          }
         },
         "protected_research_baseline": 164.2
       },
@@ -6440,8 +6736,16 @@
       "research_breakdown": {
         "grants": {},
         "phd_students": {
-          "assessor": 16,
-          "co_supervision": 96
+          "assessor": {
+            "count": 2,
+            "rate": 8,
+            "total": 16
+          },
+          "co_supervision": {
+            "count": 2,
+            "rate": 48,
+            "total": 96
+          }
         },
         "protected_research_baseline": 164.2
       },
@@ -6779,9 +7083,21 @@
           "grant_3984461": 164.2
         },
         "phd_students": {
-          "assessor": 16,
-          "co_supervision": 96,
-          "supervision": 80
+          "assessor": {
+            "count": 2,
+            "rate": 8,
+            "total": 16
+          },
+          "co_supervision": {
+            "count": 2,
+            "rate": 48,
+            "total": 96
+          },
+          "supervision": {
+            "count": 1,
+            "rate": 80,
+            "total": 80
+          }
         },
         "protected_research_baseline": 164.2
       },
@@ -6894,8 +7210,16 @@
       "research_breakdown": {
         "grants": {},
         "phd_students": {
-          "co_supervision": 48,
-          "supervision": 240
+          "co_supervision": {
+            "count": 1,
+            "rate": 48,
+            "total": 48
+          },
+          "supervision": {
+            "count": 3,
+            "rate": 80,
+            "total": 240
+          }
         },
         "protected_research_baseline": 164.2
       },
@@ -7013,8 +7337,16 @@
           "grant_2590694": 82.1
         },
         "phd_students": {
-          "assessor": 8,
-          "co_supervision": 96
+          "assessor": {
+            "count": 1,
+            "rate": 8,
+            "total": 8
+          },
+          "co_supervision": {
+            "count": 2,
+            "rate": 48,
+            "total": 96
+          }
         },
         "protected_research_baseline": 164.2
       },
@@ -7202,9 +7534,21 @@
       "research_breakdown": {
         "grants": {},
         "phd_students": {
-          "assessor": 24,
-          "co_supervision": 96,
-          "supervision": 80
+          "assessor": {
+            "count": 3,
+            "rate": 8,
+            "total": 24
+          },
+          "co_supervision": {
+            "count": 2,
+            "rate": 48,
+            "total": 96
+          },
+          "supervision": {
+            "count": 1,
+            "rate": 80,
+            "total": 80
+          }
         },
         "protected_research_baseline": 164.2
       },
@@ -7421,9 +7765,21 @@
       "research_breakdown": {
         "grants": {},
         "phd_students": {
-          "assessor": 16,
-          "co_supervision": 96,
-          "supervision": 80
+          "assessor": {
+            "count": 2,
+            "rate": 8,
+            "total": 16
+          },
+          "co_supervision": {
+            "count": 2,
+            "rate": 48,
+            "total": 96
+          },
+          "supervision": {
+            "count": 1,
+            "rate": 80,
+            "total": 80
+          }
         },
         "protected_research_baseline": 164.2
       },
@@ -7540,9 +7896,21 @@
       "research_breakdown": {
         "grants": {},
         "phd_students": {
-          "assessor": 48,
-          "co_supervision": 144,
-          "supervision": 320
+          "assessor": {
+            "count": 6,
+            "rate": 8,
+            "total": 48
+          },
+          "co_supervision": {
+            "count": 3,
+            "rate": 48,
+            "total": 144
+          },
+          "supervision": {
+            "count": 4,
+            "rate": 80,
+            "total": 320
+          }
         },
         "protected_research_baseline": 164.2
       },
@@ -7726,7 +8094,11 @@
       "research_breakdown": {
         "grants": {},
         "phd_students": {
-          "supervision": 80
+          "supervision": {
+            "count": 1,
+            "rate": 80,
+            "total": 80
+          }
         },
         "protected_research_baseline": 164.2
       },
@@ -7887,8 +8259,16 @@
           "grant_4726550": 164.2
         },
         "phd_students": {
-          "assessor": 16,
-          "co_supervision": 48
+          "assessor": {
+            "count": 2,
+            "rate": 8,
+            "total": 16
+          },
+          "co_supervision": {
+            "count": 1,
+            "rate": 48,
+            "total": 48
+          }
         },
         "protected_research_baseline": 164.2
       },
@@ -8003,7 +8383,11 @@
       "research_breakdown": {
         "grants": {},
         "phd_students": {
-          "assessor": 16
+          "assessor": {
+            "count": 2,
+            "rate": 8,
+            "total": 16
+          }
         },
         "protected_research_baseline": 164.2
       },
