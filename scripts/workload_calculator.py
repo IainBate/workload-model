@@ -1123,7 +1123,11 @@ def _calculate_research_workload(staff_member: StaffData, assumptions: List[str]
         co_count = staff_member.phd_co_supervisions
         co_hours = co_count * config.SUPERVISION_MULTIPLIERS["pgr_co_supervisor_per_fte"]
         phd_hours += co_hours
-        phd_breakdown["co_supervision"] = co_hours
+        phd_breakdown["co_supervision"] = {
+            "count": co_count,
+            "rate": config.SUPERVISION_MULTIPLIERS["pgr_co_supervisor_per_fte"],
+            "total": round(co_hours, 2)
+        }
         phd_details.append(f"{co_count}x part-time PhD student × {config.SUPERVISION_MULTIPLIERS['pgr_co_supervisor_per_fte']}h/FTE")
 
     # TAP assessor work (assessor for PhD students)
