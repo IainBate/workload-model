@@ -452,8 +452,8 @@ class TestSyncAdjustmentNames:
         with open(path, "r", newline="", encoding="utf-8") as f:
             rows = list(csv.reader(f))
         assert rows[0] == dl._ADJUSTMENTS_HEADER
-        assert rows[1] == ["Alice Adams", "", "", "", "", "", ""]
-        assert rows[2] == ["Bob Brown", "", "", "", "", "", ""]
+        assert rows[1] == ["Alice Adams", "", "", "", "", "", "", ""]
+        assert rows[2] == ["Bob Brown", "", "", "", "", "", "", ""]
         assert len(rows) == 3
 
     def test_all_covered_is_a_true_no_op(self, tmp_path, monkeypatch):
