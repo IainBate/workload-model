@@ -558,25 +558,33 @@ class TestSyncAdjustmentNames:
         assert path.read_bytes() == after_first
 
     def test_stale_unresolvable_person_cell_does_not_crash_or_duplicate(self, tmp_path, monkeypatch):
-        """A Person cell that doesn't match anyone via normalize_name (e.g. a
-        typo/former spelling) must not crash sync, and must not cause a second
-        row to be appended for the staff member it might actually refer to."""
+        """A Person cell that normalize_name cannot resolve at all (returns None
+        - e.g. a stale placeholder left in the sheet) must not crash sync. The
+        row is left exactly as-is (never rewritten), and running sync again
+        afterwards must not pile up a second copy of whatever got appended."""
         monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
         year_data = _make_year_data([
             StaffData(canonical_name="Alice Adams", active=True),
         ])
         path = tmp_path / "workload_adjustments.csv"
         _write_adjustments_csv(path, [
-            {"Person": "Alicia Adamz"},  # stale/unresolvable spelling, unrelated to any alias
+            {"Person": "TBD"},  # unresolvable placeholder -> normalize_name returns None
         ])
+        before_content = path.read_text(encoding="utf-8")
 
         added = dl.sync_adjustment_names(year_data)
 
-        # Best-effort heuristic: the unresolved raw spelling is treated as
-        # already "covering" someone, so no canonical-named row is appended.
-        assert added == ()
-        content = path.read_text(encoding="utf-8")
-        assert content.count("Alice Adams") == 0
+        # Alice Adams is genuinely missing (the "TBD" row covers no one in
+        # particular), so she gets appended; the stale row is untouched.
+        assert added == ("Alice Adams",)
+        after_content = path.read_text(encoding="utf-8")
+        assert after_content.startswith(before_content)
+        assert after_content.count("TBD") == 1
+
+        # Idempotent: a second run must not re-add or duplicate anything.
+        second = dl.sync_adjustment_names(year_data)
+        assert second == ()
+        assert path.read_text(encoding="utf-8") == after_content
 
 
 class TestAdjustmentDeduplicationMerge:
