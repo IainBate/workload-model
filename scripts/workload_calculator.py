@@ -1675,6 +1675,19 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
         # Administration
         admin_hours, admin_breakdown, admin_detail = _calculate_admin_workload(staff, nominal_hours)
 
+        # Apply module-scoped Teaching adjustments (Teaching Module column filled in
+        # workload_adjustments.csv) first, mutating this person's raw per-module breakdown
+        # dicts in place - the same dict object teaching_module_breakdowns is built from
+        # below, so the mutation is automatically visible everywhere downstream. Must run
+        # before _apply_adjustments() below, which now skips these entries (they're handled
+        # here instead) and only applies category-wide (blank Teaching Module) adjustments.
+        module_adjustment_total = _apply_teaching_module_adjustments(
+            staff,
+            staff_teaching.get(canonical_name, {}).get("teaching_module_breakdowns", {}),
+            missing_data,
+        )
+        teaching_hours += module_adjustment_total
+
         # Apply manual workload adjustments (data/workload_adjustments.csv), if any,
         # on top of the calculated category totals. This is the ONLY place adjustments
         # are applied - reassigning here means every downstream consumer (nominal-hours
