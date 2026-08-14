@@ -1203,5 +1203,252 @@ class TestHoDFallbackRegression:
         assert "Committee Chair" in john_result.admin_detail
 
 
+def _calc_single(staff_member: StaffData):
+    """Run the full calculate_workload() pipeline for one staff member with no
+    modules, so teaching_hours starts at 0.0 and research/admin are just the
+    protected baseline / service-points floor. Returns the single WorkloadResult."""
+    year_data = YearData.create(
+        year_label="2026-7",
+        modules=[],
+        student_counts={},
+        assessment_counts={},
+        staff={staff_member.canonical_name: staff_member},
+        known_lecturers=set(),
+        known_lecturers_per_module={}
+    )
+    results = calculate_workload(year_data, validate_input=False)
+    assert len(results) == 1
+    return results[0]
+
+
+def _base_staff(canonical_name="Adj Test Person", **overrides):
+    """A minimal StaffData with zero teaching/research/admin activity beyond the
+    protected research baseline and admin service points, so any change after
+    adding adjustments is attributable purely to the adjustment."""
+    defaults = dict(
+        canonical_name=canonical_name, fte=1.0, roles=(), phd_supervisions=0,
+        phd_co_supervisions=0, phd_assessor_count=0, research_projects=(),
+        saint_modules=(), pastoral_students=0, project_load=0, active=True,
+    )
+    defaults.update(overrides)
+    return StaffData(**defaults)
+
+
+class TestManualAdjustments:
+    """workload_adjustments.csv application via _apply_adjustments() and its
+    two call sites inside calculate_workload()."""
+
+    HOURS_ATTR = {"teaching": "teaching_hours", "research": "research_hours", "admin": "admin_hours"}
+
+    @pytest.mark.parametrize("category", ["teaching", "research", "admin"])
+    def test_single_delta_increases_category_and_total(self, category):
+        baseline = _calc_single(_base_staff())
+        calculated_value = getattr(baseline, self.HOURS_ATTR[category])
+
+        adj = AdjustmentRecord(category=category, mode="delta", value=25.0,
+                                rationale="extra work", source_row=2, raw_person="Adj Test Person")
+        adjusted = _calc_single(_base_staff(adjustments=(adj,)))
+
+        assert getattr(adjusted, self.HOURS_ATTR[category]) == pytest.approx(calculated_value + 25.0)
+        assert adjusted.total_hours == pytest.approx(baseline.total_hours + 25.0)
+        assert adjusted.adjustments_breakdown[category]["mode"] == "delta"
+        assert adjusted.adjustments_breakdown[category]["delta"] == pytest.approx(25.0)
+
+    @pytest.mark.parametrize("category", ["teaching", "research", "admin"])
+    def test_multiple_deltas_summed(self, category):
+        baseline = _calc_single(_base_staff())
+        calculated_value = getattr(baseline, self.HOURS_ATTR[category])
+
+        adjs = (
+            AdjustmentRecord(category=category, mode="delta", value=10.0,
+                              rationale="a", source_row=2, raw_person="Adj Test Person"),
+            AdjustmentRecord(category=category, mode="delta", value=-3.0,
+                              rationale="b", source_row=3, raw_person="Adj Test Person"),
+        )
+        adjusted = _calc_single(_base_staff(adjustments=adjs))
+
+        assert getattr(adjusted, self.HOURS_ATTR[category]) == pytest.approx(calculated_value + 7.0)
+        assert adjusted.adjustments_breakdown[category]["delta"] == pytest.approx(7.0)
+        assert len(adjusted.adjustments_breakdown[category]["entries"]) == 2
+
+    @pytest.mark.parametrize("category", ["teaching", "research", "admin"])
+    def test_absolute_override_replaces_total_keeps_breakdown_visible(self, category):
+        baseline = _calc_single(_base_staff())
+        calculated_value = getattr(baseline, self.HOURS_ATTR[category])
+        baseline_breakdown = getattr(baseline, f"{category}_breakdown")
+
+        adj = AdjustmentRecord(category=category, mode="absolute", value=999.0,
+                                rationale="override for testing", source_row=2,
+                                raw_person="Adj Test Person")
+        adjusted = _calc_single(_base_staff(adjustments=(adj,)))
+
+        assert getattr(adjusted, self.HOURS_ATTR[category]) == pytest.approx(999.0)
+        assert adjusted.total_hours == pytest.approx(baseline.total_hours - calculated_value + 999.0)
+
+        info = adjusted.adjustments_breakdown[category]
+        assert info["mode"] == "absolute"
+        assert info["calculated_total"] == pytest.approx(calculated_value)
+        assert info["adjusted_total"] == pytest.approx(999.0)
+        assert info["delta"] == pytest.approx(999.0 - calculated_value)
+
+        # Calculated sub-items (e.g. admin's engagement/personal_development,
+        # research's protected_research_baseline) remain visible untouched,
+        # alongside the new manual_adjustment reconciliation key.
+        adjusted_breakdown = getattr(adjusted, f"{category}_breakdown")
+        for key, value in baseline_breakdown.items():
+            assert adjusted_breakdown.get(key) == value
+        assert adjusted_breakdown["manual_adjustment"] == pytest.approx(info["delta"])
+
+        # sum(breakdown.values()) == category total still holds (numeric leaves only).
+        numeric_sum = sum(v for v in adjusted_breakdown.values() if isinstance(v, (int, float)))
+        assert numeric_sum == pytest.approx(getattr(adjusted, self.HOURS_ATTR[category]), abs=0.05)
+
+    @pytest.mark.parametrize("category", ["teaching", "research", "admin"])
+    def test_absolute_and_delta_conflict_applies_nothing(self, category):
+        baseline = _calc_single(_base_staff())
+        calculated_value = getattr(baseline, self.HOURS_ATTR[category])
+
+        adjs = (
+            AdjustmentRecord(category=category, mode="absolute", value=500.0,
+                              rationale="override", source_row=2, raw_person="Adj Test Person"),
+            AdjustmentRecord(category=category, mode="delta", value=10.0,
+                              rationale="delta", source_row=3, raw_person="Adj Test Person"),
+        )
+        adjusted = _calc_single(_base_staff(adjustments=adjs))
+
+        assert getattr(adjusted, self.HOURS_ATTR[category]) == pytest.approx(calculated_value)
+        assert category not in adjusted.adjustments_breakdown
+        assert any("conflict" in m.lower() for m in adjusted.missing_data)
+
+    @pytest.mark.parametrize("category", ["teaching", "research", "admin"])
+    def test_two_absolutes_conflict_applies_nothing(self, category):
+        baseline = _calc_single(_base_staff())
+        calculated_value = getattr(baseline, self.HOURS_ATTR[category])
+
+        adjs = (
+            AdjustmentRecord(category=category, mode="absolute", value=500.0,
+                              rationale="override 1", source_row=2, raw_person="Adj Test Person"),
+            AdjustmentRecord(category=category, mode="absolute", value=600.0,
+                              rationale="override 2", source_row=3, raw_person="Adj Test Person"),
+        )
+        adjusted = _calc_single(_base_staff(adjustments=adjs))
+
+        assert getattr(adjusted, self.HOURS_ATTR[category]) == pytest.approx(calculated_value)
+        assert category not in adjusted.adjustments_breakdown
+        assert any("conflict" in m.lower() for m in adjusted.missing_data)
+
+    @pytest.mark.parametrize("category", ["teaching", "research", "admin"])
+    def test_negative_result_rejected(self, category):
+        baseline = _calc_single(_base_staff())
+        calculated_value = getattr(baseline, self.HOURS_ATTR[category])
+
+        adj = AdjustmentRecord(category=category, mode="delta", value=-(calculated_value + 1000.0),
+                                rationale="huge negative delta", source_row=2,
+                                raw_person="Adj Test Person")
+        adjusted = _calc_single(_base_staff(adjustments=(adj,)))
+
+        assert getattr(adjusted, self.HOURS_ATTR[category]) == pytest.approx(calculated_value)
+        assert category not in adjusted.adjustments_breakdown
+        assert any("negative" in m.lower() for m in adjusted.missing_data)
+
+    def test_no_adjustments_leaves_result_unaffected(self):
+        result = _calc_single(_base_staff())
+        assert result.adjustments_breakdown == {}
+        assert result.total_hours == pytest.approx(
+            result.teaching_hours + result.research_hours + result.admin_hours)
+
+    def test_adjustment_warnings_surface_in_missing_data(self):
+        staff = _base_staff(adjustment_warnings=("row 5: malformed cell - not applied.",))
+        result = _calc_single(staff)
+        assert any("row 5: malformed cell" in m for m in result.missing_data)
+
+
+class TestApplyAdjustmentsDirect:
+    """Direct unit tests of _apply_adjustments() itself, isolated from the full
+    calculate_workload() pipeline."""
+
+    def test_returns_calculated_values_unchanged_when_no_adjustments(self):
+        staff = _base_staff()
+        calculated = {"teaching": 100.0, "research": 200.0, "admin": 50.0}
+        missing_data = []
+        adjusted, breakdown = _apply_adjustments(staff, calculated, missing_data)
+        assert adjusted == calculated
+        assert breakdown == {}
+        assert missing_data == []
+
+    def test_delta_and_absolute_independent_across_categories(self):
+        staff = _base_staff(adjustments=(
+            AdjustmentRecord(category="teaching", mode="delta", value=15.0,
+                              rationale="a", source_row=2, raw_person="X"),
+            AdjustmentRecord(category="admin", mode="absolute", value=40.0,
+                              rationale="b", source_row=3, raw_person="X"),
+        ))
+        calculated = {"teaching": 100.0, "research": 200.0, "admin": 50.0}
+        missing_data = []
+        adjusted, breakdown = _apply_adjustments(staff, calculated, missing_data)
+        assert adjusted == {"teaching": 115.0, "research": 200.0, "admin": 40.0}
+        assert breakdown["teaching"]["mode"] == "delta"
+        assert breakdown["admin"]["mode"] == "absolute"
+        assert "research" not in breakdown
+        assert missing_data == []
+
+
+class TestFormatAdjustmentItems:
+    """_format_adjustment_items() (output_generator.py) - pure rendering of
+    already-computed adjustments_breakdown data. No arithmetic, text only."""
+
+    def test_delta_renders_amount_and_rationale(self):
+        from output_generator import _format_adjustment_items
+
+        class FakeResult:
+            adjustments_breakdown = {
+                "admin": {
+                    "mode": "delta",
+                    "calculated_total": 175.0,
+                    "adjusted_total": 200.0,
+                    "delta": 25.0,
+                    "entries": ({"mode": "delta", "amount": 25.0,
+                                 "rationale": "extra committee work", "source_row": 2},),
+                }
+            }
+
+        html_parts = _format_adjustment_items(FakeResult(), "admin-item")
+        assert len(html_parts) == 1
+        assert "+25.0h" in html_parts[0]
+        assert "Rationale: extra committee work" in html_parts[0]
+        assert "manual-adjustment-line" in html_parts[0]
+
+    def test_absolute_override_renders_calculated_and_adjusted(self):
+        from output_generator import _format_adjustment_items
+
+        class FakeResult:
+            adjustments_breakdown = {
+                "research": {
+                    "mode": "absolute",
+                    "calculated_total": 164.2,
+                    "adjusted_total": 300.0,
+                    "delta": 135.8,
+                    "entries": ({"mode": "absolute", "amount": 300.0,
+                                 "rationale": "grant admin override", "source_row": 4},),
+                }
+            }
+
+        html_parts = _format_adjustment_items(FakeResult(), "research-item")
+        assert len(html_parts) == 1
+        assert "Manual override applied" in html_parts[0]
+        assert "Calculated: 164.2h" in html_parts[0]
+        assert "Adjusted: 300.0h" in html_parts[0]
+        assert "Rationale: grant admin override" in html_parts[0]
+        assert "manual-override-block" in html_parts[0]
+
+    def test_no_adjustment_returns_empty_list(self):
+        from output_generator import _format_adjustment_items
+
+        class FakeResult:
+            adjustments_breakdown = {}
+
+        assert _format_adjustment_items(FakeResult(), "teaching-item") == []
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
