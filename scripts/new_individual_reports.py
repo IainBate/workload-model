@@ -245,7 +245,7 @@ def _format_teaching_section_sorted(
             <div style="margin-left:20px;">
                 <div class="detail-item teaching-item">
                     <span class="detail-name">Projects</span>
-                    <span class="detail-hours">{proj_projects_total} projects x {proj_level} = {proj_hours_total:.1f}h</span>
+                    <span class="detail-hours">{proj_projects_total} {_pluralize('projects', proj_projects_total)} x {proj_level} = {proj_hours_total:.1f}h</span>
                     <span class="detail-activity teaching-activity"></span>
                 </div>
             </div>
