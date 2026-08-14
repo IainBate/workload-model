@@ -1062,6 +1062,58 @@ def _load_adjustments(filepath: str = "workload_adjustments.csv"):
     return adjustments, warnings_by_name, unattributed
 
 
+_ADJUSTMENTS_HEADER = ["Person", "Teaching Adjustment", "Teaching Rationale",
+                       "Research Adjustment", "Research Rationale",
+                       "Admin Adjustment", "Admin Rationale"]
+
+
+def sync_adjustment_names(year_data: "YearData", filepath: str = "workload_adjustments.csv") -> Tuple[str, ...]:
+    """Ensure every active staff member in year_data has at least one row in
+    workload_adjustments.csv, appending a blank row for anyone missing.
+    Never modifies, reorders, or removes an existing row - strictly additive.
+    Idempotent: a name already present (under any resolvable alias spelling)
+    is never re-added. Returns the canonical names that were newly added
+    (empty tuple if the file already covered everyone, e.g. on every run
+    after the first)."""
+    path = DATA_DIR / filepath
+    file_exists = path.exists()
+
+    covered: Set[str] = set()
+    if file_exists:
+        with open(path, "r", encoding="utf-8-sig") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                person = (row.get("Person") or "").strip()
+                if not person:
+                    continue
+                resolved = normalize_name(person, year_data.reverse_lookup, unknown_callback=None)
+                if resolved:
+                    covered.add(resolved)
+                else:
+                    # Can't resolve this spelling to a canonical name (e.g. a stale
+                    # or unmatched entry). Fall back to the raw text itself so we
+                    # don't risk appending a second, canonical-named row for what
+                    # might be the very same person - best-effort, not a guarantee.
+                    covered.add(person.upper())
+
+    missing = sorted(
+        s.canonical_name for s in year_data.staff
+        if s.active and s.canonical_name not in covered
+    )
+
+    if not missing:
+        return ()
+
+    with open(path, "a", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        if not file_exists:
+            writer.writerow(_ADJUSTMENTS_HEADER)
+        for name in missing:
+            writer.writerow([name, "", "", "", "", "", ""])
+
+    return tuple(missing)
+
+
 def _load_waw_roles(filepath: str = "WAW.csv") -> Dict[str, list]:
     """Load departmental roles from WAW.csv. Returns {role_name: [(staff_name, percentage)]}."""
     path = DATA_DIR / filepath
