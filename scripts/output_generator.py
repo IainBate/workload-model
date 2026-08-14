@@ -1142,6 +1142,60 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
     return html
 
 
+_CSS_CLASS_TO_CATEGORY = {"teaching-item": "teaching", "research-item": "research", "admin-item": "admin"}
+
+
+def _format_adjustment_items(r: WorkloadResult, css_class: str) -> List[str]:
+    """Render manual-adjustment display for one category.
+
+    Reads r.adjustments_breakdown only - never recomputes, never re-derives.
+    Returns [] if nothing to show for this css_class's category.
+    """
+    category = _CSS_CLASS_TO_CATEGORY.get(css_class)
+    info = (r.adjustments_breakdown or {}).get(category) if category else None
+    if not info:
+        return []
+    if info["mode"] == "absolute":
+        entry = info["entries"][0]
+        return [f"""<div class="detail-item {css_class} manual-override-block">
+            <span class="detail-name">Manual override applied</span>
+            <span class="detail-hours">Calculated: {info['calculated_total']:.1f}h &rarr; Adjusted: {info['adjusted_total']:.1f}h</span>
+            <span class="detail-activity">Rationale: {entry['rationale']}</span>
+        </div>"""]
+    parts = []
+    for entry in info["entries"]:
+        sign = "+" if entry["amount"] >= 0 else ""
+        parts.append(f"""<div class="detail-item {css_class} manual-adjustment-line">
+            <span class="detail-name">Manual adjustment</span>
+            <span class="detail-hours">{sign}{entry['amount']:.1f}h</span>
+            <span class="detail-activity">Rationale: {entry['rationale']}</span>
+        </div>""")
+    return parts
+
+
+def _format_adjustments_summary(r: WorkloadResult) -> str:
+    """Pure-text one-line-per-category summary of manual adjustments, for the flat
+    CSV/Excel exports (which have no room for the highlighted HTML block). Reads
+    r.adjustments_breakdown only - never recomputes, never re-derives."""
+    info = r.adjustments_breakdown or {}
+    if not info:
+        return "None"
+    parts = []
+    for category in ("teaching", "research", "admin"):
+        cat_info = info.get(category)
+        if not cat_info:
+            continue
+        rationales = "; ".join(e["rationale"] for e in cat_info["entries"])
+        if cat_info["mode"] == "absolute":
+            parts.append(
+                f"{category.title()}: Calculated {cat_info['calculated_total']:.1f}h -> "
+                f"Adjusted {cat_info['adjusted_total']:.1f}h (override) - {rationales}")
+        else:
+            sign = "+" if cat_info["delta"] >= 0 else ""
+            parts.append(f"{category.title()}: {sign}{cat_info['delta']:.1f}h - {rationales}")
+    return "; ".join(parts) if parts else "None"
+
+
 def format_detail_section(r: WorkloadResult, title: str, hours: float, breakdown: Dict[str, Any], css_class: str,
                           is_teaching: bool = False,
                           supervision_details: Tuple[str, ...] = (),
