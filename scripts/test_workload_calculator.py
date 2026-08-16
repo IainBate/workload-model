@@ -1761,8 +1761,8 @@ class TestFormatModuleAdjustmentSection:
         parts = _format_module_adjustment_section(module_breakdown, "teaching-item", "COM00029I")
 
         assert len(parts) == 2
-        assert "manual-override-block" in parts[0]
-        assert "Manual adjustment" in parts[0]
+        assert "manual-adjustment-line" in parts[0]
+        assert "Manual adjustment (absolute override)" in parts[0]
         assert "200.0h" in parts[0]
         assert "[COM00029I]" in parts[0]
         assert "Calculation" in parts[1]
