@@ -1788,6 +1788,7 @@ class TestFormatModuleAdjustmentSection:
 
         assert len(parts) == 2
         assert "manual-adjustment-line" in parts[0]
+        assert "Manual adjustment (delta)" in parts[0]
         assert "+10.0h" in parts[0]
         assert "Calculation" in parts[1]
         assert "Rationale: extra cover" in parts[1]
