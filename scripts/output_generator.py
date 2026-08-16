@@ -1612,26 +1612,26 @@ def _format_module_adjustment_section(module_breakdown: Dict[str, Any], css_clas
 
     if info['mode'] == 'absolute':
         entry = info['entries'][0]
-        parts.append(f"""<div class="detail-item {css_class} manual-override-block">
-            <span class="detail-name">{label_prefix}Manual adjustment</span>
+        parts.append(f"""<div class="detail-item {css_class} manual-adjustment-line">
+            <span class="detail-name">{label_prefix}Manual adjustment (absolute override)</span>
             <span class="detail-hours">{info['adjusted_total']:.1f}h</span>
             <span class="detail-activity teaching-activity"></span>
         </div>""")
         parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
             <span class="detail-name" style="color:#333;">Calculation</span>
-            <span class="detail-hours">Calculated: {info['calculated_total']:.1f}h &rarr; Adjusted: {info['adjusted_total']:.1f}h. Rationale: {entry['rationale']}</span>
+            <span class="detail-hours">Calculated: {info['calculated_total']:.1f}h &rarr; Adjusted: {info['adjusted_total']:.1f}h (absolute override). Rationale: {entry['rationale']}</span>
         </div>""")
     else:
         for entry in info['entries']:
             sign = "+" if entry['amount'] >= 0 else ""
             parts.append(f"""<div class="detail-item {css_class} manual-adjustment-line">
-                <span class="detail-name">{label_prefix}Manual adjustment</span>
+                <span class="detail-name">{label_prefix}Manual adjustment (delta)</span>
                 <span class="detail-hours">{sign}{entry['amount']:.1f}h</span>
                 <span class="detail-activity teaching-activity"></span>
             </div>""")
             parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
                 <span class="detail-name" style="color:#333;">Calculation</span>
-                <span class="detail-hours">Rationale: {entry['rationale']}</span>
+                <span class="detail-hours">{sign}{entry['amount']:.1f}h delta applied to the calculated total. Rationale: {entry['rationale']}</span>
             </div>""")
     return parts
 
