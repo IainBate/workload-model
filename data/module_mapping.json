@@ -173,6 +173,15 @@
     },
     "ARIA": {
       "notes": "New module for 2026-7"
+    },
+    "ELLA": {
+      "notes": "New module for 2026-7"
+    },
+    "LLMA": {
+      "notes": "New module for 2026-7"
+    },
+    "NLPG": {
+      "notes": "New module for 2026-7"
     }
   },
   "excluded_modules": {
