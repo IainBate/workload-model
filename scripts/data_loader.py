@@ -1360,6 +1360,7 @@ _WAW_ROLE_MAPPING = {
     # Admissions roles
     "Director of Admissions & Outreach": "Director of Admissions",
     "Undergraduate Admissions Tutor": "Deputy Director of Admissions (UG Admissions)",
+    "Graduate School Board (GSB) Chair": "Graduate Chair",
     "Deputy Graduate Chair": "Deputy Graduate Chair",
     "Graduate School Board (PGR Supervisor Representative)": "Graduate School Board (Ordinary member)",
     # Additional roles from WAW
