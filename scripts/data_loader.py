@@ -1320,9 +1320,10 @@ _WAW_ROLE_MAPPING = {
     "Deputy Head (Research) and Chair DRC": "Deputy Head (Research)",
     # Committee chairs
     "Chair of Equality, Diversity and Inclusion Committee": "Chair of Equality, Diversity and Inclusion (EDI) Committee",
-    "Chair of the Board of Examiners": "Chair of the Board of Examiners",
+    "Chair of the Board of Examiners": "CBoE (on-campus)",
     "Chair ECA committee (online)": "Chair ECA committee (online)",
-    "Chair of the Department Education Committee": "Chair of the Department Education Committee",
+    "Chair of the Department Education Committee": "DEC Chair",
+    "StAMP committee members": "StAMP committee",
     "Chair of the Research Progression Panel": "Progression Panel Chair",
     "Chair of the Ethics Committee": "Ethics",
     "Ethics Committee members": "Ethics Committee Member",
