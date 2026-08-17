@@ -50,20 +50,20 @@
         "hw_lab": 0.0,
         "marking": 20.0,
         "pastoral_supervision": 75,
-        "practicals": 55.0,
+        "practicals": 110.0,
         "project_supervision": 160,
         "supervision": 0.0,
-        "teaching": 27.5
+        "teaching": 55.0
       },
-      "teaching_hours": 345.0,
+      "teaching_hours": 427.5,
       "teaching_module_breakdowns": {
         "NLPG": {
           "assessment_setting": 7.5,
           "delivery_structured": {
             "base_per_teacher": 11.0,
-            "lecturer_type": "standard",
+            "lecturer_type": "existing_lecturer_new_content",
             "lectures_per_week": 1.0,
-            "multiplier": 2.5,
+            "multiplier": 5,
             "teacher_count": 2,
             "total_lecture_hours": 22.0,
             "week_count": 11
@@ -94,13 +94,13 @@
             "COM00214M"
           ],
           "online_content_dev": 0.0,
-          "practicals": 55.0,
+          "practicals": 110.0,
           "practicals_structured": {
-            "applied_rate": 2.0,
+            "applied_rate": 4.0,
             "first_session_hours": 2.0,
             "first_session_rate": 2.5,
             "first_session_sessions": 1,
-            "first_session_total": 44.0,
+            "first_session_total": 88.0,
             "groups_per_teacher": 1.0,
             "n_teachers": 2,
             "repeat_hours": 0.0,
@@ -113,11 +113,11 @@
             "week_count": 11
           },
           "supervision": 0.0,
-          "teaching": 27.5,
+          "teaching": 55.0,
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1014.3
+      "total_hours": 1096.8
     },
     "Alena Denisova": {
       "adjustments_breakdown": {},
@@ -683,20 +683,20 @@
         "hw_lab": 0.0,
         "marking": 21.8667,
         "pastoral_supervision": 36,
-        "practicals": 73.3333,
+        "practicals": 128.3333,
         "project_supervision": 64,
         "supervision": 0.0,
-        "teaching": 36.6667
+        "teaching": 55.0
       },
-      "teaching_hours": 241.8667,
+      "teaching_hours": 315.2,
       "teaching_module_breakdowns": {
         "ELLA": {
           "assessment_setting": 5.0,
           "delivery_structured": {
             "base_per_teacher": 7.3333,
-            "lecturer_type": "standard",
+            "lecturer_type": "existing_lecturer_new_content",
             "lectures_per_week": 1.0,
-            "multiplier": 2.5,
+            "multiplier": 5,
             "teacher_count": 3,
             "total_lecture_hours": 22.0,
             "week_count": 11
@@ -727,13 +727,13 @@
             "COM00216M"
           ],
           "online_content_dev": 0.0,
-          "practicals": 55.0,
+          "practicals": 110.0,
           "practicals_structured": {
-            "applied_rate": 3.0,
+            "applied_rate": 6.0,
             "first_session_hours": 2.0,
             "first_session_rate": 2.5,
             "first_session_sessions": 1,
-            "first_session_total": 66.0,
+            "first_session_total": 132.0,
             "groups_per_teacher": 0.6667,
             "n_teachers": 3,
             "repeat_hours": 0.0,
@@ -746,7 +746,7 @@
             "week_count": 11
           },
           "supervision": 0.0,
-          "teaching": 18.3333,
+          "teaching": 36.6667,
           "total_lecture_hours": 22.0
         },
         "ENG2": {
@@ -815,7 +815,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1061.4667
+      "total_hours": 1134.8
     },
     "Carlo Ottaviani": {
       "adjustments_breakdown": {},
@@ -1983,20 +1983,20 @@
         "hw_lab": 0.0,
         "marking": 20.0,
         "pastoral_supervision": 75,
-        "practicals": 55.0,
+        "practicals": 110.0,
         "project_supervision": 112,
         "supervision": 0.0,
-        "teaching": 27.5
+        "teaching": 55.0
       },
-      "teaching_hours": 297.0,
+      "teaching_hours": 379.5,
       "teaching_module_breakdowns": {
         "NLPG": {
           "assessment_setting": 7.5,
           "delivery_structured": {
             "base_per_teacher": 11.0,
-            "lecturer_type": "standard",
+            "lecturer_type": "existing_lecturer_new_content",
             "lectures_per_week": 1.0,
-            "multiplier": 2.5,
+            "multiplier": 5,
             "teacher_count": 2,
             "total_lecture_hours": 22.0,
             "week_count": 11
@@ -2027,13 +2027,13 @@
             "COM00214M"
           ],
           "online_content_dev": 0.0,
-          "practicals": 55.0,
+          "practicals": 110.0,
           "practicals_structured": {
-            "applied_rate": 2.0,
+            "applied_rate": 4.0,
             "first_session_hours": 2.0,
             "first_session_rate": 2.5,
             "first_session_sessions": 1,
-            "first_session_total": 44.0,
+            "first_session_total": 88.0,
             "groups_per_teacher": 1.0,
             "n_teachers": 2,
             "repeat_hours": 0.0,
@@ -2046,11 +2046,11 @@
             "week_count": 11
           },
           "supervision": 0.0,
-          "teaching": 27.5,
+          "teaching": 55.0,
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1420.6
+      "total_hours": 1503.1
     },
     "Dimitris Kolovos": {
       "adjustments_breakdown": {},
@@ -2505,19 +2505,19 @@
         "hw_lab": 0.0,
         "marking": 20.0,
         "pastoral_supervision": 0,
-        "practicals": 27.5,
+        "practicals": 55.0,
         "supervision": 0.0,
-        "teaching": 27.5
+        "teaching": 55.0
       },
-      "teaching_hours": 82.5,
+      "teaching_hours": 137.5,
       "teaching_module_breakdowns": {
         "LLMA": {
           "assessment_setting": 7.5,
           "delivery_structured": {
             "base_per_teacher": 11.0,
-            "lecturer_type": "standard",
+            "lecturer_type": "existing_lecturer_new_content",
             "lectures_per_week": 1.0,
-            "multiplier": 2.5,
+            "multiplier": 5,
             "teacher_count": 2,
             "total_lecture_hours": 22.0,
             "week_count": 11
@@ -2548,13 +2548,13 @@
             "COM00215M"
           ],
           "online_content_dev": 0.0,
-          "practicals": 27.5,
+          "practicals": 55.0,
           "practicals_structured": {
-            "applied_rate": 2.5,
+            "applied_rate": 5.0,
             "first_session_hours": 2.0,
             "first_session_rate": 2.5,
             "first_session_sessions": 1,
-            "first_session_total": 55.0,
+            "first_session_total": 110.0,
             "n_teachers": 2,
             "repeat_hours": 0,
             "repeat_rate": 1.5,
@@ -2564,11 +2564,11 @@
             "week_count": 11
           },
           "supervision": 0.0,
-          "teaching": 27.5,
+          "teaching": 55.0,
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 2134.02
+      "total_hours": 2189.02
     },
     "Iain Bate": {
       "adjustments_breakdown": {},
@@ -2885,12 +2885,12 @@
         "hw_lab": 0.0,
         "marking": 50.6,
         "pastoral_supervision": 75,
-        "practicals": 181.5,
+        "practicals": 209.0,
         "project_supervision": 112,
         "supervision": 0.0,
-        "teaching": 110.0
+        "teaching": 137.5
       },
-      "teaching_hours": 551.6,
+      "teaching_hours": 606.6,
       "teaching_module_breakdowns": {
         "DEEP": {
           "assessment_setting": 11.25,
@@ -2964,9 +2964,9 @@
           "assessment_setting": 11.25,
           "delivery_structured": {
             "base_per_teacher": 11.0,
-            "lecturer_type": "new_lecturer",
+            "lecturer_type": "new_lecturer_new_content",
             "lectures_per_week": 1.0,
-            "multiplier": 5,
+            "multiplier": 7.5,
             "teacher_count": 2,
             "total_lecture_hours": 22.0,
             "week_count": 11
@@ -2997,13 +2997,13 @@
             "COM00215M"
           ],
           "online_content_dev": 0.0,
-          "practicals": 55.0,
+          "practicals": 82.5,
           "practicals_structured": {
-            "applied_rate": 5.0,
+            "applied_rate": 7.5,
             "first_session_hours": 2.0,
             "first_session_rate": 2.5,
             "first_session_sessions": 1,
-            "first_session_total": 110.0,
+            "first_session_total": 165.0,
             "n_teachers": 2,
             "repeat_hours": 0,
             "repeat_rate": 1.5,
@@ -3013,11 +3013,11 @@
             "week_count": 11
           },
           "supervision": 0.0,
-          "teaching": 55.0,
+          "teaching": 82.5,
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 972.9
+      "total_hours": 1027.9
     },
     "James Walker": {
       "adjustments_breakdown": {},
@@ -6028,20 +6028,20 @@
         "hw_lab": 0.0,
         "marking": 55.3333,
         "pastoral_supervision": 6,
-        "practicals": 231.0,
+        "practicals": 286.0,
         "project_supervision": 32,
         "supervision": 0.0,
-        "teaching": 73.3333
+        "teaching": 91.6667
       },
-      "teaching_hours": 420.1667,
+      "teaching_hours": 493.5,
       "teaching_module_breakdowns": {
         "ELLA": {
           "assessment_setting": 7.5,
           "delivery_structured": {
             "base_per_teacher": 7.3333,
-            "lecturer_type": "new_lecturer",
+            "lecturer_type": "new_lecturer_new_content",
             "lectures_per_week": 1.0,
-            "multiplier": 5,
+            "multiplier": 7.5,
             "teacher_count": 3,
             "total_lecture_hours": 22.0,
             "week_count": 11
@@ -6072,13 +6072,13 @@
             "COM00216M"
           ],
           "online_content_dev": 0.0,
-          "practicals": 110.0,
+          "practicals": 165.0,
           "practicals_structured": {
-            "applied_rate": 6.0,
+            "applied_rate": 9.0,
             "first_session_hours": 2.0,
             "first_session_rate": 2.5,
             "first_session_sessions": 1,
-            "first_session_total": 132.0,
+            "first_session_total": 198.0,
             "groups_per_teacher": 0.6667,
             "n_teachers": 3,
             "repeat_hours": 0.0,
@@ -6091,7 +6091,7 @@
             "week_count": 11
           },
           "supervision": 0.0,
-          "teaching": 36.6667,
+          "teaching": 55.0,
           "total_lecture_hours": 22.0
         },
         "ENG1": {
@@ -6153,7 +6153,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 759.3667
+      "total_hours": 832.7
     },
     "Roberto Metere": {
       "adjustments_breakdown": {},
@@ -6967,12 +6967,12 @@
         "hw_lab": 0.0,
         "marking": 23.8,
         "pastoral_supervision": 75,
-        "practicals": 146.6667,
+        "practicals": 201.6667,
         "project_supervision": 112,
         "supervision": 0.0,
-        "teaching": 73.3333
+        "teaching": 91.6667
       },
-      "teaching_hours": 445.8,
+      "teaching_hours": 519.1333,
       "teaching_module_breakdowns": {
         "AURO": {
           "assessment_setting": 7.5,
@@ -7043,9 +7043,9 @@
           "assessment_setting": 7.5,
           "delivery_structured": {
             "base_per_teacher": 7.3333,
-            "lecturer_type": "new_lecturer",
+            "lecturer_type": "new_lecturer_new_content",
             "lectures_per_week": 1.0,
-            "multiplier": 5,
+            "multiplier": 7.5,
             "teacher_count": 3,
             "total_lecture_hours": 22.0,
             "week_count": 11
@@ -7076,13 +7076,13 @@
             "COM00216M"
           ],
           "online_content_dev": 0.0,
-          "practicals": 110.0,
+          "practicals": 165.0,
           "practicals_structured": {
-            "applied_rate": 6.0,
+            "applied_rate": 9.0,
             "first_session_hours": 2.0,
             "first_session_rate": 2.5,
             "first_session_sessions": 1,
-            "first_session_total": 132.0,
+            "first_session_total": 198.0,
             "groups_per_teacher": 0.6667,
             "n_teachers": 3,
             "repeat_hours": 0.0,
@@ -7095,11 +7095,11 @@
             "week_count": 11
           },
           "supervision": 0.0,
-          "teaching": 36.6667,
+          "teaching": 55.0,
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 785.0
+      "total_hours": 858.3333
     },
     "Stefano Pirandola": {
       "adjustments_breakdown": {},
