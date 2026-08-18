@@ -981,6 +981,14 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
         # Get practical hours for this teacher (from helper result - already includes weeks)
         teacher_practical_hrs = individual_practical_hours.get(teacher, 0.0)
 
+        # Module leadership: one working day for whoever leads the module, on top
+        # of their share of the teaching team's work. Only the lead receives it.
+        teacher_module_leadership = (
+            config.MODULE_LEADERSHIP_HOURS
+            if lead_teacher and teacher == lead_teacher
+            else 0.0
+        )
+
         # Total for this teacher from module activities
         total_teacher_hours = (
             teacher_lecture_hours_with_mult +
@@ -989,7 +997,8 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
             marking_hours_per_teacher +
             teacher_supervision_hours.get(teacher, 0.0) +
             teacher_hw_lab +
-            teacher_drop_in
+            teacher_drop_in +
+            teacher_module_leadership
         )
 
         # Build detail text for display using helper results
