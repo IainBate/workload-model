@@ -251,7 +251,7 @@ def _build_reverse_lookup(mappings: Dict[str, List[str]]) -> Tuple[Dict[str, str
     warnings = []
     for canonical, aliases in mappings.items():
         for alias in aliases:
-            key = alias.strip().lower()
+            key = _normalize_apostrophes(alias.strip().lower())
             if key in reverse and reverse[key] != canonical:
                 warnings.append(
                     f"Duplicate alias '{alias}' maps to both '{reverse[key]}' and '{canonical}'. "
