@@ -1234,10 +1234,12 @@ def _calculate_admin_workload(staff_member: StaffData, nominal_hours: float) -> 
         nominal_hours: Annual working hours (scaled by FTE)
 
     Returns:
-        Tuple of (total_hours, breakdown_dict, detail_string) where:
+        Tuple of (total_hours, breakdown_dict, detail_string, unknown_roles) where:
             - total_hours: Sum of all administrative activities
             - breakdown_dict: Role-wise hour allocations
             - detail_string: Human-readable summary
+            - unknown_roles: role names with no entry in Appendix A, for the caller
+              to surface via missing_data rather than scoring them as 0%
     """
     total = 0.0
     details = []
