@@ -1179,9 +1179,17 @@ def _load_adjustments(filepath: str = "workload_adjustments.csv"):
     return adjustments, warnings_by_name, unattributed
 
 
+# "Other Notes" is a free-text column for changes that don't fit the
+# delta/absolute-override grammar the other columns follow - never read or
+# applied automatically by _load_adjustments(). It's a place to describe what
+# you want in plain English; ask Claude to read it and convert each entry
+# into the right Teaching/Research/Admin Adjustment + Rationale cells (or
+# implement it directly in code, if it's not something an adjustment row can
+# express at all - a new WAW role, say). See CLAUDE.md's "Manual Workload
+# Adjustments" section.
 _ADJUSTMENTS_HEADER = ["Person", "Teaching Module", "Teaching Adjustment", "Teaching Rationale",
                        "Research Adjustment", "Research Rationale",
-                       "Admin Adjustment", "Admin Rationale"]
+                       "Admin Adjustment", "Admin Rationale", "Other Notes"]
 
 
 def sync_adjustment_names(year_data: "YearData", filepath: str = "workload_adjustments.csv") -> Tuple[str, ...]:
