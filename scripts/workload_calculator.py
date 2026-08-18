@@ -50,7 +50,8 @@ from data_loader import (
 # module's breakdown dict by _apply_teaching_module_adjustments()) automatically
 # rolls into the aggregated teaching_breakdown total.
 _TEACHING_MODULE_SUM_KEYS = ["teaching", "practicals", "assessment_setting", "marking",
-                             "admin", "supervision", "hw_lab", "drop_in", "manual_adjustment"]
+                             "admin", "supervision", "hw_lab", "drop_in",
+                             "module_leadership", "manual_adjustment"]
 
 
 def _get_prev_year_module_names(module: ModuleData) -> List[str]:
