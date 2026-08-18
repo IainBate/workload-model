@@ -1881,7 +1881,9 @@ def load_all_data(data_dir: str = None,
             if norm == name:
                 in_wtw = True
                 break
-        if in_wtw:
+        has_waw_role = bool(data.roles)
+        has_fte_record = _find_data(name, name, pt_info_all) is not None
+        if in_wtw or has_waw_role or has_fte_record:
             filtered_staff[name] = data
 
     staff = filtered_staff
