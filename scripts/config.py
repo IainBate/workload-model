@@ -115,6 +115,10 @@ SCSE_LECTURE_HOURS_PER_10_CREDITS: float = _params.get("lecture_contact_hours", 
 
 # Project setting allowance - given once per year to each supervisor with non-zero project load
 PROJECT_SETTING_ALLOWANCE: float = 6.0  # Teaching-related, for setting projects for students
+# One additional working day per module led, on top of the leader's share of the
+# teaching team's work. A task rate, not an admin role percentage.
+MODULE_LEADERSHIP_HOURS: float = _params.get("task_multipliers", {}).get(
+    "module_leadership_hours_per_module", 7.3)
 
 # Stage codes (for module level detection)
 STAGE_UG_LEVEL_1: int = 1  # Year 1 undergraduate
