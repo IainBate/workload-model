@@ -1713,7 +1713,12 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
         research_total = protected_research + research_hours
 
         # Administration
-        admin_hours, admin_breakdown, admin_detail = _calculate_admin_workload(staff, nominal_hours)
+        admin_hours, admin_breakdown, admin_detail, unknown_roles = _calculate_admin_workload(staff, nominal_hours)
+        for unknown_role in unknown_roles:
+            missing_data.append(
+                f"Role '{unknown_role}' is recorded in WAW but has no rate in "
+                f"Appendix A - no hours have been credited for it"
+            )
 
         # Apply module-scoped Teaching adjustments (Teaching Module column filled in
         # workload_adjustments.csv) first, mutating this person's raw per-module breakdown
