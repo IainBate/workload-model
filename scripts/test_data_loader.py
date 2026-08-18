@@ -96,40 +96,33 @@ class TestNameNormalization:
 
 
 class TestCategoryResolution:
-    """Contract-category (ART / T and S) resolution precedence."""
+    """Contract-category (ART / T and S) resolution precedence.
 
-    def test_art_sheet_takes_precedence(self):
+    Staff Categories and FTE.csv replaced two separate sources (2026-08-19):
+    Part time.csv (FTE + a Staff Category column) and the ART Performance
+    data-capture sheet (category only). _resolve_category_from_data() now
+    takes a single staff_ref dict instead of two.
+    """
+
+    def test_staff_reference_takes_precedence(self):
         got = dl._resolve_category_from_data(
-            "Someone", "ART", {"staff_category": "T and S"}, {"Someone": "T and S"}
+            "Someone", {"category": "ART", "fte": 1.0}, {"Someone": "T and S"}
         )
         assert got == "ART"
 
-    def test_falls_back_to_part_time_csv(self):
-        got = dl._resolve_category_from_data(
-            "Someone", None, {"staff_category": "T and S"}, {}
-        )
-        assert got == "T and S"
-
     def test_falls_back_to_saved_override(self):
-        got = dl._resolve_category_from_data("Someone", None, None, {"Someone": "ART"})
+        got = dl._resolve_category_from_data("Someone", None, {"Someone": "ART"})
         assert got == "ART"
 
     def test_unknown_returns_empty_not_a_guess(self):
         """Must return '' so callers can ask, rather than inventing a category."""
-        assert dl._resolve_category_from_data("Nobody", None, None, {}) == ""
+        assert dl._resolve_category_from_data("Nobody", None, {}) == ""
 
-    def test_art_sheet_parses_lastname_firstname(self):
-        """The sheet is 'Lastname, Firstname'; some rows omit the comma."""
-        data = dl._load_art_ts_categories()
-        assert data.get("Sarah Carrington") == "T and S"
-        assert data.get("Rob Alexander") == "ART"
-        # Comma-less rows still resolve
-        assert data.get("Mike O'Dea") == "T and S"
-        assert data.get("Richard Wilson") == "ART"
-
-    def test_art_sheet_typo_correction_applied(self):
-        """'Banerjee, Soumua' in the source is a typo for Soumya."""
-        assert dl._load_art_ts_categories().get("Soumya Banerjee") == "ART"
+    def test_staff_reference_file_loads_category_and_fte(self):
+        data = dl._load_staff_categories_and_fte()
+        assert data.get("Sarah Carrington") == {"category": "T and S", "fte": 0.8, "notes": ""}
+        assert data.get("Rob Alexander", {}).get("category") == "ART"
+        assert data.get("Ibrahim Habli", {}).get("category") == "ART"
 
 
 class TestModuleVariantMerging:
