@@ -2,65 +2,78 @@ Workload Model Baseline Generation Summary
 ==================================================
 
 Year: 2026-7
-Modules: 38
-Staff: 56
+Modules: 49
+Staff: 65
 
 Modules:
-  - ARIA (COM00072H) [20cr, Stage 3] - Tommy, Peter
-  - AURO (COM00052H) [20cr, Stage 3] - Pedro, Alvaro, Soumya
-  - CBDA (COM00068H) [20cr, Stage 3] - Mike OD, Roberto
-  - CTAP (COM00048H) [20cr, Stage 3] - Sia, Roberto, Carlo
-  - DATA (COM00028I) [20cr, Stage 2] - Xinwei, Pourya
-  - DEEP (COM00049H) [20cr, Stage 3] - Will, James S
-  - EHAC (COM00064H) [20cr, Stage 3] - Roberto, Yuchen
-  - ELLA (COM00071H) [20cr, Stage 3] - Robbert, Antonio, Soumya
-  - EMBS (COM00003H) [20cr, Stage 3] - Xiaotian, Ian G
-  - ENG1 (COM00019I) [20cr, Stage 2] - Kostas, Robbert, Tommy
-  - ENG2 (COM00055H) [20cr, Stage 3] - Antonio, Dimitris, Kostas
-  - FOAM (<new for one year>) [20cr, Stage 3] - Tommy, Peter
-  - GODS (COM00063H) [20cr, Stage 3] - Paul, Mike OD
-  - GPIG (COM00138M) [40cr, Stage 3] - Xinwei, Radu
-  - HCIN (COM00018C) [20cr, Stage 1] - Jacob, Paul, Katrina
-  - HINT (COM00040H) [20cr, Stage 3] - Claire, Rob A
-  - HIPC (COM00036H) [20cr, Stage 3] - Steven W, Xiaotian
-  - IDEV (COM00060H) [20cr, Stage 3] - Joe, Alena
-  - IMLO (COM00026I) [20cr, Stage 2] - James W, Claudio, Pourya
-  - LLMA (COM00070H) [20cr, Stage 3] - James S, Frank
-  - LPTC (LAW00062H) [20cr, Stage 3] - Law School, Colin
-  - NETS (COM00056H) [20cr, Stage 3] - Yuchen, Vasileios
-  - NLPG (COM00069H) [20cr, Stage 3] - Dimitar, Adrian
-  - PLEI (COM00065H) [20cr, Stage 3] - Alena, Jo I
-  - PRAD (COM00195M) [20cr, Stage 3] - Carlo, Joe
-  - QUAL (COM00058H) [20cr, Stage 3] - Jen, Jo I
-  - QUCO (COM00042H) [20cr, Stage 3] - Sam B, Stefano
-  - ROCS (COM00066H) [20cr, Stage 3] - Yan, Will
-  - SAIL (COM00050H) [20cr, Stage 3] - Peter, Felix
-  - SOF1 (COM00015C) [20cr, Stage 1] - Dawn, Kofi, Poonam
-  - SOF2 (COM00016C) [20cr, Stage 1] - Kofi, Dawn, Fang
-  - SYS1 (COM00011C) [20cr, Stage 1] - Mike F, Andy P, Pedro
-  - SYS2 (COM00029I) [20cr, Stage 2] - Andy P, Mike F, Chris CB
-  - SYS3 (COM00018I) [20cr, Stage 2] - Pengcheng, Chris CB, Da
-  - TECC (COM00054H) [20cr, Stage 3] - Katrina, Jen
-  - THE1 (COM00013C) [20cr, Stage 1] - Simon F, Nick, Sia
-  - THE2 (COM00014C) [20cr, Stage 1] - Alvaro, Detlef, Sam B
-  - THE3 (COM00027I) [20cr, Stage 2] - Detlef, Simon F, Fang
+  - ARIA (COM00072H) [20cr, Stage 3] - Tommy Yuan, Peter Nightingale, Alvaro Miyazawa
+  - AURO (COM00052H) [20cr, Stage 3] - Pedro Ribeiro, Alvaro Miyazawa, Soumya Banerjee
+  - CASA (COM00017M) [10cr, Stage 4] - Simon Burton, Richard Hawkins
+  - CBDA (COM00068H) [20cr, Stage 3] - Michael O’Dea, Roberto Metere
+  - CTAP (COM00048H) [20cr, Stage 3] - Siamak Shahandashti, Roberto Metere, Carlo Ottaviani
+  - DATA (COM00028I) [20cr, Stage 2] - Xinwei Fang, Pourya Shamsolmoali
+  - DEEP (COM00049H) [20cr, Stage 3] - Will Smith, Pourya Shamsolmoali
+  - EHAC (COM00064H) [20cr, Stage 3] - Roberto Metere, Yuchen Zhao
+  - ELLA (COM00071H) [20cr, Stage 3] - Antonio Garcia-Dominguez, <new hire>
+  - EMBS (COM00003H) [20cr, Stage 3] - Xiaotian Dai, Ian Gray
+  - ENG1 (COM00019I) [20cr, Stage 2] - Kostas Barmpis, Tommy Yuan
+  - ENG2 (COM00055H) [20cr, Stage 3] - Antonio Garcia-Dominguez, Dimitris Kolovos, Kostas Barmpis
+  - FOAM (<new for one year>) [20cr, Stage 3] - Tommy Yuan, Peter Nightingale
+  - FSSE (COM00006M) [10cr, Stage 4] - Sarah Carrington, Oleg Lisagor
+  - GODS (COM00063H) [20cr, Stage 3] - Paul Cairns, Mike O'Dea
+  - GPIG (COM00138M) [40cr, Stage 3] - Xinwei Fang, Radu Calinescu
+  - HCIN (COM00018C) [20cr, Stage 1] - Jacob Rigby, Paul Cairns, Katrina Attwood
+  - HINT (COM00040H) [20cr, Stage 3] - Claire Ingram, Rob Alexander
+  - HIPC (COM00036H) [20cr, Stage 3] - Steven Wright, Xiaotian Dai
+  - HRAS (COM00025M) [10cr, Stage 4] - Oleg Lisagor, David Pumfrey
+  - HUFS (COM00208M) [10cr, Stage 4] - Mark Sujan, David Pumfrey
+  - IDEV (COM00060H) [20cr, Stage 3] - Joe Cutting, Alena Denisova
+  - IMLO (COM00026I) [20cr, Stage 2] - James Stovold, Claudio Guarnera, James Walker
+  - LLMA (COM00070H) [20cr, Stage 3] - Soumya Banerjee, Frank Soboczenski, Da Li
+  - LPTC (LAW00062H) [20cr, Stage 3] - Law School, Colin Paterson
+  - NETS (COM00056H) [20cr, Stage 3] - Yuchen Zhao, Vasileios Vasilakis
+  - NLPG (COM00069H) [20cr, Stage 3] - Dimitar Kazakov, Adrian Bors
+  - PLEI (COM00065H) [20cr, Stage 3] - Alena Denisova, Jo Iacovides
+  - PRAD (COM00195M) [20cr, Stage 3] - Carlo Ottaviani, Joe Cutting
+  - QUAL (COM00058H) [20cr, Stage 3] - Jen Beeston, Jo Iacovides
+  - QUCO (COM00042H) [20cr, Stage 3] - Sam Braunstein, Stefano Pirandola
+  - RASS (COM00164M) [10cr, Stage 4] - Mark Nicholson, Rob Alexander
+  - REMS (COM00201M) [20cr, Stage 4] - Rob Alexander, Claire Ingram
+  - ROCS (COM00066H) [20cr, Stage 3] - Will Smith, Mike O'Dea, Colin Paterson
+  - SAIL (COM00050H) [20cr, Stage 3] - Peter Nightingale, Felix Ulrich-Oltean
+  - SCDR (COM00047M) [10cr, Stage 4] - Richard Hawkins, Sarah Carrington
+  - SESA (COM00202M) [10cr, Stage 4] - Vasileios Vasilakis, Richard Hawkins
+  - SMSY (COM00050M) [10cr, Stage 4] - 
+  - SOF1 (COM00015C) [20cr, Stage 1] - Dawn Wood, Kofi Appiah, Poonam Yadav
+  - SOF2 (COM00016C) [20cr, Stage 1] - Kofi Appiah, Dawn Wood, Fang Yan
+  - SSAS (COM00052M) [10cr, Stage 4] - Mark Nicholson, Oleg Lisagor
+  - SYS1 (COM00011C) [20cr, Stage 1] - Mike Freeman, Andy Pomfret, Pedro Ribeiro
+  - SYS2 (COM00029I) [20cr, Stage 2] - Andy Pomfret, Mike Freeman, Chris Crispin-Bailey
+  - SYS3 (COM00018I) [20cr, Stage 2] - Pengcheng Liu, Chris Crispin-Bailey
+  - TECC (COM00054H) [20cr, Stage 3] - Katrina Attwood, Jen Beeston
+  - THE1 (COM00013C) [20cr, Stage 1] - Simon Foster, Nick Pears, Siamak Shahandashti
+  - THE2 (COM00014C) [20cr, Stage 1] - Alvaro Miyazawa, Detlef Plump, Sam Braunstein
+  - THE3 (COM00027I) [20cr, Stage 2] - Detlef Plump, Simon Foster
+  - TLSA (COM00059M) [10cr, Stage 4] - 
 
 Staff:
   - Adrian Bors [FTE: 1.0, Roles: Internationalisation and Visitors Coordinator]
   - Alena Denisova [FTE: 1.0, Roles: Ethics Committee Chair]
   - Alvaro Miyazawa [FTE: 1.0, Roles: Deputy CBoEs]
+  - Ana Cavalcanti [FTE: 1.0, Roles: Research Group Leader]
   - Andrew Pomfret [FTE: 1.0, Roles: Academic Admissions Team]
   - Antonio Garcia-Dominguez [FTE: 1.0, Roles: none]
   - Carlo Ottaviani [FTE: 1.0, Roles: Progression Panel]
   - Christopher Crispin-Bailey [FTE: 1.0, Roles: GTA Coordinator, Union]
   - Claire Ingram [FTE: 1.0, Roles: Outreach and Extra-Curricular Activities]
-  - Claudio Guarnera [FTE: 1.0, Roles: none]
+  - Claudio Guarnera [FTE: 0.4, Roles: none]
   - Colin Paterson [FTE: 1.0, Roles: none]
   - Da Li [FTE: 1.0, Roles: none]
+  - David Pumfrey [FTE: 0.5, Roles: none]
   - Dawn H Wood [FTE: 1.0, Roles: none]
   - Detlef Plump [FTE: 1.0, Roles: EC Officer (on-campus), Other PLs]
   - Dimitar Kazakov [FTE: 1.0, Roles: Ethics Committee Member]
-  - Dimitris Kolovos [FTE: 1.0, Roles: none]
+  - Dimitris Kolovos [FTE: 1.0, Roles: Research Group Leader, Research Mentor]
   - Fang Yan [FTE: 1.0, Roles: none]
   - Felix Ulrich-Oltean [FTE: 1.0, Roles: none]
   - Frank Soboczenski [FTE: 1.0, Roles: Academic Admissions Team]
@@ -69,36 +82,43 @@ Staff:
   - Jacob Rigby [FTE: 1.0, Roles: Taught Project Coordinator]
   - James Stovold [FTE: 1.0, Roles: Academic Admissions Team]
   - James Walker [FTE: 1.0, Roles: none]
-  - Jen Beeston [FTE: 1.0, Roles: Chair of the Department Education Committee]
+  - Jen Beeston [FTE: 1.0, Roles: DEC Chair]
   - Jo Iacovides [FTE: 1.0, Roles: Progression Panel]
   - Joe Cutting [FTE: 1.0, Roles: ECR representative]
+  - John McDermid [FTE: 1.0, Roles: Research Group Leader]
   - Katrina Attwood [FTE: 1.0, Roles: Director of Students]
   - Kofi Appiah [FTE: 1.0, Roles: Deputy Director of Admissions (UG Admissions)]
-  - Kostas Barmpis [FTE: 1.0, Roles: PhD Training Officer]
+  - Kostas Barmpis [FTE: 1.0, Roles: PGR Training Officer]
+  - Mark Nicholson [FTE: 0.8, Roles: StAMP committee]
+  - Mark Sujan [FTE: 0.8, Roles: none]
   - Mike Freeman [FTE: 1.0, Roles: Academic Admissions Team]
   - Mike O'Dea [FTE: 1.0, Roles: Other PLs]
   - Nick Pears [FTE: 1.0, Roles: Deputy Head (Research)]
+  - Oleg Lisagor [FTE: 1.0, Roles: Other PLs]
   - Paul Cairns [FTE: 1.0, Roles: Other PLs, REF Lead]
   - Pedro Ribeiro [FTE: 1.0, Roles: Progression Panel]
-  - Pengcheng Liu [FTE: 1.0, Roles: Graduate School Board (GSB) Chair]
+  - Pengcheng Liu [FTE: 1.0, Roles: Graduate Chair, Research Group Leader]
   - Peter Nightingale [FTE: 1.0, Roles: UG PL]
-  - Phoebe [FTE: 1.0, Roles: none]
   - Poonam Yadav [FTE: 1.0, Roles: Progression Panel]
   - Pourya Shamsolmoali [FTE: 1.0, Roles: Graduate School Board (Ordinary member), Other PLs]
-  - Radu Calinescu [FTE: 1.0, Roles: none]
-  - Rob Alexander [FTE: 1.0, Roles: StAMP committee members]
-  - Robbert Jongeling [FTE: 1.0, Roles: none]
-  - Roberto Metere [FTE: 1.0, Roles: StAMP committee members]
+  - Radu Calinescu [FTE: 1.0, Roles: Research Mentor]
+  - Richard Hawkins [FTE: 1.0, Roles: Other PLs, Impact]
+  - Richard Wilson [FTE: 0.6, Roles: ART staff representative, Research Group Leader]
+  - Rob Alexander [FTE: 1.0, Roles: StAMP committee]
+  - Roberto Metere [FTE: 1.0, Roles: StAMP committee]
   - Sam Braunstein [FTE: 1.0, Roles: none]
-  - Siamak Shahandashti [FTE: 1.0, Roles: Deputy Graduate Chair]
+  - Sarah Carrington [FTE: 0.8, Roles: none]
+  - Siamak Shahandashti [FTE: 1.0, Roles: Deputy Graduate Chair, Research Group Leader]
+  - Simon Burton [FTE: 1.0, Roles: none]
   - Simon Foster [FTE: 1.0, Roles: none]
-  - Soumya Banerjee [FTE: 1.0, Roles: none]
-  - Stefano Pirandola [FTE: 1.0, Roles: Progression Panel Chair]
-  - Steven Wright [FTE: 1.0, Roles: Chair of the Board of Examiners]
+  - Simos Gerasimou [FTE: 1.0, Roles: Research Mentor]
+  - Soumya Banerjee [FTE: 1.0, Roles: Mumbai Campus Partnership Leader]
+  - Stefano Pirandola [FTE: 1.0, Roles: Progression Panel Chair, Research Group Leader]
+  - Steven Wright [FTE: 1.0, Roles: CBoE (on-campus)]
   - Steven Xiaotian Dai [FTE: 1.0, Roles: Student Disability Representative]
-  - Tommy Yuan [FTE: 1.0, Roles: CSCSE SQA Partnership Leader, Deputy CBoEs]
+  - Tommy Yuan [FTE: 1.0, Roles: CSCSE HAP Partnership Leader, Deputy CBoEs]
   - Vasileios Vasilakis [FTE: 1.0, Roles: Deputy CBoEs]
   - William Smith [FTE: 1.0, Roles: Director of Admissions, Internally Distributed Funding panel reviewer]
   - Xinwei Fang [FTE: 1.0, Roles: Other PLs]
-  - Yan Jia [FTE: 1.0, Roles: none]
+  - Yan Jia [FTE: 1.0, Roles: Ethics Committee Member]
   - Yuchen Zhao [FTE: 1.0, Roles: Other PLs]

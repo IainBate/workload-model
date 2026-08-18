@@ -1928,6 +1928,15 @@ def generate_per_staff_reports(results: List[WorkloadResult], year_data: YearDat
     staff_reports_dir = os.path.join(output_dir, "Individual Reports")
     os.makedirs(staff_reports_dir, exist_ok=True)
 
+    # Clear stale reports before writing this run's set. Without this, a staff
+    # member who leaves the roster (renamed, excluded, no longer active) keeps
+    # an outdated report sitting in the directory indefinitely - it looks like a
+    # live, current document but reflects data from whenever they were last
+    # calculated. Only *_workload.html is touched, so anything else placed in
+    # this directory by hand is left alone.
+    for stale in glob.glob(os.path.join(staff_reports_dir, "*_workload.html")):
+        os.remove(stale)
+
     # Generate individual reports using the helper function
     for r in results:
         html_content = _create_individual_staff_report_html(r, year_data)
