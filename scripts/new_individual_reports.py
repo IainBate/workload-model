@@ -496,6 +496,11 @@ def generate_new_style_individual_reports(
     report_dir = os.path.join(output_dir, "New Individual Reports")
     os.makedirs(report_dir, exist_ok=True)
 
+    # Clear stale reports before writing this run's set - see the matching
+    # comment in output_generator.py's generate_per_staff_reports().
+    for stale in glob.glob(os.path.join(report_dir, "*_workload.html")):
+        os.remove(stale)
+
     for r in results:
         safe_name = "".join(c if c.isalnum() or c in " -_" else "_" for c in r.name)
         report_path = os.path.join(report_dir, f"{safe_name}_workload.html")
