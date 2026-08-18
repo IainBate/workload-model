@@ -148,9 +148,10 @@ def check_header_file(filename: str) -> Tuple[str, List[str]]:
     missing_other = [c for c in expected if c not in actual_set and c not in missing_critical]
     extra = [c for c in actual if c and c not in expected]
 
-    # Duplicate column names are the Part time.csv "FTE" trap: DictReader silently
-    # keeps only the last-occurring value for a repeated header, with no error and
-    # no indication which one won. Worth flagging every time, not just once.
+    # Duplicate column names are the trap that used to bite Part time.csv (now
+    # retired): DictReader silently keeps only the last-occurring value for a
+    # repeated header, with no error and no indication which one won. Worth
+    # flagging every time, not just once.
     seen, dupes = set(), set()
     for c in actual:
         if c and c in seen:
