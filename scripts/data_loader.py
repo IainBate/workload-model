@@ -547,7 +547,15 @@ def _parse_wtw_csv(filepath: str, known_lecturers: Set[str] = None,
             codes_str = row[1] if len(row) > 1 else ""
             codes = tuple(c.strip() for c in codes_str.split(",") if c.strip())
             if not codes:
-                continue
+                # The previous-year layout has no codes column - column 1 is the
+                # semester there, which is blank for block-taught SCSE modules. That
+                # file exists only to discover who taught what last year, so a named
+                # row is enough; requiring a "code" silently dropped every SCSE
+                # module from it and made the whole SCSE team look like new
+                # lecturers (5x) on modules they have taught for years.
+                if year_label.startswith("2026"):
+                    continue
+                codes = (name,)
 
             # Stage. "SC" marks the block-taught SCSE masters modules, whose codes
             # all carry the "M" suffix - record them at MSc level (CLAUDE.md's
