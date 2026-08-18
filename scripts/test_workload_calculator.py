@@ -1205,7 +1205,42 @@ class TestHoDFallbackRegression:
 
         # Both roles should be present
         assert "Head of Department" in john_result.admin_detail
-        assert "Committee Chair" in john_result.admin_detail
+        assert "REF Lead" in john_result.admin_detail
+
+    def test_unknown_role_is_flagged_not_silently_zeroed(self):
+        """A WAW role with no Appendix A rate must be reported, not scored as 0%.
+
+        Silently returning 0.0 for an unrecognised name is what hid five real
+        roles (CBoE, DEC Chair, Graduate Chair, StAMP, CSCSE) worth ~1,480h.
+        """
+        staff = StaffData(
+            canonical_name="Jane Doe", aliases=("Jane Doe",), fte=1.0,
+            roles=["REF Lead", "Chair of Something That Does Not Exist"],
+            active=True,
+        )
+        total, breakdown, detail, unknown_roles = _calculate_admin_workload(
+            staff, config.NOMINAL_WORKING_HOURS_PER_YEAR)
+
+        assert unknown_roles == ["Chair of Something That Does Not Exist"]
+        assert "Chair of Something That Does Not Exist" not in breakdown
+        assert "Chair of Something That Does Not Exist" not in detail
+        # The recognised role is unaffected.
+        assert breakdown["REF Lead"] == pytest.approx(
+            config.NOMINAL_WORKING_HOURS_PER_YEAR * config.ROLES_PERCENTAGE["REF Lead"])
+
+    def test_duplicate_role_is_counted_once(self):
+        """A role duplicated in WAW must not add its hours twice.
+
+        The breakdown dict is keyed by role, so a double-count would make the
+        total silently disagree with the detail shown beside it.
+        """
+        once = StaffData(canonical_name="A", aliases=("A",), fte=1.0,
+                         roles=["REF Lead"], active=True)
+        twice = StaffData(canonical_name="B", aliases=("B",), fte=1.0,
+                          roles=["REF Lead", "REF Lead"], active=True)
+        nominal = config.NOMINAL_WORKING_HOURS_PER_YEAR
+        assert (_calculate_admin_workload(twice, nominal)[0]
+                == pytest.approx(_calculate_admin_workload(once, nominal)[0]))
 
 
 def _calc_single(staff_member: StaffData):
