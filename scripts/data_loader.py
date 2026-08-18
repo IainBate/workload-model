@@ -1420,7 +1420,7 @@ _WAW_ROLE_MAPPING = {
     "Graduate School Board (PGR Supervisor Representative)": "Graduate School Board (Ordinary member)",
     # Additional roles from WAW
     "Head of Department": "Head of Department",
-    "PGR Training Officer": "PhD Training Officer",  # PGR = Postgraduate Research
+    # "PGR Training Officer" now matches Appendix A verbatim, so no mapping is needed.
     "Research Progression Panel member": "Progression Panel",
     "REF lead": "REF Lead",
     "Internally Distributed Funding panel reviewer": "Internally Distributed Funding panel reviewer",

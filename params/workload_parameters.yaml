@@ -122,7 +122,6 @@ task_multipliers:
 
 roles_percentage_of_nominal_hours:
   # General Roles
-  EDI Chair: 0.20
   DEC Chair: 0.30
   Chair of Equality, Diversity and Inclusion (EDI) Committee: 0.05
   ECR representative: 0.0
@@ -130,15 +129,12 @@ roles_percentage_of_nominal_hours:
 
   # Research and Teaching
   Director of Students: 0.20
-  Deputy Chair BoS: 0.20
 
   # Teaching Only
   CBoE (on-campus): 0.30
   CBoE (online): 0.50
   Deputy CBoEs: 0.10
-  Exam Paper checking panel: 0.025
   StAMP committee: 0.04
-  Technical Quality Manager (on-campus): 0.30
   EC Officer (on-campus): 0.15
   Chair ECA committee (online): 0.15
   Internationalisation and Visitors Coordinator: 0.05
@@ -157,8 +153,6 @@ roles_percentage_of_nominal_hours:
   Outreach and Extra-Curricular Activities: 0.05
   Taught Project Coordinator: 0.10
   GTA Coordinator: 0.10
-  Visiting international students: 0.05
-  Year Tutors: 0.10
   Union: 0.075
 
   # Research Only
@@ -166,11 +160,10 @@ roles_percentage_of_nominal_hours:
   Deputy Graduate Chair: 0.10
   Graduate School Board (Ordinary member): 0.025
   Research Group Leader: 0.10
-  PhD Training Officer: 0.05
+  PGR Training Officer: 0.05
   Impact: 0.10
   Progression Panel Chair: 0.15
   Progression Panel: 0.10
-  Departmental Seminars: 0.025
   REF Lead: 0.05
   Internally Distributed Funding panel reviewer: 0.025
   Research Mentor: 0.02
