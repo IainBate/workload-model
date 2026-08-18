@@ -253,7 +253,7 @@ def main():
 
     # Publishing strategy: Send emails with form links
     if args.send_emails:
-        _handle_email_send(args, results, year_data)
+        _handle_email_send(args, results, year_data, output_dir)
 
     # Publishing strategy: Generate feedback dashboard
     if args.feedback_csv:
