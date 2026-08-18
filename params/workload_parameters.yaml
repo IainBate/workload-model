@@ -61,6 +61,12 @@ task_multipliers:
   # Project supervision settings (per project student)
   project_setting_allowance: 6.0  # Additional hours allowance per project student
 
+  # Module leadership: one additional working day per module led, on top of whatever
+  # the leader does as a member of the teaching team. Costed as a task rate rather
+  # than an administrative role percentage, so it is shown against the module
+  # alongside delivery, practicals and assessment.
+  module_leadership_hours_per_module: 7.3
+
   assessment_setting_hours_per_paper:
     automated_marked:
       standard: 25
