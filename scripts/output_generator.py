@@ -1314,6 +1314,7 @@ def format_detail_section(r: WorkloadResult, title: str, hours: float, breakdown
                     <span class="detail-hours">{grant_value:.1f}h</span>
                     <span class="detail-activity research-activity"></span>
                 </div>""")
+                subtotal_terms.append((display_name, grant_value))
 
         # PhD students (nested under "PhD Supervision" heading if present)
         # Each entry is a structured breakdown dict (count/rate/total), matching the
