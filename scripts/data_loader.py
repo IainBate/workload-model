@@ -315,7 +315,7 @@ def normalize_name(name: str, reverse_lookup: Dict[str, str],
         return None
 
     name = name.strip()
-    key = name.lower()
+    key = _normalize_apostrophes(name.lower())
 
     if key in reverse_lookup:
         return reverse_lookup[key]
