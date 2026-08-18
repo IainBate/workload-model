@@ -1644,6 +1644,7 @@ def _format_module_header(stage: str, modules_in_stage: List[Dict[str, Any]]) ->
     practical_sessions = 0
     practical_session_hours = 0.0
     teacher_count = 1
+    block_taught_hours = 0.0
 
     for mod in modules_in_stage:
         mb = mod.get('module_breakdown', {})
@@ -1652,7 +1653,10 @@ def _format_module_header(stage: str, modules_in_stage: List[Dict[str, Any]]) ->
         # delivery breakdown rather than being inferred from hour totals.
         delivery = mb.get('delivery_structured') or {}
         if delivery:
-            lectures_per_week += delivery.get('lectures_per_week', 0.0)
+            if delivery.get('is_block_taught'):
+                block_taught_hours += delivery.get('total_lecture_hours', 0.0)
+            else:
+                lectures_per_week += delivery.get('lectures_per_week', 0.0)
             teacher_count = max(teacher_count, delivery.get('teacher_count', 1))
 
         ps = mb.get('practicals_structured') or {}
