@@ -14,6 +14,7 @@ instead of parsing free-form detail strings.
 """
 
 import csv
+import glob
 import os
 from dataclasses import dataclass, field
 from pathlib import Path
