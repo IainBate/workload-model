@@ -298,7 +298,7 @@ def _handle_form_generation(args, results, year_data):
     print(f"  python -c \"from google_forms import generate_prefilled_urls; ...\"")
 
 
-def _handle_email_send(args, results, year_data):
+def _handle_email_send(args, results, year_data, output_dir):
     """Handle SMTP email sending."""
     if not EMAIL_SENDER_AVAILABLE:
         print("\nEmail sender is not available.")
@@ -310,10 +310,23 @@ def _handle_email_send(args, results, year_data):
 
     # Load emails
     if EMAIL_DATA_AVAILABLE:
-        emails = get_all_staff_emails(year_data)
+        emails, missing_names = get_all_staff_emails(year_data)
         print(f"\nLoaded email addresses for {len(emails)} staff members")
     else:
         print("\nEmail data module not available.")
+        return
+
+    # Only attempt to send to staff with a confirmed address - see
+    # email_data.get_all_staff_emails()'s docstring for why a guessed address
+    # is never substituted here.
+    sendable = [r for r in results if r.name in emails]
+    if missing_names:
+        print(f"  Skipping {len(missing_names)} staff with no confirmed address: "
+              f"{', '.join(missing_names)}")
+    if not sendable:
+        print("\nNo staff have a confirmed email address - nothing to send. "
+              "Add data/Staff Emails.csv (Name,Email) or an Email column on "
+              "Staff Categories and FTE.csv.")
         return
 
     # Load SMTP config
@@ -334,17 +347,16 @@ def _handle_email_send(args, results, year_data):
 
     # Generate form URLs (placeholder - would use actual form ID)
     print("\nGenerating pre-filled form URLs...")
-    if GOOGLE_FORMS_AVAILABLE and EMAIL_DATA_AVAILABLE:
-        # In practice, you'd provide a form_id from a created form
-        print("  Note: Form ID not provided. Use --form-id to generate URLs.")
-        print("  Without form IDs, emails will be sent without personalized links.")
-        form_urls = {r.name: "[FORM_URL_HERE]" for r in results}
-    else:
-        form_urls = {r.name: "[FORM_URL_HERE]" for r in results}
+    print("  Note: Form ID not provided. Use --form-id to generate URLs.")
+    print("  Without form IDs, emails will be sent without personalized links.")
+    form_urls = {r.name: "[FORM_URL_HERE]" for r in sendable}
 
     # Send emails with attachments from output directory
-    print(f"\nSending emails to {len(results)} staff members...")
-    statuses = send_emails_via_smtp(results, form_urls, smtp_config, output_dir=output_dir)
+    print(f"\nSending emails to {len(sendable)} staff members...")
+    statuses = send_emails_via_smtp(
+        sendable, form_urls, emails, smtp_config,
+        year_label=year_data.year_label, output_dir=output_dir,
+    )
 
     success_count = sum(1 for v in statuses.values() if v)
     fail_count = len(statuses) - success_count
