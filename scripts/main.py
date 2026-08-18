@@ -48,10 +48,14 @@ def prompt_name_match(user_name: str, canonical_name=None) -> bool:
         return response == "y"
 
 
-def detect_wtw_files(base_dir: str = "."):
-    """Detect available WTW files."""
-    files = sorted(glob.glob(os.path.join(base_dir, "WTW *.csv")))
-    return files
+def detect_wtw_year_sheets(base_dir: str = "."):
+    """Detect the year-named sheets (e.g. "2026-7") in the WTW workbook."""
+    path = os.path.join(base_dir, WTW_XLSX_FILENAME)
+    if not os.path.exists(path):
+        return []
+    import openpyxl
+    wb = openpyxl.load_workbook(path, read_only=True)
+    return sorted(s for s in wb.sheetnames if YEAR_SHEET_PATTERN.match(s))
 
 
 def print_data_summary(year_data, results=None):
