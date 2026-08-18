@@ -1893,6 +1893,13 @@ def load_all_data(data_dir: str = None,
                 break
         has_waw_role = bool(data.roles)
         has_fte_record = _find_data(name, name, part_time_data) is not None
+        if name in NON_MODELLED_STAFF:
+            if has_waw_role:
+                print(f"  Data warning: {name} holds WAW role(s) {list(data.roles)} but is "
+                      f"not workload-modelled ({name} in NON_MODELLED_STAFF) - no one else "
+                      f"holds {'them' if len(data.roles) > 1 else 'it'}, so those hours are "
+                      f"not costed anywhere in this run.")
+            continue
         if in_wtw or has_waw_role or has_fte_record:
             filtered_staff[name] = data
 
