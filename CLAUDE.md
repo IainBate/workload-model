@@ -151,7 +151,7 @@ This project provides an automated system for calculating academic staff workloa
 
 ### Data pipeline
 ```
-WTW 2026-7.csv + WTW 2025-6.csv  →  Module data + known lecturers
+CS WTW Who Teaches What.xlsx (sheets "2026-7"/"2025-6") →  Module data + known lecturers
 CS Module Numbers.csv              →  Student counts per module
 CS Module Assessment Numbers.csv   →  Assessment counts
 pastoral_load.csv                  →  Pastoral supervision defaults (preferred over the Loadings.csv fallback below)
