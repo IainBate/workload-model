@@ -509,7 +509,8 @@ SCSE_STAGE = 4
 # Compared case-folded against the raw WTW cell text, so this must be filtered
 # before any module split or roster-inclusion decision runs - never after.
 NON_MODELLED_TEACHERS = {
-    "kate p",  # RA doing some teaching on HUFS (confirmed 2026-08-18)
+    "kate p",         # RA doing some teaching on HUFS (confirmed 2026-08-18)
+    "kate preston",   # same person, full name as recorded in the WTW xlsx
 }
 
 # Same idea, but for canonical names rather than raw WTW cell text - people who
