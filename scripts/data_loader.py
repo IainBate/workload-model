@@ -1882,7 +1882,7 @@ def load_all_data(data_dir: str = None,
                 in_wtw = True
                 break
         has_waw_role = bool(data.roles)
-        has_fte_record = _find_data(name, name, pt_info_all) is not None
+        has_fte_record = _find_data(name, name, part_time_data) is not None
         if in_wtw or has_waw_role or has_fte_record:
             filtered_staff[name] = data
 
