@@ -1839,6 +1839,7 @@ def _format_teaching_section_for_staff(result: WorkloadResult, title: str, hours
                 </div>
             </div>
         </div>""")
+        subtotal_terms.append(("Pastoral Supervision", past_hours_total))
 
     # Project supervision
     if project_breakdown:
