@@ -1233,8 +1233,9 @@ def sync_adjustment_names(year_data: "YearData", filepath: str = "workload_adjus
         writer = csv.writer(f)
         if not file_exists:
             writer.writerow(_ADJUSTMENTS_HEADER)
+        blank_row_width = len(_ADJUSTMENTS_HEADER) - 1  # every column after Person
         for name in missing:
-            writer.writerow([name, "", "", "", "", "", "", ""])
+            writer.writerow([name] + [""] * blank_row_width)
 
     return tuple(missing)
 
