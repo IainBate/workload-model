@@ -1431,7 +1431,6 @@ _WAW_ROLE_MAPPING = {
     "REF lead": "REF Lead",
     "Internally Distributed Funding panel reviewer": "Internally Distributed Funding panel reviewer",
     "Research Impact (including REF impact submission)": "Impact",
-    "Deputy Director of Admissions (POVD etc)": "Deputy Director of Admissions (POVD etc)",
     "Deputy Director of Admissions (UG Admissions)": "Deputy Director of Admissions (UG Admissions)",
 }
 
