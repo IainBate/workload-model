@@ -1681,9 +1681,15 @@ def _format_module_header(stage: str, modules_in_stage: List[Dict[str, Any]]) ->
         schedule_bits.append(f"{practical_sessions} practical session{'s' if practical_sessions != 1 else ''} (each {hrs_label})")
 
     header = f"{stage} Module"
+    teacher_word = _format_number_as_word(teacher_count)
+    teacher_suffix = f"split between {teacher_word} lecturer{'s' if teacher_count != 1 else ''}"
     if schedule_bits:
-        teacher_word = _format_number_as_word(teacher_count)
-        header += f" - {' and '.join(schedule_bits)} per week split between {teacher_word} lecturer{'s' if teacher_count != 1 else ''}"
+        header += f" - {' and '.join(schedule_bits)} per week {teacher_suffix}"
+    elif block_taught_hours > 0:
+        # Block-taught: state the contact total rather than a weekly rhythm.
+        hours_label = (f"{block_taught_hours:.0f}h" if block_taught_hours == int(block_taught_hours)
+                       else f"{block_taught_hours:.1f}h")
+        header += f" - {hours_label} of block-taught lectures {teacher_suffix}"
     return header
 
 
