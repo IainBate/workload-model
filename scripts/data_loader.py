@@ -1556,7 +1556,8 @@ def load_all_data(data_dir: str = None,
             m_code = code[:-1] + "M"
             merged_student_counts[code] = count + student_counts[m_code]
             merged_student_counts[m_code] = count + student_counts[m_code]
-        elif code.endswith("M") and code[:-1] + "H" in student_counts:
+        elif code.endswith("M") and code[:-1] + "H" in student_counts \
+                and _is_same_module(code, code[:-1] + "H"):
             # This is the M variant; already handled above
             pass
         else:
