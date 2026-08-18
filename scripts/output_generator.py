@@ -139,6 +139,24 @@ def _format_hours(hours: float) -> str:
     return f"{hours:.1f}h"
 
 
+def _format_subtotal_line(hours: float, terms: List[Tuple[str, float]]) -> str:
+    """Render a section's closing Subtotal line, showing the calculation
+    ("Subtotal: 213.1 + 148.0 + 57.0 + 112.0 = 530.1h") when the listed
+    components are known to sum to the section total.
+
+    Falls back to a plain "Subtotal: Xh" line when they don't - notably under a
+    manual override, where the displayed total is the adjusted figure rather
+    than a sum of the calculated components, so a formula would be wrong.
+    """
+    values = [v for _, v in terms if v != 0]
+    if values and abs(sum(values) - hours) < 0.05:
+        formula = f"{values[0]:.1f}"
+        for v in values[1:]:
+            formula += f" + {v:.1f}" if v >= 0 else f" - {abs(v):.1f}"
+        return f"""<p style="font-size:0.85em;color:#666;padding-top:10px;">Subtotal: {formula} = {hours:.1f}h</p>"""
+    return f"""<p style="font-size:0.85em;color:#666;padding-top:10px;">Subtotal: {hours:.1f}h</p>"""
+
+
 def _pluralize(word: str, count: float) -> str:
     """Singularize a plural noun (strip trailing 's') when count == 1, else leave as-is.
     Used for supervision-style "N word(s) x rate ..." lines (pastoral/project/PhD) so
