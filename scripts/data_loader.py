@@ -1850,7 +1850,15 @@ def load_all_data(data_dir: str = None,
     # Deduplicate staff roster
     staff = _deduplicate_staff(staff, mappings)
 
-    # Filter: only include staff who appear in WTW modules (teachers, module leader, or checker)
+    # Filter the roster down to this year's active staff.
+    #
+    # Appearing in WTW is the usual signal, but it is not the only one. The model
+    # says a member of staff not associated with any module simply has 0 teaching
+    # hours - "including the HoD and other staff in substantial administrative
+    # roles" - not that they drop out of the department. Filtering on WTW alone
+    # meant anyone whose contribution is entirely administrative got no report at
+    # all, and their WAW role silently landed on nobody. So a WAW role or a
+    # recorded part-time FTE also earns a place on the roster.
     wtw_staff = set()
     for m in modules:
         wtw_staff.add(m.lead_name)
