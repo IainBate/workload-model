@@ -504,6 +504,15 @@ def _load_module_mapping() -> Dict[str, Any]:
 SCSE_STAGE_MARKER = "SC"
 SCSE_STAGE = 4
 
+# People who appear in WTW but are not workload-modelled - research assistants and
+# other non-academic contributors who pick up some teaching. Filtered out at parse
+# time so they neither join the staff roster nor take a share of a module: the
+# module's hours split between the remaining team instead. Compared case-folded
+# against the raw WTW cell.
+NON_MODELLED_TEACHERS = {
+    "kate p",  # RA doing some teaching on HUFS (confirmed 2026-08-18)
+}
+
 
 def _parse_wtw_csv(filepath: str, known_lecturers: Set[str] = None,
                    new_modules: Set[str] = None) -> List[ModuleData]:

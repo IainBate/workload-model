@@ -1,6 +1,6 @@
 {
   "description": "Staff name normalization lookup table. Maps canonical full names to all known name variants across WTW, WAW, and other CSV files. Updated annually as staff change.",
-  "last_updated": "2026-07-20",
+  "last_updated": "2026-08-18",
   "mappings": {
     "Mike O'Dea": [
       "Mike O'D",
@@ -33,7 +33,8 @@
     ],
     "William Smith": [
       "Will",
-      "Will Smith"
+      "Will Smith",
+      "William Smith"
     ],
     "Iain Bate": [
       "Iain B",
@@ -215,6 +216,7 @@
       "Dimitris Kovolos"
     ],
     "Mark Nicholson": [
+      "Mark",
       "Mark N",
       "Mark Nicholson"
     ],
@@ -347,10 +349,6 @@
       "Phoebe",
       "Phoebe"
     ],
-    "Kate P": [
-      "Kate P",
-      "Kate P"
-    ],
     "Phillip Morgan": [
       "Phillip Morgan",
       "Phillip Morgan"
@@ -440,11 +438,6 @@
     ],
     "Helen Petrie": [
       "Helen Petrie"
-    ],
-    "William Smith": [
-      "Will",
-      "Will Smith",
-      "William Smith"
     ]
   }
 }
