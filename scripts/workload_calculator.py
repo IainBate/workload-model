@@ -863,7 +863,8 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
                                   known_lecturers_global: set,
                                   known_lecturers_per_module: Dict[str, frozenset],
                                   staff_data: Dict[str, StaffData],
-                                  supervision: SupervisionAllocation) -> dict:
+                                  supervision: SupervisionAllocation,
+                                  lead_teacher: str = "") -> dict:
     """Calculate teaching workload for a single module, split by teacher.
 
     Applies multipliers based on lecturer experience (new vs. established) and
