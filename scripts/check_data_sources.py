@@ -63,32 +63,14 @@ EXPECTED_HEADERS: Dict[str, List[str]] = {
         "Bid Awarded Date", "Price to Funder at Submit", "Collaborator(s)",
         "Subawardee(s)", "Partner(s)", "Other Organisation(s)",
     ],
-    # The real header has "FTE" TWICE (see CRITICAL_COLUMNS note below) plus ~19
-    # further decorative columns unused by the loader, all included here so they
-    # don't spam "new column" noise every run.
-    "Part time.csv": [
-        "Surname", "", "Gender", "Staff Category",
-        "Total available hours (all sections)", "Total available teaching and admin hours",
-        "Teaching total score", "Admin total score", "Other (such as PGCAP)",
-        "Total Research/Scholarship available hours", "Research", "FTE", "FTE", "Total",
-        "PhD supervision", "Modules", "UG supervision",
-        "UG supervision total hours (6 hours per student)", "PG supervision",
-        "PG supervision total hours (6 hours per student)", "U/G project supervision",
-        "UG project supervision total hours (22 hours per student)", "MsC project supervision",
-        "MsC project supervision total hours (40 hours per student)", "Project Marking",
-        "Research grants", "Percentage of grant for Wlm", "Admin roles",
-        "Notes for 25-26",
-    ],
+    "Staff Categories and FTE.csv": ["Name", "Category", "FTE", "Notes"],
 }
 
-# Column names that are year-stamped in the source sheet itself. data_loader.py
-# reads Part time.csv's notes column via .get("Notes for 25-26", "") - next year
-# the sheet will legitimately rename it to "Notes for 26-27", which the loader
-# tolerates gracefully (an empty Notes column, not a broken load), but nobody
-# would notice the mismatch without being told to look for it.
-YEAR_STAMPED_COLUMNS: Dict[str, str] = {
-    "Part time.csv": "Notes for 25-26",
-}
+# Column names that are year-stamped in the source sheet itself. No current
+# entries - the file that used to need this (Part time.csv's "Notes for
+# 25-26" column) was retired 2026-08-19 in favour of Staff Categories and
+# FTE.csv, whose Notes column carries no year stamp.
+YEAR_STAMPED_COLUMNS: Dict[str, str] = {}
 
 # Columns data_loader.py actually reads by name from each file above - a subset of
 # EXPECTED_HEADERS. If one of these goes missing, rows silently return "" or 0;
