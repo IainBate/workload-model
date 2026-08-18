@@ -553,6 +553,7 @@ def _parse_wtw_csv(filepath: str, known_lecturers: Set[str] = None,
             # all carry the "M" suffix - record them at MSc level (CLAUDE.md's
             # "1-3 UG, 4+ MSc" convention) so project supervision uses the MSc rate.
             stage = 0
+            stage_raw = ""
             if len(row) > 2:
                 stage_raw = row[2].strip()
                 if stage_raw.isdigit():
