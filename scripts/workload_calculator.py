@@ -1522,15 +1522,15 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
             else:
                 normalized_teachers.append(t.strip())
 
-        # Include the module lead as a teacher only if they're also listed as one of the teachers
-        # The lead column (column 6 in WTW CSV) is separate from the teacher columns (7-8)
-        # Only add lead to teachers list if they're teaching the module
+        # The lead column (column 6 in WTW CSV) is separate from the teacher columns
+        # (7-8), but the loader already folds the lead into module.teachers. Resolve
+        # it to a canonical name here so the calculator can credit module leadership
+        # to the right person - it has no access to the name lookup itself.
+        lead_teacher = ""
         if module.lead_name:
             lead_name = normalize_name(module.lead_name.strip(), year_data.reverse_lookup, unknown_callback=None)
-            # Only add if lead is also in the teachers list (i.e., they're actually teaching)
             if lead_name and lead_name in normalized_teachers:
-                # Lead is already in the list, no need to add again
-                pass
+                lead_teacher = lead_name
 
         if not normalized_teachers:
             # Module has no teachers - flag as incomplete
