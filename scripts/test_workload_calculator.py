@@ -541,7 +541,7 @@ class TestAdminWorkload:
         )
 
         # Head of Department is 100% in config
-        total, breakdown, detail = _calculate_admin_workload(staff, config.NOMINAL_WORKING_HOURS_PER_YEAR)
+        total, breakdown, detail, unknown_roles = _calculate_admin_workload(staff, config.NOMINAL_WORKING_HOURS_PER_YEAR)
 
         assert "Head of Department" in breakdown
         # Should be 100% of nominal hours = 1642h
@@ -561,7 +561,7 @@ class TestAdminWorkload:
             active=True
         )
 
-        total, breakdown, detail = _calculate_admin_workload(staff, config.NOMINAL_WORKING_HOURS_PER_YEAR)
+        total, breakdown, detail, unknown_roles = _calculate_admin_workload(staff, config.NOMINAL_WORKING_HOURS_PER_YEAR)
 
         # Should include engagement and personal development
         assert "engagement" in breakdown
@@ -587,7 +587,7 @@ class TestAdminWorkload:
             active=True
         )
 
-        total, breakdown, detail = _calculate_admin_workload(staff, config.NOMINAL_WORKING_HOURS_PER_YEAR * 0.5)
+        total, breakdown, detail, unknown_roles = _calculate_admin_workload(staff, config.NOMINAL_WORKING_HOURS_PER_YEAR * 0.5)
 
         # With FTE scaling, total should be less than full-time equivalent
         nominal_for_calc = config.NOMINAL_WORKING_HOURS_PER_YEAR * 0.5
@@ -636,7 +636,7 @@ class TestFTECalculation:
             active=True
         )
 
-        total, breakdown, detail = _calculate_admin_workload(staff, config.NOMINAL_WORKING_HOURS_PER_YEAR * 0.5)
+        total, breakdown, detail, unknown_roles = _calculate_admin_workload(staff, config.NOMINAL_WORKING_HOURS_PER_YEAR * 0.5)
 
         # Service points should be scaled by FTE (0.5)
         expected_engagement = config.BASELOADS.get('engagement', 100.0) * 0.5
@@ -1178,7 +1178,10 @@ class TestHoDFallbackRegression:
         hod_staff = StaffData(
             canonical_name="John Smith",
             fte=1.0,
-            roles=["Head of Department", "Committee Chair"],  # Multiple roles
+            # Multiple roles, both of which must exist in Appendix A - an
+            # unrecognised name is now reported via missing_data rather than
+            # being carried through the breakdown at 0%.
+            roles=["Head of Department", "REF Lead"],
             phd_supervisions=0,
             phd_co_supervisions=0,
             phd_assessor_count=0,
