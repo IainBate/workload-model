@@ -115,12 +115,11 @@ WAW_SECTION_MARKERS = [
     "Research Group Leads", "Research Mentors",
 ]
 
-# Contract categories the loader recognises from the ART Performance sheet
-# (data_loader.py's _load_art_ts_categories only keeps "T&S" and "ART" rows,
-# silently dropping anyone whose column-2 value is anything else). A category
-# introduced by the source sheet - "T&R", say - would silently exclude everyone
-# tagged with it from the normative-split comparison, with no warning.
-KNOWN_ART_CATEGORIES = {"ART", "T&S"}
+# Contract categories config.py's normative_key_for_category() maps to a
+# normative split. A category value introduced in Staff Categories and
+# FTE.csv - "T&R", say - would silently disable the normative-split
+# comparison for anyone tagged with it, with no warning.
+KNOWN_ART_CATEGORIES = {"ART", "T and S"}
 
 
 def _read_actual_header(path: Path) -> Optional[List[str]]:
