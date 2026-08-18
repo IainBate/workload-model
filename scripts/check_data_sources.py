@@ -276,27 +276,42 @@ def check_waw() -> Tuple[str, List[str]]:
 
 
 def check_staff_categories() -> Tuple[str, List[str]]:
-    path = DATA_DIR / "Staff Categories and FTE.csv"
+    """Self-contained check (header + values) for Staff Categories and FTE.csv -
+    called directly by main() rather than via the generic EXPECTED_HEADERS loop,
+    so this file gets one combined report row instead of two."""
+    filename = "Staff Categories and FTE.csv"
+    path = DATA_DIR / filename
     if not path.exists():
         return "FAIL", ["File not found."]
 
+    header_status, header_messages = check_header_file(filename)
+    if header_status == "FAIL":
+        return header_status, header_messages
+
     rows = list(csv.DictReader(open(path, "r", encoding="utf-8-sig")))
+    messages = list(header_messages)
+    status = header_status
+
     found = {(row.get("Category") or "").strip() for row in rows if (row.get("Category") or "").strip()}
     unknown = sorted(v for v in found if v not in KNOWN_ART_CATEGORIES)
     if unknown:
-        return "WARN", [
+        status = "WARN"
+        messages.append(
             f"Category value(s) other than {sorted(KNOWN_ART_CATEGORIES)} found: "
             f"{unknown}. normative_key_for_category() in config.py only maps "
             f"\"ART\" and \"T and S\" - anyone with a different value gets no "
             f"normative-split comparison."
-        ]
+        )
 
     names_no_fte = [row["Name"] for row in rows if not (row.get("FTE") or "").strip()]
     if names_no_fte:
-        return "WARN", [f"Row(s) with a blank FTE (defaults to 1.0): {names_no_fte}"]
+        status = "WARN"
+        messages.append(f"Row(s) with a blank FTE (defaults to 1.0): {names_no_fte}")
 
-    return "PASS", [f"{len(rows)} staff recorded, only known categories found: "
-                    f"{sorted(KNOWN_ART_CATEGORIES)}."]
+    if status == header_status == "PASS":
+        messages.append(f"{len(rows)} staff recorded, only known categories found: "
+                        f"{sorted(KNOWN_ART_CATEGORIES)}.")
+    return status, messages
 
 
 def check_filename_exists(filename: str, note: str = "") -> Tuple[str, List[str]]:
