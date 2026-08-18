@@ -1269,8 +1269,20 @@ def _load_waw_roles(filepath: str = "WAW.csv") -> Dict[str, list]:
     return roles
 
 
-def _load_part_time(filepath: str = "Part time.csv") -> Dict[str, dict]:
-    """Load part-time data. Returns {person_name: {fte, ...}}."""
+def _load_staff_categories_and_fte(filepath: str = "Staff Categories and FTE.csv") -> Dict[str, dict]:
+    """Load contract category (ART / T and S) and FTE per staff member.
+
+    Replaced two separate sources (2026-08-19): Part time.csv (FTE, plus a
+    Staff Category column) and the ART Performance data-capture sheet
+    (category only, ~600 columns of unrelated performance-review data for a
+    single category lookup). Both were large exports that would "quickly go
+    out of date" per the person maintaining this model; this is a single
+    hand-maintained file with just the two fields the pipeline actually reads
+    from either of them. See docs/data_refresh_guide.docx for how to keep it
+    current.
+
+    Returns {person_name: {"category": str, "fte": float, "notes": str}}.
+    """
     path = DATA_DIR / filepath
     if not path.exists():
         return {}
@@ -1279,79 +1291,17 @@ def _load_part_time(filepath: str = "Part time.csv") -> Dict[str, dict]:
     with open(path, "r", encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
         for row in reader:
-            surname = row.get("Surname", "").strip()
-            if not surname or surname == "Total":
+            name = (row.get("Name") or "").strip()
+            if not name:
                 continue
             try:
-                data[surname] = {
-                    "staff_category": row.get("Staff Category", "").strip(),
-                    "fte": float(row.get("FTE", 0) or 0),
-                    "total_hours": float(row.get("Total available hours (all sections)", 0) or 0),
-                    "teaching_admin_hours": float(row.get("Total available teaching and admin hours", 0) or 0),
-                    "teaching_score": float(row.get("Teaching total score", 0) or 0),
-                    "admin_score": float(row.get("Admin total score", 0) or 0),
-                    "research_hours": float(row.get("Total Research/Scholarship available hours", 0) or 0),
-                    "research": row.get("Research", "").strip(),
-                    "notes": row.get("Notes for 25-26", "").strip(),
+                data[name] = {
+                    "category": (row.get("Category") or "").strip(),
+                    "fte": float(row.get("FTE") or 1.0),
+                    "notes": (row.get("Notes") or "").strip(),
                 }
-            except (ValueError, KeyError):
+            except (ValueError, TypeError):
                 pass
-    return data
-
-
-# One-off spelling correction for a known typo in the ART Performance data
-# capture sheet ("Banerjee, Soumua" - should be "Soumya"), so it resolves to
-# the correct canonical name instead of silently failing to match.
-_ART_TS_NAME_CORRECTIONS = {
-    "Soumua": "Soumya",
-}
-
-
-def _load_art_ts_categories(filepath: str = "CS Data Collection on ART Performance 2026 - MASTER Overall Data Capture.csv") -> Dict[str, str]:
-    """Load staff contract category (ART / T and S) from the ART Performance
-    data capture sheet. Returns {parsed_name: category}, where parsed_name is
-    a best-effort "Firstname Lastname" reconstruction of the sheet's
-    "Lastname, Firstname" column, intended to be resolved against the normal
-    canonical-name system (aliases/normalize_name) by the caller - this
-    function does no name normalization itself.
-    """
-    path = DATA_DIR / filepath
-    if not path.exists():
-        return {}
-
-    data = {}
-    with open(path, "r", encoding="utf-8-sig") as f:
-        reader = csv.reader(f)
-        for row in reader:
-            if len(row) < 2:
-                continue
-            raw_name = row[0].strip()
-            category = row[1].strip()
-            if category == "T&S":
-                category = "T and S"
-            elif category != "ART":
-                continue
-            if not raw_name:
-                continue
-
-            if "," in raw_name:
-                lastname, _, firstname = raw_name.partition(",")
-            else:
-                # A few rows in the source sheet are missing the comma
-                # (e.g. "O'Dea Mike", "Wilson Richard") - the last
-                # whitespace-separated token is the first name.
-                parts = raw_name.rsplit(" ", 1)
-                if len(parts) != 2:
-                    continue
-                lastname, firstname = parts
-
-            firstname = firstname.strip()
-            lastname = lastname.strip()
-            firstname = _ART_TS_NAME_CORRECTIONS.get(firstname, firstname)
-            if not firstname or not lastname:
-                continue
-
-            data[f"{firstname} {lastname}"] = category
     return data
 
 
