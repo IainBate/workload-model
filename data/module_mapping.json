@@ -189,6 +189,26 @@
       "reason": "Supervision of taught projects is credited to the Taught Project Coordinator admin role (see WAW), not as module teaching. Counting the module as well would double-count the same work.",
       "excluded_from": "teaching workload",
       "decided": "2026-08-14"
+    },
+    "Artificial Intelligence (AI)": {
+      "reason": "SAINTS module - cross-department, not costed in this workload model. Staff who teach it get a footnote instead (see StaffData.saint_modules).",
+      "excluded_from": "teaching workload",
+      "decided": "2026-08-18"
+    },
+    "Law, Ethics and Society (LES)": {
+      "reason": "SAINTS module - cross-department, not costed in this workload model. Staff who teach it get a footnote instead (see StaffData.saint_modules).",
+      "excluded_from": "teaching workload",
+      "decided": "2026-08-18"
+    },
+    "Foundations of Safe AI (Safe AI 1)": {
+      "reason": "SAINTS module - cross-department, not costed in this workload model. Staff who teach it get a footnote instead (see StaffData.saint_modules).",
+      "excluded_from": "teaching workload",
+      "decided": "2026-08-18"
+    },
+    "Designing Safe AI (Safe AI 2)": {
+      "reason": "SAINTS module - cross-department, not costed in this workload model. Staff who teach it get a footnote instead (see StaffData.saint_modules).",
+      "excluded_from": "teaching workload",
+      "decided": "2026-08-18"
     }
   }
 }
