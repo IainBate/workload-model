@@ -1529,12 +1529,29 @@ def load_all_data(data_dir: str = None,
     practical_data = _load_practical_data()
 
     # Merge student counts for H/M variants (combine numbers for same module)
-    # e.g., COM00056H (NETS-H) + COM00188M (NETS-M) should be combined
+    # e.g., COM00056H (NETS-H) + COM00188M (NETS-M) should be combined.
+    #
+    # The pairing is by trailing H/M on an otherwise identical key, which is right
+    # for the acronym-suffixed keys ("NETS-H"/"NETS-M") this was written for, but
+    # two real codes can share a numeric stem while belonging to entirely different
+    # modules - COM00052H is AURO, COM00052M is the SCSE module SSAS. Merging those
+    # would credit each with the other's cohort, so a stem pair is only treated as
+    # an H/M variant when the two codes are not claimed by different WTW rows.
+    code_owner = {}
+    for module in modules:
+        for module_code in module.codes:
+            code_owner.setdefault(module_code, module.name)
+
+    def _is_same_module(code_a: str, code_b: str) -> bool:
+        owner_a, owner_b = code_owner.get(code_a), code_owner.get(code_b)
+        return owner_a is None or owner_b is None or owner_a == owner_b
+
     merged_student_counts = {}
     for code, count in student_counts.items():
         # Check if this code is part of an H/M pair
         base_code = code
-        if code.endswith("H") and code[:-1] + "M" in student_counts:
+        if code.endswith("H") and code[:-1] + "M" in student_counts \
+                and _is_same_module(code, code[:-1] + "M"):
             # This is the H variant; combine with M
             m_code = code[:-1] + "M"
             merged_student_counts[code] = count + student_counts[m_code]
