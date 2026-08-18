@@ -22,6 +22,12 @@ lecture_contact_hours:
   # Default lecture contact time per week (standard modules without specified contact time)
   default_hours_per_week: 2.0
 
+  # Block-taught SCSE masters modules are not semesterised: each 10 credits carries
+  # about three days of contact, all of it delivered as lectures and split between
+  # the module team. A 20-credit SCSE module therefore carries 44h, not the flat 22h
+  # a semesterised module gets regardless of its credit weighting.
+  scse_hours_per_10_credits: 22.0
+
 # Protected research time baseline (10% of nominal hours = 164.2h)
 # This is the minimum protected research time per year
 protected_research_baseline: 164.2
