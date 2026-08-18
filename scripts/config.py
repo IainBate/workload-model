@@ -111,6 +111,7 @@ DEFAULT_CONTACT_HOURS_PER_CREDIT: float = 1.0  # Standard contact hours per cred
 
 # Default lecture contact hours per week (standard modules without specified contact time)
 DEFAULT_LECURE_HOURS_PER_WEEK: float = _params.get("lecture_contact_hours", {}).get("default_hours_per_week", 2.0)
+SCSE_LECTURE_HOURS_PER_10_CREDITS: float = _params.get("lecture_contact_hours", {}).get("scse_hours_per_10_credits", 22.0)
 
 # Project setting allowance - given once per year to each supervisor with non-zero project load
 PROJECT_SETTING_ALLOWANCE: float = 6.0  # Teaching-related, for setting projects for students
