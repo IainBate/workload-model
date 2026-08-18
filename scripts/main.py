@@ -145,6 +145,13 @@ def main():
     parser.add_argument("--export-baseline", action="store_true", help="Export the structured calculation baseline (baseline/expected_results.json) and exit")
     parser.add_argument("--interactive", action="store_true", help="Prompt for unknown names")
     parser.add_argument("--google-sheets", action="store_true", help="Upload results to Google Sheets after calculation")
+
+    # Publishing strategy arguments
+    parser.add_argument("--generate-forms", action="store_true", help="Create Google Forms for staff feedback")
+    parser.add_argument("--form-title", type=str, default=None, help="Title for the feedback form (default: 'Workload Review {year}')")
+    parser.add_argument("--send-emails", action="store_true", help="Send emails with form links to staff")
+    parser.add_argument("--smtp-config", type=str, default=None, help="Path to SMTP configuration YAML file")
+    parser.add_argument("--feedback-csv", type=str, default=None, help="Path to exported feedback CSV (for dashboard)")
     args = parser.parse_args()
 
     # Get project root (parent of scripts folder)
