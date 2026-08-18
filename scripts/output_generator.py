@@ -1369,13 +1369,16 @@ def format_detail_section(r: WorkloadResult, title: str, hours: float, breakdown
                         categories[cat] = []
                     categories[cat].append((name, value))
 
-        # Add top-level items first
+        # Add top-level items first, tracking each one as a term of the closing
+        # calculation so "Subtotal:" shows what it's the sum of, not just the total.
+        subtotal_terms: List[Tuple[str, float]] = []
         for item_name, item_value, display_name in sorted(top_level_items, key=lambda x: -x[1]):
             items_html_parts.append(f"""<div class="detail-item {css_class}">
                 <span class="detail-name">{display_name}</span>
                 <span class="detail-hours">{item_value:.1f}h</span>
                 <span class="detail-activity {css_class.replace('-item', '-') + 'activity'}"></span>
             </div>""")
+            subtotal_terms.append((display_name, item_value))
 
         # Add category items
         for category_name, items in sorted(categories.items()):
@@ -1388,8 +1391,18 @@ def format_detail_section(r: WorkloadResult, title: str, hours: float, breakdown
                     <span class="detail-hours">{item_value:.1f}h</span>
                     <span class="detail-activity {css_class.replace('-item', '-') + 'activity'}"></span>
                 </div>""")
+                subtotal_terms.append((display_name, item_value))
 
     items_html_parts.extend(_format_adjustment_items(r, css_class))
+
+    # A delta adjustment is folded into `hours` already, so it must join the
+    # formula too; an absolute override makes `hours` the adjusted figure rather
+    # than a sum of these components, so _format_subtotal_line falls back to a
+    # plain total on its own once the terms no longer add up to it.
+    category = _CSS_CLASS_TO_CATEGORY.get(css_class)
+    this_adjustment = (r.adjustments_breakdown or {}).get(category) if category else None
+    if this_adjustment and this_adjustment["mode"] != "absolute":
+        subtotal_terms.append(("Manual adjustment", this_adjustment["delta"]))
 
     items_html = ''.join(items_html_parts)
 
@@ -1399,7 +1412,7 @@ def format_detail_section(r: WorkloadResult, title: str, hours: float, breakdown
             <span class="card-total">{hours:.1f}h</span>
         </div>
         {items_html}
-        <p style="font-size:0.85em;color:#666;padding-top:10px;">Subtotal: {hours:.1f}h</p>
+        {_format_subtotal_line(hours, subtotal_terms)}
     </div>"""
 
 def _format_module_delivery_section(module_breakdown: Dict[str, Any], is_new_lecturer: bool,
