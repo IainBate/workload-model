@@ -1375,56 +1375,68 @@ def _save_category_overrides(overrides: Dict[str, str], filepath: str = "staff_c
         f.write("\n")
 
 
-def load_wtw_files(base_dir: str = None) -> Tuple[List[ModuleData], str]:
-    """Load the current year's WTW file and return modules with year label.
+def _wtw_year_sheets(base_dir) -> Tuple[Any, List[str]]:
+    """Open WTW_XLSX_FILENAME and return (workbook, sorted year-sheet names) -
+    e.g. [..., "2025-6", "2026-7"]. Sheet names are filtered to YEAR_SHEET_PATTERN
+    so the workbook's other tabs (Allocation, General Checking - human planning
+    aids with no consumer in this pipeline) are never mistaken for a year."""
+    import openpyxl
+    path = Path(base_dir) / WTW_XLSX_FILENAME
+    if not path.exists():
+        raise DataLoadError(f"WTW workbook not found: {path}")
+    wb = openpyxl.load_workbook(str(path), data_only=True)
+    year_sheets = sorted(s for s in wb.sheetnames if YEAR_SHEET_PATTERN.match(s))
+    return wb, year_sheets
 
-    Auto-detects the latest WTW CSV file from the data directory.
+
+def load_wtw_files(base_dir: str = None) -> Tuple[List[ModuleData], str]:
+    """Load the current year's WTW sheet and return modules with year label.
+
+    Auto-detects the latest year-named sheet (e.g. "2026-7") in
+    WTW_XLSX_FILENAME.
 
     Args:
-        base_dir: Directory containing WTW files. Defaults to data folder.
+        base_dir: Directory containing the WTW workbook. Defaults to data folder.
 
     Returns:
         Tuple of (list of ModuleData, year_label string)
 
     Raises:
-        DataLoadError: If no WTW CSV files are found in the data directory.
+        DataLoadError: If the WTW workbook or no year sheet is found.
     """
     if base_dir is None:
         base_dir = DATA_DIR
 
-    wtw_files = sorted(glob.glob(os.path.join(base_dir, "WTW *.csv")))
-    if not wtw_files:
-        raise DataLoadError("No WTW CSV files found in the data directory.")
+    wb, year_sheets = _wtw_year_sheets(base_dir)
+    if not year_sheets:
+        raise DataLoadError(f"No year-named sheet found in {WTW_XLSX_FILENAME}.")
 
-    # Use the latest file (highest year number)
-    latest = wtw_files[-1]
-    year = _detect_year_from_filename(latest)
-    modules = _parse_wtw_csv(latest)
+    year = year_sheets[-1]
+    modules = _parse_wtw_sheet(wb[year], year)
     return modules, year
 
 
 def load_previous_wtw(base_dir: str = None) -> Optional[List[ModuleData]]:
-    """Load the previous year's WTW file for new lecturer detection.
+    """Load the previous year's WTW sheet for new lecturer detection.
 
     Used to identify lecturers who were teaching in the previous academic year,
     which affects their multiplier assignment (new lecturers get higher multipliers).
 
     Args:
-        base_dir: Directory containing WTW files. Defaults to data folder.
+        base_dir: Directory containing the WTW workbook. Defaults to data folder.
 
     Returns:
         List of ModuleData from the previous year, or None if fewer than 2
-        WTW files are available.
+        year sheets are available.
     """
     if base_dir is None:
         base_dir = DATA_DIR
 
-    wtw_files = sorted(glob.glob(os.path.join(base_dir, "WTW *.csv")))
-    if len(wtw_files) < 2:
+    wb, year_sheets = _wtw_year_sheets(base_dir)
+    if len(year_sheets) < 2:
         return None
-    # Second-to-last file
-    prev = wtw_files[-2]
-    return _parse_wtw_csv(prev)
+    prev = year_sheets[-2]
+    return _parse_wtw_sheet(wb[prev], prev)
 
 
 # WAW role names → YAML role names mapping
