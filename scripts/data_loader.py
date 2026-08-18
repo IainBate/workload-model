@@ -1777,16 +1777,6 @@ def load_all_data(data_dir: str = None,
     sorted_names = sorted(all_names)
 
     # Process each name
-    saint_module_map = {
-        "Richard W": ["Artificial Intelligence (AI)"],
-        "Frank": ["Artificial Intelligence (AI)"],
-        "Phillip Morgan": ["Law, Ethics and Society (LES)"],
-        "Jennifer Chubb": ["Law, Ethics and Society (LES)"],
-        "Tom Stoneham": ["Law, Ethics and Society (LES)"],
-        "Ibrahim": ["Foundations of Safe AI (Safe AI 1)"],
-        "Yan": ["Foundations of Safe AI (Safe AI 1)", "Designing Safe AI (Safe AI 2)"],
-        "Colin": ["Designing Safe AI (Safe AI 2)"],
-    }
 
     # Build consolidated data lookup in a single pass per source
     # This avoids multiple loops over all_names and all data sources
