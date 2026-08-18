@@ -129,14 +129,15 @@ def main():
 
     base_dir = os.path.join(PROJECT_ROOT, "data") if args.data_dir is None else args.data_dir
 
-    # Detect WTW files
-    wtw_files = detect_wtw_files(base_dir)
-    if not wtw_files:
-        print("ERROR: No WTW CSV files found. Expected files matching 'WTW *.csv'.")
+    # Detect WTW workbook year sheets
+    wtw_year_sheets = detect_wtw_year_sheets(base_dir)
+    if not wtw_year_sheets:
+        print(f"ERROR: No year-named sheet found in {WTW_XLSX_FILENAME!r}. "
+              f"Expected a sheet named like '2026-7'.")
         sys.exit(1)
 
-    print(f"Found WTW files: {', '.join(os.path.basename(f) for f in wtw_files)}")
-    print(f"Using: {os.path.basename(wtw_files[-1])}")
+    print(f"Found WTW year sheets: {', '.join(wtw_year_sheets)}")
+    print(f"Using: {wtw_year_sheets[-1]}")
 
     # Load all data (data_dir is passed, defaults to DATA_DIR inside load_all_data)
     print("\nLoading data...")
