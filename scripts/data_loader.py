@@ -617,7 +617,8 @@ def _parse_wtw_csv(filepath: str, known_lecturers: Set[str] = None,
                 for idx in [4, 5, 6]:
                     if len(row) > idx and row[idx].strip():
                         teachers_list.append(row[idx].strip())
-            teachers = tuple(teachers_list)
+            teachers = tuple(t for t in teachers_list
+                             if t.lower() not in NON_MODELLED_TEACHERS)
 
             # Extra markers - convert to tuple
             extra_markers_str = ""
