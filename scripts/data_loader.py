@@ -1783,8 +1783,7 @@ def load_all_data(data_dir: str = None,
         proj_data = _find_data(raw_name, canonical, project_load_data)
         phd_info = _find_data(raw_name, canonical, phd_data)
         fte_info = _find_data(raw_name, canonical, fte_data)
-        pt_info = _find_data(raw_name, canonical, part_time_data)
-        art_ts_category = _find_data(raw_name, canonical, art_ts_data)
+        staff_ref = _find_data(raw_name, canonical, staff_ref_data)
         adj_records = _find_all_matches(raw_name, canonical, adjustments_data)
         adj_warnings = _find_all_matches(raw_name, canonical, adjustment_warnings)
 
