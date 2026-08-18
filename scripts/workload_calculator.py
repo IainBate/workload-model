@@ -1540,7 +1540,7 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
         module_teaching = _calculate_teaching_workload(
             module, normalized_teachers, year_data.known_lecturers,
             year_data.known_lecturers_per_module, staff_dict,
-            supervision=supervision
+            supervision=supervision, lead_teacher=lead_teacher
         )
 
         for teacher, breakdown in module_teaching.items():
