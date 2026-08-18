@@ -275,8 +275,10 @@ def _handle_form_generation(args, results, year_data):
 
     # Load emails for pre-filling
     if EMAIL_DATA_AVAILABLE:
-        emails = get_all_staff_emails(year_data)
+        emails, missing_names = get_all_staff_emails(year_data)
         print(f"\nLoaded email addresses for {len(emails)} staff members")
+        if missing_names:
+            print(f"  No confirmed address for {len(missing_names)}: {', '.join(missing_names)}")
 
     # Create or use existing form
     form_title = args.form_title or f"Workload Review {year_data.year_label}"
