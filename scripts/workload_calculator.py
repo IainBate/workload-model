@@ -1839,10 +1839,13 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
             if "teaching_module_breakdowns" in staff_data and staff_data["teaching_module_breakdowns"]:
                 # Use new aggregation function to sum per-module breakdowns
                 teaching_breakdown = _aggregate_teaching_breakdown(staff_data)
-            elif len(staff_data.get("details", [])) > 0:
-                # Fallback: parse from details string for backward compatibility
-                if "teaching_breakdown" in staff_data and staff_data["teaching_breakdown"]:
-                    teaching_breakdown = _sum_breakdown_dict(staff_data["teaching_breakdown"])
+            elif staff_data.get("teaching_breakdown"):
+                # No modules, but supervision still produces teaching hours. This
+                # must not be conditioned on "details" (which is appended per
+                # module): a member of staff who supervises but teaches no module
+                # would otherwise get those hours in teaching_hours while the
+                # breakdown stayed empty, so the two silently disagreed.
+                teaching_breakdown = _sum_breakdown_dict(staff_data["teaching_breakdown"])
 
         # Extract structured supervision breakdowns (pastoral and project)
         pastoral_breakdown = {}
