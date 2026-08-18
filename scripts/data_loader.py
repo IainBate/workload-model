@@ -525,187 +525,232 @@ NON_MODELLED_STAFF = {
 }
 
 
-def _parse_wtw_csv(filepath: str, known_lecturers: Set[str] = None,
-                   new_modules: Set[str] = None) -> List[ModuleData]:
-    """
-    Parse a WTW CSV file into ModuleData objects.
-    Handles both 2025-6 and 2026-7 formats.
+# Filename of the "Who Teaches What" workbook that superseded WTW 2025-6.csv /
+# WTW 2026-7.csv (migrated 2026-08-18). Each academic year is a separate sheet
+# named e.g. "2026-7"; load_wtw_files()/load_previous_wtw() pick the current and
+# prior year by sorting sheet names matching YEAR_SHEET_PATTERN, mirroring how
+# the old code picked the latest two "WTW *.csv" files by filename sort.
+WTW_XLSX_FILENAME = "CS WTW Who Teaches What.xlsx"
+YEAR_SHEET_PATTERN = re.compile(r"^\d{4}-\d$")
+
+# Cohort value marking the SAINTS modules (Artificial Intelligence, Law/Ethics/
+# Society, Foundations of Safe AI, Designing Safe AI) - cross-department modules
+# with no module code of their own. See the codes-fallback in _parse_wtw_sheet()
+# and the excluded_modules entries in module_mapping.json.
+SAINTS_COHORT = "SAINTS"
+
+
+def _find_wtw_header_row(rows: List[tuple]) -> Tuple[Optional[int], Optional[tuple]]:
+    """Find the header row in a WTW sheet's rows (a row containing a cell that
+    reads "Code(s)" or "Who Teaches What"), mirroring the CSV parser's original
+    detection rule so both file formats locate the header the same way."""
+    for i, row in enumerate(rows):
+        for cell in row:
+            if cell and ("Code(s)" in str(cell) or "Who Teaches What" in str(cell)):
+                return i, row
+    return None, None
+
+
+def _wtw_column_map(header: tuple) -> Dict[str, List[int]]:
+    """Map each header cell's exact text to the column index(es) it appears at.
+    A name can repeat (e.g. "Cohort" labels both the module-name column and the
+    real cohort column) or represent a multi-column group (e.g. "Teaching" is
+    followed by two unlabeled continuation columns) - callers pick the right
+    occurrence/offset explicitly rather than this function guessing."""
+    idx: Dict[str, List[int]] = {}
+    for i, h in enumerate(header):
+        if h:
+            idx.setdefault(str(h).strip(), []).append(i)
+    return idx
+
+
+def _wtw_cell_str(value: Any) -> str:
+    """Normalize an xlsx cell to a stripped string, treating None as empty."""
+    return str(value).strip() if value is not None else ""
+
+
+def _wtw_cell_bool(value: Any) -> bool:
+    """A checker-required-style flag cell: openpyxl may hand back a real bool
+    (native Excel checkbox/TRUE) or the text "TRUE"/"FALSE" depending on how the
+    sheet was authored - handle both rather than assuming one."""
+    if isinstance(value, bool):
+        return value
+    return _wtw_cell_str(value).upper() == "TRUE"
+
+
+def _parse_wtw_sheet(ws, year_label: str, new_modules: Set[str] = None) -> List[ModuleData]:
+    """Parse one sheet (e.g. "2026-7" or "2025-6") of WTW_XLSX_FILENAME into
+    ModuleData objects, reading columns by header NAME rather than hardcoded
+    position.
+
+    Replaced the CSV-positional parser (2026-08-18) after auditing found it was
+    silently misreading several trailing columns - general_checker in particular
+    was reading the "General Checker Required?" TRUE/FALSE flag as if it were a
+    person's name, feeding the literal string "TRUE" into the staff roster. That
+    class of bug is structural to position-based parsing of a hand-edited sheet
+    where columns get reordered; reading by header name instead means a genuine
+    reorder is still handled correctly, and a genuinely missing/renamed column
+    fails by returning nothing for that field rather than reading the wrong one.
     """
     modules = []
-    year_label = _detect_year_from_filename(filepath)
-
-    with open(filepath, "r", encoding="utf-8-sig") as f:
-        content = f.read().splitlines()
-
-    # Find the header row (contains "Code(s)" or "Who Teaches What")
-    header_idx = -1
-    for i, line in enumerate(content):
-        if "Code(s)" in line or "Who Teaches What" in line:
-            header_idx = i
-            break
-
-    if header_idx == -1:
+    rows = list(ws.iter_rows(values_only=True))
+    header_idx, header = _find_wtw_header_row(rows)
+    if header_idx is None:
         return modules
+    colmap = _wtw_column_map(header)
 
-    # Parse rows starting after the header
-    reader = csv.reader(content[header_idx + 1:])
-    for row in reader:
-        if len(row) < 2:
+    def col(name: str, nth: int = 0) -> Optional[int]:
+        idxs = colmap.get(name)
+        if not idxs or nth >= len(idxs):
+            return None
+        return idxs[nth]
+
+    def cell(row: tuple, idx: Optional[int]) -> Any:
+        return row[idx] if idx is not None and idx < len(row) else None
+
+    code_col = col("Code(s)")
+    stage_col = col("Stage")
+    semester_col = col("Semester")
+    credits_col = col("Credits")
+    # "Cohort" labels both the module-name column (0) and the real cohort label
+    # (e.g. "UG1") further along - the real one is whichever second occurrence
+    # exists; sheets with no code column (2025-6) only have the one at index 3.
+    cohort_col = col("Cohort", nth=1) if len(colmap.get("Cohort", [])) > 1 else col("Cohort", nth=1) or col("Cohort", nth=0)
+    lead_col = col("Who Teaches What (WTW) Lead")
+    teaching_col = col("Teaching")  # first of up to 3 teacher slots (Teaching, then 2 unlabeled continuation columns)
+    expert_col = col("Expert Checker")
+    general_col = col("General Checker")
+    general_req_col = col("General Checker Required?")
+    hm_col = col("Module has H and M variants")
+    extra_markers_col = col("Extra Markers") if col("Extra Markers") is not None else col("Markers")
+    practicals_col = col("Practicals")
+
+    for row in rows[header_idx + 1:]:
+        if not row or not row[0]:
             continue
-
-        # Skip empty or header-like rows
-        if not row[0].strip() or row[0].strip().startswith("Allocation"):
+        name_raw = _wtw_cell_str(row[0])
+        if not name_raw or name_raw.startswith("Allocation"):
             continue
+        # Collapse embedded newlines/runs of whitespace (e.g. a wrapped cell like
+        # "Artificial \nIntelligence (AI)") into single spaces.
+        name = re.sub(r"\s+", " ", name_raw)
 
-        try:
-            # Module name
-            name = row[0].strip()
-            if not name:
+        codes_raw = _wtw_cell_str(cell(row, code_col))
+        codes = tuple(c.strip() for c in codes_raw.split(",") if c.strip())
+
+        cohort = _wtw_cell_str(cell(row, cohort_col))
+
+        if not codes:
+            # SAINTS modules (and, on the previous-year sheet, every module - it
+            # has no Code(s) column at all) have no code entered. Keep the module
+            # rather than silently dropping it; teaching-hours exclusion for
+            # SAINTS is handled explicitly via module_mapping.json's
+            # excluded_modules, the same mechanism "Projects" already uses -
+            # dropping the row here would also erase it from the "noted, not
+            # included in workload" footnote, which needs the real module data.
+            if code_col is not None and cohort.strip().upper() != SAINTS_COHORT:
                 continue
+            codes = (name,)
 
-            # Module codes
-            codes_str = row[1] if len(row) > 1 else ""
-            codes = tuple(c.strip() for c in codes_str.split(",") if c.strip())
-            if not codes:
-                # The previous-year layout has no codes column - column 1 is the
-                # semester there, which is blank for block-taught SCSE modules. That
-                # file exists only to discover who taught what last year, so a named
-                # row is enough; requiring a "code" silently dropped every SCSE
-                # module from it and made the whole SCSE team look like new
-                # lecturers (5x) on modules they have taught for years.
-                if year_label.startswith("2026"):
-                    continue
-                codes = (name,)
+        # Stage. "SC" marks the block-taught SCSE masters modules, whose codes
+        # all carry the "M" suffix - record them at MSc level (CLAUDE.md's
+        # "1-3 UG, 4+ MSc" convention) so project supervision uses the MSc rate.
+        stage_val = cell(row, stage_col)
+        stage = 0
+        is_scse = False
+        if isinstance(stage_val, (int, float)):
+            stage = int(stage_val)
+        elif isinstance(stage_val, str) and stage_val.strip().upper() == SCSE_STAGE_MARKER:
+            stage = SCSE_STAGE
+            is_scse = True
 
-            # Stage. "SC" marks the block-taught SCSE masters modules, whose codes
-            # all carry the "M" suffix - record them at MSc level (CLAUDE.md's
-            # "1-3 UG, 4+ MSc" convention) so project supervision uses the MSc rate.
-            stage = 0
-            stage_raw = ""
-            if len(row) > 2:
-                stage_raw = row[2].strip()
-                if stage_raw.isdigit():
-                    stage = int(stage_raw)
-                elif stage_raw.upper() == SCSE_STAGE_MARKER:
-                    stage = SCSE_STAGE
+        # Semester. Block-taught modules record "-" rather than a semester number.
+        semester_val = cell(row, semester_col)
+        semester = 0
+        if isinstance(semester_val, (int, float)):
+            semester = int(semester_val)
+        elif isinstance(semester_val, str):
+            s = semester_val.strip()
+            if s.isdigit():
+                semester = int(s)
+            elif "-" in s:
+                head = s.split("-")[0].strip()
+                semester = int(head) if head.isdigit() else 0
 
-            # Semester. Block-taught modules record "-" rather than a semester
-            # number; treat anything non-numeric as "no fixed semester" (0). This
-            # must not raise - the caller's except clause discards the whole module.
-            semester = 0
-            if len(row) > 3:
-                s = row[3].strip()
-                if s.isdigit():
-                    semester = int(s)
-                elif "-" in s:
-                    head = s.split("-")[0].strip()  # e.g., "1-2" -> 1
-                    semester = int(head) if head.isdigit() else 0
+        credits_val = cell(row, credits_col)
+        credits = int(credits_val) if isinstance(credits_val, (int, float)) else 0
 
-            # Credits
-            credits = int(row[4]) if len(row) > 4 and row[4].strip().isdigit() else 0
+        lead_name = _wtw_cell_str(cell(row, lead_col))
+        if lead_name.lower() in NON_MODELLED_TEACHERS:
+            lead_name = ""
 
-            # Cohort
-            cohort = row[5].strip() if len(row) > 5 else ""
+        # Teachers: the lead plus up to 3 slots in the "Teaching" column group.
+        # A person appearing in more than one slot (the lead also teaching) is
+        # only counted once, preserving first-seen order.
+        raw_slots = [lead_name]
+        if teaching_col is not None:
+            for offset in range(3):
+                raw_slots.append(_wtw_cell_str(cell(row, teaching_col + offset)))
+        seen_lower = set()
+        teachers_list = []
+        for t in raw_slots:
+            if t and t.lower() not in seen_lower:
+                seen_lower.add(t.lower())
+                teachers_list.append(t)
+        teachers = tuple(t for t in teachers_list if t.lower() not in NON_MODELLED_TEACHERS)
 
-            # Lead name
-            lead_name = row[6].strip() if len(row) > 6 else ""
-            if lead_name.lower() in NON_MODELLED_TEACHERS:
-                lead_name = ""
+        extra_markers_str = _wtw_cell_str(cell(row, extra_markers_col))
+        extra_markers = tuple(m.strip() for m in extra_markers_str.split(",") if m.strip())
 
-            # Teachers - varies by year format
-            teachers_list = []
-            if year_label.startswith("2026"):
-                # 2026-7 format: columns 7, 8 are teachers
-                for idx in [7, 8]:
-                    if len(row) > idx and row[idx].strip():
-                        teachers_list.append(row[idx].strip())
-                # Add lead to teachers list (lead is column 6)
-                # This ensures leads who are also teaching get included in workload calculation
-                if lead_name and lead_name not in teachers_list:
-                    teachers_list.insert(0, lead_name)
-            else:
-                # 2025-6 format: columns 4, 5, 6 are teachers (different layout)
-                for idx in [4, 5, 6]:
-                    if len(row) > idx and row[idx].strip():
-                        teachers_list.append(row[idx].strip())
-            teachers = tuple(t for t in teachers_list
-                             if t.lower() not in NON_MODELLED_TEACHERS)
-
-            # Extra markers - convert to tuple
-            extra_markers_str = ""
-            if len(row) > 9 and row[9].strip():
-                extra_markers_str = row[9]
-            extra_markers = tuple(m.strip() for m in extra_markers_str.split(",") if m.strip())
-
-            # Expert checker (column 11 in WTW 2026-7 format)
+        expert_checker = _wtw_cell_str(cell(row, expert_col))
+        if expert_checker.upper() in ("N/A", "NONE", "TBD"):
             expert_checker = ""
-            if len(row) > 11:
-                val = row[11].strip()
-                if val and val.upper() not in ("N/A", "NONE", "TBD"):
-                    expert_checker = val
 
-            # General checker required
-            general_checker_required = False
-            if len(row) > 11:
-                val = row[11].strip().upper()
-                general_checker_required = "TRUE" in val
-
-            # General checker
+        general_checker = _wtw_cell_str(cell(row, general_col))
+        if general_checker.upper() in ("N/A", "NONE", "TBD"):
             general_checker = ""
-            if len(row) > 12:
-                val = row[12].strip()
-                if val and val.upper() not in ("N/A", "NONE", "TBD"):
-                    general_checker = val
 
-            # Has H/M variants
-            has_h_m_variants = False
-            if len(row) > 14:
-                val = row[14].strip().upper()
-                has_h_m_variants = "TRUE" in val
+        general_checker_required = (
+            _wtw_cell_bool(cell(row, general_req_col)) if general_req_col is not None else False
+        )
+        has_h_m_variants = _wtw_cell_bool(cell(row, hm_col)) if hm_col is not None else False
 
-            # Read practicals count from column 13 (new column)
-            practicals = 0
-            if len(row) > 13 and row[13].strip():
-                try:
-                    practicals = int(row[13].strip())
-                except ValueError:
-                    practicals = 0
+        practicals = 0
+        practicals_val = cell(row, practicals_col)
+        if isinstance(practicals_val, (int, float)):
+            practicals = int(practicals_val)
+        elif isinstance(practicals_val, str) and practicals_val.strip().isdigit():
+            practicals = int(practicals_val.strip())
 
-            # Block-taught SCSE modules carry contact in proportion to credits
-            # (about three days per 10 credits), unlike semesterised modules whose
-            # lecture contact is a flat 2h/week regardless of credit weighting.
-            lecture_contact_hours = 0.0
-            if stage == SCSE_STAGE and stage_raw.upper() == SCSE_STAGE_MARKER and credits > 0:
-                lecture_contact_hours = (
-                    config.SCSE_LECTURE_HOURS_PER_10_CREDITS * credits / 10.0
-                )
+        # Block-taught SCSE modules carry contact in proportion to credits (about
+        # three days per 10 credits), unlike semesterised modules whose lecture
+        # contact is a flat 2h/week regardless of credit weighting.
+        lecture_contact_hours = 0.0
+        if is_scse and credits > 0:
+            lecture_contact_hours = config.SCSE_LECTURE_HOURS_PER_10_CREDITS * credits / 10.0
 
-            module = ModuleData(
-                name=name,
-                codes=codes,
-                stage=stage,
-                semester=semester,
-                lecture_contact_hours=lecture_contact_hours,
-                credits=credits,
-                cohort=cohort,
-                lead_name=lead_name,
-                teachers=teachers,
-                extra_markers=extra_markers,
-                expert_checker=expert_checker,
-                general_checker_required=general_checker_required,
-                general_checker=general_checker,
-                practicals=practicals,
-                has_h_m_variants=has_h_m_variants,
-                student_count=config.DEFAULT_STUDENT_COUNT,
-                assessment_count=1,
-                source_year=year_label,
-                marking_type="manual",
-                new_content=name in (new_modules or set()),
-            )
-            modules.append(module)
-
-        except (IndexError, ValueError):
-            continue
+        modules.append(ModuleData(
+            name=name,
+            codes=codes,
+            stage=stage,
+            semester=semester,
+            lecture_contact_hours=lecture_contact_hours,
+            credits=credits,
+            cohort=cohort,
+            lead_name=lead_name,
+            teachers=teachers,
+            extra_markers=extra_markers,
+            expert_checker=expert_checker,
+            general_checker_required=general_checker_required,
+            general_checker=general_checker,
+            practicals=practicals,
+            has_h_m_variants=has_h_m_variants,
+            student_count=config.DEFAULT_STUDENT_COUNT,
+            assessment_count=1,
+            source_year=year_label,
+            marking_type="manual",
+            new_content=name in (new_modules or set()),
+        ))
 
     return modules
 
