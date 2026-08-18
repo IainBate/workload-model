@@ -639,11 +639,21 @@ def _parse_wtw_csv(filepath: str, known_lecturers: Set[str] = None,
                 except ValueError:
                     practicals = 0
 
+            # Block-taught SCSE modules carry contact in proportion to credits
+            # (about three days per 10 credits), unlike semesterised modules whose
+            # lecture contact is a flat 2h/week regardless of credit weighting.
+            lecture_contact_hours = 0.0
+            if stage == SCSE_STAGE and stage_raw.upper() == SCSE_STAGE_MARKER and credits > 0:
+                lecture_contact_hours = (
+                    config.SCSE_LECTURE_HOURS_PER_10_CREDITS * credits / 10.0
+                )
+
             module = ModuleData(
                 name=name,
                 codes=codes,
                 stage=stage,
                 semester=semester,
+                lecture_contact_hours=lecture_contact_hours,
                 credits=credits,
                 cohort=cohort,
                 lead_name=lead_name,
