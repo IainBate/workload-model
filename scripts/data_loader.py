@@ -492,6 +492,14 @@ def _load_module_mapping() -> Dict[str, Any]:
         return json.load(f)
 
 
+# The SCSE masters modules are block-taught rather than semesterised, and WTW
+# records their stage as "SC" with "-" for the semester. They are MSc-level (every
+# code carries the "M" suffix), so they map onto stage 4 under CLAUDE.md's
+# "1-3 UG, 4+ MSc" convention.
+SCSE_STAGE_MARKER = "SC"
+SCSE_STAGE = 4
+
+
 def _parse_wtw_csv(filepath: str, known_lecturers: Set[str] = None,
                    new_modules: Set[str] = None) -> List[ModuleData]:
     """
