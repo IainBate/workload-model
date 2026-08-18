@@ -1857,8 +1857,17 @@ def _format_teaching_section_for_staff(result: WorkloadResult, title: str, hours
                 </div>
             </div>
         </div>""")
+        subtotal_terms.append(("Project Supervision", proj_hours_total))
 
     items_html_parts.extend(_format_adjustment_items(result, css_class))
+
+    # A delta adjustment is folded into `hours` already, so it must join the
+    # formula too; an absolute override replaces the calculated total outright,
+    # so the components below it no longer sum to `hours` and _format_subtotal_line
+    # falls back to a plain total on its own (values won't add up to match).
+    teaching_adjustment = (result.adjustments_breakdown or {}).get("teaching")
+    if teaching_adjustment and teaching_adjustment["mode"] != "absolute":
+        subtotal_terms.append(("Manual adjustment", teaching_adjustment["delta"]))
 
     items_html = ''.join(items_html_parts)
 
@@ -1868,7 +1877,7 @@ def _format_teaching_section_for_staff(result: WorkloadResult, title: str, hours
             <span class="card-total">{hours:.1f}h</span>
         </div>
         {items_html}
-        <p style="font-size:0.85em;color:#666;padding-top:10px;">Subtotal: {hours:.1f}h</p>
+        {_format_subtotal_line(hours, subtotal_terms)}
     </div>"""
 
 
