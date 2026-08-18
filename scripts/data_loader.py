@@ -1901,7 +1901,12 @@ def load_all_data(data_dir: str = None,
                 in_wtw = True
                 break
         has_waw_role = bool(data.roles)
-        has_fte_record = _find_data(name, name, part_time_data) is not None
+        # Anyone listed in Staff Categories and FTE.csv is active staff by
+        # definition (that's exactly what the file records), so being in it
+        # earns a roster place the same way a WAW role or WTW appearance does
+        # - this is what brings in someone like Ibrahim Habli, full-time ART
+        # staff with no teaching or admin (confirmed 2026-08-19).
+        in_staff_reference = _find_data(name, name, staff_ref_data) is not None
         if name in NON_MODELLED_STAFF:
             if has_waw_role:
                 print(f"  Data warning: {name} holds WAW role(s) {list(data.roles)} but is "
@@ -1909,7 +1914,7 @@ def load_all_data(data_dir: str = None,
                       f"holds {'them' if len(data.roles) > 1 else 'it'}, so those hours are "
                       f"not costed anywhere in this run.")
             continue
-        if in_wtw or has_waw_role or has_fte_record:
+        if in_wtw or has_waw_role or in_staff_reference:
             filtered_staff[name] = data
 
     staff = filtered_staff
