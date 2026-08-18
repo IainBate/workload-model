@@ -412,7 +412,7 @@ ceilings to 2 projects instead of 1 — exactly +16h teaching (one UG project), 
 | File | Status |
 |---|---|
 | `project_load.csv` | **Deleted** — superseded by Loadings.csv (recoverable from git). |
-| `WTW 2025-6.csv` | **Kept — do not delete.** A filename grep shows it as unused, but it is loaded by `glob("WTW *.csv")` in `load_previous_wtw()` and supplies **52 known lecturers / 46 per-module entries** for new-lecturer detection. Deleting it would silently flip every returning lecturer to the 5× new-lecturer rate and massively inflate teaching hours. |
+| `WTW 2025-6.csv` | **Superseded 2026-08-18.** Migrated to `data/CS WTW Who Teaches What.xlsx` (sheets `2025-6`/`2026-7`), which replaced this and `WTW 2026-7.csv`; both CSVs deleted (recoverable from git). The "do not delete" warning below no longer applies to the CSV - `load_previous_wtw()` now reads the xlsx by column name, not the file this row is about. |
 | `Part time.csv` | **Kept, but currently inert.** None of its 4 people (Carrington, Pumfrey, Sujan, Wilson) are in the active roster, and every roster member is 1.0 FTE — so it contributes nothing today. It is still the *mechanism* for part-time FTE, so deleting it would silently give any future part-time member 1.0 FTE. Flagged rather than removed. |
 | All others | In active use. |
 
