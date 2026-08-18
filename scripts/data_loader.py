@@ -598,6 +598,8 @@ def _parse_wtw_csv(filepath: str, known_lecturers: Set[str] = None,
 
             # Lead name
             lead_name = row[6].strip() if len(row) > 6 else ""
+            if lead_name.lower() in NON_MODELLED_TEACHERS:
+                lead_name = ""
 
             # Teachers - varies by year format
             teachers_list = []
