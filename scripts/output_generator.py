@@ -1821,6 +1821,7 @@ def _format_teaching_section_for_staff(result: WorkloadResult, title: str, hours
             items_html_parts.append(f"""<div style="margin-bottom:15px;">
                 <p style="font-size:1.1em;color:#4CAF50;margin:0 0 5px 20px;font-weight:bold;">- Total = {_format_hours(stage_total)}</p>
             </div>""")
+            subtotal_terms.append((stage, stage_total))
 
     # Phase 3b: Use structured supervision breakdowns instead of regex parsing
     # Pastoral supervision
