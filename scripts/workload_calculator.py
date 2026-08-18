@@ -152,8 +152,14 @@ def _calculate_lecture_hours_and_multipliers(module: ModuleData,
     # This represents the standard weekly lecture contact time for staff
     default_lecture_hours_per_week = DEFAULT_LECURE_HOURS_PER_WEEK
 
-    # Calculate lecture hours using the default (2h/week × 11 weeks = 22h typical)
-    lecture_hours = default_lecture_hours_per_week * contact_weeks
+    # Calculate lecture hours using the default (2h/week × 11 weeks = 22h typical).
+    # A module that records its own total lecture contact overrides that - the
+    # block-taught SCSE modules scale with credits instead of running weekly.
+    explicit_lecture_hours = getattr(module, 'lecture_contact_hours', 0.0) or 0.0
+    if explicit_lecture_hours > 0:
+        lecture_hours = explicit_lecture_hours
+    else:
+        lecture_hours = default_lecture_hours_per_week * contact_weeks
 
     # Calculate practical duration for reporting purposes
     if practicals_count > 0 and module.practical_contact_hours > 0:
