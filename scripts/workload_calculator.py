@@ -1281,7 +1281,9 @@ def _calculate_admin_workload(staff_member: StaffData, nominal_hours: float) -> 
     details.append(f"Engagement (email/meetings): {engagement_hours:.1f}h")
     details.append(f"Personal development: {personal_dev_hours:.1f}h (FTE: {fte_value:.2f})")
 
-    return total, breakdown, "; ".join(details) if details else "No administrative roles"
+    return (total, breakdown,
+            "; ".join(details) if details else "No administrative roles",
+            unknown_roles)
 
 
 def _apply_adjustments(staff_member: StaffData, calculated: Dict[str, float],
