@@ -1345,6 +1345,7 @@ def format_detail_section(r: WorkloadResult, title: str, hours: float, breakdown
                     <span class="detail-hours">{count} {unit_label} x {rate}h each = {total:.1f}h</span>
                     <span class="detail-activity research-activity"></span>
                 </div>""")
+                subtotal_terms.append((display_name, total))
 
     else:
         # Generic formatting for admin and other sections
