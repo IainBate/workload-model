@@ -615,7 +615,7 @@ def _parse_wtw_sheet(ws, year_label: str, new_modules: Set[str] = None) -> List[
     # "Cohort" labels both the module-name column (0) and the real cohort label
     # (e.g. "UG1") further along - the real one is whichever second occurrence
     # exists; sheets with no code column (2025-6) only have the one at index 3.
-    cohort_col = col("Cohort", nth=1) if len(colmap.get("Cohort", [])) > 1 else col("Cohort", nth=1) or col("Cohort", nth=0)
+    cohort_col = col("Cohort", nth=1) or col("Cohort", nth=0)
     lead_col = col("Who Teaches What (WTW) Lead")
     teaching_col = col("Teaching")  # first of up to 3 teacher slots (Teaching, then 2 unlabeled continuation columns)
     expert_col = col("Expert Checker")
