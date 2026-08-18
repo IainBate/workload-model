@@ -1832,13 +1832,13 @@ def load_all_data(data_dir: str = None,
             # down to this year's staff) so we never prompt about someone who
             # won't appear in any report.
             resolved_category = _resolve_category_from_data(
-                canonical, art_ts_category, pt_info, category_overrides
+                canonical, staff_ref, category_overrides
             )
 
             staff[canonical] = StaffData(
                 canonical_name=canonical,
                 aliases=tuple(mappings.get(canonical, [canonical])),
-                fte=pt_info["fte"] if pt_info else 1.0,
+                fte=staff_ref["fte"] if staff_ref else 1.0,
                 employment_start=proj_data["employment_start"] if proj_data else 0,
                 active=proj_data["active"] if proj_data else True,
                 category=resolved_category,
