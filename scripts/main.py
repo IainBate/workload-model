@@ -36,6 +36,31 @@ try:
 except ImportError:
     GOOGLE_SHEETS_AVAILABLE = False
 
+# Try to import publishing strategy modules (optional)
+try:
+    from email_data import load_staff_emails, get_all_staff_emails
+    EMAIL_DATA_AVAILABLE = True
+except ImportError:
+    EMAIL_DATA_AVAILABLE = False
+
+try:
+    from google_forms import create_feedback_form, generate_prefilled_urls
+    GOOGLE_FORMS_AVAILABLE = True
+except ImportError:
+    GOOGLE_FORMS_AVAILABLE = False
+
+try:
+    from email_sender import send_emails_via_smtp, verify_smtp_config
+    EMAIL_SENDER_AVAILABLE = True
+except ImportError:
+    EMAIL_SENDER_AVAILABLE = False
+
+try:
+    from feedback_dashboard import generate_feedback_summary
+    FEEDBACK_DASHBOARD_AVAILABLE = True
+except ImportError:
+    FEEDBACK_DASHBOARD_AVAILABLE = False
+
 
 def prompt_name_match(user_name: str, canonical_name=None) -> bool:
     """Interactive prompt for unknown staff names."""
