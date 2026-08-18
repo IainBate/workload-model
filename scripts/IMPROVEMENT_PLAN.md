@@ -10,7 +10,7 @@ Section B (testing foundation) and the gated B10 refactor still to do. Built fro
 
 ## Decisions made (2026-08-12)
 
-1. **Doc of record:** `Work Allocation Model.docx` is the sole source of truth. Code/config/
+1. **Doc of record:** `docs/Work Allocation Model.docx` is the sole source of truth. Code/config/
    report-footer citations updated accordingly.
 2. **Ethics Committee Member %:** Confirmed **20%**. `workload_parameters.yaml` reverted to 0.20,
    self-contradictory prose caveat removed from the docx.
@@ -109,7 +109,7 @@ The 30h minimum admin teaching load has been removed end-to-end:
 | `config.py` | Removed `MIN_ADMIN_TEACHING_HOURS`. |
 | `params/workload_parameters.yaml` | Removed `min_admin_teaching: 30`, replaced with a comment stating the rule explicitly so it can't be silently reintroduced. |
 | `output_generator.py`, `new_individual_reports.py` | Removed the "Minimum Admin Teaching Load" line from both report renderers. |
-| `Work Allocation Model.docx` | Removed the "Minimum administrative teaching load — 30" row from the baselines table; removed "minimum admin teaching" from the FTE-scaling list; **added an explicit statement of the rule**, which was A2's original problem (the model was never written down). |
+| `docs/Work Allocation Model.docx` | Removed the "Minimum administrative teaching load — 30" row from the baselines table; removed "minimum admin teaching" from the FTE-scaling list; **added an explicit statement of the rule**, which was A2's original problem (the model was never written down). |
 
 **Impact: exactly one person, exactly as intended.** Iain Bate was the only staff member receiving
 it. Teaching 30h → 0h, total 2,435.6h → 2,405.6h, with engagement (100h) and personal development
@@ -176,7 +176,7 @@ and independent-study time, not extra lecture contact. Actions taken:
   now-orphaned `validatecontacthours()` validator, and 25 constructor arguments across the two
   test files. It computed a credit-derived number that nothing consumed, which had already misled
   one unit test into asserting the wrong hours (see Test suite health).
-- Documented the rule in `Work Allocation Model.docx` §2: lecture contact is 2h/week over 11 weeks
+- Documented the rule in `docs/Work Allocation Model.docx` §2: lecture contact is 2h/week over 11 weeks
   (22h) for every module regardless of credit weighting, with the reasoning stated.
 
 No hours changed — verified via calculation baseline and the full 61-test suite.

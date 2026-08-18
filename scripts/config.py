@@ -1,6 +1,6 @@
 """
 Configuration and constants for workload calculations.
-Loads parameters from workload_parameters.yaml (extracted from Work Allocation Model.docx).
+Loads parameters from workload_parameters.yaml (extracted from docs/Work Allocation Model.docx).
 
 This is the runtime source of truth for all workload parameters.
 """
