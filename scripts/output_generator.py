@@ -1534,6 +1534,20 @@ def _format_module_assessment_section(module_breakdown: Dict[str, Any], css_clas
     if module_code and not module_code.startswith('<') and not module_code.endswith('>'):
         label_prefix = f"[{module_code}] "
 
+    # Module leadership sits at the same level as delivery and practicals: it is
+    # work done on the module, not an administrative role percentage.
+    module_leadership = module_breakdown.get('module_leadership', 0)
+    if module_leadership > 0:
+        parts.append(f"""<div class="detail-item {css_class}">
+            <span class="detail-name">{label_prefix}Module Leadership</span>
+            <span class="detail-hours">{module_leadership:.1f}h</span>
+            <span class="detail-activity teaching-activity"></span>
+        </div>""")
+        parts.append(f"""<div class="detail-item {css_class}" style="padding-left:40px;font-size:0.85em;color:#666;">
+            <span class="detail-name" style="color:#333;">Calculation</span>
+            <span class="detail-hours">1 day @ {module_leadership:.1f}h for leading the module</span>
+        </div>""")
+
     assessment_setting_per_module = module_breakdown.get('assessment_setting', 0)
     if assessment_setting_per_module > 0:
         parts.append(f"""<div class="detail-item {css_class}">
