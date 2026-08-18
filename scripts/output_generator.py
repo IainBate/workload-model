@@ -20,6 +20,13 @@ from pathlib import Path
 from typing import List, Optional, Dict, Any, Tuple
 
 import reporting_helpers
+from workload_calculator import _TEACHING_MODULE_SUM_KEYS
+
+# Components rendered in their own sections of the individual report rather than
+# against the module, so they must not also appear in the per-module total.
+_MODULE_TOTAL_EXCLUDED_KEYS = frozenset({"supervision", "admin", "hw_lab", "drop_in"})
+_MODULE_TOTAL_KEYS = [k for k in _TEACHING_MODULE_SUM_KEYS
+                      if k not in _MODULE_TOTAL_EXCLUDED_KEYS]
 
 # Get project root directory (parent of scripts folder)
 SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
