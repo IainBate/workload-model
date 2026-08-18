@@ -1378,7 +1378,6 @@ def format_detail_section(r: WorkloadResult, title: str, hours: float, breakdown
 
         # Add top-level items first, tracking each one as a term of the closing
         # calculation so "Subtotal:" shows what it's the sum of, not just the total.
-        subtotal_terms: List[Tuple[str, float]] = []
         for item_name, item_value, display_name in sorted(top_level_items, key=lambda x: -x[1]):
             items_html_parts.append(f"""<div class="detail-item {css_class}">
                 <span class="detail-name">{display_name}</span>
