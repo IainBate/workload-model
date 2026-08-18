@@ -340,9 +340,9 @@ def _handle_email_send(args, results, year_data):
     else:
         form_urls = {r.name: "[FORM_URL_HERE]" for r in results}
 
-    # Send emails
+    # Send emails with attachments from output directory
     print(f"\nSending emails to {len(results)} staff members...")
-    statuses = send_emails_via_smtp(results, form_urls, smtp_config)
+    statuses = send_emails_via_smtp(results, form_urls, smtp_config, output_dir=output_dir)
 
     success_count = sum(1 for v in statuses.values() if v)
     fail_count = len(statuses) - success_count
