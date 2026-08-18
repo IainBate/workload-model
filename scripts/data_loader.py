@@ -1840,13 +1840,9 @@ def load_all_data(data_dir: str = None,
                 if norm_member == canonical:
                     staff_roles.append(yaml_role)
 
-        # Check for SAINTS modules
-        saint_modules = []
-        for saint_name, modules_list in saint_module_map.items():
-            if raw_name.upper() == saint_name.upper() or \
-               saint_name.lower() in canonical.lower() or \
-               saint_name.lower() in raw_name.lower():
-                saint_modules.extend(modules_list)
+        # SAINTS modules this person teaches, from the real WTW data captured
+        # above (excluded_saint_modules_by_teacher) rather than a hardcoded map.
+        saint_modules = list(excluded_saint_modules_by_teacher.get(canonical, ()))
 
         if canonical not in staff:
             # Extract pastoral students from pastoral_load_data (prioritized) or project_load data
