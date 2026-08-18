@@ -171,7 +171,7 @@ workload_adjustments.csv (optional, auto-synced) → Manual Teaching/Research/Ad
 - `main.py` — Entry point. Orchestrates loading → calculation → output.
 
 ### Data files
-- **WTW CSVs** (`WTW 2026-7.csv`, `WTW 2025-6.csv`): Module list, teachers, checkers. 2025-6 used for new lecturer detection.
+- **`CS WTW Who Teaches What.xlsx`** (migrated 2026-08-18, replacing `WTW 2026-7.csv`/`WTW 2025-6.csv`): Module list, teachers, checkers, one sheet per academic year (e.g. `2026-7`), read by column NAME via `_parse_wtw_sheet()` in `data_loader.py` - `load_wtw_files()`/`load_previous_wtw()` auto-pick the latest two year-named sheets. The workbook's `Allocation`, `General Checking`, and any sheet older than the two most recent years are human planning aids with no consumer in this pipeline. Previous-year sheet used for new lecturer detection.
 - **`staff_name_lookup.json`**: Canonical name → aliases mapping for staff name normalization.
 - **`module_mapping.json`**: Module H/M merges, unified project modules, dropped/new modules between years.
 - **`workload_parameters.yaml`**: All workload parameters extracted from the .docx.
