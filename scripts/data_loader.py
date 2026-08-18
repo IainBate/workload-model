@@ -504,13 +504,23 @@ def _load_module_mapping() -> Dict[str, Any]:
 SCSE_STAGE_MARKER = "SC"
 SCSE_STAGE = 4
 
-# People who appear in WTW but are not workload-modelled - research assistants and
-# other non-academic contributors who pick up some teaching. Filtered out at parse
-# time so they neither join the staff roster nor take a share of a module: the
-# module's hours split between the remaining team instead. Compared case-folded
-# against the raw WTW cell.
+# People who appear in the data but are not workload-modelled - research assistants
+# and other non-academic contributors who pick up some teaching or a WAW role.
+# Compared case-folded against the raw WTW cell text, so this must be filtered
+# before any module split or roster-inclusion decision runs - never after.
 NON_MODELLED_TEACHERS = {
     "kate p",  # RA doing some teaching on HUFS (confirmed 2026-08-18)
+}
+
+# Same idea, but for canonical names rather than raw WTW cell text - people who
+# hold a WAW role or FTE record (so they would otherwise earn a roster place
+# under the "active staff" rule above) but are not workload-modelled. Checked
+# after normalization, at the final roster filter.
+NON_MODELLED_STAFF = {
+    "Philippa Ryan",  # RA; holds the EDI Committee Chair role in WAW but isn't
+                       # workload-modelled (confirmed 2026-08-18). No one else
+                       # holds that role, so its 82.1h goes uncosted - flagged
+                       # via missing_data below rather than silently dropped.
 }
 
 
