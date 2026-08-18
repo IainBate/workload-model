@@ -1285,6 +1285,10 @@ def format_detail_section(r: WorkloadResult, title: str, hours: float, breakdown
 
     items_html_parts = []
 
+    # Track the value behind each visible component, in display order, so the
+    # closing Subtotal line can show the calculation rather than just the total.
+    subtotal_terms: List[Tuple[str, float]] = []
+
     # Handle research section specially to show hierarchical structure
     if css_class == "research-item":
         # Protected research baseline (top level)
@@ -1295,6 +1299,7 @@ def format_detail_section(r: WorkloadResult, title: str, hours: float, breakdown
                 <span class="detail-hours">{protected_baseline:.1f}h</span>
                 <span class="detail-activity research-activity"></span>
             </div>""")
+            subtotal_terms.append(("Protected research baseline", protected_baseline))
 
         # Grants (nested under "Research Grants" heading if present)
         grants = breakdown.get('grants', {})
