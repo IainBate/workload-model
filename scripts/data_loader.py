@@ -1730,7 +1730,7 @@ def load_all_data(data_dir: str = None,
         all_names.add(name)
     for name in fte_data:
         all_names.add(name)
-    for name in part_time_data:
+    for name in staff_ref_data:
         all_names.add(name)
 
     # Sort names for deterministic processing order
