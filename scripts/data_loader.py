@@ -1982,15 +1982,8 @@ def load_all_data(data_dir: str = None,
                     hod_roles.append(yaml_role)
 
         # Resolve contract category using the same priority order as regular staff
-        art_ts_category_hod = None
-        for key, val in art_ts_data.items():
-            norm_key = normalize_name(key, reverse_lookup, unknown_callback=None)
-            if norm_key == hod_name_from_waw:
-                art_ts_category_hod = val
-                break
-
         resolved_category_hod = _resolve_category_from_data(
-            hod_name_from_waw, art_ts_category_hod, pt_info_hod, category_overrides
+            hod_name_from_waw, staff_ref_hod, category_overrides
         )
 
         # Collect adjustment rows/warnings for the HoD (if available). This uses the
