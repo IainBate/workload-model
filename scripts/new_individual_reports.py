@@ -30,6 +30,7 @@ To keep or drop a specific proposal, flip its entry in NEW_REPORT_FEATURES
 and regenerate.
 """
 
+import glob
 import os
 from datetime import datetime
 from pathlib import Path
