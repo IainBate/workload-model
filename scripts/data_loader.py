@@ -1578,15 +1578,33 @@ def load_all_data(data_dir: str = None,
 
     # Drop modules explicitly excluded from teaching workload. These are modules
     # whose work is credited elsewhere (e.g. "Projects" is covered by the Taught
-    # Project Coordinator admin role), so counting them here would double-count.
-    # Configured in module_mapping.json rather than hardcoded.
+    # Project Coordinator admin role) or out of scope entirely (SAINTS modules,
+    # cross-department), so counting them here would double-count or misrepresent
+    # the work. Configured in module_mapping.json rather than hardcoded.
+    #
+    # SAINTS modules are captured separately before being dropped: their real
+    # lead/teachers feed the "Also teaches: ... (SAINTS - not included in
+    # workload)" footnote below, keyed by canonical name via
+    # excluded_saint_modules_by_teacher - this replaces a previously hardcoded,
+    # hand-maintained saint_module_map dict that duplicated (and could drift
+    # from) the same information already sitting in the WTW data.
     excluded_modules = module_mapping.get("excluded_modules", {}) or {}
+    excluded_saint_modules_by_teacher: Dict[str, List[str]] = {}
     if excluded_modules:
         kept = []
         for module in modules:
             if module.name in excluded_modules:
                 reason = excluded_modules[module.name].get("reason", "no reason recorded")
                 print(f"Excluding module '{module.name}' from teaching workload: {reason}")
+                if module.cohort.strip().upper() == SAINTS_COHORT:
+                    for raw_name in (module.lead_name, *module.teachers):
+                        if not raw_name:
+                            continue
+                        canonical = normalize_name(raw_name, reverse_lookup, unknown_callback, mappings)
+                        key = canonical or raw_name
+                        excluded_saint_modules_by_teacher.setdefault(key, [])
+                        if module.name not in excluded_saint_modules_by_teacher[key]:
+                            excluded_saint_modules_by_teacher[key].append(module.name)
             else:
                 kept.append(module)
         modules = kept
