@@ -325,6 +325,8 @@ def main() -> int:
     results: List[Tuple[str, str, List[str]]] = []
 
     for filename in EXPECTED_HEADERS:
+        if filename == "Staff Categories and FTE.csv":
+            continue  # combined header+value check below, one report row
         status, messages = check_header_file(filename)
         results.append((filename, status, messages))
 
@@ -334,8 +336,8 @@ def main() -> int:
     status, messages = check_waw()
     results.append(("WAW.csv", status, messages))
 
-    status, messages = check_art_categories()
-    results.append(("CS Data Collection on ART Performance ... .csv", status, messages))
+    status, messages = check_staff_categories()
+    results.append(("Staff Categories and FTE.csv", status, messages))
 
     status, messages = check_filename_exists(
         "workload_adjustments.csv",
