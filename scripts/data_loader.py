@@ -536,17 +536,28 @@ def _parse_wtw_csv(filepath: str, known_lecturers: Set[str] = None,
             if not codes:
                 continue
 
-            # Stage
-            stage = int(row[2]) if len(row) > 2 and row[2].strip().isdigit() else 0
+            # Stage. "SC" marks the block-taught SCSE masters modules, whose codes
+            # all carry the "M" suffix - record them at MSc level (CLAUDE.md's
+            # "1-3 UG, 4+ MSc" convention) so project supervision uses the MSc rate.
+            stage = 0
+            if len(row) > 2:
+                stage_raw = row[2].strip()
+                if stage_raw.isdigit():
+                    stage = int(stage_raw)
+                elif stage_raw.upper() == SCSE_STAGE_MARKER:
+                    stage = SCSE_STAGE
 
-            # Semester
+            # Semester. Block-taught modules record "-" rather than a semester
+            # number; treat anything non-numeric as "no fixed semester" (0). This
+            # must not raise - the caller's except clause discards the whole module.
             semester = 0
             if len(row) > 3:
                 s = row[3].strip()
                 if s.isdigit():
                     semester = int(s)
                 elif "-" in s:
-                    semester = int(s.split("-")[0])  # e.g., "1-2"
+                    head = s.split("-")[0].strip()  # e.g., "1-2" -> 1
+                    semester = int(head) if head.isdigit() else 0
 
             # Credits
             credits = int(row[4]) if len(row) > 4 and row[4].strip().isdigit() else 0
