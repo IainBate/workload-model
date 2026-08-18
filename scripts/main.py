@@ -11,7 +11,6 @@ Usage:
 import argparse
 import os
 import sys
-import glob
 
 # Get project root (parent of scripts folder)
 SCRIPTS_DIR = os.path.dirname(os.path.abspath(__file__))
