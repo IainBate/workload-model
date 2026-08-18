@@ -247,7 +247,128 @@ def main():
         else:
             write_workload_to_google_sheets(results, year_data)
 
+    # Publishing strategy: Create Google Forms for feedback
+    if args.generate_forms:
+        _handle_form_generation(args, results, year_data)
+
+    # Publishing strategy: Send emails with form links
+    if args.send_emails:
+        _handle_email_send(args, results, year_data)
+
+    # Publishing strategy: Generate feedback dashboard
+    if args.feedback_csv:
+        _handle_feedback_dashboard(args, results, output_dir)
+
     print("\nDone.")
+
+
+def _handle_form_generation(args, results, year_data):
+    """Handle Google Form generation and URL creation."""
+    if not GOOGLE_FORMS_AVAILABLE:
+        print("\nGoogle Forms integration is not available.")
+        print("Install with: pip install google-api-python-client google-auth")
+        return
+
+    print("\n" + "="*60)
+    print("Google Forms Integration")
+    print("="*60)
+
+    # Load emails for pre-filling
+    if EMAIL_DATA_AVAILABLE:
+        emails = get_all_staff_emails(year_data)
+        print(f"\nLoaded email addresses for {len(emails)} staff members")
+
+    # Create or use existing form
+    form_title = args.form_title or f"Workload Review {year_data.year_label}"
+    print(f"\nCreating feedback form: {form_title}")
+
+    # Note: Without OAuth, we provide instructions for manual form creation
+    print("\nNOTE: Google Forms API requires OAuth credentials.")
+    print("To proceed manually:")
+    print(f"  1. Go to https://docs.google.com/forms/u/0/")
+    print("  2. Create a new blank form")
+    print(f"  3. Title: {form_title}")
+    print("  4. Add questions for feedback collection")
+    print("  5. Get your form ID from the URL (forms.gle/{FORM_ID})")
+
+    # Generate prefilled URLs using manual approach
+    print("\nTo generate pre-filled URLs after creating the form:")
+    print(f"  python -c \"from google_forms import generate_prefilled_urls; ...\"")
+
+
+def _handle_email_send(args, results, year_data):
+    """Handle SMTP email sending."""
+    if not EMAIL_SENDER_AVAILABLE:
+        print("\nEmail sender is not available.")
+        return
+
+    print("\n" + "="*60)
+    print("Email Distribution")
+    print("="*60)
+
+    # Load emails
+    if EMAIL_DATA_AVAILABLE:
+        emails = get_all_staff_emails(year_data)
+        print(f"\nLoaded email addresses for {len(emails)} staff members")
+    else:
+        print("\nEmail data module not available.")
+        return
+
+    # Load SMTP config
+    smtp_config_path = args.smtp_config
+    if smtp_config_path and os.path.exists(smtp_config_path):
+        import yaml
+        with open(smtp_config_path, 'r') as f:
+            smtp_config = yaml.safe_load(f)
+    else:
+        print("\nSMTP configuration not provided or file not found.")
+        print("Please provide --smtp-config path to YAML config file")
+        return
+
+    # Verify SMTP config
+    if not verify_smtp_config(smtp_config):
+        print("\nSMTP configuration is incomplete.")
+        return
+
+    # Generate form URLs (placeholder - would use actual form ID)
+    print("\nGenerating pre-filled form URLs...")
+    if GOOGLE_FORMS_AVAILABLE and EMAIL_DATA_AVAILABLE:
+        # In practice, you'd provide a form_id from a created form
+        print("  Note: Form ID not provided. Use --form-id to generate URLs.")
+        print("  Without form IDs, emails will be sent without personalized links.")
+        form_urls = {r.name: "[FORM_URL_HERE]" for r in results}
+    else:
+        form_urls = {r.name: "[FORM_URL_HERE]" for r in results}
+
+    # Send emails
+    print(f"\nSending emails to {len(results)} staff members...")
+    statuses = send_emails_via_smtp(results, form_urls, smtp_config)
+
+    success_count = sum(1 for v in statuses.values() if v)
+    fail_count = len(statuses) - success_count
+    print(f"\nEmail send complete: {success_count} succeeded, {fail_count} failed")
+
+
+def _handle_feedback_dashboard(args, results, output_dir):
+    """Generate feedback summary dashboard."""
+    if not FEEDBACK_DASHBOARD_AVAILABLE:
+        print("\nFeedback dashboard is not available.")
+        return
+
+    print("\n" + "="*60)
+    print("Feedback Dashboard")
+    print("="*60)
+
+    # Generate the dashboard
+    html_path = generate_feedback_summary(
+        results=results,
+        feedback_csv_path=args.feedback_csv,
+        output_dir=output_dir,
+        year_label=getattr(results[0], 'year_label', '2026-7') if results else '2026-7',
+        deadline=None  # Can be added via --deadline if needed
+    )
+
+    print(f"\nFeedback dashboard generated: {html_path}")
 
 
 if __name__ == "__main__":
