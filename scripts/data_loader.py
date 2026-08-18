@@ -279,7 +279,20 @@ _NON_PERSON_ENTRIES = {
     "module has h and m variants", "practicals", "markers", "notes",
     "allocation counter", "total", "lead", "teaching", "marking",
     "expert checker", "sOF1", "tHE1", "hCIN", "sOF2", "sYS1",
+    "<new hire>",  # WTW placeholder for a not-yet-filled teaching slot, not a person
 }
+
+
+def _normalize_apostrophes(text: str) -> str:
+    """Fold curly/smart apostrophes to a plain straight one before name matching.
+
+    Word/Google Docs auto-convert a typed ' into a curly ’ (U+2019); a name typed
+    into the WTW workbook can carry that character while staff_name_lookup.json's
+    aliases use a plain '. Without this, "O'Dea" (registered alias) and "O’Dea"
+    (as typed in the source sheet) silently fail to match and the same person
+    ends up as two separate "staff members" with their hours split between them.
+    """
+    return text.replace("’", "'").replace("‘", "'")
 
 
 def normalize_name(name: str, reverse_lookup: Dict[str, str],
