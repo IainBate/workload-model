@@ -1080,6 +1080,7 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
                 "supervision": teacher_supervision_hours.get(teacher, 0.0),
                 "hw_lab": teacher_hw_lab,
                 "drop_in": teacher_drop_in,
+                "module_leadership": teacher_module_leadership,
                 "online_content_dev": 0.0,  # Not calculated per-module in current implementation
                 # Store the base contact hours (before multiplier) for display purposes
                 "lecture_contact_hours": lecture_result['individual_lecture_contact_hours'].get(teacher, 0.0),
