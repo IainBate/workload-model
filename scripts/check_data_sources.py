@@ -90,7 +90,7 @@ CRITICAL_COLUMNS: Dict[str, List[str]] = {
         "Staff member", "Total as supervisor (sole or co-supervisor) AND TAP member",
     ],
     "% FTE for CS.csv": ["Project Lead", "Project ID", "% FTE", "PI or Co-I", "Project Title"],
-    "Part time.csv": ["Surname", "Staff Category", "FTE"],
+    "Staff Categories and FTE.csv": ["Name", "Category", "FTE"],
 }
 
 # WTW workbook: read by header NAME (since 2026-08-18, replacing a positional
