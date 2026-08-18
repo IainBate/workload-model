@@ -1198,6 +1198,12 @@ def _load_waw_roles(filepath: str = "WAW.csv") -> Dict[str, list]:
                 continue
             if role.startswith("Red indicates"):
                 continue
+            # Cross-reference rows point the reader at a role recorded elsewhere in
+            # the file ("see main roles below"); they are not assignments, so they
+            # must not become roles - otherwise every one raises a spurious unknown
+            # -role warning once unrecognised names are flagged.
+            if staff_on_campus.lower().startswith("see main roles"):
+                continue
             # Only include on-campus staff (skip online team)
             if staff_on_campus:
                 roles.setdefault(role, []).append(staff_on_campus)
