@@ -523,6 +523,8 @@ NON_MODELLED_STAFF = {
                        # workload-modelled (confirmed 2026-08-18). No one else
                        # holds that role, so its 82.1h goes uncosted - flagged
                        # via missing_data below rather than silently dropped.
+    "Phoebe Barraclough",  # Online T&S staff (confirmed 2026-08-18); appears only
+                       # as CTAP's expert checker, no workload spec needed.
 }
 
 
