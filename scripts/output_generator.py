@@ -1779,10 +1779,12 @@ def _format_teaching_section_for_staff(result: WorkloadResult, title: str, hours
         stage_total = 0.0
         for mod in modules_in_stage:
             mb = mod.get('module_breakdown', {})
-            # Sum up the main teaching components from the module breakdown
-            # ('manual_adjustment' included so this total agrees with the module-scoped
-            # "Manual adjustment" line item rendered above it whenever one is present)
-            for key in ['teaching', 'practicals', 'assessment_setting', 'marking', 'manual_adjustment']:
+            # Sum the module's own components, derived from the calculator's
+            # authoritative key list so a new component can't be added there and
+            # silently go missing from this total. Supervision, HW labs and drop-ins
+            # are excluded because they are rendered in their own sections below;
+            # counting them here too would show the same hours twice.
+            for key in _MODULE_TOTAL_KEYS:
                 if key in mb and isinstance(mb[key], (int, float)):
                     stage_total += mb[key]
 
