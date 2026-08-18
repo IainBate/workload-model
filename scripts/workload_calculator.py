@@ -1242,12 +1242,24 @@ def _calculate_admin_workload(staff_member: StaffData, nominal_hours: float) -> 
     total = 0.0
     details = []
     breakdown = {}
+    unknown_roles = []
 
-    # Track which roles have been counted to avoid double-counting
+    # Track which roles have been counted to avoid double-counting. A role listed
+    # twice in WAW (a duplicated row) would otherwise add its hours twice while the
+    # breakdown dict, being keyed by role, showed a single line - so the total and
+    # the detail would silently disagree.
     counted_roles = set()
 
     for role in staff_member.roles:
-        percentage = config.ROLES_PERCENTAGE.get(role, 0.0)
+        if role in counted_roles:
+            continue
+        if role not in config.ROLES_PERCENTAGE:
+            # No guessed data: an unrecognised role name is a WAW/spec mismatch,
+            # not a 0% role. Scoring it silently as zero is what previously hid
+            # several roles worth hundreds of hours.
+            unknown_roles.append(role)
+            continue
+        percentage = config.ROLES_PERCENTAGE[role]
         hours = nominal_hours * percentage
         total += hours
         breakdown[role] = hours
