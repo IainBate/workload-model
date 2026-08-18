@@ -85,13 +85,18 @@ The immutable DTO passed from calculator to output. Contains all pre-computed nu
 
 `data/workload_adjustments.csv` (optional) lets a human apply a reviewed correction to a
 person's Teaching, Research, or Admin total, with a mandatory rationale, for cases the model
-doesn't capture. Columns: `Person, Teaching Adjustment, Teaching Rationale, Research Adjustment,
-Research Rationale, Admin Adjustment, Admin Rationale`.
+doesn't capture. Columns: `Person, Teaching Module, Teaching Adjustment, Teaching Rationale,
+Research Adjustment, Research Rationale, Admin Adjustment, Admin Rationale, Other Notes`.
 
 - **Grammar** (case-insensitive): `+N`, `-N`, or a bare `N` = **delta**; `SET N` = **absolute
   override**. Never a leading `=` — Excel/Sheets evaluates `=250` as a formula and drops the `=`
   on CSV re-save, which would make overrides indistinguishable from deltas after a spreadsheet
   round-trip. A filled adjustment cell with a blank rationale is rejected, not applied.
+- **`Other Notes`** (added 2026-08-19): free text for a change that doesn't fit the
+  delta/absolute-override grammar above — never read or applied automatically. Write what you
+  want in plain English; ask Claude to read the column and either convert each entry into the
+  right Teaching/Research/Admin Adjustment + Rationale cells, or implement it directly if it
+  isn't something an adjustment row can express at all (a new WAW role, say).
 - **Multiple rows per person stack** within a category (deltas sum). An absolute override mixed
   with a delta for the *same* category, two absolute overrides for the same category, or any
   adjustment that would drive a category negative — none of these get resolved by guessing;
