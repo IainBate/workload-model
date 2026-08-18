@@ -36,3 +36,6 @@ temp_excel/
 
 # Comparison report (generated)
 # three_way_comparison_report.md
+
+# Office lock files
+~$*

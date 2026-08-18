@@ -49,6 +49,7 @@
         "drop_in": 0.0,
         "hw_lab": 0.0,
         "marking": 20.0,
+        "module_leadership": 0.0,
         "pastoral_supervision": 75,
         "practicals": 110.0,
         "project_supervision": 160,
@@ -61,6 +62,7 @@
           "assessment_setting": 7.5,
           "delivery_structured": {
             "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "existing_lecturer_new_content",
             "lectures_per_week": 1.0,
             "multiplier": 5,
@@ -93,6 +95,7 @@
             "COM00069H",
             "COM00214M"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
           "practicals": 110.0,
           "practicals_structured": {
@@ -171,18 +174,20 @@
         "drop_in": 0.0,
         "hw_lab": 0.0,
         "marking": 10.7,
+        "module_leadership": 7.3,
         "pastoral_supervision": 81,
         "practicals": 55.0,
         "project_supervision": 112,
         "supervision": 0.0,
         "teaching": 55.0
       },
-      "teaching_hours": 343.7,
+      "teaching_hours": 351.0,
       "teaching_module_breakdowns": {
         "IDEV": {
           "assessment_setting": 15.0,
           "delivery_structured": {
             "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -215,6 +220,7 @@
             "COM00060H",
             "COM00179M"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
           "practicals": 27.5,
           "practicals_structured": {
@@ -239,6 +245,7 @@
           "assessment_setting": 15.0,
           "delivery_structured": {
             "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -280,6 +287,7 @@
             "COM00065H",
             "COM00190M"
           ],
+          "module_leadership": 7.3,
           "online_content_dev": 0.0,
           "practicals": 27.5,
           "practicals_structured": {
@@ -301,7 +309,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1291.3
+      "total_hours": 1298.6
     },
     "Alvaro Miyazawa": {
       "adjustments_breakdown": {},
@@ -314,7 +322,9 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
-      "missing_data": [],
+      "missing_data": [
+        "ARIA: no student numbers in CS Module Numbers.csv - marking hours estimated from a default of 100 students"
+      ],
       "name": "Alvaro Miyazawa",
       "nominal_hours": 1642.0,
       "pastoral_breakdown": {
@@ -346,22 +356,82 @@
       },
       "research_hours": 268.2,
       "teaching_breakdown": {
-        "assessment_setting": 10.0,
+        "assessment_setting": 15.0,
         "drop_in": 0.0,
         "hw_lab": 0.0,
-        "marking": 52.8667,
+        "marking": 66.2,
+        "module_leadership": 7.3,
         "pastoral_supervision": 39,
-        "practicals": 18.3333,
+        "practicals": 55.0,
         "project_supervision": 48,
         "supervision": 0.0,
-        "teaching": 36.6667
+        "teaching": 73.3333
       },
-      "teaching_hours": 204.8667,
+      "teaching_hours": 303.8333,
       "teaching_module_breakdowns": {
+        "ARIA": {
+          "assessment_setting": 5.0,
+          "delivery_structured": {
+            "base_per_teacher": 7.3333,
+            "is_block_taught": false,
+            "lecturer_type": "existing_lecturer_new_content",
+            "lectures_per_week": 1.0,
+            "multiplier": 5,
+            "teacher_count": 3,
+            "total_lecture_hours": 22.0,
+            "week_count": 11
+          },
+          "drop_in": 0.0,
+          "hw_lab": 0.0,
+          "lecture_contact_hours": 7.3333,
+          "marking": 13.3333,
+          "marking_structured": {
+            "hours_per_teacher": 13.3333,
+            "is_automated": false,
+            "levels": [
+              {
+                "label": null,
+                "main_hours": 33.3333,
+                "main_student_count": 100,
+                "rate_per_script": 0.3333,
+                "resit_hours": 6.6667,
+                "resit_student_count": 20.0,
+                "total_hours": 40.0
+              }
+            ],
+            "n_teachers": 3,
+            "total_hours": 40.0
+          },
+          "module_codes": [
+            "COM00072H",
+            "COM00217M"
+          ],
+          "module_leadership": 0.0,
+          "online_content_dev": 0.0,
+          "practicals": 36.6667,
+          "practicals_structured": {
+            "applied_rate": 5.0,
+            "first_session_hours": 2.0,
+            "first_session_rate": 2.5,
+            "first_session_sessions": 1,
+            "first_session_total": 110.0,
+            "n_teachers": 3,
+            "repeat_hours": 0,
+            "repeat_rate": 1.5,
+            "repeat_total": 0.0,
+            "sessions_per_teacher": 0.3333,
+            "total": 22.0,
+            "week_count": 11
+          },
+          "supervision": 0.0,
+          "teaching": 36.6667,
+          "total_lecture_hours": 22.0
+        },
         "AURO": {
           "assessment_setting": 5.0,
           "delivery_structured": {
             "base_per_teacher": 7.3333,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -403,6 +473,7 @@
             "COM00052H",
             "COM00186M"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
           "practicals": 18.3333,
           "practicals_structured": {
@@ -427,6 +498,7 @@
           "assessment_setting": 5.0,
           "delivery_structured": {
             "base_per_teacher": 7.3333,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -458,6 +530,7 @@
           "module_codes": [
             "COM00014C"
           ],
+          "module_leadership": 7.3,
           "online_content_dev": 0.0,
           "practicals": 0.0,
           "supervision": 0.0,
@@ -465,7 +538,54 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 812.2667
+      "total_hours": 911.2333
+    },
+    "Ana Cavalcanti": {
+      "adjustments_breakdown": {},
+      "admin_breakdown": {
+        "Research Group Leader": 164.2,
+        "engagement": 100.0,
+        "personal_development": 75.0
+      },
+      "admin_hours": 339.2,
+      "assumptions": [
+        "Invalid FTE value for grant: '?'",
+        "Invalid FTE value for grant: '?'"
+      ],
+      "category": "ART",
+      "fte": 1.0,
+      "missing_data": [],
+      "name": "Ana Cavalcanti",
+      "nominal_hours": 1642.0,
+      "pastoral_breakdown": {
+        "rate": 3,
+        "student_count": 0,
+        "total": 0
+      },
+      "project_breakdown": {},
+      "research_breakdown": {
+        "grants": {},
+        "phd_students": {
+          "co_supervision": {
+            "count": 8,
+            "rate": 48,
+            "total": 384
+          }
+        },
+        "protected_research_baseline": 164.2
+      },
+      "research_hours": 548.2,
+      "teaching_breakdown": {
+        "pastoral_breakdown": {
+          "rate": 3,
+          "student_count": 0,
+          "total": 0
+        },
+        "pastoral_supervision": 0
+      },
+      "teaching_hours": 0.0,
+      "teaching_module_breakdowns": {},
+      "total_hours": 887.4
     },
     "Andrew Pomfret": {
       "adjustments_breakdown": {},
@@ -503,18 +623,20 @@
         "drop_in": 0.0,
         "hw_lab": 0.0,
         "marking": 74.6667,
+        "module_leadership": 7.3,
         "pastoral_supervision": 33,
         "practicals": 154.0,
         "project_supervision": 144,
         "supervision": 0.0,
         "teaching": 36.6667
       },
-      "teaching_hours": 452.3333,
+      "teaching_hours": 459.6333,
       "teaching_module_breakdowns": {
         "SYS1": {
           "assessment_setting": 5.0,
           "delivery_structured": {
             "base_per_teacher": 7.3333,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -546,6 +668,7 @@
           "module_codes": [
             "COM00011C"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
           "practicals": 77.0,
           "practicals_structured": {
@@ -573,6 +696,7 @@
           "assessment_setting": 5.0,
           "delivery_structured": {
             "base_per_teacher": 7.3333,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -604,6 +728,7 @@
           "module_codes": [
             "COM00029I"
           ],
+          "module_leadership": 7.3,
           "online_content_dev": 0.0,
           "practicals": 77.0,
           "practicals_structured": {
@@ -628,7 +753,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 873.6333
+      "total_hours": 880.9333
     },
     "Antonio Garcia-Dominguez": {
       "adjustments_breakdown": {},
@@ -678,35 +803,37 @@
       },
       "research_hours": 644.6,
       "teaching_breakdown": {
-        "assessment_setting": 10.0,
+        "assessment_setting": 12.5,
         "drop_in": 0.0,
         "hw_lab": 0.0,
-        "marking": 21.8667,
+        "marking": 28.5333,
+        "module_leadership": 14.6,
         "pastoral_supervision": 36,
         "practicals": 128.3333,
         "project_supervision": 64,
         "supervision": 0.0,
-        "teaching": 55.0
+        "teaching": 73.3333
       },
-      "teaching_hours": 315.2,
+      "teaching_hours": 357.3,
       "teaching_module_breakdowns": {
         "ELLA": {
-          "assessment_setting": 5.0,
+          "assessment_setting": 7.5,
           "delivery_structured": {
-            "base_per_teacher": 7.3333,
+            "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "existing_lecturer_new_content",
             "lectures_per_week": 1.0,
             "multiplier": 5,
-            "teacher_count": 3,
+            "teacher_count": 2,
             "total_lecture_hours": 22.0,
             "week_count": 11
           },
           "drop_in": 0.0,
           "hw_lab": 0.0,
-          "lecture_contact_hours": 7.3333,
-          "marking": 13.3333,
+          "lecture_contact_hours": 11.0,
+          "marking": 20.0,
           "marking_structured": {
-            "hours_per_teacher": 13.3333,
+            "hours_per_teacher": 20.0,
             "is_automated": false,
             "levels": [
               {
@@ -719,40 +846,42 @@
                 "total_hours": 40.0
               }
             ],
-            "n_teachers": 3,
+            "n_teachers": 2,
             "total_hours": 40.0
           },
           "module_codes": [
             "COM00071H",
             "COM00216M"
           ],
+          "module_leadership": 7.3,
           "online_content_dev": 0.0,
           "practicals": 110.0,
           "practicals_structured": {
-            "applied_rate": 6.0,
+            "applied_rate": 4.0,
             "first_session_hours": 2.0,
             "first_session_rate": 2.5,
             "first_session_sessions": 1,
-            "first_session_total": 132.0,
-            "groups_per_teacher": 0.6667,
-            "n_teachers": 3,
+            "first_session_total": 88.0,
+            "groups_per_teacher": 1.0,
+            "n_teachers": 2,
             "repeat_hours": 0.0,
             "repeat_rate": 1.5,
             "repeat_sessions_per_teacher": 0,
             "repeat_total": 0.0,
-            "sessions_per_teacher": 0.8333,
+            "sessions_per_teacher": 1.25,
             "total": 55.0,
             "total_groups": 2,
             "week_count": 11
           },
           "supervision": 0.0,
-          "teaching": 36.6667,
+          "teaching": 55.0,
           "total_lecture_hours": 22.0
         },
         "ENG2": {
           "assessment_setting": 5.0,
           "delivery_structured": {
             "base_per_teacher": 7.3333,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -794,6 +923,7 @@
             "COM00055H",
             "COM00187M"
           ],
+          "module_leadership": 7.3,
           "online_content_dev": 0.0,
           "practicals": 18.3333,
           "practicals_structured": {
@@ -815,7 +945,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1134.8
+      "total_hours": 1176.9
     },
     "Carlo Ottaviani": {
       "adjustments_breakdown": {},
@@ -864,18 +994,20 @@
         "drop_in": 0.0,
         "hw_lab": 0.0,
         "marking": 30.4,
+        "module_leadership": 7.3,
         "pastoral_supervision": 78,
         "practicals": 137.5,
         "project_supervision": 112,
         "supervision": 0.0,
         "teaching": 45.8333
       },
-      "teaching_hours": 416.2333,
+      "teaching_hours": 423.5333,
       "teaching_module_breakdowns": {
         "CTAP": {
           "assessment_setting": 5.0,
           "delivery_structured": {
             "base_per_teacher": 7.3333,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -917,6 +1049,7 @@
             "COM00048H",
             "COM00183M"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
           "practicals": 82.5,
           "practicals_structured": {
@@ -944,6 +1077,7 @@
           "assessment_setting": 7.5,
           "delivery_structured": {
             "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -975,6 +1109,7 @@
           "module_codes": [
             "COM00195M"
           ],
+          "module_leadership": 7.3,
           "online_content_dev": 0.0,
           "practicals": 55.0,
           "practicals_structured": {
@@ -999,7 +1134,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1023.6333
+      "total_hours": 1030.9333
     },
     "Christopher Crispin-Bailey": {
       "adjustments_breakdown": {},
@@ -1034,22 +1169,24 @@
       },
       "research_hours": 164.2,
       "teaching_breakdown": {
-        "assessment_setting": 12.5,
+        "assessment_setting": 15.0,
         "drop_in": 0.0,
         "hw_lab": 0.0,
-        "marking": 73.6,
+        "marking": 91.9333,
+        "module_leadership": 0.0,
         "pastoral_supervision": 57,
-        "practicals": 220.0,
+        "practicals": 253.0,
         "project_supervision": 112,
         "supervision": 0.0,
-        "teaching": 55.0
+        "teaching": 64.1667
       },
-      "teaching_hours": 530.1,
+      "teaching_hours": 593.1,
       "teaching_module_breakdowns": {
         "SYS2": {
           "assessment_setting": 7.5,
           "delivery_structured": {
             "base_per_teacher": 7.3333,
+            "is_block_taught": false,
             "lecturer_type": "new_lecturer",
             "lectures_per_week": 1.0,
             "multiplier": 5,
@@ -1081,6 +1218,7 @@
           "module_codes": [
             "COM00029I"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
           "practicals": 132.0,
           "practicals_structured": {
@@ -1105,22 +1243,23 @@
           "total_lecture_hours": 22.0
         },
         "SYS3": {
-          "assessment_setting": 5.0,
+          "assessment_setting": 7.5,
           "delivery_structured": {
-            "base_per_teacher": 7.3333,
+            "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
-            "teacher_count": 3,
+            "teacher_count": 2,
             "total_lecture_hours": 22.0,
             "week_count": 11
           },
           "drop_in": 0.0,
           "hw_lab": 0.0,
-          "lecture_contact_hours": 7.3333,
-          "marking": 36.6667,
+          "lecture_contact_hours": 11.0,
+          "marking": 55.0,
           "marking_structured": {
-            "hours_per_teacher": 36.6667,
+            "hours_per_teacher": 55.0,
             "is_automated": false,
             "levels": [
               {
@@ -1133,37 +1272,38 @@
                 "total_hours": 110.0
               }
             ],
-            "n_teachers": 3,
+            "n_teachers": 2,
             "total_hours": 110.0
           },
           "module_codes": [
             "COM00018I"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
-          "practicals": 88.0,
+          "practicals": 121.0,
           "practicals_structured": {
-            "applied_rate": 3.0,
+            "applied_rate": 2.0,
             "first_session_hours": 2.0,
             "first_session_rate": 2.5,
             "first_session_sessions": 1,
-            "first_session_total": 66.0,
-            "groups_per_teacher": 2.0,
-            "n_teachers": 3,
-            "repeat_hours": 2.0,
+            "first_session_total": 44.0,
+            "groups_per_teacher": 3.0,
+            "n_teachers": 2,
+            "repeat_hours": 4.0,
             "repeat_rate": 1.5,
-            "repeat_sessions_per_teacher": 1.0,
-            "repeat_total": 33.0,
-            "sessions_per_teacher": 1.3333,
-            "total": 88.0,
+            "repeat_sessions_per_teacher": 2.0,
+            "repeat_total": 66.0,
+            "sessions_per_teacher": 2.75,
+            "total": 121.0,
             "total_groups": 6,
             "week_count": 11
           },
           "supervision": 0.0,
-          "teaching": 18.3333,
+          "teaching": 27.5,
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1156.65
+      "total_hours": 1219.65
     },
     "Claire Ingram": {
       "adjustments_breakdown": {},
@@ -1185,10 +1325,10 @@
         "total": 3
       },
       "project_breakdown": {
-        "level": "UG",
+        "level": "MSc",
         "project_count": 10,
-        "rate": 16,
-        "total": 160
+        "rate": 24,
+        "total": 240
       },
       "research_breakdown": {
         "grants": {},
@@ -1197,22 +1337,24 @@
       },
       "research_hours": 164.2,
       "teaching_breakdown": {
-        "assessment_setting": 7.5,
+        "assessment_setting": 22.5,
         "drop_in": 0.0,
         "hw_lab": 0.0,
-        "marking": 13.2,
+        "marking": 16.8,
+        "module_leadership": 7.3,
         "pastoral_supervision": 3,
         "practicals": 27.5,
-        "project_supervision": 160,
+        "project_supervision": 240,
         "supervision": 0.0,
-        "teaching": 27.5
+        "teaching": 82.5
       },
-      "teaching_hours": 238.7,
+      "teaching_hours": 399.6,
       "teaching_module_breakdowns": {
         "HINT": {
           "assessment_setting": 7.5,
           "delivery_structured": {
             "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -1254,6 +1396,7 @@
             "COM00040H",
             "COM00173M"
           ],
+          "module_leadership": 7.3,
           "online_content_dev": 0.0,
           "practicals": 27.5,
           "practicals_structured": {
@@ -1273,25 +1416,68 @@
           "supervision": 0.0,
           "teaching": 27.5,
           "total_lecture_hours": 22.0
+        },
+        "REMS": {
+          "assessment_setting": 15.0,
+          "delivery_structured": {
+            "base_per_teacher": 22.0,
+            "is_block_taught": true,
+            "lecturer_type": "standard",
+            "lectures_per_week": 0.0,
+            "multiplier": 2.5,
+            "teacher_count": 2,
+            "total_lecture_hours": 44.0,
+            "week_count": 0
+          },
+          "drop_in": 0.0,
+          "hw_lab": 0.0,
+          "lecture_contact_hours": 22.0,
+          "marking": 3.6,
+          "marking_structured": {
+            "hours_per_teacher": 3.6,
+            "is_automated": false,
+            "levels": [
+              {
+                "label": null,
+                "main_hours": 6.0,
+                "main_student_count": 12,
+                "rate_per_script": 0.5,
+                "resit_hours": 1.2,
+                "resit_student_count": 2.4,
+                "total_hours": 7.2
+              }
+            ],
+            "n_teachers": 2,
+            "total_hours": 7.2
+          },
+          "module_codes": [
+            "COM00201M"
+          ],
+          "module_leadership": 0.0,
+          "online_content_dev": 0.0,
+          "practicals": 0.0,
+          "supervision": 0.0,
+          "teaching": 55.0,
+          "total_lecture_hours": 44.0
         }
       },
-      "total_hours": 660.0
+      "total_hours": 820.9
     },
     "Claudio Guarnera": {
       "adjustments_breakdown": {},
       "admin_breakdown": {
-        "engagement": 100.0,
-        "personal_development": 75.0
+        "engagement": 40.0,
+        "personal_development": 30.0
       },
-      "admin_hours": 175.0,
+      "admin_hours": 70.0,
       "assumptions": [],
       "category": "ART",
-      "fte": 1.0,
+      "fte": 0.4,
       "missing_data": [
         "No administrative roles assigned"
       ],
       "name": "Claudio Guarnera",
-      "nominal_hours": 1642.0,
+      "nominal_hours": 656.8,
       "pastoral_breakdown": {
         "rate": 3,
         "student_count": 10,
@@ -1317,14 +1503,15 @@
             "total": 96
           }
         },
-        "protected_research_baseline": 164.2
+        "protected_research_baseline": 65.68
       },
-      "research_hours": 276.2,
+      "research_hours": 177.68,
       "teaching_breakdown": {
         "assessment_setting": 10.0,
         "drop_in": 0.0,
         "hw_lab": 0.0,
         "marking": 40.5333,
+        "module_leadership": 0.0,
         "pastoral_supervision": 30,
         "practicals": 66.0,
         "project_supervision": 48,
@@ -1337,6 +1524,7 @@
           "assessment_setting": 10.0,
           "delivery_structured": {
             "base_per_teacher": 7.3333,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -1368,6 +1556,7 @@
           "module_codes": [
             "COM00026I"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
           "practicals": 66.0,
           "practicals_structured": {
@@ -1392,7 +1581,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 664.0667
+      "total_hours": 460.5467
     },
     "Colin Paterson": {
       "adjustments_breakdown": {},
@@ -1444,22 +1633,24 @@
       },
       "research_hours": 579.76,
       "teaching_breakdown": {
-        "assessment_setting": 7.5,
+        "assessment_setting": 22.5,
         "drop_in": 0.0,
         "hw_lab": 0.0,
-        "marking": 20.0,
+        "marking": 35.7333,
+        "module_leadership": 0.0,
         "pastoral_supervision": 57,
-        "practicals": 0.0,
+        "practicals": 110.0,
         "project_supervision": 112,
         "supervision": 0.0,
-        "teaching": 27.5
+        "teaching": 64.1667
       },
-      "teaching_hours": 224.0,
+      "teaching_hours": 401.4,
       "teaching_module_breakdowns": {
         "LPTC": {
           "assessment_setting": 7.5,
           "delivery_structured": {
             "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -1491,14 +1682,85 @@
           "module_codes": [
             "LAW00062H"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
           "practicals": 0.0,
           "supervision": 0.0,
           "teaching": 27.5,
           "total_lecture_hours": 22.0
+        },
+        "ROCS": {
+          "assessment_setting": 15.0,
+          "delivery_structured": {
+            "base_per_teacher": 7.3333,
+            "is_block_taught": false,
+            "lecturer_type": "new_lecturer",
+            "lectures_per_week": 1.0,
+            "multiplier": 5,
+            "teacher_count": 3,
+            "total_lecture_hours": 22.0,
+            "week_count": 11
+          },
+          "drop_in": 0.0,
+          "hw_lab": 0.0,
+          "lecture_contact_hours": 7.3333,
+          "marking": 15.7333,
+          "marking_structured": {
+            "hours_per_teacher": 15.7333,
+            "is_automated": false,
+            "levels": [
+              {
+                "label": "H level",
+                "main_hours": 3.3333,
+                "main_student_count": 10,
+                "rate_per_script": 0.3333,
+                "resit_hours": 0.6667,
+                "resit_student_count": 2.0,
+                "total_hours": 4.0
+              },
+              {
+                "label": "M level",
+                "main_hours": 36.0,
+                "main_student_count": 72,
+                "rate_per_script": 0.5,
+                "resit_hours": 7.2,
+                "resit_student_count": 14.4,
+                "total_hours": 43.2
+              }
+            ],
+            "n_teachers": 3,
+            "total_hours": 47.2
+          },
+          "module_codes": [
+            "COM00066H",
+            "COM00180M"
+          ],
+          "module_leadership": 0.0,
+          "online_content_dev": 0.0,
+          "practicals": 110.0,
+          "practicals_structured": {
+            "applied_rate": 6.0,
+            "first_session_hours": 2.0,
+            "first_session_rate": 2.5,
+            "first_session_sessions": 1,
+            "first_session_total": 132.0,
+            "groups_per_teacher": 0.6667,
+            "n_teachers": 3,
+            "repeat_hours": 0.0,
+            "repeat_rate": 1.5,
+            "repeat_sessions_per_teacher": 0,
+            "repeat_total": 0.0,
+            "sessions_per_teacher": 0.8333,
+            "total": 55.0,
+            "total_groups": 2,
+            "week_count": 11
+          },
+          "supervision": 0.0,
+          "teaching": 36.6667,
+          "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 978.76
+      "total_hours": 1156.16
     },
     "Da Li": {
       "adjustments_breakdown": {},
@@ -1511,7 +1773,8 @@
       "category": "ART",
       "fte": 1.0,
       "missing_data": [
-        "No administrative roles assigned"
+        "No administrative roles assigned",
+        "LLMA: no student numbers in CS Module Numbers.csv - marking hours estimated from a default of 100 students"
       ],
       "name": "Da Li",
       "nominal_hours": 1642.0,
@@ -1536,22 +1799,24 @@
         "assessment_setting": 7.5,
         "drop_in": 0.0,
         "hw_lab": 0.0,
-        "marking": 36.6667,
+        "marking": 13.3333,
+        "module_leadership": 0.0,
         "pastoral_supervision": 75,
-        "practicals": 143.0,
+        "practicals": 55.0,
         "project_supervision": 112,
         "supervision": 0.0,
-        "teaching": 36.6667
+        "teaching": 55.0
       },
-      "teaching_hours": 410.8333,
+      "teaching_hours": 317.8333,
       "teaching_module_breakdowns": {
-        "SYS3": {
+        "LLMA": {
           "assessment_setting": 7.5,
           "delivery_structured": {
             "base_per_teacher": 7.3333,
-            "lecturer_type": "new_lecturer",
+            "is_block_taught": false,
+            "lecturer_type": "new_lecturer_new_content",
             "lectures_per_week": 1.0,
-            "multiplier": 5,
+            "multiplier": 7.5,
             "teacher_count": 3,
             "total_lecture_hours": 22.0,
             "week_count": 11
@@ -1559,52 +1824,180 @@
           "drop_in": 0.0,
           "hw_lab": 0.0,
           "lecture_contact_hours": 7.3333,
-          "marking": 36.6667,
+          "marking": 13.3333,
           "marking_structured": {
-            "hours_per_teacher": 36.6667,
+            "hours_per_teacher": 13.3333,
             "is_automated": false,
             "levels": [
               {
                 "label": null,
-                "main_hours": 91.6667,
-                "main_student_count": 275,
+                "main_hours": 33.3333,
+                "main_student_count": 100,
                 "rate_per_script": 0.3333,
-                "resit_hours": 18.3333,
-                "resit_student_count": 55.0,
-                "total_hours": 110.0
+                "resit_hours": 6.6667,
+                "resit_student_count": 20.0,
+                "total_hours": 40.0
               }
             ],
             "n_teachers": 3,
-            "total_hours": 110.0
+            "total_hours": 40.0
           },
           "module_codes": [
-            "COM00018I"
+            "COM00070H",
+            "COM00215M"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
-          "practicals": 143.0,
+          "practicals": 55.0,
           "practicals_structured": {
-            "applied_rate": 4.875,
+            "applied_rate": 7.5,
             "first_session_hours": 2.0,
             "first_session_rate": 2.5,
             "first_session_sessions": 1,
-            "first_session_total": 107.25,
-            "groups_per_teacher": 2.0,
+            "first_session_total": 165.0,
             "n_teachers": 3,
-            "repeat_hours": 2.0,
+            "repeat_hours": 0,
             "repeat_rate": 1.5,
-            "repeat_sessions_per_teacher": 1.0,
-            "repeat_total": 33.0,
-            "sessions_per_teacher": 1.3333,
-            "total": 88.0,
-            "total_groups": 6,
+            "repeat_total": 0.0,
+            "sessions_per_teacher": 0.3333,
+            "total": 22.0,
             "week_count": 11
           },
           "supervision": 0.0,
-          "teaching": 36.6667,
+          "teaching": 55.0,
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 750.0333
+      "total_hours": 657.0333
+    },
+    "David Pumfrey": {
+      "adjustments_breakdown": {},
+      "admin_breakdown": {
+        "engagement": 50.0,
+        "personal_development": 37.5
+      },
+      "admin_hours": 87.5,
+      "assumptions": [],
+      "category": "T and S",
+      "fte": 0.5,
+      "missing_data": [
+        "No administrative roles assigned"
+      ],
+      "name": "David Pumfrey",
+      "nominal_hours": 821.0,
+      "pastoral_breakdown": {
+        "rate": 3,
+        "student_count": 0,
+        "total": 0
+      },
+      "project_breakdown": {},
+      "research_breakdown": {
+        "grants": {},
+        "phd_students": {},
+        "protected_research_baseline": 82.1
+      },
+      "research_hours": 82.1,
+      "teaching_breakdown": {
+        "assessment_setting": 22.5,
+        "drop_in": 0.0,
+        "hw_lab": 0.0,
+        "marking": 18.6,
+        "module_leadership": 0.0,
+        "pastoral_supervision": 0,
+        "practicals": 0.0,
+        "supervision": 0.0,
+        "teaching": 55.0
+      },
+      "teaching_hours": 96.1,
+      "teaching_module_breakdowns": {
+        "HRAS": {
+          "assessment_setting": 15.0,
+          "delivery_structured": {
+            "base_per_teacher": 11.0,
+            "is_block_taught": true,
+            "lecturer_type": "standard",
+            "lectures_per_week": 0.0,
+            "multiplier": 2.5,
+            "teacher_count": 2,
+            "total_lecture_hours": 22.0,
+            "week_count": 0
+          },
+          "drop_in": 0.0,
+          "hw_lab": 0.0,
+          "lecture_contact_hours": 11.0,
+          "marking": 13.5,
+          "marking_structured": {
+            "hours_per_teacher": 13.5,
+            "is_automated": false,
+            "levels": [
+              {
+                "label": null,
+                "main_hours": 22.5,
+                "main_student_count": 45,
+                "rate_per_script": 0.5,
+                "resit_hours": 4.5,
+                "resit_student_count": 9.0,
+                "total_hours": 27.0
+              }
+            ],
+            "n_teachers": 2,
+            "total_hours": 27.0
+          },
+          "module_codes": [
+            "COM00025M"
+          ],
+          "module_leadership": 0.0,
+          "online_content_dev": 0.0,
+          "practicals": 0.0,
+          "supervision": 0.0,
+          "teaching": 27.5,
+          "total_lecture_hours": 22.0
+        },
+        "HUFS": {
+          "assessment_setting": 7.5,
+          "delivery_structured": {
+            "base_per_teacher": 11.0,
+            "is_block_taught": true,
+            "lecturer_type": "standard",
+            "lectures_per_week": 0.0,
+            "multiplier": 2.5,
+            "teacher_count": 2,
+            "total_lecture_hours": 22.0,
+            "week_count": 0
+          },
+          "drop_in": 0.0,
+          "hw_lab": 0.0,
+          "lecture_contact_hours": 11.0,
+          "marking": 5.1,
+          "marking_structured": {
+            "hours_per_teacher": 5.1,
+            "is_automated": false,
+            "levels": [
+              {
+                "label": null,
+                "main_hours": 8.5,
+                "main_student_count": 17,
+                "rate_per_script": 0.5,
+                "resit_hours": 1.7,
+                "resit_student_count": 3.4,
+                "total_hours": 10.2
+              }
+            ],
+            "n_teachers": 2,
+            "total_hours": 10.2
+          },
+          "module_codes": [
+            "COM00208M"
+          ],
+          "module_leadership": 0.0,
+          "online_content_dev": 0.0,
+          "practicals": 0.0,
+          "supervision": 0.0,
+          "teaching": 27.5,
+          "total_lecture_hours": 22.0
+        }
+      },
+      "total_hours": 265.7
     },
     "Dawn H Wood": {
       "adjustments_breakdown": {},
@@ -1643,18 +2036,20 @@
         "drop_in": 0.0,
         "hw_lab": 0.0,
         "marking": 87.3333,
+        "module_leadership": 7.3,
         "pastoral_supervision": 39,
         "practicals": 115.5,
         "project_supervision": 144,
         "supervision": 0.0,
         "teaching": 36.6667
       },
-      "teaching_hours": 437.5,
+      "teaching_hours": 444.8,
       "teaching_module_breakdowns": {
         "SOF1": {
           "assessment_setting": 5.0,
           "delivery_structured": {
             "base_per_teacher": 7.3333,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -1686,6 +2081,7 @@
           "module_codes": [
             "COM00015C"
           ],
+          "module_leadership": 7.3,
           "online_content_dev": 0.0,
           "practicals": 77.0,
           "practicals_structured": {
@@ -1713,6 +2109,7 @@
           "assessment_setting": 10.0,
           "delivery_structured": {
             "base_per_teacher": 7.3333,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -1744,6 +2141,7 @@
           "module_codes": [
             "COM00016C"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
           "practicals": 38.5,
           "practicals_structured": {
@@ -1768,7 +2166,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 776.7
+      "total_hours": 784.0
     },
     "Detlef Plump": {
       "adjustments_breakdown": {},
@@ -1814,22 +2212,24 @@
       },
       "research_hours": 260.2,
       "teaching_breakdown": {
-        "assessment_setting": 15.0,
+        "assessment_setting": 20.0,
         "drop_in": 0.0,
         "hw_lab": 0.0,
-        "marking": 84.1333,
+        "marking": 105.0,
+        "module_leadership": 7.3,
         "pastoral_supervision": 63,
-        "practicals": 38.5,
+        "practicals": 52.25,
         "project_supervision": 112,
         "supervision": 0.0,
-        "teaching": 36.6667
+        "teaching": 45.8333
       },
-      "teaching_hours": 349.3,
+      "teaching_hours": 405.3833,
       "teaching_module_breakdowns": {
         "THE2": {
           "assessment_setting": 5.0,
           "delivery_structured": {
             "base_per_teacher": 7.3333,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -1861,6 +2261,7 @@
           "module_codes": [
             "COM00014C"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
           "practicals": 0.0,
           "supervision": 0.0,
@@ -1868,22 +2269,23 @@
           "total_lecture_hours": 22.0
         },
         "THE3": {
-          "assessment_setting": 10.0,
+          "assessment_setting": 15.0,
           "delivery_structured": {
-            "base_per_teacher": 7.3333,
+            "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
-            "teacher_count": 3,
+            "teacher_count": 2,
             "total_lecture_hours": 22.0,
             "week_count": 11
           },
           "drop_in": 0.0,
           "hw_lab": 0.0,
-          "lecture_contact_hours": 7.3333,
-          "marking": 41.7333,
+          "lecture_contact_hours": 11.0,
+          "marking": 62.6,
           "marking_structured": {
-            "hours_per_teacher": 41.7333,
+            "hours_per_teacher": 62.6,
             "is_automated": false,
             "levels": [
               {
@@ -1896,37 +2298,38 @@
                 "total_hours": 125.2
               }
             ],
-            "n_teachers": 3,
+            "n_teachers": 2,
             "total_hours": 125.2
           },
           "module_codes": [
             "COM00027I"
           ],
+          "module_leadership": 7.3,
           "online_content_dev": 0.0,
-          "practicals": 38.5,
+          "practicals": 52.25,
           "practicals_structured": {
-            "applied_rate": 3.0,
+            "applied_rate": 2.0,
             "first_session_hours": 1.0,
             "first_session_rate": 2.5,
             "first_session_sessions": 1,
-            "first_session_total": 33.0,
-            "groups_per_teacher": 1.6667,
-            "n_teachers": 3,
-            "repeat_hours": 0.67,
+            "first_session_total": 22.0,
+            "groups_per_teacher": 2.5,
+            "n_teachers": 2,
+            "repeat_hours": 1.5,
             "repeat_rate": 1.5,
-            "repeat_sessions_per_teacher": 0.6667,
-            "repeat_total": 11.0,
-            "sessions_per_teacher": 1.1667,
-            "total": 38.5,
+            "repeat_sessions_per_teacher": 1.5,
+            "repeat_total": 24.75,
+            "sessions_per_teacher": 2.375,
+            "total": 52.25,
             "total_groups": 5,
             "week_count": 11
           },
           "supervision": 0.0,
-          "teaching": 18.3333,
+          "teaching": 27.5,
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1112.9
+      "total_hours": 1168.9833
     },
     "Dimitar Kazakov": {
       "adjustments_breakdown": {},
@@ -1982,18 +2385,20 @@
         "drop_in": 0.0,
         "hw_lab": 0.0,
         "marking": 20.0,
+        "module_leadership": 7.3,
         "pastoral_supervision": 75,
         "practicals": 110.0,
         "project_supervision": 112,
         "supervision": 0.0,
         "teaching": 55.0
       },
-      "teaching_hours": 379.5,
+      "teaching_hours": 386.8,
       "teaching_module_breakdowns": {
         "NLPG": {
           "assessment_setting": 7.5,
           "delivery_structured": {
             "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "existing_lecturer_new_content",
             "lectures_per_week": 1.0,
             "multiplier": 5,
@@ -2026,6 +2431,7 @@
             "COM00069H",
             "COM00214M"
           ],
+          "module_leadership": 7.3,
           "online_content_dev": 0.0,
           "practicals": 110.0,
           "practicals_structured": {
@@ -2050,21 +2456,21 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1503.1
+      "total_hours": 1510.4
     },
     "Dimitris Kolovos": {
       "adjustments_breakdown": {},
       "admin_breakdown": {
+        "Research Group Leader": 164.2,
+        "Research Mentor": 32.84,
         "engagement": 100.0,
         "personal_development": 75.0
       },
-      "admin_hours": 175.0,
+      "admin_hours": 372.04,
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
-      "missing_data": [
-        "No administrative roles assigned"
-      ],
+      "missing_data": [],
       "name": "Dimitris Kolovos",
       "nominal_hours": 1642.0,
       "pastoral_breakdown": {
@@ -2105,6 +2511,7 @@
         "drop_in": 0.0,
         "hw_lab": 0.0,
         "marking": 8.5333,
+        "module_leadership": 0.0,
         "pastoral_supervision": 0,
         "practicals": 18.3333,
         "supervision": 0.0,
@@ -2116,6 +2523,7 @@
           "assessment_setting": 5.0,
           "delivery_structured": {
             "base_per_teacher": 7.3333,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -2157,6 +2565,7 @@
             "COM00055H",
             "COM00187M"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
           "practicals": 18.3333,
           "practicals_structured": {
@@ -2178,7 +2587,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1340.1
+      "total_hours": 1537.14
     },
     "Fang Yan": {
       "adjustments_breakdown": {},
@@ -2213,22 +2622,24 @@
       },
       "research_hours": 164.2,
       "teaching_breakdown": {
-        "assessment_setting": 30.0,
+        "assessment_setting": 15.0,
         "drop_in": 0.0,
         "hw_lab": 0.0,
-        "marking": 85.4667,
+        "marking": 43.7333,
+        "module_leadership": 0.0,
         "pastoral_supervision": 21,
-        "practicals": 132.0,
+        "practicals": 66.0,
         "project_supervision": 32,
         "supervision": 0.0,
-        "teaching": 73.3333
+        "teaching": 36.6667
       },
-      "teaching_hours": 373.8,
+      "teaching_hours": 214.4,
       "teaching_module_breakdowns": {
         "SOF2": {
           "assessment_setting": 15.0,
           "delivery_structured": {
             "base_per_teacher": 7.3333,
+            "is_block_taught": false,
             "lecturer_type": "new_lecturer",
             "lectures_per_week": 1.0,
             "multiplier": 5,
@@ -2260,64 +2671,7 @@
           "module_codes": [
             "COM00016C"
           ],
-          "online_content_dev": 0.0,
-          "practicals": 66.0,
-          "practicals_structured": {
-            "applied_rate": 5.1429,
-            "first_session_hours": 1.0,
-            "first_session_rate": 2.5,
-            "first_session_sessions": 1,
-            "first_session_total": 56.5714,
-            "groups_per_teacher": 1.6667,
-            "n_teachers": 3,
-            "repeat_hours": 0.67,
-            "repeat_rate": 1.5,
-            "repeat_sessions_per_teacher": 0.6667,
-            "repeat_total": 11.0,
-            "sessions_per_teacher": 1.1667,
-            "total": 38.5,
-            "total_groups": 5,
-            "week_count": 11
-          },
-          "supervision": 0.0,
-          "teaching": 36.6667,
-          "total_lecture_hours": 22.0
-        },
-        "THE3": {
-          "assessment_setting": 15.0,
-          "delivery_structured": {
-            "base_per_teacher": 7.3333,
-            "lecturer_type": "new_lecturer",
-            "lectures_per_week": 1.0,
-            "multiplier": 5,
-            "teacher_count": 3,
-            "total_lecture_hours": 22.0,
-            "week_count": 11
-          },
-          "drop_in": 0.0,
-          "hw_lab": 0.0,
-          "lecture_contact_hours": 7.3333,
-          "marking": 41.7333,
-          "marking_structured": {
-            "hours_per_teacher": 41.7333,
-            "is_automated": false,
-            "levels": [
-              {
-                "label": null,
-                "main_hours": 104.3333,
-                "main_student_count": 313,
-                "rate_per_script": 0.3333,
-                "resit_hours": 20.8667,
-                "resit_student_count": 62.6,
-                "total_hours": 125.2
-              }
-            ],
-            "n_teachers": 3,
-            "total_hours": 125.2
-          },
-          "module_codes": [
-            "COM00027I"
-          ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
           "practicals": 66.0,
           "practicals_structured": {
@@ -2342,7 +2696,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 713.0
+      "total_hours": 553.6
     },
     "Felix Ulrich-Oltean": {
       "adjustments_breakdown": {},
@@ -2382,6 +2736,7 @@
         "drop_in": 0.0,
         "hw_lab": 0.0,
         "marking": 8.5,
+        "module_leadership": 0.0,
         "pastoral_supervision": 0,
         "practicals": 27.5,
         "supervision": 0.0,
@@ -2393,6 +2748,7 @@
           "assessment_setting": 7.5,
           "delivery_structured": {
             "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -2434,6 +2790,7 @@
             "COM00050H",
             "COM00191M"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
           "practicals": 27.5,
           "practicals_structured": {
@@ -2500,34 +2857,36 @@
       },
       "research_hours": 1794.42,
       "teaching_breakdown": {
-        "assessment_setting": 7.5,
+        "assessment_setting": 5.0,
         "drop_in": 0.0,
         "hw_lab": 0.0,
-        "marking": 20.0,
+        "marking": 13.3333,
+        "module_leadership": 0.0,
         "pastoral_supervision": 0,
-        "practicals": 55.0,
+        "practicals": 36.6667,
         "supervision": 0.0,
-        "teaching": 55.0
+        "teaching": 36.6667
       },
-      "teaching_hours": 137.5,
+      "teaching_hours": 91.6667,
       "teaching_module_breakdowns": {
         "LLMA": {
-          "assessment_setting": 7.5,
+          "assessment_setting": 5.0,
           "delivery_structured": {
-            "base_per_teacher": 11.0,
+            "base_per_teacher": 7.3333,
+            "is_block_taught": false,
             "lecturer_type": "existing_lecturer_new_content",
             "lectures_per_week": 1.0,
             "multiplier": 5,
-            "teacher_count": 2,
+            "teacher_count": 3,
             "total_lecture_hours": 22.0,
             "week_count": 11
           },
           "drop_in": 0.0,
           "hw_lab": 0.0,
-          "lecture_contact_hours": 11.0,
-          "marking": 20.0,
+          "lecture_contact_hours": 7.3333,
+          "marking": 13.3333,
           "marking_structured": {
-            "hours_per_teacher": 20.0,
+            "hours_per_teacher": 13.3333,
             "is_automated": false,
             "levels": [
               {
@@ -2540,35 +2899,36 @@
                 "total_hours": 40.0
               }
             ],
-            "n_teachers": 2,
+            "n_teachers": 3,
             "total_hours": 40.0
           },
           "module_codes": [
             "COM00070H",
             "COM00215M"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
-          "practicals": 55.0,
+          "practicals": 36.6667,
           "practicals_structured": {
             "applied_rate": 5.0,
             "first_session_hours": 2.0,
             "first_session_rate": 2.5,
             "first_session_sessions": 1,
             "first_session_total": 110.0,
-            "n_teachers": 2,
+            "n_teachers": 3,
             "repeat_hours": 0,
             "repeat_rate": 1.5,
             "repeat_total": 0.0,
-            "sessions_per_teacher": 0.5,
+            "sessions_per_teacher": 0.3333,
             "total": 22.0,
             "week_count": 11
           },
           "supervision": 0.0,
-          "teaching": 55.0,
+          "teaching": 36.6667,
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 2189.02
+      "total_hours": 2143.1867
     },
     "Iain Bate": {
       "adjustments_breakdown": {},
@@ -2586,8 +2946,8 @@
       "nominal_hours": 1642.0,
       "pastoral_breakdown": {
         "rate": 3,
-        "student_count": 0,
-        "total": 0
+        "student_count": 10,
+        "total": 30
       },
       "project_breakdown": {},
       "research_breakdown": {
@@ -2609,10 +2969,17 @@
         "protected_research_baseline": 164.2
       },
       "research_hours": 588.6,
-      "teaching_breakdown": {},
-      "teaching_hours": 0.0,
+      "teaching_breakdown": {
+        "pastoral_breakdown": {
+          "rate": 3,
+          "student_count": 10,
+          "total": 30
+        },
+        "pastoral_supervision": 30
+      },
+      "teaching_hours": 30.0,
       "teaching_module_breakdowns": {},
-      "total_hours": 2405.6
+      "total_hours": 2435.6
     },
     "Ian Gray": {
       "adjustments_breakdown": {},
@@ -2661,6 +3028,7 @@
         "drop_in": 0.0,
         "hw_lab": 0.0,
         "marking": 9.8,
+        "module_leadership": 0.0,
         "pastoral_supervision": 0,
         "practicals": 55.0,
         "supervision": 0.0,
@@ -2672,6 +3040,7 @@
           "assessment_setting": 7.5,
           "delivery_structured": {
             "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -2713,6 +3082,7 @@
             "COM00003H",
             "COM00175M"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
           "practicals": 55.0,
           "practicals_structured": {
@@ -2777,18 +3147,20 @@
         "drop_in": 0.0,
         "hw_lab": 0.0,
         "marking": 37.6,
+        "module_leadership": 7.3,
         "pastoral_supervision": 24,
         "practicals": 66.0,
         "project_supervision": 80,
         "supervision": 0.0,
         "teaching": 18.3333
       },
-      "teaching_hours": 235.9333,
+      "teaching_hours": 243.2333,
       "teaching_module_breakdowns": {
         "HCIN": {
           "assessment_setting": 10.0,
           "delivery_structured": {
             "base_per_teacher": 7.3333,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -2820,6 +3192,7 @@
           "module_codes": [
             "COM00018C"
           ],
+          "module_leadership": 7.3,
           "online_content_dev": 0.0,
           "practicals": 66.0,
           "practicals_structured": {
@@ -2844,7 +3217,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 821.4333
+      "total_hours": 828.7333
     },
     "James Stovold": {
       "adjustments_breakdown": {},
@@ -2857,9 +3230,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
-      "missing_data": [
-        "LLMA: no student numbers in CS Module Numbers.csv - marking hours estimated from a default of 100 students"
-      ],
+      "missing_data": [],
       "name": "James Stovold",
       "nominal_hours": 1642.0,
       "pastoral_breakdown": {
@@ -2880,144 +3251,81 @@
       },
       "research_hours": 164.2,
       "teaching_breakdown": {
-        "assessment_setting": 22.5,
+        "assessment_setting": 15.0,
         "drop_in": 0.0,
         "hw_lab": 0.0,
-        "marking": 50.6,
+        "marking": 40.5333,
+        "module_leadership": 7.3,
         "pastoral_supervision": 75,
-        "practicals": 209.0,
+        "practicals": 121.0,
         "project_supervision": 112,
         "supervision": 0.0,
-        "teaching": 137.5
+        "teaching": 36.6667
       },
-      "teaching_hours": 606.6,
+      "teaching_hours": 407.5,
       "teaching_module_breakdowns": {
-        "DEEP": {
-          "assessment_setting": 11.25,
+        "IMLO": {
+          "assessment_setting": 15.0,
           "delivery_structured": {
-            "base_per_teacher": 11.0,
+            "base_per_teacher": 7.3333,
+            "is_block_taught": false,
             "lecturer_type": "new_lecturer",
             "lectures_per_week": 1.0,
             "multiplier": 5,
-            "teacher_count": 2,
+            "teacher_count": 3,
             "total_lecture_hours": 22.0,
             "week_count": 11
           },
           "drop_in": 0.0,
           "hw_lab": 0.0,
-          "lecture_contact_hours": 11.0,
-          "marking": 30.6,
+          "lecture_contact_hours": 7.3333,
+          "marking": 40.5333,
           "marking_structured": {
-            "hours_per_teacher": 30.6,
-            "is_automated": false,
-            "levels": [
-              {
-                "label": "H level",
-                "main_hours": 28.0,
-                "main_student_count": 84,
-                "rate_per_script": 0.3333,
-                "resit_hours": 5.6,
-                "resit_student_count": 16.8,
-                "total_hours": 33.6
-              },
-              {
-                "label": "M level",
-                "main_hours": 23.0,
-                "main_student_count": 46,
-                "rate_per_script": 0.5,
-                "resit_hours": 4.6,
-                "resit_student_count": 9.2,
-                "total_hours": 27.6
-              }
-            ],
-            "n_teachers": 2,
-            "total_hours": 61.2
-          },
-          "module_codes": [
-            "COM00049H",
-            "COM00184M"
-          ],
-          "online_content_dev": 0.0,
-          "practicals": 126.5,
-          "practicals_structured": {
-            "applied_rate": 3.5385,
-            "first_session_hours": 2.0,
-            "first_session_rate": 2.5,
-            "first_session_sessions": 1,
-            "first_session_total": 77.8462,
-            "groups_per_teacher": 1.5,
-            "n_teachers": 2,
-            "repeat_hours": 1.0,
-            "repeat_rate": 1.5,
-            "repeat_sessions_per_teacher": 0.5,
-            "repeat_total": 16.5,
-            "sessions_per_teacher": 1.625,
-            "total": 71.5,
-            "total_groups": 3,
-            "week_count": 11
-          },
-          "supervision": 0.0,
-          "teaching": 55.0,
-          "total_lecture_hours": 22.0
-        },
-        "LLMA": {
-          "assessment_setting": 11.25,
-          "delivery_structured": {
-            "base_per_teacher": 11.0,
-            "lecturer_type": "new_lecturer_new_content",
-            "lectures_per_week": 1.0,
-            "multiplier": 7.5,
-            "teacher_count": 2,
-            "total_lecture_hours": 22.0,
-            "week_count": 11
-          },
-          "drop_in": 0.0,
-          "hw_lab": 0.0,
-          "lecture_contact_hours": 11.0,
-          "marking": 20.0,
-          "marking_structured": {
-            "hours_per_teacher": 20.0,
+            "hours_per_teacher": 40.5333,
             "is_automated": false,
             "levels": [
               {
                 "label": null,
-                "main_hours": 33.3333,
-                "main_student_count": 100,
+                "main_hours": 101.3333,
+                "main_student_count": 304,
                 "rate_per_script": 0.3333,
-                "resit_hours": 6.6667,
-                "resit_student_count": 20.0,
-                "total_hours": 40.0
+                "resit_hours": 20.2667,
+                "resit_student_count": 60.8,
+                "total_hours": 121.6
               }
             ],
-            "n_teachers": 2,
-            "total_hours": 40.0
+            "n_teachers": 3,
+            "total_hours": 121.6
           },
           "module_codes": [
-            "COM00070H",
-            "COM00215M"
+            "COM00026I"
           ],
+          "module_leadership": 7.3,
           "online_content_dev": 0.0,
-          "practicals": 82.5,
+          "practicals": 121.0,
           "practicals_structured": {
-            "applied_rate": 7.5,
+            "applied_rate": 5.5,
             "first_session_hours": 2.0,
             "first_session_rate": 2.5,
             "first_session_sessions": 1,
-            "first_session_total": 165.0,
-            "n_teachers": 2,
-            "repeat_hours": 0,
+            "first_session_total": 121.0,
+            "groups_per_teacher": 1.3333,
+            "n_teachers": 3,
+            "repeat_hours": 0.67,
             "repeat_rate": 1.5,
-            "repeat_total": 0.0,
-            "sessions_per_teacher": 0.5,
-            "total": 22.0,
+            "repeat_sessions_per_teacher": 0.3333,
+            "repeat_total": 11.0,
+            "sessions_per_teacher": 1.0,
+            "total": 66.0,
+            "total_groups": 4,
             "week_count": 11
           },
           "supervision": 0.0,
-          "teaching": 82.5,
+          "teaching": 36.6667,
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1027.9
+      "total_hours": 828.8
     },
     "James Walker": {
       "adjustments_breakdown": {},
@@ -3075,6 +3383,7 @@
         "drop_in": 0.0,
         "hw_lab": 0.0,
         "marking": 40.5333,
+        "module_leadership": 0.0,
         "pastoral_supervision": 63,
         "practicals": 66.0,
         "project_supervision": 112,
@@ -3087,6 +3396,7 @@
           "assessment_setting": 10.0,
           "delivery_structured": {
             "base_per_teacher": 7.3333,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -3118,6 +3428,7 @@
           "module_codes": [
             "COM00026I"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
           "practicals": 66.0,
           "practicals_structured": {
@@ -3147,11 +3458,11 @@
     "Jen Beeston": {
       "adjustments_breakdown": {},
       "admin_breakdown": {
-        "Chair of the Department Education Committee": 0.0,
+        "DEC Chair": 492.6,
         "engagement": 100.0,
         "personal_development": 75.0
       },
-      "admin_hours": 175.0,
+      "admin_hours": 667.6,
       "assumptions": [],
       "category": "T and S",
       "fte": 1.0,
@@ -3191,18 +3502,20 @@
         "drop_in": 0.0,
         "hw_lab": 0.0,
         "marking": 24.9,
+        "module_leadership": 7.3,
         "pastoral_supervision": 27,
         "practicals": 82.5,
         "project_supervision": 144,
         "supervision": 0.0,
         "teaching": 55.0
       },
-      "teaching_hours": 348.4,
+      "teaching_hours": 355.7,
       "teaching_module_breakdowns": {
         "QUAL": {
           "assessment_setting": 7.5,
           "delivery_structured": {
             "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -3244,6 +3557,7 @@
             "COM00058H",
             "COM00181M"
           ],
+          "module_leadership": 7.3,
           "online_content_dev": 0.0,
           "practicals": 27.5,
           "practicals_structured": {
@@ -3268,6 +3582,7 @@
           "assessment_setting": 7.5,
           "delivery_structured": {
             "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -3309,6 +3624,7 @@
             "COM00054H",
             "COM00189M"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
           "practicals": 55.0,
           "practicals_structured": {
@@ -3333,7 +3649,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 855.6
+      "total_hours": 1355.5
     },
     "Jo Iacovides": {
       "adjustments_breakdown": {},
@@ -3382,6 +3698,7 @@
         "drop_in": 0.0,
         "hw_lab": 0.0,
         "marking": 17.2,
+        "module_leadership": 0.0,
         "pastoral_supervision": 36,
         "practicals": 55.0,
         "project_supervision": 112,
@@ -3394,6 +3711,7 @@
           "assessment_setting": 15.0,
           "delivery_structured": {
             "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -3435,6 +3753,7 @@
             "COM00065H",
             "COM00190M"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
           "practicals": 27.5,
           "practicals_structured": {
@@ -3459,6 +3778,7 @@
           "assessment_setting": 7.5,
           "delivery_structured": {
             "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -3500,6 +3820,7 @@
             "COM00058H",
             "COM00181M"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
           "practicals": 27.5,
           "practicals_structured": {
@@ -3570,18 +3891,20 @@
         "drop_in": 0.0,
         "hw_lab": 0.0,
         "marking": 19.8,
+        "module_leadership": 7.3,
         "pastoral_supervision": 48,
         "practicals": 82.5,
         "project_supervision": 112,
         "supervision": 0.0,
         "teaching": 55.0
       },
-      "teaching_hours": 339.8,
+      "teaching_hours": 347.1,
       "teaching_module_breakdowns": {
         "IDEV": {
           "assessment_setting": 15.0,
           "delivery_structured": {
             "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -3614,6 +3937,7 @@
             "COM00060H",
             "COM00179M"
           ],
+          "module_leadership": 7.3,
           "online_content_dev": 0.0,
           "practicals": 27.5,
           "practicals_structured": {
@@ -3638,6 +3962,7 @@
           "assessment_setting": 7.5,
           "delivery_structured": {
             "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -3669,6 +3994,7 @@
           "module_codes": [
             "COM00195M"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
           "practicals": 55.0,
           "practicals_structured": {
@@ -3693,7 +4019,55 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 743.0
+      "total_hours": 750.3
+    },
+    "John McDermid": {
+      "adjustments_breakdown": {},
+      "admin_breakdown": {
+        "Research Group Leader": 164.2,
+        "engagement": 100.0,
+        "personal_development": 75.0
+      },
+      "admin_hours": 339.2,
+      "assumptions": [],
+      "category": "ART",
+      "fte": 1.0,
+      "missing_data": [],
+      "name": "John McDermid",
+      "nominal_hours": 1642.0,
+      "pastoral_breakdown": {
+        "rate": 3,
+        "student_count": 0,
+        "total": 0
+      },
+      "project_breakdown": {},
+      "research_breakdown": {
+        "grants": {
+          "grant_3874036": 821.0,
+          "grant_4846427": 82.1,
+          "grant_4903854": 328.4
+        },
+        "phd_students": {
+          "co_supervision": {
+            "count": 3,
+            "rate": 48,
+            "total": 144
+          }
+        },
+        "protected_research_baseline": 164.2
+      },
+      "research_hours": 1539.7,
+      "teaching_breakdown": {
+        "pastoral_breakdown": {
+          "rate": 3,
+          "student_count": 0,
+          "total": 0
+        },
+        "pastoral_supervision": 0
+      },
+      "teaching_hours": 0.0,
+      "teaching_module_breakdowns": {},
+      "total_hours": 1878.9
     },
     "Katrina Attwood": {
       "adjustments_breakdown": {},
@@ -3737,18 +4111,20 @@
         "drop_in": 0.0,
         "hw_lab": 0.0,
         "marking": 53.0,
+        "module_leadership": 7.3,
         "pastoral_supervision": 66,
         "practicals": 121.0,
         "project_supervision": 144,
         "supervision": 0.0,
         "teaching": 45.8333
       },
-      "teaching_hours": 447.3333,
+      "teaching_hours": 454.6333,
       "teaching_module_breakdowns": {
         "HCIN": {
           "assessment_setting": 10.0,
           "delivery_structured": {
             "base_per_teacher": 7.3333,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -3780,6 +4156,7 @@
           "module_codes": [
             "COM00018C"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
           "practicals": 66.0,
           "practicals_structured": {
@@ -3807,6 +4184,7 @@
           "assessment_setting": 7.5,
           "delivery_structured": {
             "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -3848,6 +4226,7 @@
             "COM00054H",
             "COM00189M"
           ],
+          "module_leadership": 7.3,
           "online_content_dev": 0.0,
           "practicals": 55.0,
           "practicals_structured": {
@@ -3872,7 +4251,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1162.9333
+      "total_hours": 1170.2333
     },
     "Kofi Appiah": {
       "adjustments_breakdown": {},
@@ -3926,18 +4305,20 @@
         "drop_in": 0.0,
         "hw_lab": 0.0,
         "marking": 87.3333,
+        "module_leadership": 7.3,
         "pastoral_supervision": 54,
         "practicals": 115.5,
         "project_supervision": 80,
         "supervision": 0.0,
         "teaching": 36.6667
       },
-      "teaching_hours": 388.5,
+      "teaching_hours": 395.8,
       "teaching_module_breakdowns": {
         "SOF1": {
           "assessment_setting": 5.0,
           "delivery_structured": {
             "base_per_teacher": 7.3333,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -3969,6 +4350,7 @@
           "module_codes": [
             "COM00015C"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
           "practicals": 77.0,
           "practicals_structured": {
@@ -3996,6 +4378,7 @@
           "assessment_setting": 10.0,
           "delivery_structured": {
             "base_per_teacher": 7.3333,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -4027,6 +4410,7 @@
           "module_codes": [
             "COM00016C"
           ],
+          "module_leadership": 7.3,
           "online_content_dev": 0.0,
           "practicals": 38.5,
           "practicals_structured": {
@@ -4051,12 +4435,12 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1166.0
+      "total_hours": 1173.3
     },
     "Kostas Barmpis": {
       "adjustments_breakdown": {},
       "admin_breakdown": {
-        "PhD Training Officer": 82.1,
+        "PGR Training Officer": 82.1,
         "engagement": 100.0,
         "personal_development": 75.0
       },
@@ -4099,35 +4483,37 @@
       },
       "research_hours": 548.6,
       "teaching_breakdown": {
-        "assessment_setting": 15.0,
+        "assessment_setting": 20.0,
         "drop_in": 0.0,
         "hw_lab": 0.0,
-        "marking": 50.5333,
+        "marking": 71.5333,
+        "module_leadership": 7.3,
         "pastoral_supervision": 66,
-        "practicals": 84.3333,
+        "practicals": 106.3333,
         "project_supervision": 112,
         "supervision": 0.0,
-        "teaching": 36.6667
+        "teaching": 45.8333
       },
-      "teaching_hours": 364.5333,
+      "teaching_hours": 429.0,
       "teaching_module_breakdowns": {
         "ENG1": {
-          "assessment_setting": 10.0,
+          "assessment_setting": 15.0,
           "delivery_structured": {
-            "base_per_teacher": 7.3333,
+            "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
-            "teacher_count": 3,
+            "teacher_count": 2,
             "total_lecture_hours": 22.0,
             "week_count": 11
           },
           "drop_in": 0.0,
           "hw_lab": 0.0,
-          "lecture_contact_hours": 7.3333,
-          "marking": 42.0,
+          "lecture_contact_hours": 11.0,
+          "marking": 63.0,
           "marking_structured": {
-            "hours_per_teacher": 42.0,
+            "hours_per_teacher": 63.0,
             "is_automated": false,
             "levels": [
               {
@@ -4140,39 +4526,41 @@
                 "total_hours": 126.0
               }
             ],
-            "n_teachers": 3,
+            "n_teachers": 2,
             "total_hours": 126.0
           },
           "module_codes": [
             "COM00019I"
           ],
+          "module_leadership": 7.3,
           "online_content_dev": 0.0,
-          "practicals": 66.0,
+          "practicals": 88.0,
           "practicals_structured": {
-            "applied_rate": 3.0,
+            "applied_rate": 2.0,
             "first_session_hours": 2.0,
             "first_session_rate": 2.5,
             "first_session_sessions": 1,
-            "first_session_total": 66.0,
-            "groups_per_teacher": 1.3333,
-            "n_teachers": 3,
-            "repeat_hours": 0.67,
+            "first_session_total": 44.0,
+            "groups_per_teacher": 2.0,
+            "n_teachers": 2,
+            "repeat_hours": 2.0,
             "repeat_rate": 1.5,
-            "repeat_sessions_per_teacher": 0.3333,
-            "repeat_total": 11.0,
-            "sessions_per_teacher": 1.0,
-            "total": 66.0,
+            "repeat_sessions_per_teacher": 1.0,
+            "repeat_total": 33.0,
+            "sessions_per_teacher": 2.0,
+            "total": 88.0,
             "total_groups": 4,
             "week_count": 11
           },
           "supervision": 0.0,
-          "teaching": 18.3333,
+          "teaching": 27.5,
           "total_lecture_hours": 22.0
         },
         "ENG2": {
           "assessment_setting": 5.0,
           "delivery_structured": {
             "base_per_teacher": 7.3333,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -4214,6 +4602,7 @@
             "COM00055H",
             "COM00187M"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
           "practicals": 18.3333,
           "practicals_structured": {
@@ -4235,7 +4624,233 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1170.2333
+      "total_hours": 1234.7
+    },
+    "Mark Nicholson": {
+      "adjustments_breakdown": {},
+      "admin_breakdown": {
+        "StAMP committee": 52.544,
+        "engagement": 80.0,
+        "personal_development": 60.0
+      },
+      "admin_hours": 192.544,
+      "assumptions": [],
+      "category": "T and S",
+      "fte": 0.8,
+      "missing_data": [],
+      "name": "Mark Nicholson",
+      "nominal_hours": 1313.6,
+      "pastoral_breakdown": {
+        "rate": 3,
+        "student_count": 5,
+        "total": 15
+      },
+      "project_breakdown": {
+        "level": "MSc",
+        "project_count": 8,
+        "rate": 24,
+        "total": 192
+      },
+      "research_breakdown": {
+        "grants": {},
+        "phd_students": {
+          "co_supervision": {
+            "count": 2,
+            "rate": 48,
+            "total": 96
+          }
+        },
+        "protected_research_baseline": 131.36
+      },
+      "research_hours": 227.36,
+      "teaching_breakdown": {
+        "assessment_setting": 22.5,
+        "drop_in": 0.0,
+        "hw_lab": 0.0,
+        "marking": 15.6,
+        "module_leadership": 14.6,
+        "pastoral_supervision": 15,
+        "practicals": 0.0,
+        "project_supervision": 192,
+        "supervision": 0.0,
+        "teaching": 55.0
+      },
+      "teaching_hours": 314.7,
+      "teaching_module_breakdowns": {
+        "RASS": {
+          "assessment_setting": 7.5,
+          "delivery_structured": {
+            "base_per_teacher": 11.0,
+            "is_block_taught": true,
+            "lecturer_type": "standard",
+            "lectures_per_week": 0.0,
+            "multiplier": 2.5,
+            "teacher_count": 2,
+            "total_lecture_hours": 22.0,
+            "week_count": 0
+          },
+          "drop_in": 0.0,
+          "hw_lab": 0.0,
+          "lecture_contact_hours": 11.0,
+          "marking": 6.3,
+          "marking_structured": {
+            "hours_per_teacher": 6.3,
+            "is_automated": false,
+            "levels": [
+              {
+                "label": null,
+                "main_hours": 10.5,
+                "main_student_count": 21,
+                "rate_per_script": 0.5,
+                "resit_hours": 2.1,
+                "resit_student_count": 4.2,
+                "total_hours": 12.6
+              }
+            ],
+            "n_teachers": 2,
+            "total_hours": 12.6
+          },
+          "module_codes": [
+            "COM00164M"
+          ],
+          "module_leadership": 7.3,
+          "online_content_dev": 0.0,
+          "practicals": 0.0,
+          "supervision": 0.0,
+          "teaching": 27.5,
+          "total_lecture_hours": 22.0
+        },
+        "SSAS": {
+          "assessment_setting": 15.0,
+          "delivery_structured": {
+            "base_per_teacher": 11.0,
+            "is_block_taught": true,
+            "lecturer_type": "standard",
+            "lectures_per_week": 0.0,
+            "multiplier": 2.5,
+            "teacher_count": 2,
+            "total_lecture_hours": 22.0,
+            "week_count": 0
+          },
+          "drop_in": 0.0,
+          "hw_lab": 0.0,
+          "lecture_contact_hours": 11.0,
+          "marking": 9.3,
+          "marking_structured": {
+            "hours_per_teacher": 9.3,
+            "is_automated": false,
+            "levels": [
+              {
+                "label": null,
+                "main_hours": 15.5,
+                "main_student_count": 31,
+                "rate_per_script": 0.5,
+                "resit_hours": 3.1,
+                "resit_student_count": 6.2,
+                "total_hours": 18.6
+              }
+            ],
+            "n_teachers": 2,
+            "total_hours": 18.6
+          },
+          "module_codes": [
+            "COM00052M"
+          ],
+          "module_leadership": 7.3,
+          "online_content_dev": 0.0,
+          "practicals": 0.0,
+          "supervision": 0.0,
+          "teaching": 27.5,
+          "total_lecture_hours": 22.0
+        }
+      },
+      "total_hours": 734.604
+    },
+    "Mark Sujan": {
+      "adjustments_breakdown": {},
+      "admin_breakdown": {
+        "engagement": 80.0,
+        "personal_development": 60.0
+      },
+      "admin_hours": 140.0,
+      "assumptions": [],
+      "category": "ART",
+      "fte": 0.8,
+      "missing_data": [
+        "No administrative roles assigned"
+      ],
+      "name": "Mark Sujan",
+      "nominal_hours": 1313.6,
+      "pastoral_breakdown": {
+        "rate": 3,
+        "student_count": 0,
+        "total": 0
+      },
+      "project_breakdown": {},
+      "research_breakdown": {
+        "grants": {},
+        "phd_students": {},
+        "protected_research_baseline": 131.36
+      },
+      "research_hours": 131.36,
+      "teaching_breakdown": {
+        "assessment_setting": 7.5,
+        "drop_in": 0.0,
+        "hw_lab": 0.0,
+        "marking": 5.1,
+        "module_leadership": 7.3,
+        "pastoral_supervision": 0,
+        "practicals": 0.0,
+        "supervision": 0.0,
+        "teaching": 27.5
+      },
+      "teaching_hours": 47.4,
+      "teaching_module_breakdowns": {
+        "HUFS": {
+          "assessment_setting": 7.5,
+          "delivery_structured": {
+            "base_per_teacher": 11.0,
+            "is_block_taught": true,
+            "lecturer_type": "standard",
+            "lectures_per_week": 0.0,
+            "multiplier": 2.5,
+            "teacher_count": 2,
+            "total_lecture_hours": 22.0,
+            "week_count": 0
+          },
+          "drop_in": 0.0,
+          "hw_lab": 0.0,
+          "lecture_contact_hours": 11.0,
+          "marking": 5.1,
+          "marking_structured": {
+            "hours_per_teacher": 5.1,
+            "is_automated": false,
+            "levels": [
+              {
+                "label": null,
+                "main_hours": 8.5,
+                "main_student_count": 17,
+                "rate_per_script": 0.5,
+                "resit_hours": 1.7,
+                "resit_student_count": 3.4,
+                "total_hours": 10.2
+              }
+            ],
+            "n_teachers": 2,
+            "total_hours": 10.2
+          },
+          "module_codes": [
+            "COM00208M"
+          ],
+          "module_leadership": 7.3,
+          "online_content_dev": 0.0,
+          "practicals": 0.0,
+          "supervision": 0.0,
+          "teaching": 27.5,
+          "total_lecture_hours": 22.0
+        }
+      },
+      "total_hours": 318.76
     },
     "Mike Freeman": {
       "adjustments_breakdown": {},
@@ -4273,18 +4888,20 @@
         "drop_in": 0.0,
         "hw_lab": 0.0,
         "marking": 74.6667,
+        "module_leadership": 7.3,
         "pastoral_supervision": 54,
         "practicals": 154.0,
         "project_supervision": 144,
         "supervision": 0.0,
         "teaching": 36.6667
       },
-      "teaching_hours": 473.3333,
+      "teaching_hours": 480.6333,
       "teaching_module_breakdowns": {
         "SYS1": {
           "assessment_setting": 5.0,
           "delivery_structured": {
             "base_per_teacher": 7.3333,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -4316,6 +4933,7 @@
           "module_codes": [
             "COM00011C"
           ],
+          "module_leadership": 7.3,
           "online_content_dev": 0.0,
           "practicals": 77.0,
           "practicals_structured": {
@@ -4343,6 +4961,7 @@
           "assessment_setting": 5.0,
           "delivery_structured": {
             "base_per_teacher": 7.3333,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -4374,6 +4993,7 @@
           "module_codes": [
             "COM00029I"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
           "practicals": 77.0,
           "practicals_structured": {
@@ -4398,7 +5018,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 894.6333
+      "total_hours": 901.9333
     },
     "Mike O'Dea": {
       "adjustments_breakdown": {},
@@ -4427,21 +5047,23 @@
       },
       "research_hours": 164.2,
       "teaching_breakdown": {
-        "assessment_setting": 15.0,
+        "assessment_setting": 30.0,
         "drop_in": 0.0,
         "hw_lab": 0.0,
-        "marking": 14.1,
+        "marking": 29.8333,
+        "module_leadership": 7.3,
         "pastoral_supervision": 0,
-        "practicals": 126.5,
+        "practicals": 236.5,
         "supervision": 0.0,
-        "teaching": 55.0
+        "teaching": 91.6667
       },
-      "teaching_hours": 210.6,
+      "teaching_hours": 395.3,
       "teaching_module_breakdowns": {
         "CBDA": {
           "assessment_setting": 7.5,
           "delivery_structured": {
             "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -4474,6 +5096,7 @@
             "COM00068H",
             "COM00207M"
           ],
+          "module_leadership": 7.3,
           "online_content_dev": 0.0,
           "practicals": 71.5,
           "practicals_structured": {
@@ -4501,6 +5124,7 @@
           "assessment_setting": 7.5,
           "delivery_structured": {
             "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -4533,6 +5157,7 @@
             "COM00063H",
             "COM00200M"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
           "practicals": 55.0,
           "practicals_structured": {
@@ -4555,9 +5180,79 @@
           "supervision": 0.0,
           "teaching": 27.5,
           "total_lecture_hours": 22.0
+        },
+        "ROCS": {
+          "assessment_setting": 15.0,
+          "delivery_structured": {
+            "base_per_teacher": 7.3333,
+            "is_block_taught": false,
+            "lecturer_type": "new_lecturer",
+            "lectures_per_week": 1.0,
+            "multiplier": 5,
+            "teacher_count": 3,
+            "total_lecture_hours": 22.0,
+            "week_count": 11
+          },
+          "drop_in": 0.0,
+          "hw_lab": 0.0,
+          "lecture_contact_hours": 7.3333,
+          "marking": 15.7333,
+          "marking_structured": {
+            "hours_per_teacher": 15.7333,
+            "is_automated": false,
+            "levels": [
+              {
+                "label": "H level",
+                "main_hours": 3.3333,
+                "main_student_count": 10,
+                "rate_per_script": 0.3333,
+                "resit_hours": 0.6667,
+                "resit_student_count": 2.0,
+                "total_hours": 4.0
+              },
+              {
+                "label": "M level",
+                "main_hours": 36.0,
+                "main_student_count": 72,
+                "rate_per_script": 0.5,
+                "resit_hours": 7.2,
+                "resit_student_count": 14.4,
+                "total_hours": 43.2
+              }
+            ],
+            "n_teachers": 3,
+            "total_hours": 47.2
+          },
+          "module_codes": [
+            "COM00066H",
+            "COM00180M"
+          ],
+          "module_leadership": 0.0,
+          "online_content_dev": 0.0,
+          "practicals": 110.0,
+          "practicals_structured": {
+            "applied_rate": 6.0,
+            "first_session_hours": 2.0,
+            "first_session_rate": 2.5,
+            "first_session_sessions": 1,
+            "first_session_total": 132.0,
+            "groups_per_teacher": 0.6667,
+            "n_teachers": 3,
+            "repeat_hours": 0.0,
+            "repeat_rate": 1.5,
+            "repeat_sessions_per_teacher": 0,
+            "repeat_total": 0.0,
+            "sessions_per_teacher": 0.8333,
+            "total": 55.0,
+            "total_groups": 2,
+            "week_count": 11
+          },
+          "supervision": 0.0,
+          "teaching": 36.6667,
+          "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 631.9
+      "total_hours": 816.6
     },
     "Nick Pears": {
       "adjustments_breakdown": {},
@@ -4611,6 +5306,7 @@
         "drop_in": 0.0,
         "hw_lab": 0.0,
         "marking": 37.6,
+        "module_leadership": 0.0,
         "pastoral_supervision": 51,
         "practicals": 33.0,
         "project_supervision": 64,
@@ -4623,6 +5319,7 @@
           "assessment_setting": 5.0,
           "delivery_structured": {
             "base_per_teacher": 7.3333,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -4654,6 +5351,7 @@
           "module_codes": [
             "COM00013C"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
           "practicals": 33.0,
           "practicals_structured": {
@@ -4680,15 +5378,194 @@
       },
       "total_hours": 1468.9333
     },
+    "Oleg Lisagor": {
+      "adjustments_breakdown": {},
+      "admin_breakdown": {
+        "Other PLs": 82.1,
+        "engagement": 100.0,
+        "personal_development": 75.0
+      },
+      "admin_hours": 257.1,
+      "assumptions": [],
+      "category": "T and S",
+      "fte": 1.0,
+      "missing_data": [],
+      "name": "Oleg Lisagor",
+      "nominal_hours": 1642.0,
+      "pastoral_breakdown": {
+        "rate": 3,
+        "student_count": 4,
+        "total": 12
+      },
+      "project_breakdown": {
+        "level": "MSc",
+        "project_count": 8,
+        "rate": 24,
+        "total": 192
+      },
+      "research_breakdown": {
+        "grants": {},
+        "phd_students": {},
+        "protected_research_baseline": 164.2
+      },
+      "research_hours": 164.2,
+      "teaching_breakdown": {
+        "assessment_setting": 45.0,
+        "drop_in": 0.0,
+        "hw_lab": 0.0,
+        "marking": 37.2,
+        "module_leadership": 7.3,
+        "pastoral_supervision": 12,
+        "practicals": 0.0,
+        "project_supervision": 192,
+        "supervision": 0.0,
+        "teaching": 82.5
+      },
+      "teaching_hours": 376.0,
+      "teaching_module_breakdowns": {
+        "FSSE": {
+          "assessment_setting": 15.0,
+          "delivery_structured": {
+            "base_per_teacher": 11.0,
+            "is_block_taught": true,
+            "lecturer_type": "standard",
+            "lectures_per_week": 0.0,
+            "multiplier": 2.5,
+            "teacher_count": 2,
+            "total_lecture_hours": 22.0,
+            "week_count": 0
+          },
+          "drop_in": 0.0,
+          "hw_lab": 0.0,
+          "lecture_contact_hours": 11.0,
+          "marking": 14.4,
+          "marking_structured": {
+            "hours_per_teacher": 14.4,
+            "is_automated": false,
+            "levels": [
+              {
+                "label": null,
+                "main_hours": 24.0,
+                "main_student_count": 48,
+                "rate_per_script": 0.5,
+                "resit_hours": 4.8,
+                "resit_student_count": 9.6,
+                "total_hours": 28.8
+              }
+            ],
+            "n_teachers": 2,
+            "total_hours": 28.8
+          },
+          "module_codes": [
+            "COM00006M",
+            "COM00212M"
+          ],
+          "module_leadership": 0.0,
+          "online_content_dev": 0.0,
+          "practicals": 0.0,
+          "supervision": 0.0,
+          "teaching": 27.5,
+          "total_lecture_hours": 22.0
+        },
+        "HRAS": {
+          "assessment_setting": 15.0,
+          "delivery_structured": {
+            "base_per_teacher": 11.0,
+            "is_block_taught": true,
+            "lecturer_type": "standard",
+            "lectures_per_week": 0.0,
+            "multiplier": 2.5,
+            "teacher_count": 2,
+            "total_lecture_hours": 22.0,
+            "week_count": 0
+          },
+          "drop_in": 0.0,
+          "hw_lab": 0.0,
+          "lecture_contact_hours": 11.0,
+          "marking": 13.5,
+          "marking_structured": {
+            "hours_per_teacher": 13.5,
+            "is_automated": false,
+            "levels": [
+              {
+                "label": null,
+                "main_hours": 22.5,
+                "main_student_count": 45,
+                "rate_per_script": 0.5,
+                "resit_hours": 4.5,
+                "resit_student_count": 9.0,
+                "total_hours": 27.0
+              }
+            ],
+            "n_teachers": 2,
+            "total_hours": 27.0
+          },
+          "module_codes": [
+            "COM00025M"
+          ],
+          "module_leadership": 7.3,
+          "online_content_dev": 0.0,
+          "practicals": 0.0,
+          "supervision": 0.0,
+          "teaching": 27.5,
+          "total_lecture_hours": 22.0
+        },
+        "SSAS": {
+          "assessment_setting": 15.0,
+          "delivery_structured": {
+            "base_per_teacher": 11.0,
+            "is_block_taught": true,
+            "lecturer_type": "standard",
+            "lectures_per_week": 0.0,
+            "multiplier": 2.5,
+            "teacher_count": 2,
+            "total_lecture_hours": 22.0,
+            "week_count": 0
+          },
+          "drop_in": 0.0,
+          "hw_lab": 0.0,
+          "lecture_contact_hours": 11.0,
+          "marking": 9.3,
+          "marking_structured": {
+            "hours_per_teacher": 9.3,
+            "is_automated": false,
+            "levels": [
+              {
+                "label": null,
+                "main_hours": 15.5,
+                "main_student_count": 31,
+                "rate_per_script": 0.5,
+                "resit_hours": 3.1,
+                "resit_student_count": 6.2,
+                "total_hours": 18.6
+              }
+            ],
+            "n_teachers": 2,
+            "total_hours": 18.6
+          },
+          "module_codes": [
+            "COM00052M"
+          ],
+          "module_leadership": 0.0,
+          "online_content_dev": 0.0,
+          "practicals": 0.0,
+          "supervision": 0.0,
+          "teaching": 27.5,
+          "total_lecture_hours": 22.0
+        }
+      },
+      "total_hours": 797.3
+    },
     "Paul Cairns": {
       "adjustments_breakdown": {},
       "admin_breakdown": {
         "Other PLs": 82.1,
         "REF Lead": 82.1,
+        "Research Group Leader": 164.2,
         "engagement": 100.0,
         "personal_development": 75.0
       },
-      "admin_hours": 339.2,
+      "admin_hours": 503.4,
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
@@ -4736,18 +5613,20 @@
         "drop_in": 0.0,
         "hw_lab": 0.0,
         "marking": 43.0,
+        "module_leadership": 7.3,
         "pastoral_supervision": 15,
         "practicals": 121.0,
         "project_supervision": 32,
         "supervision": 0.0,
         "teaching": 45.8333
       },
-      "teaching_hours": 274.3333,
+      "teaching_hours": 281.6333,
       "teaching_module_breakdowns": {
         "GODS": {
           "assessment_setting": 7.5,
           "delivery_structured": {
             "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -4780,6 +5659,7 @@
             "COM00063H",
             "COM00200M"
           ],
+          "module_leadership": 7.3,
           "online_content_dev": 0.0,
           "practicals": 55.0,
           "practicals_structured": {
@@ -4807,6 +5687,7 @@
           "assessment_setting": 10.0,
           "delivery_structured": {
             "base_per_teacher": 7.3333,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -4838,6 +5719,7 @@
           "module_codes": [
             "COM00018C"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
           "practicals": 66.0,
           "practicals_structured": {
@@ -4862,7 +5744,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1626.1333
+      "total_hours": 1797.6333
     },
     "Pedro Ribeiro": {
       "adjustments_breakdown": {},
@@ -4913,18 +5795,20 @@
         "drop_in": 0.0,
         "hw_lab": 0.0,
         "marking": 48.2,
+        "module_leadership": 7.3,
         "pastoral_supervision": 51,
         "practicals": 95.3333,
         "project_supervision": 64,
         "supervision": 0.0,
         "teaching": 36.6667
       },
-      "teaching_hours": 305.2,
+      "teaching_hours": 312.5,
       "teaching_module_breakdowns": {
         "AURO": {
           "assessment_setting": 5.0,
           "delivery_structured": {
             "base_per_teacher": 7.3333,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -4966,6 +5850,7 @@
             "COM00052H",
             "COM00186M"
           ],
+          "module_leadership": 7.3,
           "online_content_dev": 0.0,
           "practicals": 18.3333,
           "practicals_structured": {
@@ -4990,6 +5875,7 @@
           "assessment_setting": 5.0,
           "delivery_structured": {
             "base_per_teacher": 7.3333,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -5021,6 +5907,7 @@
           "module_codes": [
             "COM00011C"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
           "practicals": 77.0,
           "practicals_structured": {
@@ -5045,16 +5932,18 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1289.0
+      "total_hours": 1296.3
     },
     "Pengcheng Liu": {
       "adjustments_breakdown": {},
       "admin_breakdown": {
-        "Graduate School Board (GSB) Chair": 0.0,
+        "Graduate Chair": 328.4,
+        "Research Group Leader": 164.2,
+        "Research Mentor": 32.84,
         "engagement": 100.0,
         "personal_development": 75.0
       },
-      "admin_hours": 175.0,
+      "admin_hours": 700.44,
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
@@ -5100,35 +5989,37 @@
       },
       "research_hours": 996.58,
       "teaching_breakdown": {
-        "assessment_setting": 5.0,
+        "assessment_setting": 7.5,
         "drop_in": 0.0,
         "hw_lab": 0.0,
-        "marking": 36.6667,
+        "marking": 55.0,
+        "module_leadership": 7.3,
         "pastoral_supervision": 30,
-        "practicals": 88.0,
+        "practicals": 121.0,
         "project_supervision": 48,
         "supervision": 0.0,
-        "teaching": 18.3333
+        "teaching": 27.5
       },
-      "teaching_hours": 226.0,
+      "teaching_hours": 296.3,
       "teaching_module_breakdowns": {
         "SYS3": {
-          "assessment_setting": 5.0,
+          "assessment_setting": 7.5,
           "delivery_structured": {
-            "base_per_teacher": 7.3333,
+            "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
-            "teacher_count": 3,
+            "teacher_count": 2,
             "total_lecture_hours": 22.0,
             "week_count": 11
           },
           "drop_in": 0.0,
           "hw_lab": 0.0,
-          "lecture_contact_hours": 7.3333,
-          "marking": 36.6667,
+          "lecture_contact_hours": 11.0,
+          "marking": 55.0,
           "marking_structured": {
-            "hours_per_teacher": 36.6667,
+            "hours_per_teacher": 55.0,
             "is_automated": false,
             "levels": [
               {
@@ -5141,37 +6032,38 @@
                 "total_hours": 110.0
               }
             ],
-            "n_teachers": 3,
+            "n_teachers": 2,
             "total_hours": 110.0
           },
           "module_codes": [
             "COM00018I"
           ],
+          "module_leadership": 7.3,
           "online_content_dev": 0.0,
-          "practicals": 88.0,
+          "practicals": 121.0,
           "practicals_structured": {
-            "applied_rate": 3.0,
+            "applied_rate": 2.0,
             "first_session_hours": 2.0,
             "first_session_rate": 2.5,
             "first_session_sessions": 1,
-            "first_session_total": 66.0,
-            "groups_per_teacher": 2.0,
-            "n_teachers": 3,
-            "repeat_hours": 2.0,
+            "first_session_total": 44.0,
+            "groups_per_teacher": 3.0,
+            "n_teachers": 2,
+            "repeat_hours": 4.0,
             "repeat_rate": 1.5,
-            "repeat_sessions_per_teacher": 1.0,
-            "repeat_total": 33.0,
-            "sessions_per_teacher": 1.3333,
-            "total": 88.0,
+            "repeat_sessions_per_teacher": 2.0,
+            "repeat_total": 66.0,
+            "sessions_per_teacher": 2.75,
+            "total": 121.0,
             "total_groups": 6,
             "week_count": 11
           },
           "supervision": 0.0,
-          "teaching": 18.3333,
+          "teaching": 27.5,
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1397.58
+      "total_hours": 1993.32
     },
     "Peter Nightingale": {
       "adjustments_breakdown": {},
@@ -5218,35 +6110,37 @@
       },
       "research_hours": 300.2,
       "teaching_breakdown": {
-        "assessment_setting": 22.5,
+        "assessment_setting": 20.0,
         "drop_in": 0.0,
         "hw_lab": 0.0,
-        "marking": 37.5,
+        "marking": 30.8333,
+        "module_leadership": 7.3,
         "pastoral_supervision": 54,
-        "practicals": 137.5,
+        "practicals": 119.1667,
         "project_supervision": 80,
         "supervision": 0.0,
-        "teaching": 137.5
+        "teaching": 119.1667
       },
-      "teaching_hours": 469.0,
+      "teaching_hours": 430.4667,
       "teaching_module_breakdowns": {
         "ARIA": {
-          "assessment_setting": 7.5,
+          "assessment_setting": 5.0,
           "delivery_structured": {
-            "base_per_teacher": 11.0,
+            "base_per_teacher": 7.3333,
+            "is_block_taught": false,
             "lecturer_type": "existing_lecturer_new_content",
             "lectures_per_week": 1.0,
             "multiplier": 5,
-            "teacher_count": 2,
+            "teacher_count": 3,
             "total_lecture_hours": 22.0,
             "week_count": 11
           },
           "drop_in": 0.0,
           "hw_lab": 0.0,
-          "lecture_contact_hours": 11.0,
-          "marking": 20.0,
+          "lecture_contact_hours": 7.3333,
+          "marking": 13.3333,
           "marking_structured": {
-            "hours_per_teacher": 20.0,
+            "hours_per_teacher": 13.3333,
             "is_automated": false,
             "levels": [
               {
@@ -5259,37 +6153,39 @@
                 "total_hours": 40.0
               }
             ],
-            "n_teachers": 2,
+            "n_teachers": 3,
             "total_hours": 40.0
           },
           "module_codes": [
             "COM00072H",
             "COM00217M"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
-          "practicals": 55.0,
+          "practicals": 36.6667,
           "practicals_structured": {
             "applied_rate": 5.0,
             "first_session_hours": 2.0,
             "first_session_rate": 2.5,
             "first_session_sessions": 1,
             "first_session_total": 110.0,
-            "n_teachers": 2,
+            "n_teachers": 3,
             "repeat_hours": 0,
             "repeat_rate": 1.5,
             "repeat_total": 0.0,
-            "sessions_per_teacher": 0.5,
+            "sessions_per_teacher": 0.3333,
             "total": 22.0,
             "week_count": 11
           },
           "supervision": 0.0,
-          "teaching": 55.0,
+          "teaching": 36.6667,
           "total_lecture_hours": 22.0
         },
         "FOAM": {
           "assessment_setting": 7.5,
           "delivery_structured": {
             "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "existing_lecturer_new_content",
             "lectures_per_week": 1.0,
             "multiplier": 5,
@@ -5321,6 +6217,7 @@
           "module_codes": [
             "<new for one year>"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
           "practicals": 55.0,
           "practicals_structured": {
@@ -5345,6 +6242,7 @@
           "assessment_setting": 7.5,
           "delivery_structured": {
             "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -5386,6 +6284,7 @@
             "COM00050H",
             "COM00191M"
           ],
+          "module_leadership": 7.3,
           "online_content_dev": 0.0,
           "practicals": 27.5,
           "practicals_structured": {
@@ -5407,39 +6306,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1108.4
-    },
-    "Phoebe": {
-      "adjustments_breakdown": {},
-      "admin_breakdown": {
-        "engagement": 100.0,
-        "personal_development": 75.0
-      },
-      "admin_hours": 175.0,
-      "assumptions": [],
-      "category": "T and S",
-      "fte": 1.0,
-      "missing_data": [
-        "No administrative roles assigned"
-      ],
-      "name": "Phoebe",
-      "nominal_hours": 1642.0,
-      "pastoral_breakdown": {
-        "rate": 3,
-        "student_count": 0,
-        "total": 0
-      },
-      "project_breakdown": {},
-      "research_breakdown": {
-        "grants": {},
-        "phd_students": {},
-        "protected_research_baseline": 164.2
-      },
-      "research_hours": 164.2,
-      "teaching_breakdown": {},
-      "teaching_hours": 0.0,
-      "teaching_module_breakdowns": {},
-      "total_hours": 339.2
+      "total_hours": 1069.8667
     },
     "Poonam Yadav": {
       "adjustments_breakdown": {},
@@ -5497,6 +6364,7 @@
         "drop_in": 0.0,
         "hw_lab": 0.0,
         "marking": 43.6,
+        "module_leadership": 0.0,
         "pastoral_supervision": 75,
         "practicals": 77.0,
         "project_supervision": 32,
@@ -5509,6 +6377,7 @@
           "assessment_setting": 5.0,
           "delivery_structured": {
             "base_per_teacher": 7.3333,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -5540,6 +6409,7 @@
           "module_codes": [
             "COM00015C"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
           "practicals": 77.0,
           "practicals_structured": {
@@ -5610,22 +6480,24 @@
       },
       "research_hours": 228.2,
       "teaching_breakdown": {
-        "assessment_setting": 17.5,
+        "assessment_setting": 18.75,
         "drop_in": 0.0,
         "hw_lab": 0.0,
-        "marking": 99.7333,
+        "marking": 89.8,
+        "module_leadership": 0.0,
         "pastoral_supervision": 15,
-        "practicals": 154.0,
+        "practicals": 214.5,
         "project_supervision": 64,
         "supervision": 0.0,
-        "teaching": 45.8333
+        "teaching": 82.5
       },
-      "teaching_hours": 396.0667,
+      "teaching_hours": 484.55,
       "teaching_module_breakdowns": {
         "DATA": {
           "assessment_setting": 7.5,
           "delivery_structured": {
             "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -5657,6 +6529,7 @@
           "module_codes": [
             "COM00028I"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
           "practicals": 88.0,
           "practicals_structured": {
@@ -5680,80 +6553,91 @@
           "teaching": 27.5,
           "total_lecture_hours": 22.0
         },
-        "IMLO": {
-          "assessment_setting": 10.0,
+        "DEEP": {
+          "assessment_setting": 11.25,
           "delivery_structured": {
-            "base_per_teacher": 7.3333,
-            "lecturer_type": "standard",
+            "base_per_teacher": 11.0,
+            "is_block_taught": false,
+            "lecturer_type": "new_lecturer",
             "lectures_per_week": 1.0,
-            "multiplier": 2.5,
-            "teacher_count": 3,
+            "multiplier": 5,
+            "teacher_count": 2,
             "total_lecture_hours": 22.0,
             "week_count": 11
           },
           "drop_in": 0.0,
           "hw_lab": 0.0,
-          "lecture_contact_hours": 7.3333,
-          "marking": 40.5333,
+          "lecture_contact_hours": 11.0,
+          "marking": 30.6,
           "marking_structured": {
-            "hours_per_teacher": 40.5333,
+            "hours_per_teacher": 30.6,
             "is_automated": false,
             "levels": [
               {
-                "label": null,
-                "main_hours": 101.3333,
-                "main_student_count": 304,
+                "label": "H level",
+                "main_hours": 28.0,
+                "main_student_count": 84,
                 "rate_per_script": 0.3333,
-                "resit_hours": 20.2667,
-                "resit_student_count": 60.8,
-                "total_hours": 121.6
+                "resit_hours": 5.6,
+                "resit_student_count": 16.8,
+                "total_hours": 33.6
+              },
+              {
+                "label": "M level",
+                "main_hours": 23.0,
+                "main_student_count": 46,
+                "rate_per_script": 0.5,
+                "resit_hours": 4.6,
+                "resit_student_count": 9.2,
+                "total_hours": 27.6
               }
             ],
-            "n_teachers": 3,
-            "total_hours": 121.6
+            "n_teachers": 2,
+            "total_hours": 61.2
           },
           "module_codes": [
-            "COM00026I"
+            "COM00049H",
+            "COM00184M"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
-          "practicals": 66.0,
+          "practicals": 126.5,
           "practicals_structured": {
-            "applied_rate": 3.0,
+            "applied_rate": 3.5385,
             "first_session_hours": 2.0,
             "first_session_rate": 2.5,
             "first_session_sessions": 1,
-            "first_session_total": 66.0,
-            "groups_per_teacher": 1.3333,
-            "n_teachers": 3,
-            "repeat_hours": 0.67,
+            "first_session_total": 77.8462,
+            "groups_per_teacher": 1.5,
+            "n_teachers": 2,
+            "repeat_hours": 1.0,
             "repeat_rate": 1.5,
-            "repeat_sessions_per_teacher": 0.3333,
-            "repeat_total": 11.0,
-            "sessions_per_teacher": 1.0,
-            "total": 66.0,
-            "total_groups": 4,
+            "repeat_sessions_per_teacher": 0.5,
+            "repeat_total": 16.5,
+            "sessions_per_teacher": 1.625,
+            "total": 71.5,
+            "total_groups": 3,
             "week_count": 11
           },
           "supervision": 0.0,
-          "teaching": 18.3333,
+          "teaching": 55.0,
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 922.4167
+      "total_hours": 1010.9
     },
     "Radu Calinescu": {
       "adjustments_breakdown": {},
       "admin_breakdown": {
+        "Research Mentor": 32.84,
         "engagement": 100.0,
         "personal_development": 75.0
       },
-      "admin_hours": 175.0,
+      "admin_hours": 207.84,
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
-      "missing_data": [
-        "No administrative roles assigned"
-      ],
+      "missing_data": [],
       "name": "Radu Calinescu",
       "nominal_hours": 1642.0,
       "pastoral_breakdown": {
@@ -5798,6 +6682,7 @@
         "drop_in": 0.0,
         "hw_lab": 0.0,
         "marking": 10.5,
+        "module_leadership": 0.0,
         "pastoral_supervision": 27,
         "practicals": 27.5,
         "project_supervision": 16,
@@ -5810,6 +6695,7 @@
           "assessment_setting": 22.5,
           "delivery_structured": {
             "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -5841,6 +6727,7 @@
           "module_codes": [
             "COM00138M"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
           "practicals": 27.5,
           "practicals_structured": {
@@ -5862,16 +6749,262 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1224.7
+      "total_hours": 1257.54
+    },
+    "Richard Hawkins": {
+      "adjustments_breakdown": {},
+      "admin_breakdown": {
+        "Impact": 164.2,
+        "Other PLs": 82.1,
+        "engagement": 100.0,
+        "personal_development": 75.0
+      },
+      "admin_hours": 421.3,
+      "assumptions": [],
+      "category": "ART",
+      "fte": 1.0,
+      "missing_data": [],
+      "name": "Richard Hawkins",
+      "nominal_hours": 1642.0,
+      "pastoral_breakdown": {
+        "rate": 3,
+        "student_count": 23,
+        "total": 69
+      },
+      "project_breakdown": {
+        "level": "MSc",
+        "project_count": 7,
+        "rate": 24,
+        "total": 168
+      },
+      "research_breakdown": {
+        "grants": {
+          "grant_3874036": 82.1
+        },
+        "phd_students": {
+          "assessor": {
+            "count": 2,
+            "rate": 8,
+            "total": 16
+          },
+          "co_supervision": {
+            "count": 2,
+            "rate": 48,
+            "total": 96
+          }
+        },
+        "protected_research_baseline": 164.2
+      },
+      "research_hours": 358.3,
+      "teaching_breakdown": {
+        "assessment_setting": 22.5,
+        "drop_in": 0.0,
+        "hw_lab": 0.0,
+        "marking": 29.1,
+        "module_leadership": 7.3,
+        "pastoral_supervision": 69,
+        "practicals": 0.0,
+        "project_supervision": 168,
+        "supervision": 0.0,
+        "teaching": 82.5
+      },
+      "teaching_hours": 378.4,
+      "teaching_module_breakdowns": {
+        "CASA": {
+          "assessment_setting": 7.5,
+          "delivery_structured": {
+            "base_per_teacher": 11.0,
+            "is_block_taught": true,
+            "lecturer_type": "standard",
+            "lectures_per_week": 0.0,
+            "multiplier": 2.5,
+            "teacher_count": 2,
+            "total_lecture_hours": 22.0,
+            "week_count": 0
+          },
+          "drop_in": 0.0,
+          "hw_lab": 0.0,
+          "lecture_contact_hours": 11.0,
+          "marking": 11.4,
+          "marking_structured": {
+            "hours_per_teacher": 11.4,
+            "is_automated": false,
+            "levels": [
+              {
+                "label": null,
+                "main_hours": 19.0,
+                "main_student_count": 38,
+                "rate_per_script": 0.5,
+                "resit_hours": 3.8,
+                "resit_student_count": 7.6,
+                "total_hours": 22.8
+              }
+            ],
+            "n_teachers": 2,
+            "total_hours": 22.8
+          },
+          "module_codes": [
+            "COM00017M"
+          ],
+          "module_leadership": 0.0,
+          "online_content_dev": 0.0,
+          "practicals": 0.0,
+          "supervision": 0.0,
+          "teaching": 27.5,
+          "total_lecture_hours": 22.0
+        },
+        "SCDR": {
+          "assessment_setting": 7.5,
+          "delivery_structured": {
+            "base_per_teacher": 11.0,
+            "is_block_taught": true,
+            "lecturer_type": "standard",
+            "lectures_per_week": 0.0,
+            "multiplier": 2.5,
+            "teacher_count": 2,
+            "total_lecture_hours": 22.0,
+            "week_count": 0
+          },
+          "drop_in": 0.0,
+          "hw_lab": 0.0,
+          "lecture_contact_hours": 11.0,
+          "marking": 11.1,
+          "marking_structured": {
+            "hours_per_teacher": 11.1,
+            "is_automated": false,
+            "levels": [
+              {
+                "label": null,
+                "main_hours": 18.5,
+                "main_student_count": 37,
+                "rate_per_script": 0.5,
+                "resit_hours": 3.7,
+                "resit_student_count": 7.4,
+                "total_hours": 22.2
+              }
+            ],
+            "n_teachers": 2,
+            "total_hours": 22.2
+          },
+          "module_codes": [
+            "COM00047M"
+          ],
+          "module_leadership": 7.3,
+          "online_content_dev": 0.0,
+          "practicals": 0.0,
+          "supervision": 0.0,
+          "teaching": 27.5,
+          "total_lecture_hours": 22.0
+        },
+        "SESA": {
+          "assessment_setting": 7.5,
+          "delivery_structured": {
+            "base_per_teacher": 11.0,
+            "is_block_taught": true,
+            "lecturer_type": "standard",
+            "lectures_per_week": 0.0,
+            "multiplier": 2.5,
+            "teacher_count": 2,
+            "total_lecture_hours": 22.0,
+            "week_count": 0
+          },
+          "drop_in": 0.0,
+          "hw_lab": 0.0,
+          "lecture_contact_hours": 11.0,
+          "marking": 6.6,
+          "marking_structured": {
+            "hours_per_teacher": 6.6,
+            "is_automated": false,
+            "levels": [
+              {
+                "label": null,
+                "main_hours": 11.0,
+                "main_student_count": 22,
+                "rate_per_script": 0.5,
+                "resit_hours": 2.2,
+                "resit_student_count": 4.4,
+                "total_hours": 13.2
+              }
+            ],
+            "n_teachers": 2,
+            "total_hours": 13.2
+          },
+          "module_codes": [
+            "COM00202M"
+          ],
+          "module_leadership": 0.0,
+          "online_content_dev": 0.0,
+          "practicals": 0.0,
+          "supervision": 0.0,
+          "teaching": 27.5,
+          "total_lecture_hours": 22.0
+        }
+      },
+      "total_hours": 1158.0
+    },
+    "Richard Wilson": {
+      "adjustments_breakdown": {},
+      "admin_breakdown": {
+        "ART staff representative": 0.0,
+        "Research Group Leader": 98.52,
+        "engagement": 60.0,
+        "personal_development": 45.0
+      },
+      "admin_hours": 203.52,
+      "assumptions": [],
+      "category": "ART",
+      "fte": 0.6,
+      "missing_data": [],
+      "name": "Richard Wilson",
+      "nominal_hours": 985.2,
+      "pastoral_breakdown": {
+        "rate": 3,
+        "student_count": 1,
+        "total": 3
+      },
+      "project_breakdown": {},
+      "research_breakdown": {
+        "grants": {},
+        "phd_students": {
+          "assessor": {
+            "count": 2,
+            "rate": 8,
+            "total": 16
+          },
+          "co_supervision": {
+            "count": 2,
+            "rate": 48,
+            "total": 96
+          },
+          "supervision": {
+            "count": 3,
+            "rate": 80,
+            "total": 240
+          }
+        },
+        "protected_research_baseline": 98.52
+      },
+      "research_hours": 450.52,
+      "teaching_breakdown": {
+        "pastoral_breakdown": {
+          "rate": 3,
+          "student_count": 1,
+          "total": 3
+        },
+        "pastoral_supervision": 3
+      },
+      "teaching_hours": 3.0,
+      "teaching_module_breakdowns": {},
+      "total_hours": 657.04
     },
     "Rob Alexander": {
       "adjustments_breakdown": {},
       "admin_breakdown": {
-        "StAMP committee members": 0.0,
+        "StAMP committee": 65.68,
         "engagement": 100.0,
         "personal_development": 75.0
       },
-      "admin_hours": 175.0,
+      "admin_hours": 240.68,
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
@@ -5884,10 +7017,10 @@
         "total": 39
       },
       "project_breakdown": {
-        "level": "UG",
+        "level": "MSc",
         "project_count": 7,
-        "rate": 16,
-        "total": 112
+        "rate": 24,
+        "total": 168
       },
       "research_breakdown": {
         "grants": {
@@ -5909,22 +7042,24 @@
       },
       "research_hours": 398.3,
       "teaching_breakdown": {
-        "assessment_setting": 7.5,
+        "assessment_setting": 30.0,
         "drop_in": 0.0,
         "hw_lab": 0.0,
-        "marking": 13.2,
+        "marking": 23.1,
+        "module_leadership": 7.3,
         "pastoral_supervision": 39,
         "practicals": 27.5,
-        "project_supervision": 112,
+        "project_supervision": 168,
         "supervision": 0.0,
-        "teaching": 27.5
+        "teaching": 110.0
       },
-      "teaching_hours": 226.7,
+      "teaching_hours": 404.9,
       "teaching_module_breakdowns": {
         "HINT": {
           "assessment_setting": 7.5,
           "delivery_structured": {
             "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -5966,6 +7101,7 @@
             "COM00040H",
             "COM00173M"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
           "practicals": 27.5,
           "practicals_structured": {
@@ -5985,184 +7121,104 @@
           "supervision": 0.0,
           "teaching": 27.5,
           "total_lecture_hours": 22.0
-        }
-      },
-      "total_hours": 800.0
-    },
-    "Robbert Jongeling": {
-      "adjustments_breakdown": {},
-      "admin_breakdown": {
-        "engagement": 100.0,
-        "personal_development": 75.0
-      },
-      "admin_hours": 175.0,
-      "assumptions": [],
-      "category": "ART",
-      "fte": 1.0,
-      "missing_data": [
-        "No administrative roles assigned",
-        "ELLA: no student numbers in CS Module Numbers.csv - marking hours estimated from a default of 100 students"
-      ],
-      "name": "Robbert Jongeling",
-      "nominal_hours": 1642.0,
-      "pastoral_breakdown": {
-        "rate": 3,
-        "student_count": 2,
-        "total": 6
-      },
-      "project_breakdown": {
-        "level": "UG",
-        "project_count": 2,
-        "rate": 16,
-        "total": 32
-      },
-      "research_breakdown": {
-        "grants": {},
-        "phd_students": {},
-        "protected_research_baseline": 164.2
-      },
-      "research_hours": 164.2,
-      "teaching_breakdown": {
-        "assessment_setting": 22.5,
-        "drop_in": 0.0,
-        "hw_lab": 0.0,
-        "marking": 55.3333,
-        "pastoral_supervision": 6,
-        "practicals": 286.0,
-        "project_supervision": 32,
-        "supervision": 0.0,
-        "teaching": 91.6667
-      },
-      "teaching_hours": 493.5,
-      "teaching_module_breakdowns": {
-        "ELLA": {
+        },
+        "RASS": {
           "assessment_setting": 7.5,
           "delivery_structured": {
-            "base_per_teacher": 7.3333,
-            "lecturer_type": "new_lecturer_new_content",
-            "lectures_per_week": 1.0,
-            "multiplier": 7.5,
-            "teacher_count": 3,
+            "base_per_teacher": 11.0,
+            "is_block_taught": true,
+            "lecturer_type": "standard",
+            "lectures_per_week": 0.0,
+            "multiplier": 2.5,
+            "teacher_count": 2,
             "total_lecture_hours": 22.0,
-            "week_count": 11
+            "week_count": 0
           },
           "drop_in": 0.0,
           "hw_lab": 0.0,
-          "lecture_contact_hours": 7.3333,
-          "marking": 13.3333,
+          "lecture_contact_hours": 11.0,
+          "marking": 6.3,
           "marking_structured": {
-            "hours_per_teacher": 13.3333,
+            "hours_per_teacher": 6.3,
             "is_automated": false,
             "levels": [
               {
                 "label": null,
-                "main_hours": 33.3333,
-                "main_student_count": 100,
-                "rate_per_script": 0.3333,
-                "resit_hours": 6.6667,
-                "resit_student_count": 20.0,
-                "total_hours": 40.0
+                "main_hours": 10.5,
+                "main_student_count": 21,
+                "rate_per_script": 0.5,
+                "resit_hours": 2.1,
+                "resit_student_count": 4.2,
+                "total_hours": 12.6
               }
             ],
-            "n_teachers": 3,
-            "total_hours": 40.0
+            "n_teachers": 2,
+            "total_hours": 12.6
           },
           "module_codes": [
-            "COM00071H",
-            "COM00216M"
+            "COM00164M"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
-          "practicals": 165.0,
-          "practicals_structured": {
-            "applied_rate": 9.0,
-            "first_session_hours": 2.0,
-            "first_session_rate": 2.5,
-            "first_session_sessions": 1,
-            "first_session_total": 198.0,
-            "groups_per_teacher": 0.6667,
-            "n_teachers": 3,
-            "repeat_hours": 0.0,
-            "repeat_rate": 1.5,
-            "repeat_sessions_per_teacher": 0,
-            "repeat_total": 0.0,
-            "sessions_per_teacher": 0.8333,
-            "total": 55.0,
-            "total_groups": 2,
-            "week_count": 11
-          },
+          "practicals": 0.0,
           "supervision": 0.0,
-          "teaching": 55.0,
+          "teaching": 27.5,
           "total_lecture_hours": 22.0
         },
-        "ENG1": {
+        "REMS": {
           "assessment_setting": 15.0,
           "delivery_structured": {
-            "base_per_teacher": 7.3333,
-            "lecturer_type": "new_lecturer",
-            "lectures_per_week": 1.0,
-            "multiplier": 5,
-            "teacher_count": 3,
-            "total_lecture_hours": 22.0,
-            "week_count": 11
+            "base_per_teacher": 22.0,
+            "is_block_taught": true,
+            "lecturer_type": "standard",
+            "lectures_per_week": 0.0,
+            "multiplier": 2.5,
+            "teacher_count": 2,
+            "total_lecture_hours": 44.0,
+            "week_count": 0
           },
           "drop_in": 0.0,
           "hw_lab": 0.0,
-          "lecture_contact_hours": 7.3333,
-          "marking": 42.0,
+          "lecture_contact_hours": 22.0,
+          "marking": 3.6,
           "marking_structured": {
-            "hours_per_teacher": 42.0,
+            "hours_per_teacher": 3.6,
             "is_automated": false,
             "levels": [
               {
                 "label": null,
-                "main_hours": 105.0,
-                "main_student_count": 315,
-                "rate_per_script": 0.3333,
-                "resit_hours": 21.0,
-                "resit_student_count": 63.0,
-                "total_hours": 126.0
+                "main_hours": 6.0,
+                "main_student_count": 12,
+                "rate_per_script": 0.5,
+                "resit_hours": 1.2,
+                "resit_student_count": 2.4,
+                "total_hours": 7.2
               }
             ],
-            "n_teachers": 3,
-            "total_hours": 126.0
+            "n_teachers": 2,
+            "total_hours": 7.2
           },
           "module_codes": [
-            "COM00019I"
+            "COM00201M"
           ],
+          "module_leadership": 7.3,
           "online_content_dev": 0.0,
-          "practicals": 121.0,
-          "practicals_structured": {
-            "applied_rate": 5.5,
-            "first_session_hours": 2.0,
-            "first_session_rate": 2.5,
-            "first_session_sessions": 1,
-            "first_session_total": 121.0,
-            "groups_per_teacher": 1.3333,
-            "n_teachers": 3,
-            "repeat_hours": 0.67,
-            "repeat_rate": 1.5,
-            "repeat_sessions_per_teacher": 0.3333,
-            "repeat_total": 11.0,
-            "sessions_per_teacher": 1.0,
-            "total": 66.0,
-            "total_groups": 4,
-            "week_count": 11
-          },
+          "practicals": 0.0,
           "supervision": 0.0,
-          "teaching": 36.6667,
-          "total_lecture_hours": 22.0
+          "teaching": 55.0,
+          "total_lecture_hours": 44.0
         }
       },
-      "total_hours": 832.7
+      "total_hours": 1043.88
     },
     "Roberto Metere": {
       "adjustments_breakdown": {},
       "admin_breakdown": {
-        "StAMP committee members": 0.0,
+        "StAMP committee": 65.68,
         "engagement": 100.0,
         "personal_development": 75.0
       },
-      "admin_hours": 175.0,
+      "admin_hours": 240.68,
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
@@ -6202,18 +7258,20 @@
         "drop_in": 0.0,
         "hw_lab": 0.0,
         "marking": 36.1,
+        "module_leadership": 7.3,
         "pastoral_supervision": 60,
         "practicals": 264.0,
         "project_supervision": 112,
         "supervision": 0.0,
         "teaching": 100.8333
       },
-      "teaching_hours": 604.1833,
+      "teaching_hours": 611.4833,
       "teaching_module_breakdowns": {
         "CBDA": {
           "assessment_setting": 11.25,
           "delivery_structured": {
             "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "new_lecturer",
             "lectures_per_week": 1.0,
             "multiplier": 5,
@@ -6246,6 +7304,7 @@
             "COM00068H",
             "COM00207M"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
           "practicals": 126.5,
           "practicals_structured": {
@@ -6273,6 +7332,7 @@
           "assessment_setting": 5.0,
           "delivery_structured": {
             "base_per_teacher": 7.3333,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -6314,6 +7374,7 @@
             "COM00048H",
             "COM00183M"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
           "practicals": 82.5,
           "practicals_structured": {
@@ -6341,6 +7402,7 @@
           "assessment_setting": 15.0,
           "delivery_structured": {
             "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -6382,6 +7444,7 @@
             "COM00064H",
             "COM00182M"
           ],
+          "module_leadership": 7.3,
           "online_content_dev": 0.0,
           "practicals": 55.0,
           "practicals_structured": {
@@ -6406,7 +7469,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1047.3833
+      "total_hours": 1120.3633
     },
     "Sam Braunstein": {
       "adjustments_breakdown": {},
@@ -6445,18 +7508,20 @@
         "drop_in": 0.0,
         "hw_lab": 0.0,
         "marking": 53.7,
+        "module_leadership": 7.3,
         "pastoral_supervision": 12,
         "practicals": 41.25,
         "project_supervision": 112,
         "supervision": 0.0,
         "teaching": 45.8333
       },
-      "teaching_hours": 277.2833,
+      "teaching_hours": 284.5833,
       "teaching_module_breakdowns": {
         "QUCO": {
           "assessment_setting": 7.5,
           "delivery_structured": {
             "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -6498,6 +7563,7 @@
             "COM00042H",
             "COM00168M"
           ],
+          "module_leadership": 7.3,
           "online_content_dev": 0.0,
           "practicals": 41.25,
           "practicals_structured": {
@@ -6522,6 +7588,7 @@
           "assessment_setting": 5.0,
           "delivery_structured": {
             "base_per_teacher": 7.3333,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -6553,6 +7620,7 @@
           "module_codes": [
             "COM00014C"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
           "practicals": 0.0,
           "supervision": 0.0,
@@ -6560,16 +7628,153 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 616.4833
+      "total_hours": 623.7833
+    },
+    "Sarah Carrington": {
+      "adjustments_breakdown": {},
+      "admin_breakdown": {
+        "engagement": 80.0,
+        "personal_development": 60.0
+      },
+      "admin_hours": 140.0,
+      "assumptions": [],
+      "category": "T and S",
+      "fte": 0.8,
+      "missing_data": [
+        "No administrative roles assigned"
+      ],
+      "name": "Sarah Carrington",
+      "nominal_hours": 1313.6,
+      "pastoral_breakdown": {
+        "rate": 3,
+        "student_count": 9,
+        "total": 27
+      },
+      "project_breakdown": {
+        "level": "MSc",
+        "project_count": 10,
+        "rate": 24,
+        "total": 240
+      },
+      "research_breakdown": {
+        "grants": {},
+        "phd_students": {},
+        "protected_research_baseline": 131.36
+      },
+      "research_hours": 131.36,
+      "teaching_breakdown": {
+        "assessment_setting": 22.5,
+        "drop_in": 0.0,
+        "hw_lab": 0.0,
+        "marking": 25.5,
+        "module_leadership": 7.3,
+        "pastoral_supervision": 27,
+        "practicals": 0.0,
+        "project_supervision": 240,
+        "supervision": 0.0,
+        "teaching": 55.0
+      },
+      "teaching_hours": 377.3,
+      "teaching_module_breakdowns": {
+        "FSSE": {
+          "assessment_setting": 15.0,
+          "delivery_structured": {
+            "base_per_teacher": 11.0,
+            "is_block_taught": true,
+            "lecturer_type": "standard",
+            "lectures_per_week": 0.0,
+            "multiplier": 2.5,
+            "teacher_count": 2,
+            "total_lecture_hours": 22.0,
+            "week_count": 0
+          },
+          "drop_in": 0.0,
+          "hw_lab": 0.0,
+          "lecture_contact_hours": 11.0,
+          "marking": 14.4,
+          "marking_structured": {
+            "hours_per_teacher": 14.4,
+            "is_automated": false,
+            "levels": [
+              {
+                "label": null,
+                "main_hours": 24.0,
+                "main_student_count": 48,
+                "rate_per_script": 0.5,
+                "resit_hours": 4.8,
+                "resit_student_count": 9.6,
+                "total_hours": 28.8
+              }
+            ],
+            "n_teachers": 2,
+            "total_hours": 28.8
+          },
+          "module_codes": [
+            "COM00006M",
+            "COM00212M"
+          ],
+          "module_leadership": 7.3,
+          "online_content_dev": 0.0,
+          "practicals": 0.0,
+          "supervision": 0.0,
+          "teaching": 27.5,
+          "total_lecture_hours": 22.0
+        },
+        "SCDR": {
+          "assessment_setting": 7.5,
+          "delivery_structured": {
+            "base_per_teacher": 11.0,
+            "is_block_taught": true,
+            "lecturer_type": "standard",
+            "lectures_per_week": 0.0,
+            "multiplier": 2.5,
+            "teacher_count": 2,
+            "total_lecture_hours": 22.0,
+            "week_count": 0
+          },
+          "drop_in": 0.0,
+          "hw_lab": 0.0,
+          "lecture_contact_hours": 11.0,
+          "marking": 11.1,
+          "marking_structured": {
+            "hours_per_teacher": 11.1,
+            "is_automated": false,
+            "levels": [
+              {
+                "label": null,
+                "main_hours": 18.5,
+                "main_student_count": 37,
+                "rate_per_script": 0.5,
+                "resit_hours": 3.7,
+                "resit_student_count": 7.4,
+                "total_hours": 22.2
+              }
+            ],
+            "n_teachers": 2,
+            "total_hours": 22.2
+          },
+          "module_codes": [
+            "COM00047M"
+          ],
+          "module_leadership": 0.0,
+          "online_content_dev": 0.0,
+          "practicals": 0.0,
+          "supervision": 0.0,
+          "teaching": 27.5,
+          "total_lecture_hours": 22.0
+        }
+      },
+      "total_hours": 648.66
     },
     "Siamak Shahandashti": {
       "adjustments_breakdown": {},
       "admin_breakdown": {
         "Deputy Graduate Chair": 164.2,
+        "Research Group Leader": 164.2,
         "engagement": 100.0,
         "personal_development": 75.0
       },
-      "admin_hours": 339.2,
+      "admin_hours": 503.4,
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
@@ -6616,18 +7821,20 @@
         "drop_in": 0.0,
         "hw_lab": 0.0,
         "marking": 51.2,
+        "module_leadership": 7.3,
         "pastoral_supervision": 51,
         "practicals": 115.5,
         "project_supervision": 112,
         "supervision": 0.0,
         "teaching": 36.6667
       },
-      "teaching_hours": 376.3667,
+      "teaching_hours": 383.6667,
       "teaching_module_breakdowns": {
         "CTAP": {
           "assessment_setting": 5.0,
           "delivery_structured": {
             "base_per_teacher": 7.3333,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -6669,6 +7876,7 @@
             "COM00048H",
             "COM00183M"
           ],
+          "module_leadership": 7.3,
           "online_content_dev": 0.0,
           "practicals": 82.5,
           "practicals_structured": {
@@ -6696,6 +7904,7 @@
           "assessment_setting": 5.0,
           "delivery_structured": {
             "base_per_teacher": 7.3333,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -6727,6 +7936,7 @@
           "module_codes": [
             "COM00013C"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
           "practicals": 33.0,
           "practicals_structured": {
@@ -6751,7 +7961,115 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1193.8667
+      "total_hours": 1365.3667
+    },
+    "Simon Burton": {
+      "adjustments_breakdown": {},
+      "admin_breakdown": {
+        "engagement": 100.0,
+        "personal_development": 75.0
+      },
+      "admin_hours": 175.0,
+      "assumptions": [],
+      "category": "ART",
+      "fte": 1.0,
+      "missing_data": [
+        "No administrative roles assigned"
+      ],
+      "name": "Simon Burton",
+      "nominal_hours": 1642.0,
+      "pastoral_breakdown": {
+        "rate": 3,
+        "student_count": 0,
+        "total": 0
+      },
+      "project_breakdown": {},
+      "research_breakdown": {
+        "grants": {
+          "grant_4954937": 82.1,
+          "grant_5029650": 246.3,
+          "grant_5685812": 49.26,
+          "grant_5829709": 32.84,
+          "grant_5829985": 32.84
+        },
+        "phd_students": {
+          "assessor": {
+            "count": 1,
+            "rate": 8,
+            "total": 8
+          },
+          "co_supervision": {
+            "count": 2,
+            "rate": 48,
+            "total": 96
+          },
+          "supervision": {
+            "count": 1,
+            "rate": 80,
+            "total": 80
+          }
+        },
+        "protected_research_baseline": 164.2
+      },
+      "research_hours": 791.54,
+      "teaching_breakdown": {
+        "assessment_setting": 7.5,
+        "drop_in": 0.0,
+        "hw_lab": 0.0,
+        "marking": 11.4,
+        "module_leadership": 7.3,
+        "pastoral_supervision": 0,
+        "practicals": 0.0,
+        "supervision": 0.0,
+        "teaching": 27.5
+      },
+      "teaching_hours": 53.7,
+      "teaching_module_breakdowns": {
+        "CASA": {
+          "assessment_setting": 7.5,
+          "delivery_structured": {
+            "base_per_teacher": 11.0,
+            "is_block_taught": true,
+            "lecturer_type": "standard",
+            "lectures_per_week": 0.0,
+            "multiplier": 2.5,
+            "teacher_count": 2,
+            "total_lecture_hours": 22.0,
+            "week_count": 0
+          },
+          "drop_in": 0.0,
+          "hw_lab": 0.0,
+          "lecture_contact_hours": 11.0,
+          "marking": 11.4,
+          "marking_structured": {
+            "hours_per_teacher": 11.4,
+            "is_automated": false,
+            "levels": [
+              {
+                "label": null,
+                "main_hours": 19.0,
+                "main_student_count": 38,
+                "rate_per_script": 0.5,
+                "resit_hours": 3.8,
+                "resit_student_count": 7.6,
+                "total_hours": 22.8
+              }
+            ],
+            "n_teachers": 2,
+            "total_hours": 22.8
+          },
+          "module_codes": [
+            "COM00017M"
+          ],
+          "module_leadership": 7.3,
+          "online_content_dev": 0.0,
+          "practicals": 0.0,
+          "supervision": 0.0,
+          "teaching": 27.5,
+          "total_lecture_hours": 22.0
+        }
+      },
+      "total_hours": 1020.24
     },
     "Simon Foster": {
       "adjustments_breakdown": {},
@@ -6797,22 +8115,24 @@
       },
       "research_hours": 276.2,
       "teaching_breakdown": {
-        "assessment_setting": 17.5,
+        "assessment_setting": 22.5,
         "drop_in": 0.0,
         "hw_lab": 0.0,
-        "marking": 79.3333,
+        "marking": 100.2,
+        "module_leadership": 7.3,
         "pastoral_supervision": 33,
-        "practicals": 99.0,
+        "practicals": 112.75,
         "project_supervision": 64,
         "supervision": 0.0,
-        "teaching": 55.0
+        "teaching": 64.1667
       },
-      "teaching_hours": 347.8333,
+      "teaching_hours": 403.9167,
       "teaching_module_breakdowns": {
         "THE1": {
           "assessment_setting": 7.5,
           "delivery_structured": {
             "base_per_teacher": 7.3333,
+            "is_block_taught": false,
             "lecturer_type": "new_lecturer",
             "lectures_per_week": 1.0,
             "multiplier": 5,
@@ -6844,6 +8164,7 @@
           "module_codes": [
             "COM00013C"
           ],
+          "module_leadership": 7.3,
           "online_content_dev": 0.0,
           "practicals": 60.5,
           "practicals_structured": {
@@ -6868,22 +8189,23 @@
           "total_lecture_hours": 22.0
         },
         "THE3": {
-          "assessment_setting": 10.0,
+          "assessment_setting": 15.0,
           "delivery_structured": {
-            "base_per_teacher": 7.3333,
+            "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
-            "teacher_count": 3,
+            "teacher_count": 2,
             "total_lecture_hours": 22.0,
             "week_count": 11
           },
           "drop_in": 0.0,
           "hw_lab": 0.0,
-          "lecture_contact_hours": 7.3333,
-          "marking": 41.7333,
+          "lecture_contact_hours": 11.0,
+          "marking": 62.6,
           "marking_structured": {
-            "hours_per_teacher": 41.7333,
+            "hours_per_teacher": 62.6,
             "is_automated": false,
             "levels": [
               {
@@ -6896,51 +8218,111 @@
                 "total_hours": 125.2
               }
             ],
-            "n_teachers": 3,
+            "n_teachers": 2,
             "total_hours": 125.2
           },
           "module_codes": [
             "COM00027I"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
-          "practicals": 38.5,
+          "practicals": 52.25,
           "practicals_structured": {
-            "applied_rate": 3.0,
+            "applied_rate": 2.0,
             "first_session_hours": 1.0,
             "first_session_rate": 2.5,
             "first_session_sessions": 1,
-            "first_session_total": 33.0,
-            "groups_per_teacher": 1.6667,
-            "n_teachers": 3,
-            "repeat_hours": 0.67,
+            "first_session_total": 22.0,
+            "groups_per_teacher": 2.5,
+            "n_teachers": 2,
+            "repeat_hours": 1.5,
             "repeat_rate": 1.5,
-            "repeat_sessions_per_teacher": 0.6667,
-            "repeat_total": 11.0,
-            "sessions_per_teacher": 1.1667,
-            "total": 38.5,
+            "repeat_sessions_per_teacher": 1.5,
+            "repeat_total": 24.75,
+            "sessions_per_teacher": 2.375,
+            "total": 52.25,
             "total_groups": 5,
             "week_count": 11
           },
           "supervision": 0.0,
-          "teaching": 18.3333,
+          "teaching": 27.5,
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 799.0333
+      "total_hours": 855.1167
+    },
+    "Simos Gerasimou": {
+      "adjustments_breakdown": {},
+      "admin_breakdown": {
+        "Research Mentor": 32.84,
+        "engagement": 100.0,
+        "personal_development": 75.0
+      },
+      "admin_hours": 207.84,
+      "assumptions": [],
+      "category": "ART",
+      "fte": 1.0,
+      "missing_data": [],
+      "name": "Simos Gerasimou",
+      "nominal_hours": 1642.0,
+      "pastoral_breakdown": {
+        "rate": 3,
+        "student_count": 0,
+        "total": 0
+      },
+      "project_breakdown": {},
+      "research_breakdown": {
+        "grants": {
+          "grant_3275903": 164.2,
+          "grant_3983911": 197.04,
+          "grant_4712353": 246.3,
+          "grant_4792719": 82.1
+        },
+        "phd_students": {
+          "assessor": {
+            "count": 3,
+            "rate": 8,
+            "total": 24
+          },
+          "co_supervision": {
+            "count": 3,
+            "rate": 48,
+            "total": 144
+          },
+          "supervision": {
+            "count": 1,
+            "rate": 80,
+            "total": 80
+          }
+        },
+        "protected_research_baseline": 164.2
+      },
+      "research_hours": 1101.84,
+      "teaching_breakdown": {
+        "pastoral_breakdown": {
+          "rate": 3,
+          "student_count": 0,
+          "total": 0
+        },
+        "pastoral_supervision": 0
+      },
+      "teaching_hours": 0.0,
+      "teaching_module_breakdowns": {},
+      "total_hours": 1309.68
     },
     "Soumya Banerjee": {
       "adjustments_breakdown": {},
       "admin_breakdown": {
+        "Mumbai Campus Partnership Leader": 164.2,
         "engagement": 100.0,
         "personal_development": 75.0
       },
-      "admin_hours": 175.0,
+      "admin_hours": 339.2,
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
       "missing_data": [
-        "No administrative roles assigned",
-        "ELLA: no student numbers in CS Module Numbers.csv - marking hours estimated from a default of 100 students"
+        "LLMA: no student numbers in CS Module Numbers.csv - marking hours estimated from a default of 100 students"
       ],
       "name": "Soumya Banerjee",
       "nominal_hours": 1642.0,
@@ -6966,18 +8348,20 @@
         "drop_in": 0.0,
         "hw_lab": 0.0,
         "marking": 23.8,
+        "module_leadership": 7.3,
         "pastoral_supervision": 75,
-        "practicals": 201.6667,
+        "practicals": 91.6667,
         "project_supervision": 112,
         "supervision": 0.0,
         "teaching": 91.6667
       },
-      "teaching_hours": 519.1333,
+      "teaching_hours": 416.4333,
       "teaching_module_breakdowns": {
         "AURO": {
           "assessment_setting": 7.5,
           "delivery_structured": {
             "base_per_teacher": 7.3333,
+            "is_block_taught": false,
             "lecturer_type": "new_lecturer",
             "lectures_per_week": 1.0,
             "multiplier": 5,
@@ -7019,6 +8403,7 @@
             "COM00052H",
             "COM00186M"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
           "practicals": 36.6667,
           "practicals_structured": {
@@ -7039,10 +8424,11 @@
           "teaching": 36.6667,
           "total_lecture_hours": 22.0
         },
-        "ELLA": {
+        "LLMA": {
           "assessment_setting": 7.5,
           "delivery_structured": {
             "base_per_teacher": 7.3333,
+            "is_block_taught": false,
             "lecturer_type": "new_lecturer_new_content",
             "lectures_per_week": 1.0,
             "multiplier": 7.5,
@@ -7072,26 +8458,24 @@
             "total_hours": 40.0
           },
           "module_codes": [
-            "COM00071H",
-            "COM00216M"
+            "COM00070H",
+            "COM00215M"
           ],
+          "module_leadership": 7.3,
           "online_content_dev": 0.0,
-          "practicals": 165.0,
+          "practicals": 55.0,
           "practicals_structured": {
-            "applied_rate": 9.0,
+            "applied_rate": 7.5,
             "first_session_hours": 2.0,
             "first_session_rate": 2.5,
             "first_session_sessions": 1,
-            "first_session_total": 198.0,
-            "groups_per_teacher": 0.6667,
+            "first_session_total": 165.0,
             "n_teachers": 3,
-            "repeat_hours": 0.0,
+            "repeat_hours": 0,
             "repeat_rate": 1.5,
-            "repeat_sessions_per_teacher": 0,
             "repeat_total": 0.0,
-            "sessions_per_teacher": 0.8333,
-            "total": 55.0,
-            "total_groups": 2,
+            "sessions_per_teacher": 0.3333,
+            "total": 22.0,
             "week_count": 11
           },
           "supervision": 0.0,
@@ -7099,16 +8483,17 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 858.3333
+      "total_hours": 919.8333
     },
     "Stefano Pirandola": {
       "adjustments_breakdown": {},
       "admin_breakdown": {
         "Progression Panel Chair": 246.3,
+        "Research Group Leader": 164.2,
         "engagement": 100.0,
         "personal_development": 75.0
       },
-      "admin_hours": 421.3,
+      "admin_hours": 585.5,
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
@@ -7155,6 +8540,7 @@
         "drop_in": 0.0,
         "hw_lab": 0.0,
         "marking": 11.3,
+        "module_leadership": 0.0,
         "pastoral_supervision": 75,
         "practicals": 41.25,
         "project_supervision": 112,
@@ -7167,6 +8553,7 @@
           "assessment_setting": 7.5,
           "delivery_structured": {
             "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -7208,6 +8595,7 @@
             "COM00042H",
             "COM00168M"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
           "practicals": 41.25,
           "practicals_structured": {
@@ -7229,16 +8617,16 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1216.25
+      "total_hours": 1380.45
     },
     "Steven Wright": {
       "adjustments_breakdown": {},
       "admin_breakdown": {
-        "Chair of the Board of Examiners": 0.0,
+        "CBoE (on-campus)": 492.6,
         "engagement": 100.0,
         "personal_development": 75.0
       },
-      "admin_hours": 175.0,
+      "admin_hours": 667.6,
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
@@ -7278,18 +8666,20 @@
         "drop_in": 0.0,
         "hw_lab": 0.0,
         "marking": 14.2,
+        "module_leadership": 7.3,
         "pastoral_supervision": 42,
         "practicals": 71.5,
         "project_supervision": 64,
         "supervision": 0.0,
         "teaching": 27.5
       },
-      "teaching_hours": 226.7,
+      "teaching_hours": 234.0,
       "teaching_module_breakdowns": {
         "HIPC": {
           "assessment_setting": 7.5,
           "delivery_structured": {
             "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -7331,6 +8721,7 @@
             "COM00036H",
             "COM00174M"
           ],
+          "module_leadership": 7.3,
           "online_content_dev": 0.0,
           "practicals": 71.5,
           "practicals_structured": {
@@ -7355,7 +8746,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 853.9
+      "total_hours": 1353.8
     },
     "Steven Xiaotian Dai": {
       "adjustments_breakdown": {},
@@ -7406,18 +8797,20 @@
         "drop_in": 0.0,
         "hw_lab": 0.0,
         "marking": 24.0,
+        "module_leadership": 7.3,
         "pastoral_supervision": 45,
         "practicals": 126.5,
         "project_supervision": 64,
         "supervision": 0.0,
         "teaching": 55.0
       },
-      "teaching_hours": 329.5,
+      "teaching_hours": 336.8,
       "teaching_module_breakdowns": {
         "EMBS": {
           "assessment_setting": 7.5,
           "delivery_structured": {
             "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -7459,6 +8852,7 @@
             "COM00003H",
             "COM00175M"
           ],
+          "module_leadership": 7.3,
           "online_content_dev": 0.0,
           "practicals": 55.0,
           "practicals_structured": {
@@ -7486,6 +8880,7 @@
           "assessment_setting": 7.5,
           "delivery_structured": {
             "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -7527,6 +8922,7 @@
             "COM00036H",
             "COM00174M"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
           "practicals": 71.5,
           "practicals_structured": {
@@ -7551,18 +8947,18 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1183.2
+      "total_hours": 1190.5
     },
     "Tommy Yuan": {
       "adjustments_breakdown": {},
       "admin_breakdown": {
-        "CSCSE SQA Partnership Leader": 0.0,
+        "CSCSE HAP Partnership Leader": 164.2,
         "Deputy CBoEs": 164.2,
-        "StAMP committee members": 0.0,
+        "StAMP committee": 65.68,
         "engagement": 100.0,
         "personal_development": 75.0
       },
-      "admin_hours": 339.2,
+      "admin_hours": 569.08,
       "assumptions": [],
       "category": "T and S",
       "fte": 1.0,
@@ -7605,35 +9001,37 @@
       },
       "research_hours": 364.2,
       "teaching_breakdown": {
-        "assessment_setting": 25.0,
+        "assessment_setting": 27.5,
         "drop_in": 0.0,
         "hw_lab": 0.0,
-        "marking": 71.0,
+        "marking": 85.3333,
+        "module_leadership": 14.6,
         "pastoral_supervision": 54,
-        "practicals": 176.0,
+        "practicals": 179.6667,
         "project_supervision": 144,
         "supervision": 0.0,
-        "teaching": 128.3333
+        "teaching": 119.1667
       },
-      "teaching_hours": 598.3333,
+      "teaching_hours": 624.2667,
       "teaching_module_breakdowns": {
         "ARIA": {
-          "assessment_setting": 7.5,
+          "assessment_setting": 5.0,
           "delivery_structured": {
-            "base_per_teacher": 11.0,
+            "base_per_teacher": 7.3333,
+            "is_block_taught": false,
             "lecturer_type": "existing_lecturer_new_content",
             "lectures_per_week": 1.0,
             "multiplier": 5,
-            "teacher_count": 2,
+            "teacher_count": 3,
             "total_lecture_hours": 22.0,
             "week_count": 11
           },
           "drop_in": 0.0,
           "hw_lab": 0.0,
-          "lecture_contact_hours": 11.0,
-          "marking": 20.0,
+          "lecture_contact_hours": 7.3333,
+          "marking": 13.3333,
           "marking_structured": {
-            "hours_per_teacher": 20.0,
+            "hours_per_teacher": 13.3333,
             "is_automated": false,
             "levels": [
               {
@@ -7646,50 +9044,52 @@
                 "total_hours": 40.0
               }
             ],
-            "n_teachers": 2,
+            "n_teachers": 3,
             "total_hours": 40.0
           },
           "module_codes": [
             "COM00072H",
             "COM00217M"
           ],
+          "module_leadership": 7.3,
           "online_content_dev": 0.0,
-          "practicals": 55.0,
+          "practicals": 36.6667,
           "practicals_structured": {
             "applied_rate": 5.0,
             "first_session_hours": 2.0,
             "first_session_rate": 2.5,
             "first_session_sessions": 1,
             "first_session_total": 110.0,
-            "n_teachers": 2,
+            "n_teachers": 3,
             "repeat_hours": 0,
             "repeat_rate": 1.5,
             "repeat_total": 0.0,
-            "sessions_per_teacher": 0.5,
+            "sessions_per_teacher": 0.3333,
             "total": 22.0,
             "week_count": 11
           },
           "supervision": 0.0,
-          "teaching": 55.0,
+          "teaching": 36.6667,
           "total_lecture_hours": 22.0
         },
         "ENG1": {
-          "assessment_setting": 10.0,
+          "assessment_setting": 15.0,
           "delivery_structured": {
-            "base_per_teacher": 7.3333,
+            "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
-            "teacher_count": 3,
+            "teacher_count": 2,
             "total_lecture_hours": 22.0,
             "week_count": 11
           },
           "drop_in": 0.0,
           "hw_lab": 0.0,
-          "lecture_contact_hours": 7.3333,
-          "marking": 42.0,
+          "lecture_contact_hours": 11.0,
+          "marking": 63.0,
           "marking_structured": {
-            "hours_per_teacher": 42.0,
+            "hours_per_teacher": 63.0,
             "is_automated": false,
             "levels": [
               {
@@ -7702,39 +9102,41 @@
                 "total_hours": 126.0
               }
             ],
-            "n_teachers": 3,
+            "n_teachers": 2,
             "total_hours": 126.0
           },
           "module_codes": [
             "COM00019I"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
-          "practicals": 66.0,
+          "practicals": 88.0,
           "practicals_structured": {
-            "applied_rate": 3.0,
+            "applied_rate": 2.0,
             "first_session_hours": 2.0,
             "first_session_rate": 2.5,
             "first_session_sessions": 1,
-            "first_session_total": 66.0,
-            "groups_per_teacher": 1.3333,
-            "n_teachers": 3,
-            "repeat_hours": 0.67,
+            "first_session_total": 44.0,
+            "groups_per_teacher": 2.0,
+            "n_teachers": 2,
+            "repeat_hours": 2.0,
             "repeat_rate": 1.5,
-            "repeat_sessions_per_teacher": 0.3333,
-            "repeat_total": 11.0,
-            "sessions_per_teacher": 1.0,
-            "total": 66.0,
+            "repeat_sessions_per_teacher": 1.0,
+            "repeat_total": 33.0,
+            "sessions_per_teacher": 2.0,
+            "total": 88.0,
             "total_groups": 4,
             "week_count": 11
           },
           "supervision": 0.0,
-          "teaching": 18.3333,
+          "teaching": 27.5,
           "total_lecture_hours": 22.0
         },
         "FOAM": {
           "assessment_setting": 7.5,
           "delivery_structured": {
             "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "existing_lecturer_new_content",
             "lectures_per_week": 1.0,
             "multiplier": 5,
@@ -7766,6 +9168,7 @@
           "module_codes": [
             "<new for one year>"
           ],
+          "module_leadership": 7.3,
           "online_content_dev": 0.0,
           "practicals": 55.0,
           "practicals_structured": {
@@ -7787,7 +9190,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1301.7333
+      "total_hours": 1557.5467
     },
     "Vasileios Vasilakis": {
       "adjustments_breakdown": {},
@@ -7809,10 +9212,10 @@
         "total": 78
       },
       "project_breakdown": {
-        "level": "UG",
+        "level": "MSc",
         "project_count": 7,
-        "rate": 16,
-        "total": 112
+        "rate": 24,
+        "total": 168
       },
       "research_breakdown": {
         "grants": {},
@@ -7837,22 +9240,24 @@
       },
       "research_hours": 356.2,
       "teaching_breakdown": {
-        "assessment_setting": 7.5,
+        "assessment_setting": 15.0,
         "drop_in": 0.0,
         "hw_lab": 0.0,
-        "marking": 23.6,
+        "marking": 30.2,
+        "module_leadership": 7.3,
         "pastoral_supervision": 78,
         "practicals": 55.0,
-        "project_supervision": 112,
+        "project_supervision": 168,
         "supervision": 0.0,
-        "teaching": 27.5
+        "teaching": 55.0
       },
-      "teaching_hours": 303.6,
+      "teaching_hours": 408.5,
       "teaching_module_breakdowns": {
         "NETS": {
           "assessment_setting": 7.5,
           "delivery_structured": {
             "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -7894,6 +9299,7 @@
             "COM00056H",
             "COM00188M"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
           "practicals": 55.0,
           "practicals_structured": {
@@ -7916,19 +9322,63 @@
           "supervision": 0.0,
           "teaching": 27.5,
           "total_lecture_hours": 22.0
+        },
+        "SESA": {
+          "assessment_setting": 7.5,
+          "delivery_structured": {
+            "base_per_teacher": 11.0,
+            "is_block_taught": true,
+            "lecturer_type": "standard",
+            "lectures_per_week": 0.0,
+            "multiplier": 2.5,
+            "teacher_count": 2,
+            "total_lecture_hours": 22.0,
+            "week_count": 0
+          },
+          "drop_in": 0.0,
+          "hw_lab": 0.0,
+          "lecture_contact_hours": 11.0,
+          "marking": 6.6,
+          "marking_structured": {
+            "hours_per_teacher": 6.6,
+            "is_automated": false,
+            "levels": [
+              {
+                "label": null,
+                "main_hours": 11.0,
+                "main_student_count": 22,
+                "rate_per_script": 0.5,
+                "resit_hours": 2.2,
+                "resit_student_count": 4.4,
+                "total_hours": 13.2
+              }
+            ],
+            "n_teachers": 2,
+            "total_hours": 13.2
+          },
+          "module_codes": [
+            "COM00202M"
+          ],
+          "module_leadership": 7.3,
+          "online_content_dev": 0.0,
+          "practicals": 0.0,
+          "supervision": 0.0,
+          "teaching": 27.5,
+          "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 999.0
+      "total_hours": 1103.9
     },
     "William Smith": {
       "adjustments_breakdown": {},
       "admin_breakdown": {
         "Director of Admissions": 82.1,
         "Internally Distributed Funding panel reviewer": 41.05,
+        "Research Group Leader": 164.2,
         "engagement": 100.0,
         "personal_development": 75.0
       },
-      "admin_hours": 298.15,
+      "admin_hours": 462.35,
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
@@ -7969,22 +9419,24 @@
       },
       "research_hours": 676.2,
       "teaching_breakdown": {
-        "assessment_setting": 22.5,
+        "assessment_setting": 17.5,
         "drop_in": 0.0,
         "hw_lab": 0.0,
-        "marking": 54.2,
+        "marking": 46.3333,
+        "module_leadership": 14.6,
         "pastoral_supervision": 21,
         "practicals": 126.5,
         "project_supervision": 80,
         "supervision": 0.0,
-        "teaching": 55.0
+        "teaching": 45.8333
       },
-      "teaching_hours": 359.2,
+      "teaching_hours": 351.7667,
       "teaching_module_breakdowns": {
         "DEEP": {
           "assessment_setting": 7.5,
           "delivery_structured": {
             "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -8026,6 +9478,7 @@
             "COM00049H",
             "COM00184M"
           ],
+          "module_leadership": 7.3,
           "online_content_dev": 0.0,
           "practicals": 71.5,
           "practicals_structured": {
@@ -8050,22 +9503,23 @@
           "total_lecture_hours": 22.0
         },
         "ROCS": {
-          "assessment_setting": 15.0,
+          "assessment_setting": 10.0,
           "delivery_structured": {
-            "base_per_teacher": 11.0,
+            "base_per_teacher": 7.3333,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
-            "teacher_count": 2,
+            "teacher_count": 3,
             "total_lecture_hours": 22.0,
             "week_count": 11
           },
           "drop_in": 0.0,
           "hw_lab": 0.0,
-          "lecture_contact_hours": 11.0,
-          "marking": 23.6,
+          "lecture_contact_hours": 7.3333,
+          "marking": 15.7333,
           "marking_structured": {
-            "hours_per_teacher": 23.6,
+            "hours_per_teacher": 15.7333,
             "is_automated": false,
             "levels": [
               {
@@ -8087,38 +9541,39 @@
                 "total_hours": 43.2
               }
             ],
-            "n_teachers": 2,
+            "n_teachers": 3,
             "total_hours": 47.2
           },
           "module_codes": [
             "COM00066H",
             "COM00180M"
           ],
+          "module_leadership": 7.3,
           "online_content_dev": 0.0,
           "practicals": 55.0,
           "practicals_structured": {
-            "applied_rate": 2.0,
+            "applied_rate": 3.0,
             "first_session_hours": 2.0,
             "first_session_rate": 2.5,
             "first_session_sessions": 1,
-            "first_session_total": 44.0,
-            "groups_per_teacher": 1.0,
-            "n_teachers": 2,
+            "first_session_total": 66.0,
+            "groups_per_teacher": 0.6667,
+            "n_teachers": 3,
             "repeat_hours": 0.0,
             "repeat_rate": 1.5,
             "repeat_sessions_per_teacher": 0,
             "repeat_total": 0.0,
-            "sessions_per_teacher": 1.25,
+            "sessions_per_teacher": 0.8333,
             "total": 55.0,
             "total_groups": 2,
             "week_count": 11
           },
           "supervision": 0.0,
-          "teaching": 27.5,
+          "teaching": 18.3333,
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1333.55
+      "total_hours": 1490.3167
     },
     "Xinwei Fang": {
       "adjustments_breakdown": {},
@@ -8162,18 +9617,20 @@
         "drop_in": 0.0,
         "hw_lab": 0.0,
         "marking": 69.7,
+        "module_leadership": 14.6,
         "pastoral_supervision": 27,
         "practicals": 115.5,
         "project_supervision": 112,
         "supervision": 0.0,
         "teaching": 55.0
       },
-      "teaching_hours": 409.2,
+      "teaching_hours": 423.8,
       "teaching_module_breakdowns": {
         "DATA": {
           "assessment_setting": 7.5,
           "delivery_structured": {
             "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -8205,6 +9662,7 @@
           "module_codes": [
             "COM00028I"
           ],
+          "module_leadership": 7.3,
           "online_content_dev": 0.0,
           "practicals": 88.0,
           "practicals_structured": {
@@ -8232,6 +9690,7 @@
           "assessment_setting": 22.5,
           "delivery_structured": {
             "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -8263,6 +9722,7 @@
           "module_codes": [
             "COM00138M"
           ],
+          "module_leadership": 7.3,
           "online_content_dev": 0.0,
           "practicals": 27.5,
           "practicals_structured": {
@@ -8284,21 +9744,20 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 910.5
+      "total_hours": 925.1
     },
     "Yan Jia": {
       "adjustments_breakdown": {},
       "admin_breakdown": {
+        "Ethics Committee Member": 328.4,
         "engagement": 100.0,
         "personal_development": 75.0
       },
-      "admin_hours": 175.0,
+      "admin_hours": 503.4,
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
-      "missing_data": [
-        "No administrative roles assigned"
-      ],
+      "missing_data": [],
       "name": "Yan Jia",
       "nominal_hours": 1642.0,
       "pastoral_breakdown": {
@@ -8329,87 +9788,16 @@
       },
       "research_hours": 638.7,
       "teaching_breakdown": {
-        "assessment_setting": 15.0,
-        "drop_in": 0.0,
-        "hw_lab": 0.0,
-        "marking": 23.6,
-        "pastoral_supervision": 27,
-        "practicals": 55.0,
-        "supervision": 0.0,
-        "teaching": 27.5
+        "pastoral_breakdown": {
+          "rate": 3,
+          "student_count": 9,
+          "total": 27
+        },
+        "pastoral_supervision": 27
       },
-      "teaching_hours": 148.1,
-      "teaching_module_breakdowns": {
-        "ROCS": {
-          "assessment_setting": 15.0,
-          "delivery_structured": {
-            "base_per_teacher": 11.0,
-            "lecturer_type": "standard",
-            "lectures_per_week": 1.0,
-            "multiplier": 2.5,
-            "teacher_count": 2,
-            "total_lecture_hours": 22.0,
-            "week_count": 11
-          },
-          "drop_in": 0.0,
-          "hw_lab": 0.0,
-          "lecture_contact_hours": 11.0,
-          "marking": 23.6,
-          "marking_structured": {
-            "hours_per_teacher": 23.6,
-            "is_automated": false,
-            "levels": [
-              {
-                "label": "H level",
-                "main_hours": 3.3333,
-                "main_student_count": 10,
-                "rate_per_script": 0.3333,
-                "resit_hours": 0.6667,
-                "resit_student_count": 2.0,
-                "total_hours": 4.0
-              },
-              {
-                "label": "M level",
-                "main_hours": 36.0,
-                "main_student_count": 72,
-                "rate_per_script": 0.5,
-                "resit_hours": 7.2,
-                "resit_student_count": 14.4,
-                "total_hours": 43.2
-              }
-            ],
-            "n_teachers": 2,
-            "total_hours": 47.2
-          },
-          "module_codes": [
-            "COM00066H",
-            "COM00180M"
-          ],
-          "online_content_dev": 0.0,
-          "practicals": 55.0,
-          "practicals_structured": {
-            "applied_rate": 2.0,
-            "first_session_hours": 2.0,
-            "first_session_rate": 2.5,
-            "first_session_sessions": 1,
-            "first_session_total": 44.0,
-            "groups_per_teacher": 1.0,
-            "n_teachers": 2,
-            "repeat_hours": 0.0,
-            "repeat_rate": 1.5,
-            "repeat_sessions_per_teacher": 0,
-            "repeat_total": 0.0,
-            "sessions_per_teacher": 1.25,
-            "total": 55.0,
-            "total_groups": 2,
-            "week_count": 11
-          },
-          "supervision": 0.0,
-          "teaching": 27.5,
-          "total_lecture_hours": 22.0
-        }
-      },
-      "total_hours": 961.8
+      "teaching_hours": 27.0,
+      "teaching_module_breakdowns": {},
+      "total_hours": 1169.1
     },
     "Yuchen Zhao": {
       "adjustments_breakdown": {},
@@ -8453,18 +9841,20 @@
         "drop_in": 0.0,
         "hw_lab": 0.0,
         "marking": 37.4,
+        "module_leadership": 7.3,
         "pastoral_supervision": 75,
         "practicals": 110.0,
         "project_supervision": 112,
         "supervision": 0.0,
         "teaching": 55.0
       },
-      "teaching_hours": 411.9,
+      "teaching_hours": 419.2,
       "teaching_module_breakdowns": {
         "EHAC": {
           "assessment_setting": 15.0,
           "delivery_structured": {
             "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -8506,6 +9896,7 @@
             "COM00064H",
             "COM00182M"
           ],
+          "module_leadership": 0.0,
           "online_content_dev": 0.0,
           "practicals": 55.0,
           "practicals_structured": {
@@ -8533,6 +9924,7 @@
           "assessment_setting": 7.5,
           "delivery_structured": {
             "base_per_teacher": 11.0,
+            "is_block_taught": false,
             "lecturer_type": "standard",
             "lectures_per_week": 1.0,
             "multiplier": 2.5,
@@ -8574,6 +9966,7 @@
             "COM00056H",
             "COM00188M"
           ],
+          "module_leadership": 7.3,
           "online_content_dev": 0.0,
           "practicals": 55.0,
           "practicals_structured": {
@@ -8598,9 +9991,9 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 849.2
+      "total_hours": 856.5
     }
   },
-  "staff_count": 56,
+  "staff_count": 65,
   "year_label": "2026-7"
 }
