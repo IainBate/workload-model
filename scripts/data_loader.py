@@ -74,6 +74,11 @@ class ModuleData:
     practicals: int = 0
     has_h_m_variants: bool = False
     practical_contact_hours: float = 0.0  # Actual contact hours per practical session (from CSV)
+    # Total lecture contact hours for the module, when it is not the flat weekly
+    # default. Semesterised modules leave this at 0.0 and get
+    # DEFAULT_LECURE_HOURS_PER_WEEK x TEACHING_WEEKS_PER_SEMESTER regardless of
+    # credits; block-taught SCSE modules set it from their credit weighting.
+    lecture_contact_hours: float = 0.0
     practical_groups: int = 0  # Number of parallel groups for practicals
     practical_weeks: Tuple[int, ...] = field(default_factory=tuple)  # Weeks when practicals occur (immutable)
     student_count: int = 0  # From CS Module Numbers.csv - set during loading
