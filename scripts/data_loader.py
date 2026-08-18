@@ -1959,16 +1959,16 @@ def load_all_data(data_dir: str = None,
                 proj_data_hod = val
                 break
 
-        # Get part-time info (FTE) for the HoD (if available)
-        pt_info_hod = None
-        for key, val in part_time_data.items():
+        # Get category/FTE info for the HoD (if available)
+        staff_ref_hod = None
+        for key, val in staff_ref_data.items():
             norm_key = normalize_name(key, reverse_lookup, unknown_callback=None)
             if norm_key == hod_name_from_waw:
-                pt_info_hod = val
+                staff_ref_hod = val
                 break
 
-        # Default FTE to 1.0 if no part-time data found
-        hod_fte = pt_info_hod["fte"] if pt_info_hod else 1.0
+        # Default FTE to 1.0 if no staff-reference entry found
+        hod_fte = staff_ref_hod["fte"] if staff_ref_hod else 1.0
 
         # Collect ALL roles this person holds in WAW (same logic as normal staff)
         hod_roles = []
