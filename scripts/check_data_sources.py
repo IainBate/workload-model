@@ -276,27 +276,28 @@ def check_waw() -> Tuple[str, List[str]]:
     return "PASS", ["All expected section markers present."]
 
 
-def check_art_categories() -> Tuple[str, List[str]]:
-    path = DATA_DIR / "CS Data Collection on ART Performance 2026 - MASTER Overall Data Capture.csv"
+def check_staff_categories() -> Tuple[str, List[str]]:
+    path = DATA_DIR / "Staff Categories and FTE.csv"
     if not path.exists():
-        return "WARN", ["File not found (expected - this is a year-stamped filename; "
-                        "confirm the new year's file has been renamed to match what "
-                        "data_loader.py's default parameter expects, or the load call "
-                        "has been updated to point at it)."]
+        return "FAIL", ["File not found."]
 
-    with open(path, "r", encoding="utf-8-sig") as f:
-        rows = list(csv.reader(f))
-    found = {r[1].strip() for r in rows if len(r) > 1 and r[1].strip()}
-    unknown = sorted(v for v in found if v not in KNOWN_ART_CATEGORIES and len(v) < 20)
+    rows = list(csv.DictReader(open(path, "r", encoding="utf-8-sig")))
+    found = {(row.get("Category") or "").strip() for row in rows if (row.get("Category") or "").strip()}
+    unknown = sorted(v for v in found if v not in KNOWN_ART_CATEGORIES)
     if unknown:
         return "WARN", [
-            f"Category value(s) other than {sorted(KNOWN_ART_CATEGORIES)} found in "
-            f"column 2: {unknown}. _load_art_ts_categories() only recognises "
-            f"\"T&S\" and \"ART\" - anyone tagged with a new category is silently "
-            f"excluded from contract-category resolution, the same gap Philippa "
-            f"Ryan and Kate P fell into (2026-08-18)."
+            f"Category value(s) other than {sorted(KNOWN_ART_CATEGORIES)} found: "
+            f"{unknown}. normative_key_for_category() in config.py only maps "
+            f"\"ART\" and \"T and S\" - anyone with a different value gets no "
+            f"normative-split comparison."
         ]
-    return "PASS", [f"Only known categories found: {sorted(KNOWN_ART_CATEGORIES)}."]
+
+    names_no_fte = [row["Name"] for row in rows if not (row.get("FTE") or "").strip()]
+    if names_no_fte:
+        return "WARN", [f"Row(s) with a blank FTE (defaults to 1.0): {names_no_fte}"]
+
+    return "PASS", [f"{len(rows)} staff recorded, only known categories found: "
+                    f"{sorted(KNOWN_ART_CATEGORIES)}."]
 
 
 def check_filename_exists(filename: str, note: str = "") -> Tuple[str, List[str]]:
