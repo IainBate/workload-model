@@ -476,17 +476,7 @@ def _prompt_category_match(canonical_name: str) -> Optional[str]:
     return None
 
 
-# --- WTW CSV Loading ---
-
-def _detect_year_from_filename(filename: str) -> str:
-    """Extract year label from WTW filename, e.g., 'WTW 2026-7.csv' -> '2026-7'."""
-    base = os.path.basename(filename)
-    # Look for pattern YYYY-X
-    match = re.search(r'(\d{4})-(\d)', base)
-    if match:
-        return f"{match.group(1)}-{match.group(2)}"
-    return base
-
+# --- WTW Workbook Loading ---
 
 def _load_module_mapping() -> Dict[str, Any]:
     """Load module mapping JSON to identify new modules for new_content detection."""
