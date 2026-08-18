@@ -1788,6 +1788,10 @@ def _format_teaching_section_for_staff(result: WorkloadResult, title: str, hours
             stages[stage] = []
         stages[stage].append(mod)
 
+    # Track the value behind each visible component, in display order, so the
+    # closing Subtotal line can show the calculation rather than just the total.
+    subtotal_terms: List[Tuple[str, float]] = []
+
     # Sort stages and iterate
     for stage in sorted(stages.keys()):
         modules_in_stage = stages[stage]
