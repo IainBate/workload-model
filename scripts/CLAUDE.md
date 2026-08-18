@@ -17,12 +17,10 @@ Workload Model/
 │   ├── output_generator.py    # Report generation (CSV, XLSX, PNG, HTML)
 │   └── google_sheets.py       # Google Sheets integration (optional)
 ├── data/              # Input data files
-│   ├── WTW 2026-7.csv    # Current year module data
-│   ├── WTW 2025-6.csv    # Previous year module data
+│   ├── CS WTW Who Teaches What.xlsx  # Module data (sheets "2026-7"/"2025-6") + known lecturers
 │   ├── CS Module Numbers.csv
 │   ├── CS Module Assessment Numbers.csv
 │   ├── pastoral_load.csv
-│   ├── project_load.csv
 │   ├── PhD Supervision Data.csv
 │   ├── % FTE for CS.csv
 │   ├── WAW.csv
