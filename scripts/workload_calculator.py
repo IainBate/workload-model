@@ -1044,14 +1044,20 @@ def _calculate_teaching_workload(module: ModuleData, teachers: List[str],
         # the output layer to pure formatting.
         teacher_lecture_count = lecture_result.get('teacher_count', 0) or 1
         teacher_lecture_base = lecture_result.get('total_lecture_hours', 0.0) / teacher_lecture_count
+        # Block-taught modules (the SCSE masters) deliver their contact in blocks
+        # rather than weekly, so a "N lectures per week over 11 weeks" shape would
+        # misdescribe them. Flag it here so the output layer can say what actually
+        # happens instead of inferring a weekly rhythm that doesn't exist.
+        is_block_taught = getattr(module, 'lecture_contact_hours', 0.0) > 0
         teacher_delivery_structured = {
             "teacher_count": teacher_lecture_count,
             "total_lecture_hours": lecture_result.get('total_lecture_hours', 0.0),
             "base_per_teacher": round(teacher_lecture_base, 4),
             "multiplier": lecture_result['lecture_multipliers'].get(teacher, 0.0),
             "lecturer_type": dict(lecture_result.get('lecturer_types', [])).get(teacher, 'standard'),
-            "lectures_per_week": DEFAULT_LECURE_HOURS_PER_WEEK / 2.0,
-            "week_count": contact_weeks,
+            "lectures_per_week": 0.0 if is_block_taught else DEFAULT_LECURE_HOURS_PER_WEEK / 2.0,
+            "week_count": 0 if is_block_taught else contact_weeks,
+            "is_block_taught": is_block_taught,
         }
 
         result[teacher] = {
