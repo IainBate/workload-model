@@ -31,7 +31,8 @@ This document describes a publishing strategy that extends the workload model to
 
 ### 1. Staff Email Data (`scripts/email_data.py`)
 
-**File:** `data/Staff Emails.csv` (NEW - optional)
+**File:** `data/Staff Emails.csv` (optional, still doesn't exist - create it if a dedicated email
+file is ever preferred over the option below)
 
 ```csv
 Name,Email
@@ -40,7 +41,10 @@ Alena Denisova,alena.denisova@york.ac.uk
 ...
 ```
 
-**Alternative:** Extend existing `Staff Categories and FTE.csv` with an optional Email column.
+**Implemented (2026-08-19):** `Staff Categories and FTE.csv` now has an `Email` column
+(`Name,Category,FTE,Modelled,Notes,Email`) - `load_staff_emails()` reads it as a fallback whenever
+`Staff Emails.csv` isn't present. The column exists but is blank for everyone so far; `--send-emails`
+still no-ops until real addresses are filled in.
 
 **Functions:**
 - `load_staff_emails(data_dir)` - Load email addresses from CSV
