@@ -1934,14 +1934,18 @@ def load_all_data(data_dir: str = None,
         # definition (that's exactly what the file records), so being in it
         # earns a roster place the same way a WAW role or WTW appearance does
         # - this is what brings in someone like Ibrahim Habli, full-time ART
-        # staff with no teaching or admin (confirmed 2026-08-19).
-        in_staff_reference = _find_data(name, name, staff_ref_data) is not None
-        if name in NON_MODELLED_STAFF:
+        # staff with no teaching or admin (confirmed 2026-08-19). Modelled=No
+        # is the documented exception to that - see the Modelled column's
+        # comment near NON_MODELLED_TEACHERS above.
+        staff_ref_entry = _find_data(name, name, staff_ref_data)
+        in_staff_reference = staff_ref_entry is not None
+        not_modelled = staff_ref_entry is not None and not staff_ref_entry.get("modelled", True)
+        if not_modelled:
             if has_waw_role:
                 print(f"  Data warning: {name} holds WAW role(s) {list(data.roles)} but is "
-                      f"not workload-modelled ({name} in NON_MODELLED_STAFF) - no one else "
-                      f"holds {'them' if len(data.roles) > 1 else 'it'}, so those hours are "
-                      f"not costed anywhere in this run.")
+                      f"not workload-modelled (Modelled=No in Staff Categories and FTE.csv) - "
+                      f"no one else holds {'them' if len(data.roles) > 1 else 'it'}, so those "
+                      f"hours are not costed anywhere in this run.")
             continue
         if in_wtw or has_waw_role or in_staff_reference:
             filtered_staff[name] = data
