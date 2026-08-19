@@ -1271,19 +1271,33 @@ def _load_waw_roles(filepath: str = "WAW.csv") -> Dict[str, list]:
     return roles
 
 
+_STAFF_CATEGORIES_HEADER = ["Name", "Category", "FTE", "Modelled", "Notes", "Email"]
+
+# Values in the Modelled column that mean "No" (case-insensitive). Blank/missing
+# defaults to modelled=True - this file only needs an entry when someone is the
+# exception, matching the rest of this file's "flag the exception, not the norm"
+# style (see NON_MODELLED_TEACHERS above).
+_NOT_MODELLED_VALUES = {"no", "n", "false", "0"}
+
+
 def _load_staff_categories_and_fte(filepath: str = "Staff Categories and FTE.csv") -> Dict[str, dict]:
-    """Load contract category (ART / T and S) and FTE per staff member.
+    """Load contract category (ART / T and S), FTE, and related per-person
+    reference data for staff member.
 
     Replaced two separate sources (2026-08-19): Part time.csv (FTE, plus a
     Staff Category column) and the ART Performance data-capture sheet
     (category only, ~600 columns of unrelated performance-review data for a
     single category lookup). Both were large exports that would "quickly go
     out of date" per the person maintaining this model; this is a single
-    hand-maintained file with just the two fields the pipeline actually reads
-    from either of them. See docs/data_refresh_guide.docx for how to keep it
-    current.
+    hand-maintained file with just the fields the pipeline actually reads from
+    either of them - since extended (2026-08-19) with Modelled (replacing the
+    old NON_MODELLED_STAFF hardcoded set) and Email (read by email_data.py for
+    report/feedback distribution) so those are reviewable here too, in one
+    place, instead of requiring a code change. See docs/data_refresh_guide.docx
+    for how to keep it current.
 
-    Returns {person_name: {"category": str, "fte": float, "notes": str}}.
+    Returns {person_name: {"category": str, "fte": float, "modelled": bool,
+    "notes": str, "email": str}}.
     """
     path = DATA_DIR / filepath
     if not path.exists():
@@ -1300,7 +1314,9 @@ def _load_staff_categories_and_fte(filepath: str = "Staff Categories and FTE.csv
                 data[name] = {
                     "category": (row.get("Category") or "").strip(),
                     "fte": float(row.get("FTE") or 1.0),
+                    "modelled": (row.get("Modelled") or "").strip().lower() not in _NOT_MODELLED_VALUES,
                     "notes": (row.get("Notes") or "").strip(),
+                    "email": (row.get("Email") or "").strip(),
                 }
             except (ValueError, TypeError):
                 pass
