@@ -1948,6 +1948,7 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
             pastoral_breakdown=pastoral_breakdown,  # Structured pastoral supervision breakdown
             project_breakdown=project_breakdown,  # Structured project supervision breakdown
             adjustments_breakdown=adjustments_breakdown,  # Manual workload_adjustments.csv overrides applied
+            notes=staff.notes,
         )
         results.append(result)
 
