@@ -1167,6 +1167,8 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
             </div>
         </div>
 
+        {notes_section}
+
         {teaching_section}
         {research_section}
         {admin_section}
