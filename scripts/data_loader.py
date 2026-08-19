@@ -1876,7 +1876,14 @@ def load_all_data(data_dir: str = None,
                 citizenship_value=proj_data["citizenship_value"] if proj_data else 0,
                 initial_fractional_project_load=proj_data["initial_fractional_project_load"] if proj_data else 0,
                 initial_fractional_pastoral_load=proj_data["initial_fractional_pastoral_load"] if proj_data else 0,
-                notes=proj_data["notes"] if proj_data else "",
+                # Combine notes from both sources that can carry one - Loadings.csv's
+                # free-text Notes column and Staff Categories and FTE.csv's Notes
+                # column (e.g. "Working 40% from 1st Jan 2026") - neither is
+                # authoritative over the other, so nothing here is dropped.
+                notes="; ".join(n for n in (
+                    proj_data["notes"] if proj_data else "",
+                    staff_ref["notes"] if staff_ref else "",
+                ) if n),
                 roles=tuple(staff_roles),
                 phd_supervisions=phd_info["sole_supervisor"] if phd_info else 0,
                 phd_co_supervisions=phd_info["co_supervisor"] if phd_info else 0,
