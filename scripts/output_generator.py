@@ -1044,6 +1044,8 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
         ".manual-override-block .detail-name { color: #f57f17; } "
         ".manual-adjustment-line { background: #f3f7ff; border-left: 3px solid #5c6bc0; padding: 8px 12px; margin: 4px 0; } "
         ".calc-breakdown { font-size: 0.9em; color: #777; margin-top: 10px; padding-top: 15px; border-top: 2px dashed #ddd; line-height: 1.6; } "
+        ".staff-notes-box { background: #e8f5e9; border-radius: 8px; padding: 15px 20px; margin-top: 20px; border-left: 5px solid #4CAF50; } "
+        ".staff-notes-box .notes-label { font-weight: bold; color: #2e7d32; margin-right: 8px; } "
         ".assumptions-box, .missing-data-box { background: #fff3e0; border-radius: 8px; padding: 20px; margin-top: 30px; } "
         ".assumptions-box h3, .missing-data-box h3 { color: #ef6c00; border-left-color: #ff9800; margin-top: 0; } "
         ".missing-data-box { background: #ffebee; } "
