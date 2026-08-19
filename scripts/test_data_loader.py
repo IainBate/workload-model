@@ -120,9 +120,56 @@ class TestCategoryResolution:
 
     def test_staff_reference_file_loads_category_and_fte(self):
         data = dl._load_staff_categories_and_fte()
-        assert data.get("Sarah Carrington") == {"category": "T and S", "fte": 0.8, "notes": ""}
+        assert data.get("Sarah Carrington") == {
+            "category": "T and S", "fte": 0.8, "modelled": True, "notes": "", "email": "",
+        }
         assert data.get("Rob Alexander", {}).get("category") == "ART"
         assert data.get("Ibrahim Habli", {}).get("category") == "ART"
+
+    def test_staff_reference_file_loads_modelled_flag(self):
+        """Modelled=No (Philippa Ryan, Phoebe Barraclough - 2026-08-19 migration
+        from the old NON_MODELLED_STAFF hardcoded set) parses to False; everyone
+        else defaults to True without needing an explicit 'Yes'."""
+        data = dl._load_staff_categories_and_fte()
+        assert data.get("Philippa Ryan", {}).get("modelled") is False
+        assert data.get("Phoebe Barraclough", {}).get("modelled") is False
+        assert data.get("Rob Alexander", {}).get("modelled") is True
+
+
+class TestStaffCategoriesModelledAndEmailParsing:
+    """_load_staff_categories_and_fte() parsing of the Modelled/Email columns,
+    against small in-memory fixtures rather than the real data file."""
+
+    def _write(self, path, rows, header=None):
+        header = header or ["Name", "Category", "FTE", "Modelled", "Notes", "Email"]
+        with open(path, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=header)
+            writer.writeheader()
+            for row in rows:
+                writer.writerow({col: row.get(col, "") for col in header})
+
+    @pytest.mark.parametrize("value", ["No", "no", "N", "FALSE", "0"])
+    def test_not_modelled_values(self, tmp_path, monkeypatch, value):
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        self._write(tmp_path / "Staff Categories and FTE.csv",
+                    [{"Name": "Someone", "Category": "ART", "FTE": "1.0", "Modelled": value}])
+        data = dl._load_staff_categories_and_fte()
+        assert data["Someone"]["modelled"] is False
+
+    def test_blank_modelled_defaults_true(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        self._write(tmp_path / "Staff Categories and FTE.csv",
+                    [{"Name": "Someone", "Category": "ART", "FTE": "1.0", "Modelled": ""}])
+        data = dl._load_staff_categories_and_fte()
+        assert data["Someone"]["modelled"] is True
+
+    def test_email_column_loaded(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        self._write(tmp_path / "Staff Categories and FTE.csv",
+                    [{"Name": "Someone", "Category": "ART", "FTE": "1.0",
+                      "Email": "someone@york.ac.uk"}])
+        data = dl._load_staff_categories_and_fte()
+        assert data["Someone"]["email"] == "someone@york.ac.uk"
 
 
 class TestModuleVariantMerging:
