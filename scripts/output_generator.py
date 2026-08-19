@@ -1090,6 +1090,14 @@ def _create_individual_staff_report_html(r: WorkloadResult, year_data: YearData)
 
     subtotal = r.teaching_hours + r.research_hours + r.admin_hours
 
+    # Format staff notes (from Loadings.csv and/or Staff Categories and FTE.csv)
+    if getattr(r, 'notes', ''):
+        notes_section = f"""<div class="staff-notes-box">
+            <span class="notes-label">Notes:</span>{r.notes}
+        </div>"""
+    else:
+        notes_section = ""
+
     # Format assumptions
     if hasattr(r, 'assumptions') and r.assumptions:
         assumptions_items = ''.join(f'<li>{a}</li>' for a in r.assumptions)
