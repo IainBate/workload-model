@@ -24,7 +24,7 @@ Workload Model/
 │   ├── PhD Supervision Data.csv
 │   ├── % FTE for CS.csv
 │   ├── WAW.csv
-│   ├── Part time.csv
+│   ├── Staff Categories and FTE.csv  # Category/FTE/Modelled/Notes/Email, auto-synced each run
 │   ├── workload_adjustments.csv  # optional, auto-synced each run - see below
 │   ├── staff_name_lookup.json
 │   └── module_mapping.json
