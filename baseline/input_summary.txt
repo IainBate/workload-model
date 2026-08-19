@@ -3,7 +3,7 @@ Workload Model Baseline Generation Summary
 
 Year: 2026-7
 Modules: 49
-Staff: 65
+Staff: 66
 
 Modules:
   - ARIA (COM00072H) [20cr, Stage 3] - Tommy Yuan, Peter Nightingale, Alvaro Miyazawa
@@ -79,6 +79,7 @@ Staff:
   - Frank Soboczenski [FTE: 1.0, Roles: Academic Admissions Team]
   - Iain Bate [FTE: 1.0, Roles: Head of Department]
   - Ian Gray [FTE: 1.0, Roles: Deputy Head of Department (On-campus teaching)]
+  - Ibrahim Habli [FTE: 1.0, Roles: none]
   - Jacob Rigby [FTE: 1.0, Roles: Taught Project Coordinator]
   - James Stovold [FTE: 1.0, Roles: Academic Admissions Team]
   - James Walker [FTE: 1.0, Roles: none]

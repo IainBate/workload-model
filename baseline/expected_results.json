@@ -3109,6 +3109,66 @@
       },
       "total_hours": 1444.0
     },
+    "Ibrahim Habli": {
+      "adjustments_breakdown": {},
+      "admin_breakdown": {
+        "engagement": 100.0,
+        "personal_development": 75.0
+      },
+      "admin_hours": 175.0,
+      "assumptions": [],
+      "category": "ART",
+      "fte": 1.0,
+      "missing_data": [
+        "No administrative roles assigned"
+      ],
+      "name": "Ibrahim Habli",
+      "nominal_hours": 1642.0,
+      "pastoral_breakdown": {
+        "rate": 3,
+        "student_count": 0,
+        "total": 0
+      },
+      "project_breakdown": {},
+      "research_breakdown": {
+        "grants": {
+          "grant_3874036": 656.8,
+          "grant_4698151": 164.2,
+          "grant_4726550": 164.2,
+          "grant_4963830": 82.1
+        },
+        "phd_students": {
+          "assessor": {
+            "count": 1,
+            "rate": 8,
+            "total": 8
+          },
+          "co_supervision": {
+            "count": 2,
+            "rate": 48,
+            "total": 96
+          },
+          "supervision": {
+            "count": 2,
+            "rate": 80,
+            "total": 160
+          }
+        },
+        "protected_research_baseline": 164.2
+      },
+      "research_hours": 1495.5,
+      "teaching_breakdown": {
+        "pastoral_breakdown": {
+          "rate": 3,
+          "student_count": 0,
+          "total": 0
+        },
+        "pastoral_supervision": 0
+      },
+      "teaching_hours": 0.0,
+      "teaching_module_breakdowns": {},
+      "total_hours": 1670.5
+    },
     "Jacob Rigby": {
       "adjustments_breakdown": {},
       "admin_breakdown": {
@@ -9994,6 +10054,6 @@
       "total_hours": 856.5
     }
   },
-  "staff_count": 65,
+  "staff_count": 66,
   "year_label": "2026-7"
 }

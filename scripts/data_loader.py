@@ -510,18 +510,15 @@ NON_MODELLED_TEACHERS = {
     "kate preston",   # same person, full name as recorded in the WTW xlsx
 }
 
-# Same idea, but for canonical names rather than raw WTW cell text - people who
-# hold a WAW role or FTE record (so they would otherwise earn a roster place
-# under the "active staff" rule above) but are not workload-modelled. Checked
-# after normalization, at the final roster filter.
-NON_MODELLED_STAFF = {
-    "Philippa Ryan",  # RA; holds the EDI Committee Chair role in WAW but isn't
-                       # workload-modelled (confirmed 2026-08-18). No one else
-                       # holds that role, so its 82.1h goes uncosted - flagged
-                       # via missing_data below rather than silently dropped.
-    "Phoebe Barraclough",  # Online T&S staff (confirmed 2026-08-18); appears only
-                       # as CTAP's expert checker, no workload spec needed.
-}
+# The canonical-name equivalent of NON_MODELLED_TEACHERS above - people who hold
+# a WAW role or FTE record (so they would otherwise earn a roster place under the
+# "active staff" rule above) but are not workload-modelled - used to be a second
+# hardcoded set here (Philippa Ryan, Phoebe Barraclough), each with an inline
+# comment as its rationale. Moved into the Modelled column of Staff Categories
+# and FTE.csv (2026-08-19) so a non-technical reviewer can see and update the
+# list without touching code; the rationale now lives in that row's Notes. See
+# _resolve_category_from_data() / the "in_staff_reference"/"not_modelled" check
+# in load_all_data() below for where it's read.
 
 
 # Filename of the "Who Teaches What" workbook that superseded WTW 2025-6.csv /
