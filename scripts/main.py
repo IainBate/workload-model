@@ -187,6 +187,14 @@ def main():
     if newly_added:
         print(f"\nAdded {len(newly_added)} new staff to workload_adjustments.csv: {', '.join(newly_added)}")
 
+    # Same idea for Staff Categories and FTE.csv - a new starter gets a blank
+    # row to fill in (Category, FTE, Modelled, Notes, Email) rather than
+    # silently defaulting to FTE 1.0 with no category.
+    newly_added_categories = sync_staff_categories_and_fte(year_data)
+    if newly_added_categories:
+        print(f"\nAdded {len(newly_added_categories)} new staff to Staff Categories and FTE.csv: "
+              f"{', '.join(newly_added_categories)}")
+
     # Print summary
     print_data_summary(year_data)
 
