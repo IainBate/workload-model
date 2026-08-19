@@ -489,6 +489,7 @@ Fixed, along with several other issues found while verifying each path.
 - **No SMTP dry-run from the CLI**: `--send-emails` has no way to preview
   without a working SMTP config, since the existing `--dry-run` flag exits
   before reaching the publishing-strategy section. Not currently a live risk
-  - `data/Staff Emails.csv` doesn't exist yet, so `--send-emails` safely
+  - neither `data/Staff Emails.csv` nor the `Email` column on Staff Categories
+  and FTE.csv has any addresses filled in yet, so `--send-emails` safely
   no-ops - but worth a dedicated flag before this is ever pointed at a real
   SMTP server.
