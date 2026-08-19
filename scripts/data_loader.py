@@ -1237,6 +1237,47 @@ def sync_adjustment_names(year_data: "YearData", filepath: str = "workload_adjus
     return tuple(missing)
 
 
+def sync_staff_categories_and_fte(year_data: "YearData", filepath: str = "Staff Categories and FTE.csv") -> Tuple[str, ...]:
+    """Ensure every active staff member in year_data has at least one row in
+    Staff Categories and FTE.csv, appending a blank row for anyone missing -
+    same idempotent, strictly-additive pattern as sync_adjustment_names()
+    above, so a new starter always gets a visible row to fill in (Category,
+    FTE, Modelled, Notes, Email) rather than silently defaulting. Returns the
+    canonical names that were newly added (empty tuple if the file already
+    covered everyone)."""
+    path = DATA_DIR / filepath
+    file_exists = path.exists()
+
+    covered: Set[str] = set()
+    if file_exists:
+        with open(path, "r", encoding="utf-8-sig") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                person = (row.get("Name") or "").strip()
+                if not person:
+                    continue
+                resolved = normalize_name(person, year_data.reverse_lookup, unknown_callback=None)
+                covered.add(resolved if resolved else person.upper())
+
+    missing = sorted(
+        s.canonical_name for s in year_data.staff
+        if s.active and s.canonical_name not in covered
+    )
+
+    if not missing:
+        return ()
+
+    with open(path, "a", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        if not file_exists:
+            writer.writerow(_STAFF_CATEGORIES_HEADER)
+        blank_row_width = len(_STAFF_CATEGORIES_HEADER) - 1  # every column after Name
+        for name in missing:
+            writer.writerow([name] + [""] * blank_row_width)
+
+    return tuple(missing)
+
+
 def _load_waw_roles(filepath: str = "WAW.csv") -> Dict[str, list]:
     """Load departmental roles from WAW.csv. Returns {role_name: [(staff_name, percentage)]}."""
     path = DATA_DIR / filepath
