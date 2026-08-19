@@ -164,7 +164,7 @@ Project and Pastoral Group Loads - Loadings.csv → Project loads (sole source) 
 PhD Supervision Data.csv           →  PhD supervisor/co-supervisor counts
 % FTE for CS.csv                   →  Research grant FTE allocation
 WAW.csv                            →  Departmental roles (on-campus only)
-Part time.csv                      →  FTE multiplier per staff
+Staff Categories and FTE.csv (auto-synced) → Category/FTE/Modelled/Notes/Email per staff member
 workload_adjustments.csv (optional, auto-synced) → Manual Teaching/Research/Admin overrides
 ```
 
@@ -180,6 +180,24 @@ workload_adjustments.csv (optional, auto-synced) → Manual Teaching/Research/Ad
 - **`staff_name_lookup.json`**: Canonical name → aliases mapping for staff name normalization.
 - **`module_mapping.json`**: Module H/M merges, unified project modules, dropped/new modules between years.
 - **`workload_parameters.yaml`**: All workload parameters extracted from the .docx.
+- **`Staff Categories and FTE.csv`**: Single hand-maintained file for the per-person judgment calls
+  that used to be scattered across code and large institutional exports (Part time.csv, the ART
+  Performance sheet). Columns: `Name, Category, FTE, Modelled, Notes, Email`.
+  - `Category`/`FTE`: read by `_load_staff_categories_and_fte()` in `data_loader.py`, same as before.
+  - `Modelled` (added 2026-08-19): `Yes`/blank (default) or `No` - replaces the old hardcoded
+    `NON_MODELLED_STAFF` Python set. Set to `No` with the reason in `Notes` for someone who holds a
+    WAW role or FTE record but isn't workload-modelled (e.g. an RA). `NON_MODELLED_TEACHERS` (raw,
+    pre-normalization WTW cell text like `"kate p"`) is a separate, still-hardcoded set in
+    `data_loader.py` - those names may not resolve to a canonical person at all, so they don't fit
+    this per-person file.
+  - `Notes` (added 2026-08-19): free text, merged with any Loadings.csv note and surfaced on
+    `WorkloadResult.notes` → shown in a "Notes" box on that person's individual HTML report. Not
+    parsed or acted on automatically.
+  - `Email` (added 2026-08-19): read by `email_data.py` for report/feedback distribution
+    (`data/Staff Emails.csv` is checked first if present). Never guessed - see "no guessed data"
+    below.
+  - Auto-synced with a blank row per active staff member on every run, same mechanism and rationale
+    as `workload_adjustments.csv` below (`sync_staff_categories_and_fte()`).
 - **`workload_adjustments.csv`**: Optional manual Teaching/Research/Admin adjustments (delta or
   absolute override) per staff member, with mandatory rationale. Auto-synced with a blank row per
   active staff member on every run — see "Manual Workload Adjustments" above.
