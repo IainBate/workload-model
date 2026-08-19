@@ -21,7 +21,8 @@ sys.path.insert(0, SCRIPTS_DIR)
 
 from data_loader import (
     load_all_data, normalize_name, _load_name_lookup, _build_reverse_lookup,
-    _prompt_category_match, sync_adjustment_names, WTW_XLSX_FILENAME, YEAR_SHEET_PATTERN,
+    _prompt_category_match, sync_adjustment_names, sync_staff_categories_and_fte,
+    WTW_XLSX_FILENAME, YEAR_SHEET_PATTERN,
 )
 from workload_calculator import calculate_workload
 from validation import validate_all_results, run_validation_pipeline
