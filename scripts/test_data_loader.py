@@ -689,6 +689,87 @@ class TestSyncAdjustmentNames:
         assert path.read_text(encoding="utf-8") == after_content
 
 
+class TestSyncStaffCategoriesAndFte:
+    """sync_staff_categories_and_fte() - the same additive, idempotent
+    housekeeping as sync_adjustment_names(), applied to Staff Categories and
+    FTE.csv so a new starter always gets a visible row to fill in."""
+
+    def test_missing_file_creates_header_and_all_active_staff(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        year_data = _make_year_data([
+            StaffData(canonical_name="Bob Brown", active=True),
+            StaffData(canonical_name="Alice Adams", active=True),
+        ])
+        path = tmp_path / "Staff Categories and FTE.csv"
+        assert not path.exists()
+
+        added = dl.sync_staff_categories_and_fte(year_data)
+
+        assert added == ("Alice Adams", "Bob Brown")
+        assert path.exists()
+        with open(path, "r", newline="", encoding="utf-8") as f:
+            rows = list(csv.reader(f))
+        blank = [""] * (len(dl._STAFF_CATEGORIES_HEADER) - 1)
+        assert rows[0] == dl._STAFF_CATEGORIES_HEADER
+        assert rows[1] == ["Alice Adams"] + blank
+        assert rows[2] == ["Bob Brown"] + blank
+        assert len(rows) == 3
+
+    def test_all_covered_is_a_true_no_op(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        year_data = _make_year_data([
+            StaffData(canonical_name="Alice Adams", active=True),
+        ])
+        path = tmp_path / "Staff Categories and FTE.csv"
+        with open(path, "w", newline="", encoding="utf-8") as f:
+            writer = csv.writer(f)
+            writer.writerow(dl._STAFF_CATEGORIES_HEADER)
+            writer.writerow(["Alice Adams", "ART", "1.0", "", "", ""])
+        before_bytes = path.read_bytes()
+
+        added = dl.sync_staff_categories_and_fte(year_data)
+
+        assert added == ()
+        assert path.read_bytes() == before_bytes
+
+    def test_inactive_staff_never_added(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        year_data = _make_year_data([
+            StaffData(canonical_name="Alice Adams", active=True),
+            StaffData(canonical_name="Retired Rachel", active=False),
+        ])
+        path = tmp_path / "Staff Categories and FTE.csv"
+
+        added = dl.sync_staff_categories_and_fte(year_data)
+
+        assert added == ("Alice Adams",)
+        content = path.read_text(encoding="utf-8")
+        assert "Retired Rachel" not in content
+
+    def test_partial_coverage_appends_only_missing_and_preserves_prefix(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        mappings = {
+            "Christopher Crispin-Bailey": ["Chris CB", "Christopher", "Christopher Crispin-Bailey"],
+        }
+        year_data = _make_year_data([
+            StaffData(canonical_name="Christopher Crispin-Bailey", active=True),
+            StaffData(canonical_name="Zara Zeta", active=True),
+        ], mappings=mappings)
+        path = tmp_path / "Staff Categories and FTE.csv"
+        with open(path, "w", newline="", encoding="utf-8") as f:
+            writer = csv.writer(f)
+            writer.writerow(dl._STAFF_CATEGORIES_HEADER)
+            writer.writerow(["Chris CB", "ART", "1.0", "", "", ""])  # alias spelling
+        before_content = path.read_text(encoding="utf-8")
+
+        added = dl.sync_staff_categories_and_fte(year_data)
+
+        assert added == ("Zara Zeta",)
+        after_content = path.read_text(encoding="utf-8")
+        assert after_content.startswith(before_content)
+        assert after_content.count("Christopher") == 0  # not duplicated under canonical spelling
+
+
 class TestAdjustmentDeduplicationMerge:
     """_deduplicate_staff() must not drop adjustments/adjustment_warnings when
     merging duplicate-name entries - it rebuilds StaffData from an explicit
