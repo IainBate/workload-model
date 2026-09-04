@@ -160,8 +160,8 @@ This project provides an automated system for calculating academic staff workloa
 CS WTW Who Teaches What.xlsx (sheets "2026-7"/"2025-6") →  Module data + known lecturers
 CS Module Numbers.csv              →  Student counts per module
 CS Module Assessment Numbers.csv   →  Assessment counts
-pastoral_load.csv                  →  Pastoral supervision defaults (preferred over the Loadings.csv fallback below)
-Project and Pastoral Group Loads - Loadings.csv → Project loads (sole source) + pastoral fallback
+pastoral_load.csv                  →  Pastoral supervision counts (sole source)
+ProjectLoads 2025-26.xlsx ("Advisor Loads" sheet) → Project supervision loads (sole source)
 PhD Supervision Data.csv           →  PhD supervisor/co-supervisor counts
 % FTE for CS.csv                   →  Research grant FTE allocation
 WAW.csv                            →  Departmental roles (on-campus only)
