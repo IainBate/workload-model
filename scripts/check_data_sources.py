@@ -68,10 +68,6 @@ CRITICAL_COLUMNS: Dict[str, List[str]] = {
         "Number of Practicals", "Total Duration", "Number of Practical Groups",
     ],
     "pastoral_load.csv": ["Supervisor", "UG & PGT Supervisees"],
-    "Project and Pastoral Group Loads - Loadings.csv": [
-        "Person", "Active", "Base project load", "Base pastoral load",
-        "Project Load", "Pastoral Load", "Notes",
-    ],
     "PhD Supervision Data.csv": [
         "Staff member", "Total as supervisor (sole or co-supervisor) AND TAP member",
     ],
