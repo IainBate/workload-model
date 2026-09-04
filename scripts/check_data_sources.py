@@ -364,6 +364,9 @@ def main() -> int:
     status, messages = check_wtw_workbook()
     results.append((WTW_XLSX_FILENAME, status, messages))
 
+    status, messages = check_project_loads_workbook()
+    results.append((PROJECT_LOADS_XLSX_FILENAME, status, messages))
+
     status, messages = check_waw()
     results.append(("WAW.csv", status, messages))
 
