@@ -1,6 +1,6 @@
 {
   "description": "Staff name normalization lookup table. Maps canonical full names to all known name variants across WTW, WAW, and other CSV files. Updated annually as staff change.",
-  "last_updated": "2026-08-18",
+  "last_updated": "2026-09-04",
   "mappings": {
     "Mike O'Dea": [
       "Mike O'D",
