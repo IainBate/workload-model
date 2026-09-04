@@ -202,6 +202,17 @@ workload_adjustments.csv (optional, auto-synced) → Manual Teaching/Research/Ad
 - **`workload_adjustments.csv`**: Optional manual Teaching/Research/Admin adjustments (delta or
   absolute override) per staff member, with mandatory rationale. Auto-synced with a blank row per
   active staff member on every run — see "Manual Workload Adjustments" above.
+- **`ProjectLoads 2025-26.xlsx`** (added 2026-09-04, replacing `Project and Pastoral Group Loads -
+  Loadings.csv`): Project supervision loads, sole source, read from the "Advisor Loads" sheet by
+  `_load_project_load()` in `data_loader.py`. Each row's `Total Projects (UG + PG)` column is a
+  formula over `UG Slots + UG Extras - UG Undershoot + PG Slots + PG Extras`; the loader
+  recomputes it from those four columns rather than trusting the cached formula value, since a
+  tool-saved workbook can leave that cache stale (seen for one row in this file). The superseded
+  CSV's `Active`-status and pastoral-load-fallback roles did **not** carry over: active status now
+  comes solely from the roster filter (WTW/WAW/Staff Categories and FTE.csv membership), and the
+  handful of staff who relied on the CSV's `Pastoral Load` column as a fallback (absent from
+  `pastoral_load.csv`) were given an explicit row there instead - see `_load_project_load()`'s
+  docstring for the full rationale and which staff those were.
 
 ## Development & Execution
 ### Running the Calculator
