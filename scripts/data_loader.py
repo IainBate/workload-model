@@ -1816,7 +1816,11 @@ def load_all_data(data_dir: str = None,
         saint_modules = list(excluded_saint_modules_by_teacher.get(canonical, ()))
 
         if canonical not in staff:
-            # Extract pastoral students from pastoral_load_data (prioritized) or project_load data
+            # Extract pastoral students from pastoral_load_data - the sole source
+            # since the "Project and Pastoral Group Loads - Loadings.csv" fallback
+            # this used to have was removed 2026-09-04 (see _load_project_load's
+            # docstring); the handful of active staff who relied on it were given
+            # an explicit row in pastoral_load.csv instead, so no fallback is lost.
             pastoral_students = 0
             # First try to get from dedicated pastoral_load_data
             if raw_name.upper() in pastoral_load_data:
@@ -1830,13 +1834,6 @@ def load_all_data(data_dir: str = None,
                     simplified_key = " ".join([canonical_parts[0], canonical_parts[-1]])
                     if simplified_key in pastoral_load_data:
                         pastoral_students = pastoral_load_data[simplified_key]
-
-            # Fall back to project_load.csv Pastoral Load column only if not already set from pastoral_load_data
-            if proj_data and "pastoral_load" in proj_data and pastoral_students == 0:
-                try:
-                    pastoral_students = int(float(proj_data.get("pastoral_load", 0)))
-                except (ValueError, TypeError):
-                    pastoral_students = 0
 
             # Resolve contract category (ART / T and S) from the available data
             # sources, in priority order. Anything still unresolved here is left
