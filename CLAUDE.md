@@ -191,9 +191,9 @@ workload_adjustments.csv (optional, auto-synced) → Manual Teaching/Research/Ad
     pre-normalization WTW cell text like `"kate p"`) is a separate, still-hardcoded set in
     `data_loader.py` - those names may not resolve to a canonical person at all, so they don't fit
     this per-person file.
-  - `Notes` (added 2026-08-19): free text, merged with any Loadings.csv note and surfaced on
-    `WorkloadResult.notes` → shown in a "Notes" box on that person's individual HTML report. Not
-    parsed or acted on automatically.
+  - `Notes` (added 2026-08-19): free text, merged with any per-person note from the ProjectLoads
+    workbook's Notes column and surfaced on `WorkloadResult.notes` → shown in a "Notes" box on that
+    person's individual HTML report. Not parsed or acted on automatically.
   - `Email` (added 2026-08-19): read by `email_data.py` for report/feedback distribution
     (`data/Staff Emails.csv` is checked first if present). Never guessed - see "no guessed data"
     below.
