@@ -21,6 +21,7 @@ Workload Model/
 │   ├── CS Module Numbers.csv
 │   ├── CS Module Assessment Numbers.csv
 │   ├── pastoral_load.csv
+│   ├── ProjectLoads 2025-26.xlsx  # "Advisor Loads" sheet - project supervision loads
 │   ├── PhD Supervision Data.csv
 │   ├── % FTE for CS.csv
 │   ├── WAW.csv
