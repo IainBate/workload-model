@@ -10,6 +10,7 @@ __pycache__/
 
 # Generated output files
 Staff workload model.csv
+CS Workload Model *.xlsx
 workload_summary_boxplot.png
 workload_detailed_boxplot.png
 workload_report.html
