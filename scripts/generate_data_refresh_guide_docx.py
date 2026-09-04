@@ -112,10 +112,12 @@ def build() -> Document:
           "silently, for the rest of the run. This script is a header/shape check "
           "against the format recorded on 2026-08-18, run before the real load:")
     for item in [
-        "The 7 files read by column name (CS Module Numbers, CS Module Assessment "
-        "Numbers, pastoral_load, Loadings, PhD Supervision, % FTE for CS, Part "
+        "The 6 CSVs read by column name (CS Module Numbers, CS Module Assessment "
+        "Numbers, pastoral_load, PhD Supervision, % FTE for CS, Part "
         "time): flags any column the loader depends on that's gone missing, and "
-        "any genuinely new column, so a restructure gets noticed either way.",
+        "any genuinely new column, so a restructure gets noticed either way. The "
+        "ProjectLoads workbook (an xlsx, not a CSV) gets its own shape check "
+        "instead, the same way the WTW workbook does.",
         "Part time.csv specifically: it has two columns both literally named "
         "\"FTE\" in the source sheet. Python's DictReader silently keeps only the "
         "second one - today that happens to be the real fraction (confirmed "
