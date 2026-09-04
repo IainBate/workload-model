@@ -1848,25 +1848,13 @@ def load_all_data(data_dir: str = None,
                 canonical_name=canonical,
                 aliases=tuple(mappings.get(canonical, [canonical])),
                 fte=staff_ref["fte"] if staff_ref else 1.0,
-                employment_start=proj_data["employment_start"] if proj_data else 0,
-                active=proj_data["active"] if proj_data else True,
                 category=resolved_category,
                 project_load=proj_data["project_load"] if proj_data else 0,
-                pastoral_load=proj_data["pastoral_load"] if proj_data else 0,
-                adjusted_project_load=proj_data["adjusted_project_load"] if proj_data else 0,
-                adjusted_pastoral_load=proj_data["adjusted_pastoral_load"] if proj_data else 0,
-                ecr_year=proj_data["ecr_year"] if proj_data else "N/A",
-                ecr_value=proj_data["ecr_value"] if proj_data else 0,
-                citizenship_level=proj_data["citizenship_level"] if proj_data else 0,
-                research_grant_income=proj_data["research_grant_income"] if proj_data else "N/A",
-                research_grant_income_value=proj_data["research_grant_income_value"] if proj_data else 0,
-                citizenship_value=proj_data["citizenship_value"] if proj_data else 0,
-                initial_fractional_project_load=proj_data["initial_fractional_project_load"] if proj_data else 0,
-                initial_fractional_pastoral_load=proj_data["initial_fractional_pastoral_load"] if proj_data else 0,
-                # Combine notes from both sources that can carry one - Loadings.csv's
-                # free-text Notes column and Staff Categories and FTE.csv's Notes
-                # column (e.g. "Working 40% from 1st Jan 2026") - neither is
-                # authoritative over the other, so nothing here is dropped.
+                # Combine notes from both sources that can carry one - the
+                # ProjectLoads workbook's free-text Notes column and Staff
+                # Categories and FTE.csv's Notes column (e.g. "Working 40% from
+                # 1st Jan 2026") - neither is authoritative over the other, so
+                # nothing here is dropped.
                 notes="; ".join(n for n in (
                     proj_data["notes"] if proj_data else "",
                     staff_ref["notes"] if staff_ref else "",
