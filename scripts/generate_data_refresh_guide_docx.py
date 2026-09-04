@@ -212,22 +212,29 @@ def build() -> Document:
 
     _source_file(
         doc, "pastoral_load.csv",
-        "Pastoral supervision headcount per supervisor - the preferred source "
-        "(CLAUDE.md), used ahead of Loadings.csv's Pastoral Load column.",
+        "Pastoral supervision headcount per supervisor - the sole source since "
+        "2026-09-04, when the fallback to \"Project and Pastoral Group Loads - "
+        "Loadings.csv\"'s Pastoral Load column was retired along with that file "
+        "(the handful of staff who relied on it were given an explicit row here "
+        "instead, so no numbers moved).",
         ["Columns: Supervisor, UG & PGT Supervisees."],
     )
 
     _source_file(
-        doc, "Project and Pastoral Group Loads - Loadings.csv",
-        "Project supervision load (sole source) plus a pastoral-load fallback for "
-        "anyone missing from pastoral_load.csv. Also the only place a below-1.0 "
-        "FTE note currently gets recorded for some staff (e.g. Claudio Guarnera, "
-        "Mark Nicholson), even though the model reads actual FTE from Part time.csv.",
-        ["~44 columns; only Person, Active, Base project load, Base pastoral load, "
-         "Project Load, Pastoral Load and Notes are read.",
-         "Comments in the code note this file superseded an older project_load.csv "
-         "with the same columns but stale computed values - if that file still "
-         "exists anywhere, it's dead and potentially misleading."],
+        doc, "ProjectLoads 2025-26.xlsx",
+        "Project supervision load, sole source, replacing \"Project and Pastoral "
+        "Group Loads - Loadings.csv\" (removed 2026-09-04). Read from its "
+        "\"Advisor Loads\" sheet.",
+        ["Columns used: First Name, Surname, UG Slots, UG Extras, UG Undershoot, "
+         "PG Slots, PG Extras, Notes.",
+         "\"Total Projects (UG + PG)\" is a formula over those five slot/extra/"
+         "undershoot columns; the loader recomputes it from them directly rather "
+         "than trust the cached value, which can be stale or blank in a workbook "
+         "saved by a tool that doesn't recalculate (seen for one row in this "
+         "file on 2026-09-04).",
+         "The superseded CSV's Active-status and pastoral-load-fallback roles did "
+         "not carry over - see pastoral_load.csv's entry above and "
+         "_load_project_load()'s docstring in data_loader.py."],
     )
 
     _source_file(
