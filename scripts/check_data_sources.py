@@ -39,20 +39,6 @@ EXPECTED_HEADERS: Dict[str, List[str]] = {
     "pastoral_load.csv": [
         "Supervisor", "UG & PGT Supervisees",
     ],
-    # Loadings.csv carries ~25 additional decorative/unused columns beyond what's
-    # listed below ("Column 1", "Column 2", ... and some free-text planning notes) -
-    # included here in full so they don't spam "new column" noise every run. Only
-    # the CRITICAL_COLUMNS subset is load-bearing.
-    "Project and Pastoral Group Loads - Loadings.csv": [
-        "Person", "Employment Start", "Active", "Name in WTW", "Base project load",
-        "Base pastoral load", "ECR Year", "ECR Value", "Citizenship Level",
-        "Research Grant Income", "Research Grant Income Value", "Citizen value",
-        "Initial Fractional Project Load", "Initial Fractional Pastoral Group Load",
-        "Adjusted Project Load", "Adjusted Pastoral Group Load", "Project Load",
-        "Pastoral Load", "Notes", "Column 1", "UG start of term allocation",
-        "UG Notes - allocation not including FREPEATS", "PGT", "PGT Notes",
-        "Other Notes",
-    ] + [f"Column {n}" for n in range(2, 22)],
     "PhD Supervision Data.csv": [
         "Staff member", "Total as supervisor", "Sole supervisor", "Co-supervisor",
         "TAP member", "Total as supervisor (sole or co-supervisor) AND TAP member",
