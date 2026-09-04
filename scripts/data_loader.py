@@ -2110,7 +2110,6 @@ def _deduplicate_staff(staff: Dict[str, StaffData], mappings: Dict[str, List[str
             merged_category = next((e[1].category for e in entries if e[1].category), "")
             # Sort notes to ensure deterministic output
             merged_notes = "; ".join(sorted(set(e[1].notes for e in entries if e[1].notes)))
-            merged_employment_start = max((e[1].employment_start for e in entries), default=0)
             merged_active = any(e[1].active for e in entries)
 
             # Merge PhD supervision counts (take max for each type)
