@@ -88,6 +88,20 @@ WTW_XLSX_FILENAME = "CS WTW Who Teaches What.xlsx"
 WTW_COMMON_COLUMNS = ["Who Teaches What (WTW) Lead", "Teaching"]
 WTW_CURRENT_YEAR_ONLY_COLUMNS = ["Code(s)", "Stage"]
 
+# Project supervision loads: an "Advisor Loads" sheet whose "Total Projects
+# (UG + PG)" column _load_project_load() (data_loader.py) recomputes itself
+# from the four component columns rather than trust the cached formula value
+# (which can be stale/blank - seen for one row in this file on 2026-09-04).
+# Replaced "Project and Pastoral Group Loads - Loadings.csv" (removed
+# 2026-09-04); that file's Active-status and pastoral-load-fallback roles did
+# not move here - see _load_project_load()'s docstring in data_loader.py.
+PROJECT_LOADS_XLSX_FILENAME = "ProjectLoads 2025-26.xlsx"
+PROJECT_LOADS_SHEET = "Advisor Loads"
+PROJECT_LOADS_REQUIRED_COLUMNS = [
+    "First Name", "Surname", "UG Slots", "UG Extras", "UG Undershoot",
+    "PG Slots", "PG Extras",
+]
+
 # WAW.csv has no header row at all - role/holder pairs start from line 1. The best
 # available guard is confirming the section markers the file is organised around
 # are still present, so a restructure (like the 2026-08-18 Group Leads rework) gets
