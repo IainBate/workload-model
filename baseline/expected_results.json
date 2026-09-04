@@ -23,9 +23,9 @@
       },
       "project_breakdown": {
         "level": "UG",
-        "project_count": 10,
+        "project_count": 11,
         "rate": 16,
-        "total": 160
+        "total": 176
       },
       "research_breakdown": {
         "grants": {},
@@ -52,11 +52,11 @@
         "module_leadership": 0.0,
         "pastoral_supervision": 75,
         "practicals": 110.0,
-        "project_supervision": 160,
+        "project_supervision": 176,
         "supervision": 0.0,
         "teaching": 55.0
       },
-      "teaching_hours": 427.5,
+      "teaching_hours": 443.5,
       "teaching_module_breakdowns": {
         "NLPG": {
           "assessment_setting": 7.5,
@@ -120,7 +120,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1096.8
+      "total_hours": 1112.8
     },
     "Alena Denisova": {
       "adjustments_breakdown": {},
@@ -143,9 +143,9 @@
       },
       "project_breakdown": {
         "level": "UG",
-        "project_count": 7,
+        "project_count": 5,
         "rate": 16,
-        "total": 112
+        "total": 80
       },
       "research_breakdown": {
         "grants": {},
@@ -177,11 +177,11 @@
         "module_leadership": 7.3,
         "pastoral_supervision": 81,
         "practicals": 55.0,
-        "project_supervision": 112,
+        "project_supervision": 80,
         "supervision": 0.0,
         "teaching": 55.0
       },
-      "teaching_hours": 351.0,
+      "teaching_hours": 319.0,
       "teaching_module_breakdowns": {
         "IDEV": {
           "assessment_setting": 15.0,
@@ -309,7 +309,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1298.6
+      "total_hours": 1266.6
     },
     "Alvaro Miyazawa": {
       "adjustments_breakdown": {},
@@ -334,9 +334,9 @@
       },
       "project_breakdown": {
         "level": "UG",
-        "project_count": 3,
+        "project_count": 4,
         "rate": 16,
-        "total": 48
+        "total": 64
       },
       "research_breakdown": {
         "grants": {},
@@ -363,11 +363,11 @@
         "module_leadership": 7.3,
         "pastoral_supervision": 39,
         "practicals": 55.0,
-        "project_supervision": 48,
+        "project_supervision": 64,
         "supervision": 0.0,
         "teaching": 73.3333
       },
-      "teaching_hours": 303.8333,
+      "teaching_hours": 319.8333,
       "teaching_module_breakdowns": {
         "ARIA": {
           "assessment_setting": 5.0,
@@ -538,7 +538,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 911.2333
+      "total_hours": 927.2333
     },
     "Ana Cavalcanti": {
       "adjustments_breakdown": {},
@@ -608,9 +608,9 @@
       },
       "project_breakdown": {
         "level": "UG",
-        "project_count": 9,
+        "project_count": 5,
         "rate": 16,
-        "total": 144
+        "total": 80
       },
       "research_breakdown": {
         "grants": {},
@@ -626,11 +626,11 @@
         "module_leadership": 7.3,
         "pastoral_supervision": 33,
         "practicals": 154.0,
-        "project_supervision": 144,
+        "project_supervision": 80,
         "supervision": 0.0,
         "teaching": 36.6667
       },
-      "teaching_hours": 459.6333,
+      "teaching_hours": 395.6333,
       "teaching_module_breakdowns": {
         "SYS1": {
           "assessment_setting": 5.0,
@@ -753,7 +753,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 880.9333
+      "total_hours": 816.9333
     },
     "Antonio Garcia-Dominguez": {
       "adjustments_breakdown": {},
@@ -968,9 +968,9 @@
       },
       "project_breakdown": {
         "level": "UG",
-        "project_count": 7,
+        "project_count": 6,
         "rate": 16,
-        "total": 112
+        "total": 96
       },
       "research_breakdown": {
         "grants": {},
@@ -997,11 +997,11 @@
         "module_leadership": 7.3,
         "pastoral_supervision": 78,
         "practicals": 137.5,
-        "project_supervision": 112,
+        "project_supervision": 96,
         "supervision": 0.0,
         "teaching": 45.8333
       },
-      "teaching_hours": 423.5333,
+      "teaching_hours": 407.5333,
       "teaching_module_breakdowns": {
         "CTAP": {
           "assessment_setting": 5.0,
@@ -1134,7 +1134,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1030.9333
+      "total_hours": 1014.9333
     },
     "Christopher Crispin-Bailey": {
       "adjustments_breakdown": {},
@@ -1485,9 +1485,9 @@
       },
       "project_breakdown": {
         "level": "UG",
-        "project_count": 3,
+        "project_count": 2,
         "rate": 16,
-        "total": 48
+        "total": 32
       },
       "research_breakdown": {
         "grants": {},
@@ -1514,11 +1514,11 @@
         "module_leadership": 0.0,
         "pastoral_supervision": 30,
         "practicals": 66.0,
-        "project_supervision": 48,
+        "project_supervision": 32,
         "supervision": 0.0,
         "teaching": 18.3333
       },
-      "teaching_hours": 212.8667,
+      "teaching_hours": 196.8667,
       "teaching_module_breakdowns": {
         "IMLO": {
           "assessment_setting": 10.0,
@@ -1581,7 +1581,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 460.5467
+      "total_hours": 444.5467
     },
     "Colin Paterson": {
       "adjustments_breakdown": {},
@@ -1606,9 +1606,9 @@
       },
       "project_breakdown": {
         "level": "UG",
-        "project_count": 7,
+        "project_count": 6,
         "rate": 16,
-        "total": 112
+        "total": 96
       },
       "research_breakdown": {
         "grants": {
@@ -1640,11 +1640,11 @@
         "module_leadership": 0.0,
         "pastoral_supervision": 57,
         "practicals": 110.0,
-        "project_supervision": 112,
+        "project_supervision": 96,
         "supervision": 0.0,
         "teaching": 64.1667
       },
-      "teaching_hours": 401.4,
+      "teaching_hours": 385.4,
       "teaching_module_breakdowns": {
         "LPTC": {
           "assessment_setting": 7.5,
@@ -1760,7 +1760,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1156.16
+      "total_hours": 1140.16
     },
     "Da Li": {
       "adjustments_breakdown": {},
@@ -1783,12 +1783,7 @@
         "student_count": 25,
         "total": 75
       },
-      "project_breakdown": {
-        "level": "UG",
-        "project_count": 7,
-        "rate": 16,
-        "total": 112
-      },
+      "project_breakdown": {},
       "research_breakdown": {
         "grants": {},
         "phd_students": {},
@@ -1803,11 +1798,10 @@
         "module_leadership": 0.0,
         "pastoral_supervision": 75,
         "practicals": 55.0,
-        "project_supervision": 112,
         "supervision": 0.0,
         "teaching": 55.0
       },
-      "teaching_hours": 317.8333,
+      "teaching_hours": 205.8333,
       "teaching_module_breakdowns": {
         "LLMA": {
           "assessment_setting": 7.5,
@@ -1868,7 +1862,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 657.0333
+      "total_hours": 545.0333
     },
     "David Pumfrey": {
       "adjustments_breakdown": {},
@@ -2021,9 +2015,9 @@
       },
       "project_breakdown": {
         "level": "UG",
-        "project_count": 9,
+        "project_count": 11,
         "rate": 16,
-        "total": 144
+        "total": 176
       },
       "research_breakdown": {
         "grants": {},
@@ -2039,11 +2033,11 @@
         "module_leadership": 7.3,
         "pastoral_supervision": 39,
         "practicals": 115.5,
-        "project_supervision": 144,
+        "project_supervision": 176,
         "supervision": 0.0,
         "teaching": 36.6667
       },
-      "teaching_hours": 444.8,
+      "teaching_hours": 476.8,
       "teaching_module_breakdowns": {
         "SOF1": {
           "assessment_setting": 5.0,
@@ -2166,7 +2160,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 784.0
+      "total_hours": 816.0
     },
     "Detlef Plump": {
       "adjustments_breakdown": {},
@@ -2190,9 +2184,9 @@
       },
       "project_breakdown": {
         "level": "UG",
-        "project_count": 7,
+        "project_count": 6,
         "rate": 16,
-        "total": 112
+        "total": 96
       },
       "research_breakdown": {
         "grants": {},
@@ -2219,11 +2213,11 @@
         "module_leadership": 7.3,
         "pastoral_supervision": 63,
         "practicals": 52.25,
-        "project_supervision": 112,
+        "project_supervision": 96,
         "supervision": 0.0,
         "teaching": 45.8333
       },
-      "teaching_hours": 405.3833,
+      "teaching_hours": 389.3833,
       "teaching_module_breakdowns": {
         "THE2": {
           "assessment_setting": 5.0,
@@ -2329,7 +2323,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1168.9833
+      "total_hours": 1152.9833
     },
     "Dimitar Kazakov": {
       "adjustments_breakdown": {},
@@ -2609,12 +2603,7 @@
         "student_count": 7,
         "total": 21
       },
-      "project_breakdown": {
-        "level": "UG",
-        "project_count": 2,
-        "rate": 16,
-        "total": 32
-      },
+      "project_breakdown": {},
       "research_breakdown": {
         "grants": {},
         "phd_students": {},
@@ -2629,11 +2618,10 @@
         "module_leadership": 0.0,
         "pastoral_supervision": 21,
         "practicals": 66.0,
-        "project_supervision": 32,
         "supervision": 0.0,
         "teaching": 36.6667
       },
-      "teaching_hours": 214.4,
+      "teaching_hours": 182.4,
       "teaching_module_breakdowns": {
         "SOF2": {
           "assessment_setting": 15.0,
@@ -2696,7 +2684,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 553.6
+      "total_hours": 521.6
     },
     "Felix Ulrich-Oltean": {
       "adjustments_breakdown": {},
@@ -3298,12 +3286,7 @@
         "student_count": 25,
         "total": 75
       },
-      "project_breakdown": {
-        "level": "UG",
-        "project_count": 7,
-        "rate": 16,
-        "total": 112
-      },
+      "project_breakdown": {},
       "research_breakdown": {
         "grants": {},
         "phd_students": {},
@@ -3318,11 +3301,10 @@
         "module_leadership": 7.3,
         "pastoral_supervision": 75,
         "practicals": 121.0,
-        "project_supervision": 112,
         "supervision": 0.0,
         "teaching": 36.6667
       },
-      "teaching_hours": 407.5,
+      "teaching_hours": 295.5,
       "teaching_module_breakdowns": {
         "IMLO": {
           "assessment_setting": 15.0,
@@ -3385,7 +3367,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 828.8
+      "total_hours": 716.8
     },
     "James Walker": {
       "adjustments_breakdown": {},
@@ -3409,9 +3391,9 @@
       },
       "project_breakdown": {
         "level": "UG",
-        "project_count": 7,
+        "project_count": 6,
         "rate": 16,
-        "total": 112
+        "total": 96
       },
       "research_breakdown": {
         "grants": {
@@ -3446,11 +3428,11 @@
         "module_leadership": 0.0,
         "pastoral_supervision": 63,
         "practicals": 66.0,
-        "project_supervision": 112,
+        "project_supervision": 96,
         "supervision": 0.0,
         "teaching": 18.3333
       },
-      "teaching_hours": 309.8667,
+      "teaching_hours": 293.8667,
       "teaching_module_breakdowns": {
         "IMLO": {
           "assessment_setting": 10.0,
@@ -3513,7 +3495,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1485.6667
+      "total_hours": 1469.6667
     },
     "Jen Beeston": {
       "adjustments_breakdown": {},
@@ -3536,9 +3518,9 @@
       },
       "project_breakdown": {
         "level": "UG",
-        "project_count": 9,
+        "project_count": 4,
         "rate": 16,
-        "total": 144
+        "total": 64
       },
       "research_breakdown": {
         "grants": {},
@@ -3565,11 +3547,11 @@
         "module_leadership": 7.3,
         "pastoral_supervision": 27,
         "practicals": 82.5,
-        "project_supervision": 144,
+        "project_supervision": 64,
         "supervision": 0.0,
         "teaching": 55.0
       },
-      "teaching_hours": 355.7,
+      "teaching_hours": 275.7,
       "teaching_module_breakdowns": {
         "QUAL": {
           "assessment_setting": 7.5,
@@ -3709,7 +3691,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1355.5
+      "total_hours": 1275.5
     },
     "Jo Iacovides": {
       "adjustments_breakdown": {},
@@ -3732,9 +3714,9 @@
       },
       "project_breakdown": {
         "level": "UG",
-        "project_count": 7,
+        "project_count": 6,
         "rate": 16,
-        "total": 112
+        "total": 96
       },
       "research_breakdown": {
         "grants": {},
@@ -3761,11 +3743,11 @@
         "module_leadership": 0.0,
         "pastoral_supervision": 36,
         "practicals": 55.0,
-        "project_supervision": 112,
+        "project_supervision": 96,
         "supervision": 0.0,
         "teaching": 55.0
       },
-      "teaching_hours": 297.7,
+      "teaching_hours": 281.7,
       "teaching_module_breakdowns": {
         "PLEI": {
           "assessment_setting": 15.0,
@@ -3902,7 +3884,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 985.1
+      "total_hours": 969.1
     },
     "Joe Cutting": {
       "adjustments_breakdown": {},
@@ -4150,9 +4132,9 @@
       },
       "project_breakdown": {
         "level": "UG",
-        "project_count": 9,
+        "project_count": 6,
         "rate": 16,
-        "total": 144
+        "total": 96
       },
       "research_breakdown": {
         "grants": {},
@@ -4174,11 +4156,11 @@
         "module_leadership": 7.3,
         "pastoral_supervision": 66,
         "practicals": 121.0,
-        "project_supervision": 144,
+        "project_supervision": 96,
         "supervision": 0.0,
         "teaching": 45.8333
       },
-      "teaching_hours": 454.6333,
+      "teaching_hours": 406.6333,
       "teaching_module_breakdowns": {
         "HCIN": {
           "assessment_setting": 10.0,
@@ -4311,7 +4293,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1170.2333
+      "total_hours": 1122.2333
     },
     "Kofi Appiah": {
       "adjustments_breakdown": {},
@@ -4334,9 +4316,9 @@
       },
       "project_breakdown": {
         "level": "UG",
-        "project_count": 5,
+        "project_count": 7,
         "rate": 16,
-        "total": 80
+        "total": 112
       },
       "research_breakdown": {
         "grants": {},
@@ -4368,11 +4350,11 @@
         "module_leadership": 7.3,
         "pastoral_supervision": 54,
         "practicals": 115.5,
-        "project_supervision": 80,
+        "project_supervision": 112,
         "supervision": 0.0,
         "teaching": 36.6667
       },
-      "teaching_hours": 395.8,
+      "teaching_hours": 427.8,
       "teaching_module_breakdowns": {
         "SOF1": {
           "assessment_setting": 5.0,
@@ -4495,7 +4477,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1173.3
+      "total_hours": 1205.3
     },
     "Kostas Barmpis": {
       "adjustments_breakdown": {},
@@ -4518,9 +4500,9 @@
       },
       "project_breakdown": {
         "level": "UG",
-        "project_count": 7,
+        "project_count": 2,
         "rate": 16,
-        "total": 112
+        "total": 32
       },
       "research_breakdown": {
         "grants": {
@@ -4550,11 +4532,11 @@
         "module_leadership": 7.3,
         "pastoral_supervision": 66,
         "practicals": 106.3333,
-        "project_supervision": 112,
+        "project_supervision": 32,
         "supervision": 0.0,
         "teaching": 45.8333
       },
-      "teaching_hours": 429.0,
+      "teaching_hours": 349.0,
       "teaching_module_breakdowns": {
         "ENG1": {
           "assessment_setting": 15.0,
@@ -4684,7 +4666,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1234.7
+      "total_hours": 1154.7
     },
     "Mark Nicholson": {
       "adjustments_breakdown": {},
@@ -4707,9 +4689,9 @@
       },
       "project_breakdown": {
         "level": "MSc",
-        "project_count": 8,
+        "project_count": 5,
         "rate": 24,
-        "total": 192
+        "total": 120
       },
       "research_breakdown": {
         "grants": {},
@@ -4731,11 +4713,11 @@
         "module_leadership": 14.6,
         "pastoral_supervision": 15,
         "practicals": 0.0,
-        "project_supervision": 192,
+        "project_supervision": 120,
         "supervision": 0.0,
         "teaching": 55.0
       },
-      "teaching_hours": 314.7,
+      "teaching_hours": 242.7,
       "teaching_module_breakdowns": {
         "RASS": {
           "assessment_setting": 7.5,
@@ -4824,7 +4806,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 734.604
+      "total_hours": 662.604
     },
     "Mark Sujan": {
       "adjustments_breakdown": {},
@@ -4931,12 +4913,7 @@
         "student_count": 18,
         "total": 54
       },
-      "project_breakdown": {
-        "level": "UG",
-        "project_count": 9,
-        "rate": 16,
-        "total": 144
-      },
+      "project_breakdown": {},
       "research_breakdown": {
         "grants": {},
         "phd_students": {},
@@ -4951,11 +4928,10 @@
         "module_leadership": 7.3,
         "pastoral_supervision": 54,
         "practicals": 154.0,
-        "project_supervision": 144,
         "supervision": 0.0,
         "teaching": 36.6667
       },
-      "teaching_hours": 480.6333,
+      "teaching_hours": 336.6333,
       "teaching_module_breakdowns": {
         "SYS1": {
           "assessment_setting": 5.0,
@@ -5078,7 +5054,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 901.9333
+      "total_hours": 757.9333
     },
     "Mike O'Dea": {
       "adjustments_breakdown": {},
@@ -5099,7 +5075,12 @@
         "student_count": 0,
         "total": 0
       },
-      "project_breakdown": {},
+      "project_breakdown": {
+        "level": "UG",
+        "project_count": 7,
+        "rate": 16,
+        "total": 112
+      },
       "research_breakdown": {
         "grants": {},
         "phd_students": {},
@@ -5114,10 +5095,11 @@
         "module_leadership": 7.3,
         "pastoral_supervision": 0,
         "practicals": 236.5,
+        "project_supervision": 112,
         "supervision": 0.0,
         "teaching": 91.6667
       },
-      "teaching_hours": 395.3,
+      "teaching_hours": 507.3,
       "teaching_module_breakdowns": {
         "CBDA": {
           "assessment_setting": 7.5,
@@ -5312,7 +5294,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 816.6
+      "total_hours": 928.6
     },
     "Nick Pears": {
       "adjustments_breakdown": {},
@@ -5459,9 +5441,9 @@
       },
       "project_breakdown": {
         "level": "MSc",
-        "project_count": 8,
+        "project_count": 5,
         "rate": 24,
-        "total": 192
+        "total": 120
       },
       "research_breakdown": {
         "grants": {},
@@ -5477,11 +5459,11 @@
         "module_leadership": 7.3,
         "pastoral_supervision": 12,
         "practicals": 0.0,
-        "project_supervision": 192,
+        "project_supervision": 120,
         "supervision": 0.0,
         "teaching": 82.5
       },
-      "teaching_hours": 376.0,
+      "teaching_hours": 304.0,
       "teaching_module_breakdowns": {
         "FSSE": {
           "assessment_setting": 15.0,
@@ -5614,7 +5596,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 797.3
+      "total_hours": 725.3
     },
     "Paul Cairns": {
       "adjustments_breakdown": {},
@@ -5639,9 +5621,9 @@
       },
       "project_breakdown": {
         "level": "UG",
-        "project_count": 2,
+        "project_count": 6,
         "rate": 16,
-        "total": 32
+        "total": 96
       },
       "research_breakdown": {
         "grants": {
@@ -5676,11 +5658,11 @@
         "module_leadership": 7.3,
         "pastoral_supervision": 15,
         "practicals": 121.0,
-        "project_supervision": 32,
+        "project_supervision": 96,
         "supervision": 0.0,
         "teaching": 45.8333
       },
-      "teaching_hours": 281.6333,
+      "teaching_hours": 345.6333,
       "teaching_module_breakdowns": {
         "GODS": {
           "assessment_setting": 7.5,
@@ -5804,7 +5786,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1797.6333
+      "total_hours": 1861.6333
     },
     "Pedro Ribeiro": {
       "adjustments_breakdown": {},
@@ -6017,9 +5999,9 @@
       },
       "project_breakdown": {
         "level": "UG",
-        "project_count": 3,
+        "project_count": 4,
         "rate": 16,
-        "total": 48
+        "total": 64
       },
       "research_breakdown": {
         "grants": {
@@ -6056,11 +6038,11 @@
         "module_leadership": 7.3,
         "pastoral_supervision": 30,
         "practicals": 121.0,
-        "project_supervision": 48,
+        "project_supervision": 64,
         "supervision": 0.0,
         "teaching": 27.5
       },
-      "teaching_hours": 296.3,
+      "teaching_hours": 312.3,
       "teaching_module_breakdowns": {
         "SYS3": {
           "assessment_setting": 7.5,
@@ -6123,7 +6105,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1993.32
+      "total_hours": 2009.32
     },
     "Peter Nightingale": {
       "adjustments_breakdown": {},
@@ -6389,9 +6371,9 @@
       },
       "project_breakdown": {
         "level": "UG",
-        "project_count": 2,
+        "project_count": 13,
         "rate": 16,
-        "total": 32
+        "total": 208
       },
       "research_breakdown": {
         "grants": {
@@ -6427,11 +6409,11 @@
         "module_leadership": 0.0,
         "pastoral_supervision": 75,
         "practicals": 77.0,
-        "project_supervision": 32,
+        "project_supervision": 208,
         "supervision": 0.0,
         "teaching": 18.3333
       },
-      "teaching_hours": 250.9333,
+      "teaching_hours": 426.9333,
       "teaching_module_breakdowns": {
         "SOF1": {
           "assessment_setting": 5.0,
@@ -6494,7 +6476,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1702.9333
+      "total_hours": 1878.9333
     },
     "Pourya Shamsolmoali": {
       "adjustments_breakdown": {},
@@ -6518,9 +6500,9 @@
       },
       "project_breakdown": {
         "level": "UG",
-        "project_count": 4,
+        "project_count": 2,
         "rate": 16,
-        "total": 64
+        "total": 32
       },
       "research_breakdown": {
         "grants": {},
@@ -6547,11 +6529,11 @@
         "module_leadership": 0.0,
         "pastoral_supervision": 15,
         "practicals": 214.5,
-        "project_supervision": 64,
+        "project_supervision": 32,
         "supervision": 0.0,
         "teaching": 82.5
       },
-      "teaching_hours": 484.55,
+      "teaching_hours": 452.55,
       "teaching_module_breakdowns": {
         "DATA": {
           "assessment_setting": 7.5,
@@ -6684,7 +6666,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1010.9
+      "total_hours": 978.9
     },
     "Radu Calinescu": {
       "adjustments_breakdown": {},
@@ -6833,9 +6815,9 @@
       },
       "project_breakdown": {
         "level": "MSc",
-        "project_count": 7,
+        "project_count": 6,
         "rate": 24,
-        "total": 168
+        "total": 144
       },
       "research_breakdown": {
         "grants": {
@@ -6864,11 +6846,11 @@
         "module_leadership": 7.3,
         "pastoral_supervision": 69,
         "practicals": 0.0,
-        "project_supervision": 168,
+        "project_supervision": 144,
         "supervision": 0.0,
         "teaching": 82.5
       },
-      "teaching_hours": 378.4,
+      "teaching_hours": 354.4,
       "teaching_module_breakdowns": {
         "CASA": {
           "assessment_setting": 7.5,
@@ -7000,7 +6982,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1158.0
+      "total_hours": 1134.0
     },
     "Richard Wilson": {
       "adjustments_breakdown": {},
@@ -7078,9 +7060,9 @@
       },
       "project_breakdown": {
         "level": "MSc",
-        "project_count": 7,
+        "project_count": 6,
         "rate": 24,
-        "total": 168
+        "total": 144
       },
       "research_breakdown": {
         "grants": {
@@ -7109,11 +7091,11 @@
         "module_leadership": 7.3,
         "pastoral_supervision": 39,
         "practicals": 27.5,
-        "project_supervision": 168,
+        "project_supervision": 144,
         "supervision": 0.0,
         "teaching": 110.0
       },
-      "teaching_hours": 404.9,
+      "teaching_hours": 380.9,
       "teaching_module_breakdowns": {
         "HINT": {
           "assessment_setting": 7.5,
@@ -7269,7 +7251,7 @@
           "total_lecture_hours": 44.0
         }
       },
-      "total_hours": 1043.88
+      "total_hours": 1019.88
     },
     "Roberto Metere": {
       "adjustments_breakdown": {},
@@ -7292,9 +7274,9 @@
       },
       "project_breakdown": {
         "level": "UG",
-        "project_count": 7,
+        "project_count": 6,
         "rate": 16,
-        "total": 112
+        "total": 96
       },
       "research_breakdown": {
         "grants": {},
@@ -7321,11 +7303,11 @@
         "module_leadership": 7.3,
         "pastoral_supervision": 60,
         "practicals": 264.0,
-        "project_supervision": 112,
+        "project_supervision": 96,
         "supervision": 0.0,
         "teaching": 100.8333
       },
-      "teaching_hours": 611.4833,
+      "teaching_hours": 595.4833,
       "teaching_module_breakdowns": {
         "CBDA": {
           "assessment_setting": 11.25,
@@ -7529,7 +7511,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1120.3633
+      "total_hours": 1104.3633
     },
     "Sam Braunstein": {
       "adjustments_breakdown": {},
@@ -7712,9 +7694,9 @@
       },
       "project_breakdown": {
         "level": "MSc",
-        "project_count": 10,
+        "project_count": 8,
         "rate": 24,
-        "total": 240
+        "total": 192
       },
       "research_breakdown": {
         "grants": {},
@@ -7730,11 +7712,11 @@
         "module_leadership": 7.3,
         "pastoral_supervision": 27,
         "practicals": 0.0,
-        "project_supervision": 240,
+        "project_supervision": 192,
         "supervision": 0.0,
         "teaching": 55.0
       },
-      "teaching_hours": 377.3,
+      "teaching_hours": 329.3,
       "teaching_module_breakdowns": {
         "FSSE": {
           "assessment_setting": 15.0,
@@ -7824,7 +7806,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 648.66
+      "total_hours": 600.66
     },
     "Siamak Shahandashti": {
       "adjustments_breakdown": {},
@@ -7848,9 +7830,9 @@
       },
       "project_breakdown": {
         "level": "UG",
-        "project_count": 7,
+        "project_count": 6,
         "rate": 16,
-        "total": 112
+        "total": 96
       },
       "research_breakdown": {
         "grants": {
@@ -7884,11 +7866,11 @@
         "module_leadership": 7.3,
         "pastoral_supervision": 51,
         "practicals": 115.5,
-        "project_supervision": 112,
+        "project_supervision": 96,
         "supervision": 0.0,
         "teaching": 36.6667
       },
-      "teaching_hours": 383.6667,
+      "teaching_hours": 367.6667,
       "teaching_module_breakdowns": {
         "CTAP": {
           "assessment_setting": 5.0,
@@ -8021,7 +8003,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1365.3667
+      "total_hours": 1349.3667
     },
     "Simon Burton": {
       "adjustments_breakdown": {},
@@ -8153,9 +8135,9 @@
       },
       "project_breakdown": {
         "level": "UG",
-        "project_count": 4,
+        "project_count": 2,
         "rate": 16,
-        "total": 64
+        "total": 32
       },
       "research_breakdown": {
         "grants": {},
@@ -8182,11 +8164,11 @@
         "module_leadership": 7.3,
         "pastoral_supervision": 33,
         "practicals": 112.75,
-        "project_supervision": 64,
+        "project_supervision": 32,
         "supervision": 0.0,
         "teaching": 64.1667
       },
-      "teaching_hours": 403.9167,
+      "teaching_hours": 371.9167,
       "teaching_module_breakdowns": {
         "THE1": {
           "assessment_setting": 7.5,
@@ -8309,7 +8291,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 855.1167
+      "total_hours": 823.1167
     },
     "Simos Gerasimou": {
       "adjustments_breakdown": {},
@@ -8391,12 +8373,7 @@
         "student_count": 25,
         "total": 75
       },
-      "project_breakdown": {
-        "level": "UG",
-        "project_count": 7,
-        "rate": 16,
-        "total": 112
-      },
+      "project_breakdown": {},
       "research_breakdown": {
         "grants": {},
         "phd_students": {},
@@ -8411,11 +8388,10 @@
         "module_leadership": 7.3,
         "pastoral_supervision": 75,
         "practicals": 91.6667,
-        "project_supervision": 112,
         "supervision": 0.0,
         "teaching": 91.6667
       },
-      "teaching_hours": 416.4333,
+      "teaching_hours": 304.4333,
       "teaching_module_breakdowns": {
         "AURO": {
           "assessment_setting": 7.5,
@@ -8543,7 +8519,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 919.8333
+      "total_hours": 807.8333
     },
     "Stefano Pirandola": {
       "adjustments_breakdown": {},
@@ -8567,9 +8543,9 @@
       },
       "project_breakdown": {
         "level": "UG",
-        "project_count": 7,
+        "project_count": 6,
         "rate": 16,
-        "total": 112
+        "total": 96
       },
       "research_breakdown": {
         "grants": {
@@ -8603,11 +8579,11 @@
         "module_leadership": 0.0,
         "pastoral_supervision": 75,
         "practicals": 41.25,
-        "project_supervision": 112,
+        "project_supervision": 96,
         "supervision": 0.0,
         "teaching": 27.5
       },
-      "teaching_hours": 274.55,
+      "teaching_hours": 258.55,
       "teaching_module_breakdowns": {
         "QUCO": {
           "assessment_setting": 7.5,
@@ -8677,7 +8653,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1380.45
+      "total_hours": 1364.45
     },
     "Steven Wright": {
       "adjustments_breakdown": {},
@@ -8829,9 +8805,9 @@
       },
       "project_breakdown": {
         "level": "UG",
-        "project_count": 4,
+        "project_count": 6,
         "rate": 16,
-        "total": 64
+        "total": 96
       },
       "research_breakdown": {
         "grants": {
@@ -8860,11 +8836,11 @@
         "module_leadership": 7.3,
         "pastoral_supervision": 45,
         "practicals": 126.5,
-        "project_supervision": 64,
+        "project_supervision": 96,
         "supervision": 0.0,
         "teaching": 55.0
       },
-      "teaching_hours": 336.8,
+      "teaching_hours": 368.8,
       "teaching_module_breakdowns": {
         "EMBS": {
           "assessment_setting": 7.5,
@@ -9007,7 +8983,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1190.5
+      "total_hours": 1222.5
     },
     "Tommy Yuan": {
       "adjustments_breakdown": {},
@@ -9034,9 +9010,9 @@
       },
       "project_breakdown": {
         "level": "UG",
-        "project_count": 9,
+        "project_count": 4,
         "rate": 16,
-        "total": 144
+        "total": 64
       },
       "research_breakdown": {
         "grants": {},
@@ -9068,11 +9044,11 @@
         "module_leadership": 14.6,
         "pastoral_supervision": 54,
         "practicals": 179.6667,
-        "project_supervision": 144,
+        "project_supervision": 64,
         "supervision": 0.0,
         "teaching": 119.1667
       },
-      "teaching_hours": 624.2667,
+      "teaching_hours": 544.2667,
       "teaching_module_breakdowns": {
         "ARIA": {
           "assessment_setting": 5.0,
@@ -9250,7 +9226,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1557.5467
+      "total_hours": 1477.5467
     },
     "Vasileios Vasilakis": {
       "adjustments_breakdown": {},
@@ -9273,9 +9249,9 @@
       },
       "project_breakdown": {
         "level": "MSc",
-        "project_count": 7,
+        "project_count": 6,
         "rate": 24,
-        "total": 168
+        "total": 144
       },
       "research_breakdown": {
         "grants": {},
@@ -9307,11 +9283,11 @@
         "module_leadership": 7.3,
         "pastoral_supervision": 78,
         "practicals": 55.0,
-        "project_supervision": 168,
+        "project_supervision": 144,
         "supervision": 0.0,
         "teaching": 55.0
       },
-      "teaching_hours": 408.5,
+      "teaching_hours": 384.5,
       "teaching_module_breakdowns": {
         "NETS": {
           "assessment_setting": 7.5,
@@ -9427,7 +9403,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1103.9
+      "total_hours": 1079.9
     },
     "William Smith": {
       "adjustments_breakdown": {},
@@ -9452,9 +9428,9 @@
       },
       "project_breakdown": {
         "level": "UG",
-        "project_count": 5,
+        "project_count": 6,
         "rate": 16,
-        "total": 80
+        "total": 96
       },
       "research_breakdown": {
         "grants": {},
@@ -9486,11 +9462,11 @@
         "module_leadership": 14.6,
         "pastoral_supervision": 21,
         "practicals": 126.5,
-        "project_supervision": 80,
+        "project_supervision": 96,
         "supervision": 0.0,
         "teaching": 45.8333
       },
-      "teaching_hours": 351.7667,
+      "teaching_hours": 367.7667,
       "teaching_module_breakdowns": {
         "DEEP": {
           "assessment_setting": 7.5,
@@ -9633,7 +9609,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1490.3167
+      "total_hours": 1506.3167
     },
     "Xinwei Fang": {
       "adjustments_breakdown": {},
@@ -9656,9 +9632,9 @@
       },
       "project_breakdown": {
         "level": "UG",
-        "project_count": 7,
+        "project_count": 5,
         "rate": 16,
-        "total": 112
+        "total": 80
       },
       "research_breakdown": {
         "grants": {},
@@ -9680,11 +9656,11 @@
         "module_leadership": 14.6,
         "pastoral_supervision": 27,
         "practicals": 115.5,
-        "project_supervision": 112,
+        "project_supervision": 80,
         "supervision": 0.0,
         "teaching": 55.0
       },
-      "teaching_hours": 423.8,
+      "teaching_hours": 391.8,
       "teaching_module_breakdowns": {
         "DATA": {
           "assessment_setting": 7.5,
@@ -9804,7 +9780,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 925.1
+      "total_hours": 893.1
     },
     "Yan Jia": {
       "adjustments_breakdown": {},
@@ -9825,7 +9801,12 @@
         "student_count": 9,
         "total": 27
       },
-      "project_breakdown": {},
+      "project_breakdown": {
+        "level": "UG",
+        "project_count": 4,
+        "rate": 16,
+        "total": 64
+      },
       "research_breakdown": {
         "grants": {
           "grant_3874036": 82.1,
@@ -9853,11 +9834,18 @@
           "student_count": 9,
           "total": 27
         },
-        "pastoral_supervision": 27
+        "pastoral_supervision": 27,
+        "project_breakdown": {
+          "level": "UG",
+          "project_count": 4,
+          "rate": 16,
+          "total": 64
+        },
+        "project_supervision": 64
       },
-      "teaching_hours": 27.0,
+      "teaching_hours": 91.0,
       "teaching_module_breakdowns": {},
-      "total_hours": 1169.1
+      "total_hours": 1233.1
     },
     "Yuchen Zhao": {
       "adjustments_breakdown": {},
@@ -9880,9 +9868,9 @@
       },
       "project_breakdown": {
         "level": "UG",
-        "project_count": 7,
+        "project_count": 6,
         "rate": 16,
-        "total": 112
+        "total": 96
       },
       "research_breakdown": {
         "grants": {},
@@ -9904,11 +9892,11 @@
         "module_leadership": 7.3,
         "pastoral_supervision": 75,
         "practicals": 110.0,
-        "project_supervision": 112,
+        "project_supervision": 96,
         "supervision": 0.0,
         "teaching": 55.0
       },
-      "teaching_hours": 419.2,
+      "teaching_hours": 403.2,
       "teaching_module_breakdowns": {
         "EHAC": {
           "assessment_setting": 15.0,
@@ -10051,7 +10039,7 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 856.5
+      "total_hours": 840.5
     }
   },
   "staff_count": 66,
