@@ -218,6 +218,12 @@ pip install -r requirements.txt  # python-docx, matplotlib, pandas, pyyaml
 
 ### Output files
 - `Staff workload model.csv` — Per-staff workload (Name, FTE, Total, Teaching, Research, Admin, detail columns)
+- `Staff workload model.xlsx` — Same data as the CSV, as a flat 3-sheet Excel workbook (`generate_excel_with_formulas()`)
+- `CS Workload Model {year}.xlsx` — Category-structured Excel workbook (one sheet per staff category,
+  sorted by Total; plus Teaching/Research/Admin activity-detail sheets and per-category charts) —
+  `generate_workbook_export()` in `output_generator.py`. Every visible number is read straight off
+  `WorkloadResult`/its breakdown dicts; the only formulas written are plain SUM/division over columns
+  already on the same row, so opening any Total cell shows exactly what it adds up.
 - `workload_summary_boxplot.png` — Stacked bar chart: Teaching / Research / Admin
 - `workload_detailed_boxplot.png` — Detailed component breakdown
 - `workload_report.html` — HTML report with embedded charts and table

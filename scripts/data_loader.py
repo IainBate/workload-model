@@ -910,123 +910,71 @@ def _load_pastoral_load(filepath: str = "pastoral_load.csv") -> Dict[str, int]:
     return data
 
 
-def _load_project_load(filepath: str = "Project and Pastoral Group Loads - Loadings.csv") -> Dict[str, dict]:
-    """Load project/pastoral load data. Returns {canonical_name: data_dict}.
+def _load_project_load(filepath: str = "ProjectLoads 2025-26.xlsx") -> Dict[str, dict]:
+    """Load project supervision load data. Returns {full_name: {"project_load", "notes"}}.
 
-    Source is 'Project and Pastoral Group Loads - Loadings.csv' - the current
-    export. It supersedes the older 'project_load.csv', which had identical
-    columns but slightly stale computed load values.
+    Source is the "Advisor Loads" sheet of the ProjectLoads workbook, which
+    supersedes the older 'Project and Pastoral Group Loads - Loadings.csv'
+    export (removed 2026-09-04). That CSV's Person/Active/pastoral-load-fallback
+    role has *not* moved here - "Active" status now comes solely from whether
+    someone appears in WTW/WAW/Staff Categories and FTE.csv (see the roster
+    filter in load_all_data()), and the handful of active staff who relied on
+    the old file's Pastoral Load column as a fallback (no pastoral_load.csv
+    row) had that value transplanted into pastoral_load.csv directly instead.
+
+    Each row's "Total Projects (UG + PG)" cell is a formula
+    (=UG Slots + UG Extras - UG Undershoot + PG Slots + PG Extras); it is
+    recomputed here from the four component columns rather than trusted from
+    the cached formula value, since a workbook edited by a tool that doesn't
+    recalculate (e.g. a script-driven save) can leave that cache stale or
+    blank - as seen in this file for at least one row.
     """
     path = DATA_DIR / filepath
     if not path.exists():
         return {}
 
+    import openpyxl
+    wb = openpyxl.load_workbook(str(path), data_only=True)
+    sheet_name = "Advisor Loads"
+    if sheet_name not in wb.sheetnames:
+        return {}
+    ws = wb[sheet_name]
+
+    rows = list(ws.iter_rows(values_only=True))
+    if not rows:
+        return {}
+    header = [str(c).strip() if c is not None else "" for c in rows[0]]
+    col = {name: idx for idx, name in enumerate(header)}
+    required = ["First Name", "Surname", "UG Slots", "UG Extras", "UG Undershoot",
+                "PG Slots", "PG Extras"]
+    if any(c not in col for c in required):
+        return {}
+    notes_idx = col.get("Notes")
+
+    def _num(row, name):
+        val = row[col[name]] if col[name] < len(row) else None
+        return float(val) if val is not None else 0.0
+
     data = {}
-    with open(path, "r", encoding="utf-8-sig") as f:
-        reader = csv.DictReader(f)
-        for row in reader:
-            person = row.get("Person", "").strip()
-            if not person or person == "Total FTE":
-                continue
-            try:
-                # Parse Employment Start - may be N/A, int, or float
-                emp_start_val = row.get("Employment Start", 0) or 0
-                if str(emp_start_val).strip() == "N/A" or not emp_start_val:
-                    emp_start = 0
-                else:
-                    try:
-                        emp_start = int(float(emp_start_val))
-                    except ValueError:
-                        emp_start = 0
+    for row in rows[1:]:
+        first = row[col["First Name"]] if col["First Name"] < len(row) else None
+        surname = row[col["Surname"]] if col["Surname"] < len(row) else None
+        if not first or not surname:
+            continue
+        person = f"{str(first).strip()} {str(surname).strip()}"
 
-                active_val = row.get("Active", "TRUE").strip().upper() == "TRUE"
-                proj_load = float(row.get("Base project load", 0) or 0)
-                pastoral_load = float(row.get("Base pastoral load", 0) or 0)
-                ecr_year = row.get("ECR Year", "N/A").strip()
+        total = (_num(row, "UG Slots") + _num(row, "UG Extras") - _num(row, "UG Undershoot")
+                 + _num(row, "PG Slots") + _num(row, "PG Extras"))
+        project_load = math.ceil(round(total, 6)) if total > 0 else 0
 
-                # Parse ECR Value
-                ecr_value_raw = row.get("ECR Value", 0) or 0
-                if str(ecr_value_raw).strip() == "N/A":
-                    ecr_value = 0.0
-                else:
-                    ecr_value = float(ecr_value_raw)
+        notes = ""
+        if notes_idx is not None and notes_idx < len(row) and row[notes_idx]:
+            notes = str(row[notes_idx]).strip()
 
-                # Parse Citizenship Level - may be N/A, int, or float
-                citizenship_level_raw = row.get("Citizenship Level", 0)
-                if str(citizenship_level_raw).strip() == "N/A" or not citizenship_level_raw:
-                    citizenship_level = 0
-                else:
-                    try:
-                        citizenship_level = int(float(citizenship_level_raw))
-                    except ValueError:
-                        citizenship_level = 0
-
-                research_grant_income = row.get("Research Grant Income", "N/A").strip()
-                research_grant_income_value_raw = row.get("Research Grant Income Value", 0) or 0
-                if str(research_grant_income_value_raw).strip() == "N/A":
-                    research_grant_income_value = 0.0
-                else:
-                    research_grant_income_value = float(research_grant_income_value_raw)
-
-                citizenship_value_raw = row.get("Citizen value", 0) or 0
-                if str(citizenship_value_raw).strip() == "N/A":
-                    citizenship_value = 0.0
-                else:
-                    citizenship_value = float(citizenship_value_raw)
-
-                initial_fractional_project_load_raw = row.get("Initial Fractional Project Load", 0) or 0
-                if str(initial_fractional_project_load_raw).strip() == "N/A":
-                    initial_fractional_project_load = 0.0
-                else:
-                    initial_fractional_project_load = float(initial_fractional_project_load_raw)
-
-                initial_fractional_pastoral_load_raw = row.get("Initial Fractional Pastoral Group Load", 0) or 0
-                if str(initial_fractional_pastoral_load_raw).strip() == "N/A":
-                    initial_fractional_pastoral_load = 0.0
-                else:
-                    initial_fractional_pastoral_load = float(initial_fractional_pastoral_load_raw)
-
-                adjusted_project_load_raw = row.get("Adjusted Project Load", 0) or 0
-                if str(adjusted_project_load_raw).strip() == "N/A":
-                    adjusted_project_load = 0.0
-                else:
-                    adjusted_project_load = float(adjusted_project_load_raw)
-
-                adjusted_pastoral_load_raw = row.get("Adjusted Pastoral Group Load", 0) or 0
-                if str(adjusted_pastoral_load_raw).strip() == "N/A":
-                    adjusted_pastoral_load = 0.0
-                else:
-                    adjusted_pastoral_load = float(adjusted_pastoral_load_raw)
-
-                project_load_raw = float(row.get("Project Load", 0) or 0)
-                pastoral_load_raw = float(row.get("Pastoral Load", 0) or 0)
-                notes = row.get("Notes", "").strip()
-
-                # Ceiling project load to nearest integer
-                project_load_ceil = math.ceil(project_load_raw) if project_load_raw > 0 else 0
-
-                data[person] = {
-                    "employment_start": emp_start,
-                    "active": active_val,
-                    "project_load": project_load_ceil,
-                    "pastoral_load": math.ceil(pastoral_load_raw) if pastoral_load_raw > 0 else 0,
-                    "ecr_year": ecr_year,
-                    "ecr_value": ecr_value,
-                    "citizenship_level": citizenship_level,
-                    "research_grant_income": research_grant_income,
-                    "research_grant_income_value": research_grant_income_value,
-                    "citizenship_value": citizenship_value,
-                    "initial_fractional_project_load": initial_fractional_project_load,
-                    "initial_fractional_pastoral_load": initial_fractional_pastoral_load,
-                    "adjusted_project_load": adjusted_project_load,
-                    "adjusted_pastoral_load": adjusted_pastoral_load,
-                    "project_load_raw": project_load_raw,
-                    "pastoral_load_raw": pastoral_load_raw,
-                    "notes": notes,
-                }
-            except (ValueError, KeyError) as e:
-                # Skip rows with unparseable data
-                pass
+        data[person] = {
+            "project_load": project_load,
+            "notes": notes,
+        }
     return data
 
 

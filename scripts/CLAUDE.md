@@ -129,6 +129,8 @@ pip install -r requirements.txt  # python-docx, matplotlib, pandas, pyyaml, gspr
 
 - **Staff workload model.csv** - Per-staff workload details
 - **Staff workload model.xlsx** - Excel file with charts and formatting
+- **CS Workload Model {year}.xlsx** - Category-structured workbook (one sheet per staff category,
+  plus Teaching/Research/Admin detail sheets and per-category charts) - see root CLAUDE.md
 - **workload_summary_boxplot.png** - Stacked bar chart summary
 - **workload_detailed_boxplot.png** - Detailed component breakdown
 - **workload_report.html** - HTML report with embedded charts
