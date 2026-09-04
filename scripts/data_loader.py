@@ -101,21 +101,9 @@ class StaffData:
     canonical_name: str = ""
     aliases: Tuple[str, ...] = field(default_factory=tuple)
     fte: float = 1.0
-    employment_start: int = 2020
     active: bool = True
     category: str = "T and S"
     project_load: float = 0.0
-    pastoral_load: float = 0.0
-    adjusted_project_load: float = 0.0
-    adjusted_pastoral_load: float = 0.0
-    ecr_year: str = ""
-    ecr_value: float = 0.0
-    citizenship_level: int = 1
-    research_grant_income: str = "None"
-    research_grant_income_value: float = 0.0
-    citizenship_value: float = 0.0
-    initial_fractional_project_load: float = 0.0
-    initial_fractional_pastoral_load: float = 0.0
     notes: str = ""
     roles: Tuple[str, ...] = field(default_factory=tuple)
     phd_supervisions: int = 0
