@@ -253,6 +253,41 @@ def check_wtw_workbook() -> Tuple[str, List[str]]:
     return status, messages
 
 
+def check_project_loads_workbook() -> Tuple[str, List[str]]:
+    path = DATA_DIR / PROJECT_LOADS_XLSX_FILENAME
+    if not path.exists():
+        return "FAIL", [f"File not found: {PROJECT_LOADS_XLSX_FILENAME}"]
+
+    try:
+        import openpyxl
+    except ImportError:
+        return "FAIL", ["openpyxl is not installed - `pip install openpyxl` "
+                        "(see requirements.txt)."]
+
+    wb = openpyxl.load_workbook(str(path), data_only=True)
+    if PROJECT_LOADS_SHEET not in wb.sheetnames:
+        return "FAIL", [f"Sheet {PROJECT_LOADS_SHEET!r} not found - sheets present: "
+                        f"{wb.sheetnames}"]
+
+    ws = wb[PROJECT_LOADS_SHEET]
+    rows = list(ws.iter_rows(max_row=1, values_only=True))
+    if not rows:
+        return "FAIL", [f"Sheet {PROJECT_LOADS_SHEET!r} is empty."]
+    header = {str(c).strip() for c in rows[0] if c}
+    missing = [c for c in PROJECT_LOADS_REQUIRED_COLUMNS if c not in header]
+    if missing:
+        return "FAIL", [f"Missing column(s) the loader depends on: {missing}. "
+                        f"Every row will read as 0 for these until the header is fixed."]
+
+    if "Total Projects (UG + PG)" not in header:
+        return "WARN", ["\"Total Projects (UG + PG)\" column not found - harmless, "
+                        "since _load_project_load() recomputes this from the "
+                        "component columns rather than trusting it, but its "
+                        "absence may mean the sheet's shape changed more than "
+                        "just this one column."]
+    return "PASS", ["All required columns present in the Advisor Loads sheet."]
+
+
 def check_waw() -> Tuple[str, List[str]]:
     path = DATA_DIR / "WAW.csv"
     if not path.exists():
