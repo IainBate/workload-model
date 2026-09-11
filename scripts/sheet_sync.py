@@ -35,18 +35,52 @@ class FetchError(Exception):
     """Raised when a sheet's CSV export couldn't be fetched or wasn't CSV."""
 
 
+def _extract_sheet_id(sheet_url: str) -> str:
+    m = _SHEET_ID_RE.search(sheet_url)
+    if not m:
+        raise ValueError(f"Could not find a spreadsheet ID in URL: {sheet_url}")
+    return m.group(1)
+
+
 def export_url(sheet_url: str, gid: Optional[str] = None) -> str:
     """Build a CSV export URL from a Google Sheets URL (with any /edit...
     suffix ignored - only the /d/<id> segment matters) and an optional tab gid.
     """
-    m = _SHEET_ID_RE.search(sheet_url)
-    if not m:
-        raise ValueError(f"Could not find a spreadsheet ID in URL: {sheet_url}")
-    sheet_id = m.group(1)
+    sheet_id = _extract_sheet_id(sheet_url)
     url = f"https://docs.google.com/spreadsheets/d/{sheet_id}/export?format=csv"
     if gid:
         url += f"&gid={gid}"
     return url
+
+
+def list_sheet_tabs(sheet_url: str, api_key: str, timeout: float = 15.0) -> Dict[str, str]:
+    """List every tab in a Google Sheet via the Sheets API v4. Requires an
+    API key (not OAuth - a project-level key with no user identity attached;
+    see docs/superpowers/specs/2026-09-11-google-sheets-sync-design.md for
+    how to get one). Like the CSV-export path, this only ever works against
+    a sheet shared "anyone with the link can view" - an API key grants no
+    access beyond what's already public.
+
+    Returns {tab_title: gid_as_string}. Raises FetchError on any failure
+    (HTTP error, network error); raises ValueError if `sheet_url` doesn't
+    contain a recognizable spreadsheet ID (same as export_url()).
+    """
+    sheet_id = _extract_sheet_id(sheet_url)
+    url = (f"https://sheets.googleapis.com/v4/spreadsheets/{sheet_id}"
+           f"?key={api_key}&fields=sheets.properties")
+    try:
+        with urllib.request.urlopen(url, timeout=timeout) as resp:
+            raw = resp.read()
+    except urllib.error.HTTPError as e:
+        raise FetchError(f"HTTP {e.code} listing tabs for {sheet_id}") from e
+    except urllib.error.URLError as e:
+        raise FetchError(f"could not reach Sheets API for {sheet_id}: {e.reason}") from e
+
+    data = json.loads(raw.decode("utf-8"))
+    return {
+        sheet["properties"]["title"]: str(sheet["properties"]["sheetId"])
+        for sheet in data.get("sheets", [])
+    }
 
 
 def fetch_sheet_csv(sheet_url: str, gid: Optional[str] = None, timeout: float = 15.0) -> str:
