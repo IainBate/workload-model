@@ -1330,7 +1330,7 @@ _RESEARCH_GROUP_PERCENT_SUFFIX_RE = re.compile(r"\s*\(\d+%\)\s*$")
 
 
 def _load_research_group_grades(filepath: str = "CS Research Groups.csv") -> Dict[str, str]:
-    """Load ART staff academic grades (Prof / Reader / SL / L) from CS
+    """Load ART staff academic grades (Prof / Reader / SL / Lecturer) from CS
     Research Groups.csv - the sole automatic source for ART grades, used to
     group/rank staff by seniority in the teaching-%-by-grade chart. T&S
     staff, and any ART staff this file doesn't cover, get their grade from
