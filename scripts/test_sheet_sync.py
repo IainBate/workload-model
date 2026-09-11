@@ -207,3 +207,156 @@ class TestMergeSupplementary:
             live_text="a,b\n1,2\n", supplementary_text=""
         )
         assert sheet_sync.parse_csv_rows(result) == [["a", "b"], ["1", "2"]]
+
+
+class _Recorder:
+    """Fake `out` callable that records every printed line, for assertions."""
+    def __init__(self):
+        self.lines = []
+
+    def __call__(self, line):
+        self.lines.append(line)
+
+    def text(self):
+        return "\n".join(self.lines)
+
+
+class TestReadWriteLocalFile:
+    def test_read_missing_file_returns_none(self, tmp_path):
+        assert sheet_sync.read_local_file(tmp_path / "nope.csv") is None
+
+    def test_write_then_read_round_trips(self, tmp_path):
+        path = tmp_path / "f.csv"
+        sheet_sync.write_local_file(path, "a,b\n1,2\n")
+        assert sheet_sync.read_local_file(path) == "a,b\n1,2\n"
+
+
+class TestResolveCompareFn:
+    def test_defaults_to_exact(self):
+        assert sheet_sync.resolve_compare_fn({}) is sheet_sync.compare_exact
+
+    def test_uses_named_strategy(self):
+        assert sheet_sync.resolve_compare_fn({"compare": "fte_tolerant"}) is sheet_sync.compare_fte_tolerant
+
+
+class TestSyncSource:
+    def test_inaccessible_source_reports_and_does_nothing(self, tmp_path, monkeypatch):
+        out = _Recorder()
+        called = []
+        monkeypatch.setattr(sheet_sync, "fetch_sheet_csv", lambda *a, **k: called.append(1))
+        sheet_sync.sync_source(
+            "X.csv", {"url": "https://docs.google.com/spreadsheets/d/ABC", "accessible": False},
+            data_dir=tmp_path, prompt=lambda p: "y", out=out,
+        )
+        assert called == []
+        assert "not accessible" in out.text()
+
+    def test_no_local_file_yet_creates_it_without_prompting(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(sheet_sync, "fetch_sheet_csv", lambda *a, **k: "a,b\n1,2\n")
+        prompted = []
+        sheet_sync.sync_source(
+            "X.csv", {"url": "https://docs.google.com/spreadsheets/d/ABC"},
+            data_dir=tmp_path, prompt=lambda p: prompted.append(p) or "y", out=lambda l: None,
+        )
+        assert prompted == []
+        assert (tmp_path / "X.csv").read_text() == "a,b\n1,2\n"
+
+    def test_fetch_error_is_reported_and_local_file_untouched(self, tmp_path, monkeypatch):
+        (tmp_path / "X.csv").write_text("original\n")
+        monkeypatch.setattr(
+            sheet_sync, "fetch_sheet_csv",
+            lambda *a, **k: (_ for _ in ()).throw(sheet_sync.FetchError("HTTP 401 ...")),
+        )
+        out = _Recorder()
+        sheet_sync.sync_source(
+            "X.csv", {"url": "https://docs.google.com/spreadsheets/d/ABC"},
+            data_dir=tmp_path, prompt=lambda p: "y", out=out,
+        )
+        assert "could not fetch" in out.text()
+        assert (tmp_path / "X.csv").read_text() == "original\n"
+
+    def test_up_to_date_reports_and_writes_nothing(self, tmp_path, monkeypatch):
+        (tmp_path / "X.csv").write_text("a,b\n1,2\n")
+        monkeypatch.setattr(sheet_sync, "fetch_sheet_csv", lambda *a, **k: "a,b\n1,2\n")
+        out = _Recorder()
+        sheet_sync.sync_source(
+            "X.csv", {"url": "https://docs.google.com/spreadsheets/d/ABC"},
+            data_dir=tmp_path, prompt=lambda p: "y", out=out,
+        )
+        assert "up to date" in out.text()
+
+    def test_difference_declined_leaves_local_file_unchanged(self, tmp_path, monkeypatch):
+        (tmp_path / "X.csv").write_text("a,b\n1,2\n")
+        monkeypatch.setattr(sheet_sync, "fetch_sheet_csv", lambda *a, **k: "a,b\n1,9\n")
+        sheet_sync.sync_source(
+            "X.csv", {"url": "https://docs.google.com/spreadsheets/d/ABC"},
+            data_dir=tmp_path, prompt=lambda p: "n", out=lambda l: None,
+        )
+        assert (tmp_path / "X.csv").read_text() == "a,b\n1,2\n"
+
+    def test_difference_confirmed_overwrites_local_file(self, tmp_path, monkeypatch):
+        (tmp_path / "X.csv").write_text("a,b\n1,2\n")
+        monkeypatch.setattr(sheet_sync, "fetch_sheet_csv", lambda *a, **k: "a,b\n1,9\n")
+        sheet_sync.sync_source(
+            "X.csv", {"url": "https://docs.google.com/spreadsheets/d/ABC"},
+            data_dir=tmp_path, prompt=lambda p: "y", out=lambda l: None,
+        )
+        assert (tmp_path / "X.csv").read_text() == "a,b\n1,9\n"
+
+    def test_empty_prompt_response_defaults_to_no(self, tmp_path, monkeypatch):
+        (tmp_path / "X.csv").write_text("a,b\n1,2\n")
+        monkeypatch.setattr(sheet_sync, "fetch_sheet_csv", lambda *a, **k: "a,b\n1,9\n")
+        sheet_sync.sync_source(
+            "X.csv", {"url": "https://docs.google.com/spreadsheets/d/ABC"},
+            data_dir=tmp_path, prompt=lambda p: "", out=lambda l: None,
+        )
+        assert (tmp_path / "X.csv").read_text() == "a,b\n1,2\n"
+
+    def test_confirmed_waw_sync_appends_supplementary_file(self, tmp_path, monkeypatch):
+        (tmp_path / "WAW.csv").write_text("Head,Alice,,,\n")
+        (tmp_path / "WAW_supplementary.csv").write_text("Union,Bob,,,\n")
+        monkeypatch.setattr(sheet_sync, "fetch_sheet_csv", lambda *a, **k: "Head,Carol,,,\n")
+        sheet_sync.sync_source(
+            "WAW.csv",
+            {"url": "https://docs.google.com/spreadsheets/d/ABC",
+             "supplementary_file": "WAW_supplementary.csv"},
+            data_dir=tmp_path, prompt=lambda p: "y", out=lambda l: None,
+        )
+        result = (tmp_path / "WAW.csv").read_text()
+        assert "Carol" in result
+        assert "Bob" in result
+        assert "Alice" not in result
+
+
+class TestSyncMultiTabSource:
+    def test_no_configured_tabs_reports_skipped(self, tmp_path, monkeypatch):
+        out = _Recorder()
+        called = []
+        monkeypatch.setattr(sheet_sync, "fetch_sheet_csv", lambda *a, **k: called.append(1))
+        sheet_sync.sync_multi_tab_source(
+            "Book.xlsx", {"url": "https://docs.google.com/spreadsheets/d/ABC", "tabs": {}},
+            data_dir=tmp_path, prompt=lambda p: "y", out=out,
+        )
+        assert called == []
+        assert "tabs not configured" in out.text()
+
+    def test_null_gid_tabs_are_skipped_not_fetched(self, tmp_path, monkeypatch):
+        called = []
+        monkeypatch.setattr(sheet_sync, "fetch_sheet_csv", lambda *a, **k: called.append(1))
+        sheet_sync.sync_multi_tab_source(
+            "Book.xlsx",
+            {"url": "https://docs.google.com/spreadsheets/d/ABC", "tabs": {"Sheet1": None}},
+            data_dir=tmp_path, prompt=lambda p: "y", out=lambda l: None,
+        )
+        assert called == []
+
+    def test_configured_tab_is_fetched_and_reported(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(sheet_sync, "fetch_sheet_csv", lambda *a, **k: "a,b\n1,2\n")
+        out = _Recorder()
+        sheet_sync.sync_multi_tab_source(
+            "Book.xlsx",
+            {"url": "https://docs.google.com/spreadsheets/d/ABC", "tabs": {"Advisor Loads": "123"}},
+            data_dir=tmp_path, prompt=lambda p: "y", out=out,
+        )
+        assert "Advisor Loads" in out.text()
+        assert "fetched" in out.text()
