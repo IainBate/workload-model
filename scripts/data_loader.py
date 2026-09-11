@@ -2196,6 +2196,7 @@ def _deduplicate_staff(staff: Dict[str, StaffData], mappings: Dict[str, List[str
             # Take the max values for numeric fields
             merged_fte = max((e[1].fte for e in entries if e[1].fte), default=0.0)
             merged_category = next((e[1].category for e in entries if e[1].category), "")
+            merged_grade = next((e[1].grade for e in entries if e[1].grade), "")
             # Sort notes to ensure deterministic output
             merged_notes = "; ".join(sorted(set(e[1].notes for e in entries if e[1].notes)))
             merged_active = any(e[1].active for e in entries)
