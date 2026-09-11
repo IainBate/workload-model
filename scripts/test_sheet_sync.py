@@ -182,6 +182,16 @@ class TestCompareFteTolerant:
         assert sheet_sync.compare_fte_tolerant(live, local, tolerance=10.0).has_differences is False
         assert sheet_sync.compare_fte_tolerant(live, local, tolerance=1.0).has_differences is True
 
+    def test_column_missing_from_live_header_is_reported(self):
+        """The motivating bug for this tool was a renamed/dropped CSV
+        column - compare_fte_tolerant must not silently ignore a column
+        that exists locally (with actual data) but is missing from the
+        live sheet's header entirely."""
+        live = "Project ID,Staff,% FTE\nP1,Alice,20\n"
+        local = self.HEADER + "P1,Alice,20,important note\n"
+        diff = sheet_sync.compare_fte_tolerant(live, local)
+        assert diff.has_differences is True
+
     def test_non_numeric_fte_falls_back_to_string_comparison(self):
         live = self.HEADER + "P1,Alice,n/a,\n"
         local = self.HEADER + "P1,Alice,20,\n"
