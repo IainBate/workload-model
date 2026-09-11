@@ -512,14 +512,18 @@ def _sync_one_source(name: str, config: dict, data_dir: Path = DATA_DIR,
 
 
 def main(prompt: Callable[[str], str] = input, out: Callable[[str], None] = print,
-         data_dir: Path = DATA_DIR, api_key: Optional[str] = None) -> None:
+         data_dir: Path = DATA_DIR, api_key: Optional[str] = None,
+         secrets_path: Path = SECRETS_FILE) -> None:
     """`api_key` (optional): a Google Sheets API key enabling the new-tab
-    check for multi-tab sources (see list_sheet_tabs()). Defaults to the
-    GOOGLE_SHEETS_API_KEY environment variable if not passed explicitly;
-    never required - every other check works identically without one.
+    check for multi-tab sources (see list_sheet_tabs()). Resolution order if
+    not passed explicitly: the GOOGLE_SHEETS_API_KEY environment variable,
+    then secrets.yaml (git-crypt encrypted - see _load_secret()). Never
+    required - every other check works identically without one.
     """
     if api_key is None:
-        api_key = os.environ.get("GOOGLE_SHEETS_API_KEY")
+        api_key = os.environ.get("GOOGLE_SHEETS_API_KEY") or _load_secret(
+            "google_sheets_api_key", secrets_path
+        )
     sources_path = data_dir / "google_sheets_sources.json"
     sources = load_sources(sources_path)
     if not sources:
