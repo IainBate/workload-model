@@ -1913,6 +1913,7 @@ def load_all_data(data_dir: str = None,
             resolved_category = _resolve_category_from_data(
                 canonical, staff_ref, category_overrides
             )
+            resolved_grade = _resolve_grade_from_data(canonical, staff_ref, research_group_grades)
 
             staff[canonical] = StaffData(
                 canonical_name=canonical,
