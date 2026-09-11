@@ -1783,6 +1783,12 @@ def load_all_data(data_dir: str = None,
     fte_data = _load_fte_data()
     waw_roles = _load_waw_roles()
     staff_ref_data = _load_staff_categories_and_fte()
+    research_group_grades_raw = _load_research_group_grades()
+    research_group_grades = {}
+    for raw_name, grade in research_group_grades_raw.items():
+        canon = normalize_name(raw_name, reverse_lookup, unknown_callback=None, mappings=mappings)
+        if canon:
+            research_group_grades[canon] = grade
     adjustments_data, adjustment_warnings, unattributed_adjustment_warnings = _load_adjustments()
     for w in unattributed_adjustment_warnings:
         print(f"Warning: workload_adjustments.csv {w}")
