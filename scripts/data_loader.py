@@ -188,6 +188,7 @@ class WorkloadResult:
     remaining_hours: float = 0.0
     teaching_pct_of_remaining: Optional[float] = None
     include_in_teaching_pct_chart: bool = True  # From StaffData; False = Staff Categories and FTE.csv "Teaching % Chart" = No
+    grade: str = ""  # From StaffData; Prof/Reader/SL/L etc., "" if unresolved - see _resolve_grade_from_data()
 
 
 
