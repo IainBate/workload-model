@@ -5,6 +5,7 @@ monkeypatching urllib.request.urlopen with a fake response, never by
 hitting the real network.
 """
 
+import json
 import sys
 from pathlib import Path
 from unittest.mock import MagicMock
@@ -615,3 +616,218 @@ class TestSyncOneSourceErrorIsolation:
             sheet_sync._sync_one_source(name, config, data_dir=tmp_path, prompt=lambda p: "y", out=out)
         assert "Bad.csv: unexpected error" in out.text()
         assert (tmp_path / "Good.csv").read_text() == "a,b\n1,2\n"
+
+
+class TestListSheetTabs:
+    """list_sheet_tabs() - optional, API-key-based tab discovery (no OAuth,
+    but requires a GOOGLE_SHEETS_API_KEY the CSV-export path never needed).
+    Used to flag a tab that exists live but isn't yet in
+    google_sheets_sources.json's "tabs" config, without ever guessing which
+    tab is "current"."""
+
+    def _fake_urlopen(self, monkeypatch, body: bytes, raise_error=None):
+        def fake(url, timeout=None):
+            if raise_error:
+                raise raise_error
+            response = MagicMock()
+            response.read.return_value = body
+            response.__enter__ = lambda self: response
+            response.__exit__ = lambda self, *a: False
+            return response
+        monkeypatch.setattr(sheet_sync.urllib.request, "urlopen", fake)
+
+    def test_returns_title_to_gid_mapping(self, monkeypatch):
+        body = json.dumps({
+            "sheets": [
+                {"properties": {"sheetId": 1402610559, "title": "2026-7"}},
+                {"properties": {"sheetId": 177948210, "title": "Allocation"}},
+            ]
+        }).encode("utf-8")
+        self._fake_urlopen(monkeypatch, body)
+        tabs = sheet_sync.list_sheet_tabs("https://docs.google.com/spreadsheets/d/ABC123", "fake-key")
+        assert tabs == {"2026-7": "1402610559", "Allocation": "177948210"}
+
+    def test_api_key_included_in_request_url(self, monkeypatch):
+        captured = {}
+
+        def fake(url, timeout=None):
+            captured["url"] = url
+            response = MagicMock()
+            response.read.return_value = json.dumps({"sheets": []}).encode("utf-8")
+            response.__enter__ = lambda self: response
+            response.__exit__ = lambda self, *a: False
+            return response
+        monkeypatch.setattr(sheet_sync.urllib.request, "urlopen", fake)
+
+        sheet_sync.list_sheet_tabs("https://docs.google.com/spreadsheets/d/ABC123", "my-key-123")
+        assert "key=my-key-123" in captured["url"]
+        assert "ABC123" in captured["url"]
+
+    def test_raises_fetch_error_on_http_error(self, monkeypatch):
+        import urllib.error
+        self._fake_urlopen(
+            monkeypatch, b"",
+            raise_error=urllib.error.HTTPError("url", 403, "Forbidden", {}, None)
+        )
+        with pytest.raises(sheet_sync.FetchError, match="403"):
+            sheet_sync.list_sheet_tabs("https://docs.google.com/spreadsheets/d/ABC123", "fake-key")
+
+    def test_raises_fetch_error_on_url_error(self, monkeypatch):
+        import urllib.error
+        self._fake_urlopen(monkeypatch, b"", raise_error=urllib.error.URLError("no route"))
+        with pytest.raises(sheet_sync.FetchError, match="could not reach"):
+            sheet_sync.list_sheet_tabs("https://docs.google.com/spreadsheets/d/ABC123", "fake-key")
+
+    def test_raises_value_error_when_no_sheet_id_in_url(self):
+        with pytest.raises(ValueError):
+            sheet_sync.list_sheet_tabs("https://example.com/not-a-sheet", "fake-key")
+
+
+class TestFindUnconfiguredTabs:
+    def test_tab_present_live_but_not_in_config_is_flagged(self):
+        result = sheet_sync.find_unconfigured_tabs(
+            configured_tabs={"2026-7": "1402610559"},
+            live_tabs={"2026-7": "1402610559", "2025-6": "1144909221"},
+        )
+        assert result == {"2025-6": "1144909221"}
+
+    def test_configured_tab_with_null_gid_is_not_flagged_as_new(self):
+        """A tab already listed in config (even with a not-yet-filled-in
+        null gid) is "known about", not "new" - only a title with no key
+        in configured_tabs at all counts as newly discovered."""
+        result = sheet_sync.find_unconfigured_tabs(
+            configured_tabs={"2026-7": "1402610559", "2025-6": None},
+            live_tabs={"2026-7": "1402610559", "2025-6": "1144909221"},
+        )
+        assert result == {}
+
+    def test_nothing_flagged_when_everything_configured(self):
+        result = sheet_sync.find_unconfigured_tabs(
+            configured_tabs={"2026-7": "1402610559"},
+            live_tabs={"2026-7": "1402610559"},
+        )
+        assert result == {}
+
+
+class TestSyncMultiTabSourceNewTabDetection:
+    def test_no_api_key_skips_new_tab_check_entirely(self, tmp_path, monkeypatch):
+        """Default behaviour (no api_key passed) must be unchanged from
+        before this feature existed - list_sheet_tabs must not even be
+        called."""
+        called = []
+        monkeypatch.setattr(sheet_sync, "list_sheet_tabs", lambda *a, **k: called.append(1))
+        monkeypatch.setattr(sheet_sync, "fetch_sheet_csv", lambda *a, **k: "a,b\n1,2\n")
+        out = _Recorder()
+        sheet_sync.sync_multi_tab_source(
+            "Book.xlsx",
+            {"url": "https://docs.google.com/spreadsheets/d/ABC", "tabs": {"2026-7": "123"}},
+            data_dir=tmp_path, prompt=lambda p: "y", out=out,
+        )
+        assert called == []
+
+    def test_api_key_present_flags_new_tab(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(sheet_sync, "fetch_sheet_csv", lambda *a, **k: "a,b\n1,2\n")
+        monkeypatch.setattr(
+            sheet_sync, "list_sheet_tabs",
+            lambda url, key, **k: {"2026-7": "123", "2025-6": "999"},
+        )
+        out = _Recorder()
+        sheet_sync.sync_multi_tab_source(
+            "Book.xlsx",
+            {"url": "https://docs.google.com/spreadsheets/d/ABC", "tabs": {"2026-7": "123"}},
+            data_dir=tmp_path, prompt=lambda p: "y", out=out, api_key="fake-key",
+        )
+        assert "2025-6" in out.text()
+        assert "999" in out.text()
+
+    def test_api_key_present_and_nothing_new_reports_nothing_extra(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(sheet_sync, "fetch_sheet_csv", lambda *a, **k: "a,b\n1,2\n")
+        monkeypatch.setattr(
+            sheet_sync, "list_sheet_tabs",
+            lambda url, key, **k: {"2026-7": "123"},
+        )
+        out = _Recorder()
+        sheet_sync.sync_multi_tab_source(
+            "Book.xlsx",
+            {"url": "https://docs.google.com/spreadsheets/d/ABC", "tabs": {"2026-7": "123"}},
+            data_dir=tmp_path, prompt=lambda p: "y", out=out, api_key="fake-key",
+        )
+        assert "new tab" not in out.text()
+
+    def test_new_tab_check_runs_even_when_no_tabs_configured_yet(self, tmp_path, monkeypatch):
+        called = []
+        monkeypatch.setattr(sheet_sync, "fetch_sheet_csv", lambda *a, **k: called.append(1))
+        monkeypatch.setattr(
+            sheet_sync, "list_sheet_tabs",
+            lambda url, key, **k: {"2026-7": "123"},
+        )
+        out = _Recorder()
+        sheet_sync.sync_multi_tab_source(
+            "Book.xlsx",
+            {"url": "https://docs.google.com/spreadsheets/d/ABC", "tabs": {}},
+            data_dir=tmp_path, prompt=lambda p: "y", out=out, api_key="fake-key",
+        )
+        assert called == []  # still never fetches CSV content for an unconfigured tab
+        assert "2026-7" in out.text()
+        assert "123" in out.text()
+
+    def test_list_tabs_fetch_error_is_reported_not_raised(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(sheet_sync, "fetch_sheet_csv", lambda *a, **k: "a,b\n1,2\n")
+        monkeypatch.setattr(
+            sheet_sync, "list_sheet_tabs",
+            lambda url, key, **k: (_ for _ in ()).throw(sheet_sync.FetchError("HTTP 403")),
+        )
+        out = _Recorder()
+        sheet_sync.sync_multi_tab_source(
+            "Book.xlsx",
+            {"url": "https://docs.google.com/spreadsheets/d/ABC", "tabs": {"2026-7": "123"}},
+            data_dir=tmp_path, prompt=lambda p: "y", out=out, api_key="fake-key",
+        )
+        assert "could not check for new tabs" in out.text()
+
+
+class TestMainThreadsApiKey:
+    def test_main_reads_api_key_from_environment_when_not_passed(self, tmp_path, monkeypatch):
+        sheet_sync.save_sources(
+            {"Book.xlsx": {"url": "https://docs.google.com/spreadsheets/d/ABC", "tabs": {}}},
+            path=tmp_path / "google_sheets_sources.json",
+        )
+        captured = {}
+
+        def fake_sync_multi_tab_source(name, config, data_dir=None, prompt=None, out=None, api_key=None):
+            captured["api_key"] = api_key
+        monkeypatch.setattr(sheet_sync, "sync_multi_tab_source", fake_sync_multi_tab_source)
+        monkeypatch.setenv("GOOGLE_SHEETS_API_KEY", "env-key-value")
+
+        sheet_sync.main(prompt=lambda p: "", out=lambda l: None, data_dir=tmp_path)
+        assert captured["api_key"] == "env-key-value"
+
+    def test_explicit_api_key_argument_overrides_environment(self, tmp_path, monkeypatch):
+        sheet_sync.save_sources(
+            {"Book.xlsx": {"url": "https://docs.google.com/spreadsheets/d/ABC", "tabs": {}}},
+            path=tmp_path / "google_sheets_sources.json",
+        )
+        captured = {}
+
+        def fake_sync_multi_tab_source(name, config, data_dir=None, prompt=None, out=None, api_key=None):
+            captured["api_key"] = api_key
+        monkeypatch.setattr(sheet_sync, "sync_multi_tab_source", fake_sync_multi_tab_source)
+        monkeypatch.setenv("GOOGLE_SHEETS_API_KEY", "env-key-value")
+
+        sheet_sync.main(prompt=lambda p: "", out=lambda l: None, data_dir=tmp_path, api_key="explicit-key")
+        assert captured["api_key"] == "explicit-key"
+
+    def test_no_env_var_and_no_argument_means_none(self, tmp_path, monkeypatch):
+        sheet_sync.save_sources(
+            {"Book.xlsx": {"url": "https://docs.google.com/spreadsheets/d/ABC", "tabs": {}}},
+            path=tmp_path / "google_sheets_sources.json",
+        )
+        captured = {}
+
+        def fake_sync_multi_tab_source(name, config, data_dir=None, prompt=None, out=None, api_key=None):
+            captured["api_key"] = api_key
+        monkeypatch.setattr(sheet_sync, "sync_multi_tab_source", fake_sync_multi_tab_source)
+        monkeypatch.delenv("GOOGLE_SHEETS_API_KEY", raising=False)
+
+        sheet_sync.main(prompt=lambda p: "", out=lambda l: None, data_dir=tmp_path)
+        assert captured["api_key"] is None
