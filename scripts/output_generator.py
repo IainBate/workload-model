@@ -502,6 +502,7 @@ def generate_teaching_percentage_histogram(results: List[WorkloadResult], output
     excluded = chart_data["excluded"]
     undefined = chart_data["undefined"]
     y_max = chart_data["y_max"]
+    average_pct = chart_data["average_pct"]
 
     fig, ax = plt.subplots(figsize=(max(18, len(names) * 0.35), 10))
     fig.suptitle("Teaching as a Percentage of Remaining (Non-Research/Non-Admin) Time",
@@ -521,6 +522,12 @@ def generate_teaching_percentage_histogram(results: List[WorkloadResult], output
         mpatches.Patch(color=_TEACHING_PCT_OVERLOADED_COLOR,
                         label="Overloaded (research + admin alone exceed nominal hours)"),
     ]
+    if average_pct is not None:
+        ax.axhline(y=average_pct, color="black", linestyle="--", linewidth=1.5, alpha=0.7)
+        legend_handles.append(
+            Line2D([0], [0], color="black", linestyle="--", linewidth=1.5,
+                   label=f"Average: {average_pct:.1f}%")
+        )
     ax.legend(handles=legend_handles, loc="upper right", fontsize=10)
 
     footnote_lines = []
