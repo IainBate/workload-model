@@ -641,6 +641,108 @@ def generate_teaching_percentage_histogram(results: List[WorkloadResult], output
     print(f"Teaching percentage histogram saved to {histogram_path}")
 
 
+def generate_teaching_percentage_by_grade_histogram(results: List[WorkloadResult], output_dir: str = None):
+    """
+    Same chart as generate_teaching_percentage_histogram(), but staff are
+    grouped by academic grade (Prof / Reader / SL / Lecturer, most senior
+    first) and ranked within each grade by teaching % of remaining time,
+    highest first - see _prepare_teaching_percentage_by_grade_chart_data().
+
+    Grade comes from WorkloadResult.grade (Staff Categories and FTE.csv's
+    Grade column for T&S staff and any ART staff missing from CS Research
+    Groups.csv; auto-parsed from CS Research Groups.csv for the rest of ART -
+    see _resolve_grade_from_data() in data_loader.py). This function only
+    renders. Staff with no recorded grade, or an unrecognized grade value,
+    are left out of the grouped bars (there's nowhere to place them) and
+    listed in the footnote instead, same "nothing hidden" convention as the
+    excluded/overloaded/undefined lists.
+
+    Output File:
+        - workload_teaching_percentage_by_grade_histogram.png
+    """
+    if output_dir is None:
+        output_dir = OUTPUT_DIR
+
+    chart_data = _prepare_teaching_percentage_by_grade_chart_data(results)
+    names = chart_data["names"]
+    plotted_values = chart_data["plotted_values"]
+    colors = chart_data["colors"]
+    overloaded = chart_data["overloaded"]
+    excluded = chart_data["excluded"]
+    undefined = chart_data["undefined"]
+    no_grade = chart_data["no_grade"]
+    unrecognized_grade = chart_data["unrecognized_grade"]
+    grade_groups = chart_data["grade_groups"]
+    y_max = chart_data["y_max"]
+    average_pct = chart_data["average_pct"]
+
+    # Headroom above y_max for the grade-group name labels.
+    label_y = y_max * 1.08
+    axis_top = y_max * 1.18
+
+    fig, ax = plt.subplots(figsize=(max(18, len(names) * 0.35), 10))
+    fig.suptitle("Teaching as a Percentage of Remaining Time, by Grade",
+                 fontsize=16, fontweight="bold")
+
+    ax.bar(names, plotted_values, color=colors, edgecolor="white", width=0.7)
+    ax.set_ylim(0, axis_top)
+    ax.set_xlabel("Staff (grouped by grade, ranked highest to lowest within each)", fontsize=12)
+    ax.set_ylabel("Teaching % of Remaining Time", fontsize=12)
+    ax.set_xticks(range(len(names)))
+    ax.set_xticklabels(names, rotation=90, fontsize=8)
+    ax.grid(axis="y", alpha=0.3)
+
+    for grade, start, count in grade_groups:
+        center = start + (count - 1) / 2
+        ax.text(center, label_y, grade, ha="center", va="bottom",
+                fontsize=12, fontweight="bold")
+        boundary = start - 0.5
+        if boundary > 0:
+            ax.axvline(x=boundary, color="gray", linestyle=":", alpha=0.5)
+
+    legend_handles = [
+        mpatches.Patch(color=_TEACHING_PCT_CATEGORY_COLORS["ART"], label="ART"),
+        mpatches.Patch(color=_TEACHING_PCT_CATEGORY_COLORS["T and S"], label="T and S"),
+        mpatches.Patch(color=_TEACHING_PCT_OVERLOADED_COLOR,
+                        label="Overloaded (research + admin alone exceed nominal hours)"),
+    ]
+    if average_pct is not None:
+        ax.axhline(y=average_pct, color="black", linestyle="--", linewidth=1.5, alpha=0.7)
+        legend_handles.append(
+            Line2D([0], [0], color="black", linestyle="--", linewidth=1.5,
+                   label=f"Average: {average_pct:.1f}%")
+        )
+    ax.legend(handles=legend_handles, loc="upper right", fontsize=10)
+
+    footnote_lines = []
+    if overloaded:
+        overloaded_str = "; ".join(f"{r.name}: {r.teaching_pct_of_remaining:.0f}%" for r in overloaded)
+        footnote_lines.append(f"Overloaded, bar pinned to top (actual value): {overloaded_str}")
+    if excluded:
+        excluded_str = ", ".join(r.name for r in excluded)
+        footnote_lines.append(f"Excluded (Teaching % Chart = No in Staff Categories and FTE.csv): {excluded_str}")
+    if undefined:
+        undefined_str = ", ".join(r.name for r in undefined)
+        footnote_lines.append(f"Undefined (zero remaining time): {undefined_str}")
+    if no_grade:
+        no_grade_str = ", ".join(r.name for r in no_grade)
+        footnote_lines.append(f"No grade recorded (Staff Categories and FTE.csv 'Grade' column): {no_grade_str}")
+    if unrecognized_grade:
+        unrecognized_str = ", ".join(f"{r.name} ({r.grade})" for r in unrecognized_grade)
+        footnote_lines.append(f"Unrecognized grade value: {unrecognized_str}")
+
+    if footnote_lines:
+        fig.text(0.01, 0.01, "\n".join(footnote_lines), fontsize=8, va="bottom", wrap=True)
+        plt.subplots_adjust(bottom=0.05 + 0.02 * len(footnote_lines))
+
+    plt.tight_layout(rect=(0, 0.03 * max(1, len(footnote_lines)), 1, 1))
+
+    histogram_path = os.path.join(output_dir, "workload_teaching_percentage_by_grade_histogram.png")
+    plt.savefig(histogram_path, dpi=200, bbox_inches="tight")
+    plt.close(fig)
+    print(f"Teaching percentage by-grade histogram saved to {histogram_path}")
+
+
 def generate_excel_with_formulas(results: List[WorkloadResult], year_data: YearData,
                                   output_dir: str = None):
     """
