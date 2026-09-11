@@ -407,6 +407,45 @@ _TEACHING_PCT_DEFAULT_COLOR = "#9E9E9E"
 _TEACHING_PCT_CLIPPED_COLOR = "#F44336"
 
 
+def _prepare_teaching_percentage_chart_data(
+    results: List[WorkloadResult],
+    clip_min: float = _TEACHING_PCT_CLIP_MIN,
+    clip_max: float = _TEACHING_PCT_CLIP_MAX,
+) -> Dict[str, Any]:
+    """Pure data-shaping for generate_teaching_percentage_histogram() - no
+    matplotlib, so it can be unit tested directly. Returns per-bar names,
+    plotted (possibly clipped) values, and colors, plus the three "nothing is
+    hidden" footnote lists: staff excluded via include_in_teaching_pct_chart,
+    staff whose true value was clipped to fit the axis, and staff whose
+    percentage is undefined (zero remaining time).
+    """
+    excluded = [r for r in results if not r.include_in_teaching_pct_chart]
+    included = [r for r in results
+                if r.include_in_teaching_pct_chart and r.teaching_pct_of_remaining is not None]
+    undefined = [r for r in results
+                 if r.include_in_teaching_pct_chart and r.teaching_pct_of_remaining is None]
+
+    names, plotted_values, colors, clipped = [], [], [], []
+    for r in included:
+        pct = r.teaching_pct_of_remaining
+        names.append(r.name)
+        if pct < clip_min or pct > clip_max:
+            clipped.append(r)
+            colors.append(_TEACHING_PCT_CLIPPED_COLOR)
+        else:
+            colors.append(_TEACHING_PCT_CATEGORY_COLORS.get(r.category, _TEACHING_PCT_DEFAULT_COLOR))
+        plotted_values.append(max(clip_min, min(clip_max, pct)))
+
+    return {
+        "names": names,
+        "plotted_values": plotted_values,
+        "colors": colors,
+        "clipped": clipped,
+        "excluded": excluded,
+        "undefined": undefined,
+    }
+
+
 def generate_teaching_percentage_histogram(results: List[WorkloadResult], output_dir: str = None):
     """
     Generate a department-wide bar chart of teaching hours as a percentage of
