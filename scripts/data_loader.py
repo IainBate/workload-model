@@ -1304,6 +1304,7 @@ def _load_staff_categories_and_fte(filepath: str = "Staff Categories and FTE.csv
                     "category": (row.get("Category") or "").strip(),
                     "fte": float(row.get("FTE") or 1.0),
                     "modelled": (row.get("Modelled") or "").strip().lower() not in _NOT_MODELLED_VALUES,
+                    "teaching_pct_chart": (row.get("Teaching % Chart") or "").strip().lower() not in _NOT_MODELLED_VALUES,
                     "notes": (row.get("Notes") or "").strip(),
                     "email": (row.get("Email") or "").strip(),
                 }
