@@ -177,6 +177,16 @@ class WorkloadResult:
     adjustments_breakdown: Dict[str, Dict[str, Any]] = field(default_factory=dict)  # Manual workload_adjustments.csv overrides applied, keyed by 'teaching'/'research'/'admin'
     notes: str = ""  # Free-text notes from StaffData (ProjectLoads workbook and/or Staff Categories and FTE.csv), for display only
 
+    # Teaching-%-of-remaining-time metric (for the department-wide histogram):
+    # remaining_hours = nominal_hours - (research_hours + admin_hours), i.e. FTE-adjusted
+    # capacity left over once every non-teaching hour is removed. teaching_pct_of_remaining
+    # is teaching_hours as a percentage of that - deliberately left negative/uncapped when
+    # research+admin alone exceed nominal_hours (an overcommitted person), and None only in
+    # the exact-zero-denominator case (flagged in missing_data instead of guessed).
+    remaining_hours: float = 0.0
+    teaching_pct_of_remaining: Optional[float] = None
+    include_in_teaching_pct_chart: bool = True  # From StaffData; False = Staff Categories and FTE.csv "Teaching % Chart" = No
+
 
 
 @dataclass(frozen=True)
