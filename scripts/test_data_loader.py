@@ -210,6 +210,99 @@ class TestStaffCategoriesModelledAndEmailParsing:
         data = dl._load_staff_categories_and_fte()
         assert data["Someone"]["email"] == "someone@york.ac.uk"
 
+    def test_grade_column_loaded(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        self._write(tmp_path / "Staff Categories and FTE.csv",
+                    [{"Name": "Someone", "Category": "T and S", "FTE": "1.0", "Grade": "SL"}],
+                    header=["Name", "Category", "FTE", "Modelled", "Notes", "Email",
+                            "Teaching % Chart", "Grade"])
+        data = dl._load_staff_categories_and_fte()
+        assert data["Someone"]["grade"] == "SL"
+
+    def test_blank_grade_defaults_empty_string(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        self._write(tmp_path / "Staff Categories and FTE.csv",
+                    [{"Name": "Someone", "Category": "ART", "FTE": "1.0"}])
+        data = dl._load_staff_categories_and_fte()
+        assert data["Someone"]["grade"] == ""
+
+
+class TestResearchGroupGrades:
+    """_load_research_group_grades() - parsing CS Research Groups.csv's
+    repeating 4-column-block layout, and _resolve_grade_from_data()'s
+    priority order between it and Staff Categories and FTE.csv."""
+
+    def _write(self, path, rows):
+        with open(path, "w", newline="", encoding="utf-8") as f:
+            writer = csv.writer(f)
+            for row in rows:
+                writer.writerow(row)
+
+    def test_parses_a_person_row_from_a_block(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        self._write(tmp_path / "CS Research Groups.csv", [
+            ["Group A", "", "", "", "Group B", "", "", ""],
+            ["Alice Example", "Prof", "*", "TRUE", "Bob Example", "SL", "", "TRUE"],
+        ])
+        grades = dl._load_research_group_grades()
+        assert grades == {"Alice Example": "Prof", "Bob Example": "SL"}
+
+    def test_summary_and_key_blocks_produce_no_entries(self, tmp_path, monkeypatch):
+        """The 'Group' summary table and 'Key' legend share the same 4-column
+        shape but never carry a real grade token in the second position."""
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        self._write(tmp_path / "CS Research Groups.csv", [
+            ["Group", "", "Prof", "Reader", "SL", "Lecturer", "Total"],
+            ["Artificial Intelligence", "", "1", "1", "2", "2", "6"],
+            ["Key", "", "", "", "", "", ""],
+            ["Prof ", "", "", "", "", "", ""],
+        ])
+        grades = dl._load_research_group_grades()
+        assert grades == {}
+
+    def test_stray_numeric_annotation_produces_no_entry(self, tmp_path, monkeypatch):
+        """A block position can hold a bare FTE-hours number (e.g. '2000')
+        instead of a person - it must not be mistaken for a grade."""
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        self._write(tmp_path / "CS Research Groups.csv", [
+            ["", "", "", "2000"],
+        ])
+        grades = dl._load_research_group_grades()
+        assert grades == {}
+
+    def test_percent_annotation_stripped_from_name(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        self._write(tmp_path / "CS Research Groups.csv", [
+            ["Simos Gerasimou (20%)", "SL", "", "FALSE"],
+        ])
+        grades = dl._load_research_group_grades()
+        assert grades == {"Simos Gerasimou": "SL"}
+
+    def test_missing_file_returns_empty(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        assert dl._load_research_group_grades() == {}
+
+
+class TestResolveGradeFromData:
+    def test_staff_ref_grade_takes_priority(self):
+        got = dl._resolve_grade_from_data(
+            "Someone", {"grade": "Reader"}, {"Someone": "SL"}
+        )
+        assert got == "Reader"
+
+    def test_falls_back_to_research_group_grades(self):
+        got = dl._resolve_grade_from_data("Someone", None, {"Someone": "SL"})
+        assert got == "SL"
+
+    def test_staff_ref_present_but_grade_blank_falls_back(self):
+        got = dl._resolve_grade_from_data(
+            "Someone", {"grade": ""}, {"Someone": "SL"}
+        )
+        assert got == "SL"
+
+    def test_unknown_returns_empty_not_a_guess(self):
+        assert dl._resolve_grade_from_data("Nobody", None, {}) == ""
+
 
 class TestModuleVariantMerging:
     """H/M variant handling - the same class taught to UG and MSc cohorts."""
