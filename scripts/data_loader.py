@@ -1940,6 +1940,7 @@ def load_all_data(data_dir: str = None,
                 adjustments=tuple(adj_records),
                 adjustment_warnings=tuple(adj_warnings),
                 include_in_teaching_pct_chart=staff_ref["teaching_pct_chart"] if staff_ref else True,
+                grade=resolved_grade,
             )
 
     # Deduplicate staff roster
