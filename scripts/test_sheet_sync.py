@@ -187,3 +187,23 @@ class TestCompareFteTolerant:
         local = self.HEADER + "P1,Alice,20,\n"
         diff = sheet_sync.compare_fte_tolerant(live, local)
         assert len(diff.changed) == 1
+
+
+class TestMergeSupplementary:
+    def test_appends_supplementary_rows_after_live_rows(self):
+        result = sheet_sync.merge_supplementary(
+            live_text="Role,Person,,,\nHead of Department,Iain Bate,,,\n",
+            supplementary_text="Union,Chris Crispin-Bailey,,,\n",
+        )
+        rows = sheet_sync.parse_csv_rows(result)
+        assert rows == [
+            ["Role", "Person", "", "", ""],
+            ["Head of Department", "Iain Bate", "", "", ""],
+            ["Union", "Chris Crispin-Bailey", "", "", ""],
+        ]
+
+    def test_empty_supplementary_returns_live_content_unchanged_in_rows(self):
+        result = sheet_sync.merge_supplementary(
+            live_text="a,b\n1,2\n", supplementary_text=""
+        )
+        assert sheet_sync.parse_csv_rows(result) == [["a", "b"], ["1", "2"]]
