@@ -123,6 +123,7 @@ def test_all_expected_artifacts_produced(generated):
         "workload_summary_boxplot.png",
         "workload_detailed_boxplot.png",
         "workload_teaching_percentage_histogram.png",
+        "workload_teaching_percentage_by_grade_histogram.png",
         "workload_report.html",
     ]
     for name in expected_files:
