@@ -78,6 +78,9 @@ def result_to_dict(r) -> Dict[str, Any]:
         "adjustments_breakdown": dict(r.adjustments_breakdown or {}),
         "assumptions": list(r.assumptions or ()),
         "missing_data": list(r.missing_data or ()),
+        "remaining_hours": r.remaining_hours,
+        "teaching_pct_of_remaining": r.teaching_pct_of_remaining,
+        "include_in_teaching_pct_chart": r.include_in_teaching_pct_chart,
     })
 
 
