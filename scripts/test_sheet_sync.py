@@ -360,3 +360,59 @@ class TestSyncMultiTabSource:
         )
         assert "Advisor Loads" in out.text()
         assert "fetched" in out.text()
+
+
+class TestLoadSaveSources:
+    def test_load_missing_file_returns_empty_dict(self, tmp_path):
+        assert sheet_sync.load_sources(tmp_path / "nope.json") == {}
+
+    def test_save_then_load_round_trips(self, tmp_path):
+        path = tmp_path / "sources.json"
+        sheet_sync.save_sources({"X.csv": {"url": "https://example.com"}}, path=path)
+        assert sheet_sync.load_sources(path) == {"X.csv": {"url": "https://example.com"}}
+
+
+class TestFindUnmappedFiles:
+    def test_finds_csv_and_xlsx_not_in_sources(self, tmp_path):
+        (tmp_path / "mapped.csv").write_text("a\n")
+        (tmp_path / "unmapped.csv").write_text("a\n")
+        (tmp_path / "unmapped.xlsx").write_bytes(b"")
+        (tmp_path / "ignored.json").write_text("{}")
+        unmapped = sheet_sync.find_unmapped_files({"mapped.csv": {}}, data_dir=tmp_path)
+        assert unmapped == ["unmapped.csv", "unmapped.xlsx"]
+
+    def test_no_unmapped_files_returns_empty_list(self, tmp_path):
+        (tmp_path / "mapped.csv").write_text("a\n")
+        assert sheet_sync.find_unmapped_files({"mapped.csv": {}}, data_dir=tmp_path) == []
+
+
+class TestCheckCoverage:
+    def test_pasted_url_is_added_to_sources_and_saved(self, tmp_path):
+        (tmp_path / "new_file.csv").write_text("a\n")
+        sources = {}
+        sources_path = tmp_path / "sources.json"
+        sheet_sync.check_coverage(
+            sources, data_dir=tmp_path,
+            prompt=lambda p: "https://docs.google.com/spreadsheets/d/XYZ",
+            out=lambda l: None, sources_path=sources_path,
+        )
+        assert sources["new_file.csv"]["url"] == "https://docs.google.com/spreadsheets/d/XYZ"
+        saved = sheet_sync.load_sources(sources_path)
+        assert saved["new_file.csv"]["url"] == "https://docs.google.com/spreadsheets/d/XYZ"
+
+    def test_empty_response_skips_without_adding(self, tmp_path):
+        (tmp_path / "new_file.csv").write_text("a\n")
+        sources = {}
+        sheet_sync.check_coverage(
+            sources, data_dir=tmp_path, prompt=lambda p: "",
+            out=lambda l: None, sources_path=tmp_path / "sources.json",
+        )
+        assert "new_file.csv" not in sources
+
+    def test_no_unmapped_files_never_prompts(self, tmp_path):
+        prompted = []
+        sheet_sync.check_coverage(
+            {}, data_dir=tmp_path, prompt=lambda p: prompted.append(p) or "",
+            out=lambda l: None, sources_path=tmp_path / "sources.json",
+        )
+        assert prompted == []
