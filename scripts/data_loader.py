@@ -1286,7 +1286,7 @@ def _load_staff_categories_and_fte(filepath: str = "Staff Categories and FTE.csv
     for how to keep it current.
 
     Returns {person_name: {"category": str, "fte": float, "modelled": bool,
-    "notes": str, "email": str}}.
+    "teaching_pct_chart": bool, "notes": str, "email": str}}.
     """
     path = DATA_DIR / filepath
     if not path.exists():
