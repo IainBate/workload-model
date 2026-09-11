@@ -161,8 +161,10 @@ def compare_fte_tolerant(live_text: str, local_text: str, tolerance: float = FTE
     noise). Any other column differing, or a row present on only one side,
     is still reported as a real difference.
     """
-    live_rows = list(csv.DictReader(io.StringIO(live_text)))
-    local_rows = list(csv.DictReader(io.StringIO(local_text)))
+    live_reader = csv.DictReader(io.StringIO(live_text))
+    live_rows = list(live_reader)
+    local_reader = csv.DictReader(io.StringIO(local_text))
+    local_rows = list(local_reader)
 
     live_by_key = {_fte_row_key(r): r for r in live_rows}
     local_by_key = {_fte_row_key(r): r for r in local_rows}
@@ -170,6 +172,17 @@ def compare_fte_tolerant(live_text: str, local_text: str, tolerance: float = FTE
     added: List[Tuple[Any, Any]] = []
     removed: List[Tuple[Any, Any]] = []
     changed: List[Tuple[Any, Any, Any]] = []
+
+    # A column present locally but missing from the live sheet's header (or
+    # vice versa) is a real difference even if no row's data happens to
+    # differ under the row-by-row comparison below - e.g. a renamed/dropped
+    # column whose old values were all blank. This was this tool's most
+    # safety-critical blind spot, since its motivating bug was exactly a
+    # renamed/dropped CSV column.
+    live_fields = live_reader.fieldnames or []
+    local_fields = local_reader.fieldnames or []
+    if set(live_fields) != set(local_fields):
+        changed.append(("<header>", local_fields, live_fields))
 
     for key, live_row in live_by_key.items():
         if key not in local_by_key:
