@@ -708,6 +708,28 @@ class TestFindUnconfiguredTabs:
         )
         assert result == {}
 
+    def test_ignored_tab_is_not_flagged(self):
+        """A tab a human has already looked at and judged irrelevant (e.g.
+        Allocation, General Checking) stays silent from then on - it's been
+        reviewed, so it's no longer "unknown", just deliberately excluded."""
+        result = sheet_sync.find_unconfigured_tabs(
+            configured_tabs={"2026-7": "1402610559"},
+            live_tabs={"2026-7": "1402610559", "Allocation": "177948210"},
+            ignored_tabs=["Allocation"],
+        )
+        assert result == {}
+
+    def test_unreviewed_tab_still_flagged_even_with_an_ignore_list_present(self):
+        """The ignore list only silences tabs explicitly named in it - a
+        genuinely new, never-reviewed tab must still surface even when other
+        tabs are being ignored."""
+        result = sheet_sync.find_unconfigured_tabs(
+            configured_tabs={"2026-7": "1402610559"},
+            live_tabs={"2026-7": "1402610559", "Allocation": "177948210", "2027-8": "555"},
+            ignored_tabs=["Allocation"],
+        )
+        assert result == {"2027-8": "555"}
+
 
 class TestSyncMultiTabSourceNewTabDetection:
     def test_no_api_key_skips_new_tab_check_entirely(self, tmp_path, monkeypatch):
