@@ -497,6 +497,18 @@ class TestLoadSaveSources:
         sheet_sync.save_sources({"X.csv": {"url": "https://example.com"}}, path=path)
         assert sheet_sync.load_sources(path) == {"X.csv": {"url": "https://example.com"}}
 
+    def test_save_preserves_insertion_order_not_alphabetical(self, tmp_path):
+        """The spec says sources are processed 'in the order given in the
+        JSON file' - save_sources() must not silently reorder them
+        alphabetically on the first coverage-check addition."""
+        path = tmp_path / "sources.json"
+        sheet_sync.save_sources(
+            {"Zebra.csv": {"url": "https://example.com/z"},
+             "Apple.csv": {"url": "https://example.com/a"}},
+            path=path,
+        )
+        assert list(sheet_sync.load_sources(path).keys()) == ["Zebra.csv", "Apple.csv"]
+
 
 class TestFindUnmappedFiles:
     def test_finds_csv_and_xlsx_not_in_sources(self, tmp_path):
