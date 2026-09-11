@@ -395,29 +395,37 @@ def generate_boxplots(results: List[WorkloadResult], year_data: YearData, output
     print(f"Detailed boxplot saved to {detailed_path}")
 
 
-# Display range for the teaching-%-of-remaining histogram. teaching_pct_of_remaining
-# is deliberately uncapped by workload_calculator.py (an overcommitted person's true
-# value can run to hundreds of percent, positive or negative, near a zero denominator)
-# - these bounds only affect what's drawn, never the underlying number.
-_TEACHING_PCT_CLIP_MIN = -100.0
-_TEACHING_PCT_CLIP_MAX = 200.0
+# The y-axis for the teaching-%-of-remaining histogram scales to the actual
+# (non-negative) data rather than a fixed range, so it doesn't waste space when
+# everyone sits well under 100%. This floor keeps 0-100% always visible as the
+# natural reference scale even if every bar happens to be small.
+_TEACHING_PCT_Y_AXIS_FLOOR = 100.0
+_TEACHING_PCT_Y_AXIS_HEADROOM = 1.1  # 10% headroom above the tallest normal bar
 
 _TEACHING_PCT_CATEGORY_COLORS = {"ART": "#2196F3", "T and S": "#4CAF50"}
 _TEACHING_PCT_DEFAULT_COLOR = "#9E9E9E"
-_TEACHING_PCT_CLIPPED_COLOR = "#F44336"
+_TEACHING_PCT_OVERLOADED_COLOR = "#F44336"
 
 
-def _prepare_teaching_percentage_chart_data(
-    results: List[WorkloadResult],
-    clip_min: float = _TEACHING_PCT_CLIP_MIN,
-    clip_max: float = _TEACHING_PCT_CLIP_MAX,
-) -> Dict[str, Any]:
+def _prepare_teaching_percentage_chart_data(results: List[WorkloadResult]) -> Dict[str, Any]:
     """Pure data-shaping for generate_teaching_percentage_histogram() - no
-    matplotlib, so it can be unit tested directly. Returns per-bar names,
-    plotted (possibly clipped) values, and colors, plus the three "nothing is
-    hidden" footnote lists: staff excluded via include_in_teaching_pct_chart,
-    staff whose true value was clipped to fit the axis, and staff whose
-    percentage is undefined (zero remaining time).
+    matplotlib, so it can be unit tested directly.
+
+    teaching_pct_of_remaining is deliberately uncapped by workload_calculator.py,
+    but a negative value (remaining_hours < 0: research+admin alone already
+    exceed nominal hours) isn't a meaningful fraction to plot at its literal
+    height - a small negative number would look like "does almost no teaching"
+    when the real story is "this person's non-teaching load alone is already
+    over capacity", a much more severe and structurally different condition.
+    So negative-percentage staff are pinned to the top of the y-axis in a third
+    colour ("Overloaded") instead of plotted at their true height; the axis
+    itself auto-scales to whatever the non-negative data actually spans.
+
+    Returns per-bar names, plotted values, and colours, plus the three
+    "nothing is hidden" footnote lists: staff excluded via
+    include_in_teaching_pct_chart, staff pinned as overloaded (with their
+    real, negative percentage available for the footnote), and staff whose
+    percentage is undefined (zero remaining time) - and the computed y_max.
     """
     excluded = [r for r in results if not r.include_in_teaching_pct_chart]
     included = [r for r in results
@@ -425,24 +433,30 @@ def _prepare_teaching_percentage_chart_data(
     undefined = [r for r in results
                  if r.include_in_teaching_pct_chart and r.teaching_pct_of_remaining is None]
 
-    names, plotted_values, colors, clipped = [], [], [], []
+    normal_pcts = [r.teaching_pct_of_remaining for r in included if r.teaching_pct_of_remaining >= 0]
+    y_max = max(_TEACHING_PCT_Y_AXIS_FLOOR,
+                (max(normal_pcts) if normal_pcts else 0.0) * _TEACHING_PCT_Y_AXIS_HEADROOM)
+
+    names, plotted_values, colors, overloaded = [], [], [], []
     for r in included:
         pct = r.teaching_pct_of_remaining
         names.append(r.name)
-        if pct < clip_min or pct > clip_max:
-            clipped.append(r)
-            colors.append(_TEACHING_PCT_CLIPPED_COLOR)
+        if pct < 0:
+            overloaded.append(r)
+            colors.append(_TEACHING_PCT_OVERLOADED_COLOR)
+            plotted_values.append(y_max)
         else:
             colors.append(_TEACHING_PCT_CATEGORY_COLORS.get(r.category, _TEACHING_PCT_DEFAULT_COLOR))
-        plotted_values.append(max(clip_min, min(clip_max, pct)))
+            plotted_values.append(pct)
 
     return {
         "names": names,
         "plotted_values": plotted_values,
         "colors": colors,
-        "clipped": clipped,
+        "overloaded": overloaded,
         "excluded": excluded,
         "undefined": undefined,
+        "y_max": y_max,
     }
 
 

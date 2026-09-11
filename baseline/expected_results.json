@@ -11,6 +11,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [
         "NLPG: no student numbers in CS Module Numbers.csv - marking hours estimated from a default of 100 students"
       ],
@@ -27,6 +28,7 @@
         "rate": 16,
         "total": 176
       },
+      "remaining_hours": 972.7,
       "research_breakdown": {
         "grants": {},
         "phd_students": {
@@ -120,6 +122,7 @@
           "total_lecture_hours": 22.0
         }
       },
+      "teaching_pct_of_remaining": 45.5947,
       "total_hours": 1112.8
     },
     "Alena Denisova": {
@@ -133,6 +136,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [],
       "name": "Alena Denisova",
       "nominal_hours": 1642.0,
@@ -147,6 +151,7 @@
         "rate": 16,
         "total": 80
       },
+      "remaining_hours": 694.4,
       "research_breakdown": {
         "grants": {},
         "phd_students": {
@@ -309,6 +314,7 @@
           "total_lecture_hours": 22.0
         }
       },
+      "teaching_pct_of_remaining": 45.9389,
       "total_hours": 1266.6
     },
     "Alvaro Miyazawa": {
@@ -322,6 +328,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [
         "ARIA: no student numbers in CS Module Numbers.csv - marking hours estimated from a default of 100 students"
       ],
@@ -338,6 +345,7 @@
         "rate": 16,
         "total": 64
       },
+      "remaining_hours": 1034.6,
       "research_breakdown": {
         "grants": {},
         "phd_students": {
@@ -538,22 +546,21 @@
           "total_lecture_hours": 22.0
         }
       },
+      "teaching_pct_of_remaining": 30.9137,
       "total_hours": 927.2333
     },
     "Ana Cavalcanti": {
       "adjustments_breakdown": {},
       "admin_breakdown": {
-        "Research Group Leader": 164.2,
+        "Research Group Leader": 82.1,
         "engagement": 100.0,
         "personal_development": 75.0
       },
-      "admin_hours": 339.2,
-      "assumptions": [
-        "Invalid FTE value for grant: '?'",
-        "Invalid FTE value for grant: '?'"
-      ],
+      "admin_hours": 257.1,
+      "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [],
       "name": "Ana Cavalcanti",
       "nominal_hours": 1642.0,
@@ -563,6 +570,7 @@
         "total": 0
       },
       "project_breakdown": {},
+      "remaining_hours": 836.7,
       "research_breakdown": {
         "grants": {},
         "phd_students": {
@@ -585,7 +593,8 @@
       },
       "teaching_hours": 0.0,
       "teaching_module_breakdowns": {},
-      "total_hours": 887.4
+      "teaching_pct_of_remaining": 0.0,
+      "total_hours": 805.3
     },
     "Andrew Pomfret": {
       "adjustments_breakdown": {},
@@ -598,6 +607,7 @@
       "assumptions": [],
       "category": "T and S",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [],
       "name": "Andrew Pomfret",
       "nominal_hours": 1642.0,
@@ -612,6 +622,7 @@
         "rate": 16,
         "total": 80
       },
+      "remaining_hours": 1220.7,
       "research_breakdown": {
         "grants": {},
         "phd_students": {},
@@ -753,6 +764,7 @@
           "total_lecture_hours": 22.0
         }
       },
+      "teaching_pct_of_remaining": 32.4104,
       "total_hours": 816.9333
     },
     "Antonio Garcia-Dominguez": {
@@ -765,6 +777,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [
         "No administrative roles assigned",
         "ELLA: no student numbers in CS Module Numbers.csv - marking hours estimated from a default of 100 students"
@@ -782,11 +795,9 @@
         "rate": 16,
         "total": 64
       },
+      "remaining_hours": 1150.8,
       "research_breakdown": {
-        "grants": {
-          "grant_2590694": 164.2,
-          "grant_4792719": 164.2
-        },
+        "grants": {},
         "phd_students": {
           "assessor": {
             "count": 1,
@@ -801,7 +812,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 644.6,
+      "research_hours": 316.2,
       "teaching_breakdown": {
         "assessment_setting": 12.5,
         "drop_in": 0.0,
@@ -945,7 +956,8 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1176.9
+      "teaching_pct_of_remaining": 31.048,
+      "total_hours": 848.5
     },
     "Carlo Ottaviani": {
       "adjustments_breakdown": {},
@@ -958,6 +970,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [],
       "name": "Carlo Ottaviani",
       "nominal_hours": 1642.0,
@@ -972,6 +985,7 @@
         "rate": 16,
         "total": 96
       },
+      "remaining_hours": 1034.6,
       "research_breakdown": {
         "grants": {},
         "phd_students": {
@@ -1134,6 +1148,7 @@
           "total_lecture_hours": 22.0
         }
       },
+      "teaching_pct_of_remaining": 39.3904,
       "total_hours": 1014.9333
     },
     "Christopher Crispin-Bailey": {
@@ -1148,6 +1163,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [],
       "name": "Christopher Crispin-Bailey",
       "nominal_hours": 1642.0,
@@ -1162,6 +1178,7 @@
         "rate": 16,
         "total": 112
       },
+      "remaining_hours": 1015.45,
       "research_breakdown": {
         "grants": {},
         "phd_students": {},
@@ -1303,6 +1320,7 @@
           "total_lecture_hours": 22.0
         }
       },
+      "teaching_pct_of_remaining": 58.4076,
       "total_hours": 1219.65
     },
     "Claire Ingram": {
@@ -1316,6 +1334,7 @@
       "assumptions": [],
       "category": "T and S",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [],
       "name": "Claire Ingram",
       "nominal_hours": 1642.0,
@@ -1330,6 +1349,7 @@
         "rate": 24,
         "total": 240
       },
+      "remaining_hours": 1220.7,
       "research_breakdown": {
         "grants": {},
         "phd_students": {},
@@ -1461,6 +1481,7 @@
           "total_lecture_hours": 44.0
         }
       },
+      "teaching_pct_of_remaining": 32.7353,
       "total_hours": 820.9
     },
     "Claudio Guarnera": {
@@ -1473,6 +1494,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 0.4,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [
         "No administrative roles assigned"
       ],
@@ -1489,6 +1511,7 @@
         "rate": 16,
         "total": 32
       },
+      "remaining_hours": 409.12,
       "research_breakdown": {
         "grants": {},
         "phd_students": {
@@ -1581,6 +1604,7 @@
           "total_lecture_hours": 22.0
         }
       },
+      "teaching_pct_of_remaining": 48.1195,
       "total_hours": 444.5467
     },
     "Colin Paterson": {
@@ -1593,6 +1617,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [
         "No administrative roles assigned",
         "LPTC: no student numbers in CS Module Numbers.csv - marking hours estimated from a default of 100 students"
@@ -1610,13 +1635,9 @@
         "rate": 16,
         "total": 96
       },
+      "remaining_hours": 1182.8,
       "research_breakdown": {
-        "grants": {
-          "grant_3874036": 82.1,
-          "grant_4423879": 82.1,
-          "grant_4717588": 49.26,
-          "grant_4963830": 82.1
-        },
+        "grants": {},
         "phd_students": {
           "assessor": {
             "count": 3,
@@ -1631,7 +1652,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 579.76,
+      "research_hours": 284.2,
       "teaching_breakdown": {
         "assessment_setting": 22.5,
         "drop_in": 0.0,
@@ -1760,7 +1781,8 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1140.16
+      "teaching_pct_of_remaining": 32.5837,
+      "total_hours": 844.6
     },
     "Da Li": {
       "adjustments_breakdown": {},
@@ -1772,6 +1794,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [
         "No administrative roles assigned",
         "LLMA: no student numbers in CS Module Numbers.csv - marking hours estimated from a default of 100 students"
@@ -1784,6 +1807,7 @@
         "total": 75
       },
       "project_breakdown": {},
+      "remaining_hours": 1302.8,
       "research_breakdown": {
         "grants": {},
         "phd_students": {},
@@ -1862,6 +1886,7 @@
           "total_lecture_hours": 22.0
         }
       },
+      "teaching_pct_of_remaining": 15.7993,
       "total_hours": 545.0333
     },
     "David Pumfrey": {
@@ -1874,6 +1899,7 @@
       "assumptions": [],
       "category": "T and S",
       "fte": 0.5,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [
         "No administrative roles assigned"
       ],
@@ -1885,6 +1911,7 @@
         "total": 0
       },
       "project_breakdown": {},
+      "remaining_hours": 651.4,
       "research_breakdown": {
         "grants": {},
         "phd_students": {},
@@ -1991,6 +2018,7 @@
           "total_lecture_hours": 22.0
         }
       },
+      "teaching_pct_of_remaining": 14.7528,
       "total_hours": 265.7
     },
     "Dawn H Wood": {
@@ -2003,6 +2031,7 @@
       "assumptions": [],
       "category": "T and S",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [
         "No administrative roles assigned"
       ],
@@ -2019,6 +2048,7 @@
         "rate": 16,
         "total": 176
       },
+      "remaining_hours": 1302.8,
       "research_breakdown": {
         "grants": {},
         "phd_students": {},
@@ -2160,6 +2190,7 @@
           "total_lecture_hours": 22.0
         }
       },
+      "teaching_pct_of_remaining": 36.5981,
       "total_hours": 816.0
     },
     "Detlef Plump": {
@@ -2174,6 +2205,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [],
       "name": "Detlef Plump",
       "nominal_hours": 1642.0,
@@ -2188,6 +2220,7 @@
         "rate": 16,
         "total": 96
       },
+      "remaining_hours": 878.4,
       "research_breakdown": {
         "grants": {},
         "phd_students": {
@@ -2323,6 +2356,7 @@
           "total_lecture_hours": 22.0
         }
       },
+      "teaching_pct_of_remaining": 44.3287,
       "total_hours": 1152.9833
     },
     "Dimitar Kazakov": {
@@ -2336,6 +2370,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [
         "NLPG: no student numbers in CS Module Numbers.csv - marking hours estimated from a default of 100 students"
       ],
@@ -2352,6 +2387,7 @@
         "rate": 16,
         "total": 112
       },
+      "remaining_hours": 518.4,
       "research_breakdown": {
         "grants": {},
         "phd_students": {
@@ -2450,20 +2486,22 @@
           "total_lecture_hours": 22.0
         }
       },
+      "teaching_pct_of_remaining": 74.6142,
       "total_hours": 1510.4
     },
     "Dimitris Kolovos": {
       "adjustments_breakdown": {},
       "admin_breakdown": {
-        "Research Group Leader": 164.2,
+        "Research Group Leader": 82.1,
         "Research Mentor": 32.84,
         "engagement": 100.0,
         "personal_development": 75.0
       },
-      "admin_hours": 372.04,
+      "admin_hours": 289.94,
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [],
       "name": "Dimitris Kolovos",
       "nominal_hours": 1642.0,
@@ -2473,13 +2511,9 @@
         "total": 0
       },
       "project_breakdown": {},
+      "remaining_hours": 811.86,
       "research_breakdown": {
-        "grants": {
-          "grant_2590694": 328.4,
-          "grant_3275903": 82.1,
-          "grant_4792719": 82.1,
-          "grant_5021919": 82.1
-        },
+        "grants": {},
         "phd_students": {
           "assessor": {
             "count": 1,
@@ -2499,7 +2533,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 1114.9,
+      "research_hours": 540.2,
       "teaching_breakdown": {
         "assessment_setting": 5.0,
         "drop_in": 0.0,
@@ -2581,7 +2615,8 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1537.14
+      "teaching_pct_of_remaining": 6.1833,
+      "total_hours": 880.34
     },
     "Fang Yan": {
       "adjustments_breakdown": {},
@@ -2593,6 +2628,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [
         "No administrative roles assigned"
       ],
@@ -2604,6 +2640,7 @@
         "total": 21
       },
       "project_breakdown": {},
+      "remaining_hours": 1302.8,
       "research_breakdown": {
         "grants": {},
         "phd_students": {},
@@ -2684,6 +2721,7 @@
           "total_lecture_hours": 22.0
         }
       },
+      "teaching_pct_of_remaining": 14.0006,
       "total_hours": 521.6
     },
     "Felix Ulrich-Oltean": {
@@ -2696,6 +2734,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [
         "No administrative roles assigned"
       ],
@@ -2707,6 +2746,7 @@
         "total": 0
       },
       "project_breakdown": {},
+      "remaining_hours": 1254.8,
       "research_breakdown": {
         "grants": {},
         "phd_students": {
@@ -2800,6 +2840,7 @@
           "total_lecture_hours": 22.0
         }
       },
+      "teaching_pct_of_remaining": 5.6583,
       "total_hours": 458.2
     },
     "Frank Soboczenski": {
@@ -2813,6 +2854,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [
         "LLMA: no student numbers in CS Module Numbers.csv - marking hours estimated from a default of 100 students"
       ],
@@ -2824,11 +2866,9 @@
         "total": 0
       },
       "project_breakdown": {},
+      "remaining_hours": 1084.7,
       "research_breakdown": {
-        "grants": {
-          "grant_5042890": 180.62,
-          "grant_5834943": 1313.6
-        },
+        "grants": {},
         "phd_students": {
           "assessor": {
             "count": 5,
@@ -2843,7 +2883,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 1794.42,
+      "research_hours": 300.2,
       "teaching_breakdown": {
         "assessment_setting": 5.0,
         "drop_in": 0.0,
@@ -2916,7 +2956,8 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 2143.1867
+      "teaching_pct_of_remaining": 8.4509,
+      "total_hours": 648.9667
     },
     "Iain Bate": {
       "adjustments_breakdown": {},
@@ -2929,6 +2970,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": false,
       "missing_data": [],
       "name": "Iain Bate",
       "nominal_hours": 1642.0,
@@ -2938,10 +2980,9 @@
         "total": 30
       },
       "project_breakdown": {},
+      "remaining_hours": -435.2,
       "research_breakdown": {
-        "grants": {
-          "grant_2590694": 328.4
-        },
+        "grants": {},
         "phd_students": {
           "assessor": {
             "count": 2,
@@ -2956,7 +2997,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 588.6,
+      "research_hours": 260.2,
       "teaching_breakdown": {
         "pastoral_breakdown": {
           "rate": 3,
@@ -2967,7 +3008,8 @@
       },
       "teaching_hours": 30.0,
       "teaching_module_breakdowns": {},
-      "total_hours": 2435.6
+      "teaching_pct_of_remaining": -6.8934,
+      "total_hours": 2107.2
     },
     "Ian Gray": {
       "adjustments_breakdown": {},
@@ -2980,6 +3022,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [],
       "name": "Ian Gray",
       "nominal_hours": 1642.0,
@@ -2989,6 +3032,7 @@
         "total": 0
       },
       "project_breakdown": {},
+      "remaining_hours": 297.8,
       "research_breakdown": {
         "grants": {},
         "phd_students": {
@@ -3095,6 +3139,7 @@
           "total_lecture_hours": 22.0
         }
       },
+      "teaching_pct_of_remaining": 33.5124,
       "total_hours": 1444.0
     },
     "Ibrahim Habli": {
@@ -3107,6 +3152,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": false,
       "missing_data": [
         "No administrative roles assigned"
       ],
@@ -3118,13 +3164,9 @@
         "total": 0
       },
       "project_breakdown": {},
+      "remaining_hours": 1038.8,
       "research_breakdown": {
-        "grants": {
-          "grant_3874036": 656.8,
-          "grant_4698151": 164.2,
-          "grant_4726550": 164.2,
-          "grant_4963830": 82.1
-        },
+        "grants": {},
         "phd_students": {
           "assessor": {
             "count": 1,
@@ -3144,7 +3186,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 1495.5,
+      "research_hours": 428.2,
       "teaching_breakdown": {
         "pastoral_breakdown": {
           "rate": 3,
@@ -3155,7 +3197,8 @@
       },
       "teaching_hours": 0.0,
       "teaching_module_breakdowns": {},
-      "total_hours": 1670.5
+      "teaching_pct_of_remaining": 0.0,
+      "total_hours": 603.2
     },
     "Jacob Rigby": {
       "adjustments_breakdown": {},
@@ -3168,6 +3211,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [],
       "name": "Jacob Rigby",
       "nominal_hours": 1642.0,
@@ -3182,14 +3226,13 @@
         "rate": 16,
         "total": 80
       },
+      "remaining_hours": 1138.6,
       "research_breakdown": {
-        "grants": {
-          "grant_5041144": 82.1
-        },
+        "grants": {},
         "phd_students": {},
         "protected_research_baseline": 164.2
       },
-      "research_hours": 246.3,
+      "research_hours": 164.2,
       "teaching_breakdown": {
         "assessment_setting": 10.0,
         "drop_in": 0.0,
@@ -3265,7 +3308,8 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 828.7333
+      "teaching_pct_of_remaining": 21.3625,
+      "total_hours": 746.6333
     },
     "James Stovold": {
       "adjustments_breakdown": {},
@@ -3278,6 +3322,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [],
       "name": "James Stovold",
       "nominal_hours": 1642.0,
@@ -3287,6 +3332,7 @@
         "total": 75
       },
       "project_breakdown": {},
+      "remaining_hours": 1220.7,
       "research_breakdown": {
         "grants": {},
         "phd_students": {},
@@ -3367,6 +3413,7 @@
           "total_lecture_hours": 22.0
         }
       },
+      "teaching_pct_of_remaining": 24.2074,
       "total_hours": 716.8
     },
     "James Walker": {
@@ -3379,6 +3426,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [
         "No administrative roles assigned"
       ],
@@ -3395,11 +3443,9 @@
         "rate": 16,
         "total": 96
       },
+      "remaining_hours": 958.8,
       "research_breakdown": {
-        "grants": {
-          "grant_4822585": 164.2,
-          "grant_IGGI_PROJECT_002": 328.4
-        },
+        "grants": {},
         "phd_students": {
           "assessor": {
             "count": 5,
@@ -3419,7 +3465,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 1000.8,
+      "research_hours": 508.2,
       "teaching_breakdown": {
         "assessment_setting": 10.0,
         "drop_in": 0.0,
@@ -3495,7 +3541,8 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1469.6667
+      "teaching_pct_of_remaining": 30.6494,
+      "total_hours": 977.0667
     },
     "Jen Beeston": {
       "adjustments_breakdown": {},
@@ -3508,6 +3555,7 @@
       "assumptions": [],
       "category": "T and S",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [],
       "name": "Jen Beeston",
       "nominal_hours": 1642.0,
@@ -3522,6 +3570,7 @@
         "rate": 16,
         "total": 64
       },
+      "remaining_hours": 642.2,
       "research_breakdown": {
         "grants": {},
         "phd_students": {
@@ -3691,6 +3740,7 @@
           "total_lecture_hours": 22.0
         }
       },
+      "teaching_pct_of_remaining": 42.9306,
       "total_hours": 1275.5
     },
     "Jo Iacovides": {
@@ -3704,6 +3754,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [],
       "name": "Jo Iacovides",
       "nominal_hours": 1642.0,
@@ -3718,6 +3769,7 @@
         "rate": 16,
         "total": 96
       },
+      "remaining_hours": 954.6,
       "research_breakdown": {
         "grants": {},
         "phd_students": {
@@ -3884,6 +3936,7 @@
           "total_lecture_hours": 22.0
         }
       },
+      "teaching_pct_of_remaining": 29.5097,
       "total_hours": 969.1
     },
     "Joe Cutting": {
@@ -3897,6 +3950,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [],
       "name": "Joe Cutting",
       "nominal_hours": 1642.0,
@@ -3911,6 +3965,7 @@
         "rate": 16,
         "total": 112
       },
+      "remaining_hours": 1238.8,
       "research_breakdown": {
         "grants": {},
         "phd_students": {
@@ -4061,19 +4116,21 @@
           "total_lecture_hours": 22.0
         }
       },
+      "teaching_pct_of_remaining": 28.0191,
       "total_hours": 750.3
     },
     "John McDermid": {
       "adjustments_breakdown": {},
       "admin_breakdown": {
-        "Research Group Leader": 164.2,
+        "Research Group Leader": 82.1,
         "engagement": 100.0,
         "personal_development": 75.0
       },
-      "admin_hours": 339.2,
+      "admin_hours": 257.1,
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": false,
       "missing_data": [],
       "name": "John McDermid",
       "nominal_hours": 1642.0,
@@ -4083,12 +4140,9 @@
         "total": 0
       },
       "project_breakdown": {},
+      "remaining_hours": 1076.7,
       "research_breakdown": {
-        "grants": {
-          "grant_3874036": 821.0,
-          "grant_4846427": 82.1,
-          "grant_4903854": 328.4
-        },
+        "grants": {},
         "phd_students": {
           "co_supervision": {
             "count": 3,
@@ -4098,7 +4152,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 1539.7,
+      "research_hours": 308.2,
       "teaching_breakdown": {
         "pastoral_breakdown": {
           "rate": 3,
@@ -4109,7 +4163,8 @@
       },
       "teaching_hours": 0.0,
       "teaching_module_breakdowns": {},
-      "total_hours": 1878.9
+      "teaching_pct_of_remaining": 0.0,
+      "total_hours": 565.3
     },
     "Katrina Attwood": {
       "adjustments_breakdown": {},
@@ -4122,6 +4177,7 @@
       "assumptions": [],
       "category": "T and S",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [],
       "name": "Katrina Attwood",
       "nominal_hours": 1642.0,
@@ -4136,6 +4192,7 @@
         "rate": 16,
         "total": 96
       },
+      "remaining_hours": 926.4,
       "research_breakdown": {
         "grants": {},
         "phd_students": {
@@ -4293,6 +4350,7 @@
           "total_lecture_hours": 22.0
         }
       },
+      "teaching_pct_of_remaining": 43.8939,
       "total_hours": 1122.2333
     },
     "Kofi Appiah": {
@@ -4306,6 +4364,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [],
       "name": "Kofi Appiah",
       "nominal_hours": 1642.0,
@@ -4320,6 +4379,7 @@
         "rate": 16,
         "total": 112
       },
+      "remaining_hours": 864.5,
       "research_breakdown": {
         "grants": {},
         "phd_students": {
@@ -4477,6 +4537,7 @@
           "total_lecture_hours": 22.0
         }
       },
+      "teaching_pct_of_remaining": 49.4853,
       "total_hours": 1205.3
     },
     "Kostas Barmpis": {
@@ -4490,6 +4551,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [],
       "name": "Kostas Barmpis",
       "nominal_hours": 1642.0,
@@ -4504,11 +4566,9 @@
         "rate": 16,
         "total": 32
       },
+      "remaining_hours": 1164.7,
       "research_breakdown": {
-        "grants": {
-          "grant_2590694": 164.2,
-          "grant_4792719": 164.2
-        },
+        "grants": {},
         "phd_students": {
           "assessor": {
             "count": 1,
@@ -4523,7 +4583,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 548.6,
+      "research_hours": 220.2,
       "teaching_breakdown": {
         "assessment_setting": 20.0,
         "drop_in": 0.0,
@@ -4666,7 +4726,8 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1154.7
+      "teaching_pct_of_remaining": 29.9648,
+      "total_hours": 826.3
     },
     "Mark Nicholson": {
       "adjustments_breakdown": {},
@@ -4679,6 +4740,7 @@
       "assumptions": [],
       "category": "T and S",
       "fte": 0.8,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [],
       "name": "Mark Nicholson",
       "nominal_hours": 1313.6,
@@ -4693,6 +4755,7 @@
         "rate": 24,
         "total": 120
       },
+      "remaining_hours": 893.696,
       "research_breakdown": {
         "grants": {},
         "phd_students": {
@@ -4806,6 +4869,7 @@
           "total_lecture_hours": 22.0
         }
       },
+      "teaching_pct_of_remaining": 27.1569,
       "total_hours": 662.604
     },
     "Mark Sujan": {
@@ -4818,6 +4882,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 0.8,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [
         "No administrative roles assigned"
       ],
@@ -4829,6 +4894,7 @@
         "total": 0
       },
       "project_breakdown": {},
+      "remaining_hours": 1042.24,
       "research_breakdown": {
         "grants": {},
         "phd_students": {},
@@ -4892,6 +4958,7 @@
           "total_lecture_hours": 22.0
         }
       },
+      "teaching_pct_of_remaining": 4.5479,
       "total_hours": 318.76
     },
     "Mike Freeman": {
@@ -4905,6 +4972,7 @@
       "assumptions": [],
       "category": "T and S",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [],
       "name": "Mike Freeman",
       "nominal_hours": 1642.0,
@@ -4914,6 +4982,7 @@
         "total": 54
       },
       "project_breakdown": {},
+      "remaining_hours": 1220.7,
       "research_breakdown": {
         "grants": {},
         "phd_students": {},
@@ -5054,6 +5123,7 @@
           "total_lecture_hours": 22.0
         }
       },
+      "teaching_pct_of_remaining": 27.5771,
       "total_hours": 757.9333
     },
     "Mike O'Dea": {
@@ -5067,6 +5137,7 @@
       "assumptions": [],
       "category": "T and S",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [],
       "name": "Mike O'Dea",
       "nominal_hours": 1642.0,
@@ -5081,6 +5152,7 @@
         "rate": 16,
         "total": 112
       },
+      "remaining_hours": 1220.7,
       "research_breakdown": {
         "grants": {},
         "phd_students": {},
@@ -5294,6 +5366,7 @@
           "total_lecture_hours": 22.0
         }
       },
+      "teaching_pct_of_remaining": 41.5581,
       "total_hours": 928.6
     },
     "Nick Pears": {
@@ -5307,6 +5380,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [],
       "name": "Nick Pears",
       "nominal_hours": 1642.0,
@@ -5321,6 +5395,7 @@
         "rate": 16,
         "total": 64
       },
+      "remaining_hours": 382.0,
       "research_breakdown": {
         "grants": {},
         "phd_students": {
@@ -5418,6 +5493,7 @@
           "total_lecture_hours": 22.0
         }
       },
+      "teaching_pct_of_remaining": 54.6946,
       "total_hours": 1468.9333
     },
     "Oleg Lisagor": {
@@ -5431,6 +5507,7 @@
       "assumptions": [],
       "category": "T and S",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [],
       "name": "Oleg Lisagor",
       "nominal_hours": 1642.0,
@@ -5445,6 +5522,7 @@
         "rate": 24,
         "total": 120
       },
+      "remaining_hours": 1220.7,
       "research_breakdown": {
         "grants": {},
         "phd_students": {},
@@ -5596,6 +5674,7 @@
           "total_lecture_hours": 22.0
         }
       },
+      "teaching_pct_of_remaining": 24.9037,
       "total_hours": 725.3
     },
     "Paul Cairns": {
@@ -5603,14 +5682,15 @@
       "admin_breakdown": {
         "Other PLs": 82.1,
         "REF Lead": 82.1,
-        "Research Group Leader": 164.2,
+        "Research Group Leader": 82.1,
         "engagement": 100.0,
         "personal_development": 75.0
       },
-      "admin_hours": 503.4,
+      "admin_hours": 421.3,
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [],
       "name": "Paul Cairns",
       "nominal_hours": 1642.0,
@@ -5625,11 +5705,9 @@
         "rate": 16,
         "total": 96
       },
+      "remaining_hours": 536.5,
       "research_breakdown": {
-        "grants": {
-          "grant_4962938": 0.0,
-          "grant_IGGI_PROJECT_001": 328.4
-        },
+        "grants": {},
         "phd_students": {
           "assessor": {
             "count": 7,
@@ -5649,7 +5727,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 1012.6,
+      "research_hours": 684.2,
       "teaching_breakdown": {
         "assessment_setting": 17.5,
         "drop_in": 0.0,
@@ -5786,7 +5864,8 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1861.6333
+      "teaching_pct_of_remaining": 64.4237,
+      "total_hours": 1451.1333
     },
     "Pedro Ribeiro": {
       "adjustments_breakdown": {},
@@ -5799,6 +5878,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [],
       "name": "Pedro Ribeiro",
       "nominal_hours": 1642.0,
@@ -5813,10 +5893,9 @@
         "rate": 16,
         "total": 64
       },
+      "remaining_hours": 986.6,
       "research_breakdown": {
-        "grants": {
-          "grant_5042890": 328.4
-        },
+        "grants": {},
         "phd_students": {
           "assessor": {
             "count": 1,
@@ -5831,7 +5910,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 644.6,
+      "research_hours": 316.2,
       "teaching_breakdown": {
         "assessment_setting": 10.0,
         "drop_in": 0.0,
@@ -5974,21 +6053,23 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1296.3
+      "teaching_pct_of_remaining": 31.6744,
+      "total_hours": 967.9
     },
     "Pengcheng Liu": {
       "adjustments_breakdown": {},
       "admin_breakdown": {
         "Graduate Chair": 328.4,
-        "Research Group Leader": 164.2,
+        "Research Group Leader": 82.1,
         "Research Mentor": 32.84,
         "engagement": 100.0,
         "personal_development": 75.0
       },
-      "admin_hours": 700.44,
+      "admin_hours": 618.34,
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [],
       "name": "Pengcheng Liu",
       "nominal_hours": 1642.0,
@@ -6003,13 +6084,9 @@
         "rate": 16,
         "total": 64
       },
+      "remaining_hours": 667.46,
       "research_breakdown": {
-        "grants": {
-          "grant_2590694": 82.1,
-          "grant_3450885": 328.4,
-          "grant_5773838": 147.78,
-          "grant_5983081": 82.1
-        },
+        "grants": {},
         "phd_students": {
           "assessor": {
             "count": 2,
@@ -6029,7 +6106,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 996.58,
+      "research_hours": 356.2,
       "teaching_breakdown": {
         "assessment_setting": 7.5,
         "drop_in": 0.0,
@@ -6105,7 +6182,8 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 2009.32
+      "teaching_pct_of_remaining": 46.7893,
+      "total_hours": 1286.84
     },
     "Peter Nightingale": {
       "adjustments_breakdown": {},
@@ -6118,6 +6196,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [
         "ARIA: no student numbers in CS Module Numbers.csv - marking hours estimated from a default of 100 students"
       ],
@@ -6134,6 +6213,7 @@
         "rate": 16,
         "total": 80
       },
+      "remaining_hours": 1002.6,
       "research_breakdown": {
         "grants": {},
         "phd_students": {
@@ -6348,6 +6428,7 @@
           "total_lecture_hours": 22.0
         }
       },
+      "teaching_pct_of_remaining": 42.935,
       "total_hours": 1069.8667
     },
     "Poonam Yadav": {
@@ -6361,6 +6442,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [],
       "name": "Poonam Yadav",
       "nominal_hours": 1642.0,
@@ -6375,12 +6457,9 @@
         "rate": 16,
         "total": 208
       },
+      "remaining_hours": 682.6,
       "research_breakdown": {
-        "grants": {
-          "grant_2688501": 328.4,
-          "grant_5930272": 82.1,
-          "grant_5967567": 82.1
-        },
+        "grants": {},
         "phd_students": {
           "assessor": {
             "count": 1,
@@ -6400,7 +6479,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 1112.8,
+      "research_hours": 620.2,
       "teaching_breakdown": {
         "assessment_setting": 5.0,
         "drop_in": 0.0,
@@ -6476,7 +6555,8 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1878.9333
+      "teaching_pct_of_remaining": 62.5452,
+      "total_hours": 1386.3333
     },
     "Pourya Shamsolmoali": {
       "adjustments_breakdown": {},
@@ -6490,6 +6570,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [],
       "name": "Pourya Shamsolmoali",
       "nominal_hours": 1642.0,
@@ -6504,6 +6585,7 @@
         "rate": 16,
         "total": 32
       },
+      "remaining_hours": 1115.65,
       "research_breakdown": {
         "grants": {},
         "phd_students": {
@@ -6666,6 +6748,7 @@
           "total_lecture_hours": 22.0
         }
       },
+      "teaching_pct_of_remaining": 40.5638,
       "total_hours": 978.9
     },
     "Radu Calinescu": {
@@ -6679,6 +6762,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [],
       "name": "Radu Calinescu",
       "nominal_hours": 1642.0,
@@ -6693,12 +6777,9 @@
         "rate": 16,
         "total": 16
       },
+      "remaining_hours": 925.96,
       "research_breakdown": {
-        "grants": {
-          "grant_3874036": 82.1,
-          "grant_4928324": 164.2,
-          "grant_5876296": 164.2
-        },
+        "grants": {},
         "phd_students": {
           "assessor": {
             "count": 3,
@@ -6718,7 +6799,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 918.7,
+      "research_hours": 508.2,
       "teaching_breakdown": {
         "assessment_setting": 22.5,
         "drop_in": 0.0,
@@ -6791,7 +6872,8 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1257.54
+      "teaching_pct_of_remaining": 14.1475,
+      "total_hours": 847.04
     },
     "Richard Hawkins": {
       "adjustments_breakdown": {},
@@ -6805,6 +6887,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [],
       "name": "Richard Hawkins",
       "nominal_hours": 1642.0,
@@ -6819,10 +6902,9 @@
         "rate": 24,
         "total": 144
       },
+      "remaining_hours": 944.5,
       "research_breakdown": {
-        "grants": {
-          "grant_3874036": 82.1
-        },
+        "grants": {},
         "phd_students": {
           "assessor": {
             "count": 2,
@@ -6837,7 +6919,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 358.3,
+      "research_hours": 276.2,
       "teaching_breakdown": {
         "assessment_setting": 22.5,
         "drop_in": 0.0,
@@ -6982,20 +7064,22 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1134.0
+      "teaching_pct_of_remaining": 37.5225,
+      "total_hours": 1051.9
     },
     "Richard Wilson": {
       "adjustments_breakdown": {},
       "admin_breakdown": {
         "ART staff representative": 0.0,
-        "Research Group Leader": 98.52,
+        "Research Group Leader": 49.26,
         "engagement": 60.0,
         "personal_development": 45.0
       },
-      "admin_hours": 203.52,
+      "admin_hours": 154.26,
       "assumptions": [],
       "category": "ART",
       "fte": 0.6,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [],
       "name": "Richard Wilson",
       "nominal_hours": 985.2,
@@ -7005,6 +7089,7 @@
         "total": 3
       },
       "project_breakdown": {},
+      "remaining_hours": 380.42,
       "research_breakdown": {
         "grants": {},
         "phd_students": {
@@ -7037,7 +7122,8 @@
       },
       "teaching_hours": 3.0,
       "teaching_module_breakdowns": {},
-      "total_hours": 657.04
+      "teaching_pct_of_remaining": 0.7886,
+      "total_hours": 607.78
     },
     "Rob Alexander": {
       "adjustments_breakdown": {},
@@ -7050,6 +7136,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [],
       "name": "Rob Alexander",
       "nominal_hours": 1642.0,
@@ -7064,10 +7151,9 @@
         "rate": 24,
         "total": 144
       },
+      "remaining_hours": 1085.12,
       "research_breakdown": {
-        "grants": {
-          "grant_3874036": 82.1
-        },
+        "grants": {},
         "phd_students": {
           "assessor": {
             "count": 1,
@@ -7082,7 +7168,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 398.3,
+      "research_hours": 316.2,
       "teaching_breakdown": {
         "assessment_setting": 30.0,
         "drop_in": 0.0,
@@ -7251,7 +7337,8 @@
           "total_lecture_hours": 44.0
         }
       },
-      "total_hours": 1019.88
+      "teaching_pct_of_remaining": 35.1021,
+      "total_hours": 937.78
     },
     "Roberto Metere": {
       "adjustments_breakdown": {},
@@ -7264,6 +7351,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [],
       "name": "Roberto Metere",
       "nominal_hours": 1642.0,
@@ -7278,6 +7366,7 @@
         "rate": 16,
         "total": 96
       },
+      "remaining_hours": 1133.12,
       "research_breakdown": {
         "grants": {},
         "phd_students": {
@@ -7511,6 +7600,7 @@
           "total_lecture_hours": 22.0
         }
       },
+      "teaching_pct_of_remaining": 52.5525,
       "total_hours": 1104.3633
     },
     "Sam Braunstein": {
@@ -7523,6 +7613,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [
         "No administrative roles assigned"
       ],
@@ -7539,6 +7630,7 @@
         "rate": 16,
         "total": 112
       },
+      "remaining_hours": 1302.8,
       "research_breakdown": {
         "grants": {},
         "phd_students": {},
@@ -7670,6 +7762,7 @@
           "total_lecture_hours": 22.0
         }
       },
+      "teaching_pct_of_remaining": 21.844,
       "total_hours": 623.7833
     },
     "Sarah Carrington": {
@@ -7682,6 +7775,7 @@
       "assumptions": [],
       "category": "T and S",
       "fte": 0.8,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [
         "No administrative roles assigned"
       ],
@@ -7698,6 +7792,7 @@
         "rate": 24,
         "total": 192
       },
+      "remaining_hours": 1042.24,
       "research_breakdown": {
         "grants": {},
         "phd_students": {},
@@ -7806,20 +7901,22 @@
           "total_lecture_hours": 22.0
         }
       },
+      "teaching_pct_of_remaining": 31.5954,
       "total_hours": 600.66
     },
     "Siamak Shahandashti": {
       "adjustments_breakdown": {},
       "admin_breakdown": {
         "Deputy Graduate Chair": 164.2,
-        "Research Group Leader": 164.2,
+        "Research Group Leader": 82.1,
         "engagement": 100.0,
         "personal_development": 75.0
       },
-      "admin_hours": 503.4,
+      "admin_hours": 421.3,
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [],
       "name": "Siamak Shahandashti",
       "nominal_hours": 1642.0,
@@ -7834,10 +7931,9 @@
         "rate": 16,
         "total": 96
       },
+      "remaining_hours": 824.5,
       "research_breakdown": {
-        "grants": {
-          "grant_4748293": 82.1
-        },
+        "grants": {},
         "phd_students": {
           "assessor": {
             "count": 1,
@@ -7857,7 +7953,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 478.3,
+      "research_hours": 396.2,
       "teaching_breakdown": {
         "assessment_setting": 10.0,
         "drop_in": 0.0,
@@ -8003,7 +8099,8 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1349.3667
+      "teaching_pct_of_remaining": 44.5927,
+      "total_hours": 1185.1667
     },
     "Simon Burton": {
       "adjustments_breakdown": {},
@@ -8015,6 +8112,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [
         "No administrative roles assigned"
       ],
@@ -8026,14 +8124,9 @@
         "total": 0
       },
       "project_breakdown": {},
+      "remaining_hours": 1118.8,
       "research_breakdown": {
-        "grants": {
-          "grant_4954937": 82.1,
-          "grant_5029650": 246.3,
-          "grant_5685812": 49.26,
-          "grant_5829709": 32.84,
-          "grant_5829985": 32.84
-        },
+        "grants": {},
         "phd_students": {
           "assessor": {
             "count": 1,
@@ -8053,7 +8146,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 791.54,
+      "research_hours": 348.2,
       "teaching_breakdown": {
         "assessment_setting": 7.5,
         "drop_in": 0.0,
@@ -8111,7 +8204,8 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1020.24
+      "teaching_pct_of_remaining": 4.7998,
+      "total_hours": 576.9
     },
     "Simon Foster": {
       "adjustments_breakdown": {},
@@ -8123,6 +8217,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [
         "No administrative roles assigned"
       ],
@@ -8139,6 +8234,7 @@
         "rate": 16,
         "total": 32
       },
+      "remaining_hours": 1190.8,
       "research_breakdown": {
         "grants": {},
         "phd_students": {
@@ -8291,6 +8387,7 @@
           "total_lecture_hours": 22.0
         }
       },
+      "teaching_pct_of_remaining": 31.2325,
       "total_hours": 823.1167
     },
     "Simos Gerasimou": {
@@ -8304,6 +8401,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [],
       "name": "Simos Gerasimou",
       "nominal_hours": 1642.0,
@@ -8313,13 +8411,9 @@
         "total": 0
       },
       "project_breakdown": {},
+      "remaining_hours": 1021.96,
       "research_breakdown": {
-        "grants": {
-          "grant_3275903": 164.2,
-          "grant_3983911": 197.04,
-          "grant_4712353": 246.3,
-          "grant_4792719": 82.1
-        },
+        "grants": {},
         "phd_students": {
           "assessor": {
             "count": 3,
@@ -8339,7 +8433,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 1101.84,
+      "research_hours": 412.2,
       "teaching_breakdown": {
         "pastoral_breakdown": {
           "rate": 3,
@@ -8350,7 +8444,8 @@
       },
       "teaching_hours": 0.0,
       "teaching_module_breakdowns": {},
-      "total_hours": 1309.68
+      "teaching_pct_of_remaining": 0.0,
+      "total_hours": 620.04
     },
     "Soumya Banerjee": {
       "adjustments_breakdown": {},
@@ -8363,6 +8458,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [
         "LLMA: no student numbers in CS Module Numbers.csv - marking hours estimated from a default of 100 students"
       ],
@@ -8374,6 +8470,7 @@
         "total": 75
       },
       "project_breakdown": {},
+      "remaining_hours": 1138.6,
       "research_breakdown": {
         "grants": {},
         "phd_students": {},
@@ -8519,20 +8616,22 @@
           "total_lecture_hours": 22.0
         }
       },
+      "teaching_pct_of_remaining": 26.7375,
       "total_hours": 807.8333
     },
     "Stefano Pirandola": {
       "adjustments_breakdown": {},
       "admin_breakdown": {
         "Progression Panel Chair": 246.3,
-        "Research Group Leader": 164.2,
+        "Research Group Leader": 82.1,
         "engagement": 100.0,
         "personal_development": 75.0
       },
-      "admin_hours": 585.5,
+      "admin_hours": 503.4,
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [],
       "name": "Stefano Pirandola",
       "nominal_hours": 1642.0,
@@ -8547,10 +8646,9 @@
         "rate": 16,
         "total": 96
       },
+      "remaining_hours": 782.4,
       "research_breakdown": {
-        "grants": {
-          "grant_3984461": 164.2
-        },
+        "grants": {},
         "phd_students": {
           "assessor": {
             "count": 2,
@@ -8570,7 +8668,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 520.4,
+      "research_hours": 356.2,
       "teaching_breakdown": {
         "assessment_setting": 7.5,
         "drop_in": 0.0,
@@ -8653,7 +8751,8 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1364.45
+      "teaching_pct_of_remaining": 33.0458,
+      "total_hours": 1118.15
     },
     "Steven Wright": {
       "adjustments_breakdown": {},
@@ -8666,6 +8765,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [],
       "name": "Steven Wright",
       "nominal_hours": 1642.0,
@@ -8680,6 +8780,7 @@
         "rate": 16,
         "total": 64
       },
+      "remaining_hours": 522.2,
       "research_breakdown": {
         "grants": {},
         "phd_students": {
@@ -8782,6 +8883,7 @@
           "total_lecture_hours": 22.0
         }
       },
+      "teaching_pct_of_remaining": 44.8104,
       "total_hours": 1353.8
     },
     "Steven Xiaotian Dai": {
@@ -8795,6 +8897,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [],
       "name": "Steven Xiaotian Dai",
       "nominal_hours": 1642.0,
@@ -8809,10 +8912,9 @@
         "rate": 16,
         "total": 96
       },
+      "remaining_hours": 870.4,
       "research_breakdown": {
-        "grants": {
-          "grant_2590694": 82.1
-        },
+        "grants": {},
         "phd_students": {
           "assessor": {
             "count": 1,
@@ -8827,7 +8929,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 350.3,
+      "research_hours": 268.2,
       "teaching_breakdown": {
         "assessment_setting": 15.0,
         "drop_in": 0.0,
@@ -8983,7 +9085,8 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1222.5
+      "teaching_pct_of_remaining": 42.3713,
+      "total_hours": 1140.4
     },
     "Tommy Yuan": {
       "adjustments_breakdown": {},
@@ -8998,6 +9101,7 @@
       "assumptions": [],
       "category": "T and S",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [
         "ARIA: no student numbers in CS Module Numbers.csv - marking hours estimated from a default of 100 students"
       ],
@@ -9014,6 +9118,7 @@
         "rate": 16,
         "total": 64
       },
+      "remaining_hours": 708.72,
       "research_breakdown": {
         "grants": {},
         "phd_students": {
@@ -9226,6 +9331,7 @@
           "total_lecture_hours": 22.0
         }
       },
+      "teaching_pct_of_remaining": 76.7957,
       "total_hours": 1477.5467
     },
     "Vasileios Vasilakis": {
@@ -9239,6 +9345,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [],
       "name": "Vasileios Vasilakis",
       "nominal_hours": 1642.0,
@@ -9253,6 +9360,7 @@
         "rate": 24,
         "total": 144
       },
+      "remaining_hours": 946.6,
       "research_breakdown": {
         "grants": {},
         "phd_students": {
@@ -9403,6 +9511,7 @@
           "total_lecture_hours": 22.0
         }
       },
+      "teaching_pct_of_remaining": 40.6191,
       "total_hours": 1079.9
     },
     "William Smith": {
@@ -9410,14 +9519,15 @@
       "admin_breakdown": {
         "Director of Admissions": 82.1,
         "Internally Distributed Funding panel reviewer": 41.05,
-        "Research Group Leader": 164.2,
+        "Research Group Leader": 82.1,
         "engagement": 100.0,
         "personal_development": 75.0
       },
-      "admin_hours": 462.35,
+      "admin_hours": 380.25,
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [],
       "name": "William Smith",
       "nominal_hours": 1642.0,
@@ -9432,6 +9542,7 @@
         "rate": 16,
         "total": 96
       },
+      "remaining_hours": 585.55,
       "research_breakdown": {
         "grants": {},
         "phd_students": {
@@ -9609,7 +9720,8 @@
           "total_lecture_hours": 22.0
         }
       },
-      "total_hours": 1506.3167
+      "teaching_pct_of_remaining": 62.807,
+      "total_hours": 1424.2167
     },
     "Xinwei Fang": {
       "adjustments_breakdown": {},
@@ -9622,6 +9734,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [],
       "name": "Xinwei Fang",
       "nominal_hours": 1642.0,
@@ -9636,6 +9749,7 @@
         "rate": 16,
         "total": 80
       },
+      "remaining_hours": 1140.7,
       "research_breakdown": {
         "grants": {},
         "phd_students": {
@@ -9780,6 +9894,7 @@
           "total_lecture_hours": 22.0
         }
       },
+      "teaching_pct_of_remaining": 34.3473,
       "total_hours": 893.1
     },
     "Yan Jia": {
@@ -9793,6 +9908,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [],
       "name": "Yan Jia",
       "nominal_hours": 1642.0,
@@ -9807,12 +9923,9 @@
         "rate": 16,
         "total": 64
       },
+      "remaining_hours": 910.4,
       "research_breakdown": {
-        "grants": {
-          "grant_3874036": 82.1,
-          "grant_4698151": 164.2,
-          "grant_4726550": 164.2
-        },
+        "grants": {},
         "phd_students": {
           "assessor": {
             "count": 2,
@@ -9827,7 +9940,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 638.7,
+      "research_hours": 228.2,
       "teaching_breakdown": {
         "pastoral_breakdown": {
           "rate": 3,
@@ -9845,7 +9958,8 @@
       },
       "teaching_hours": 91.0,
       "teaching_module_breakdowns": {},
-      "total_hours": 1233.1
+      "teaching_pct_of_remaining": 9.9956,
+      "total_hours": 822.6
     },
     "Yuchen Zhao": {
       "adjustments_breakdown": {},
@@ -9858,6 +9972,7 @@
       "assumptions": [],
       "category": "ART",
       "fte": 1.0,
+      "include_in_teaching_pct_chart": true,
       "missing_data": [],
       "name": "Yuchen Zhao",
       "nominal_hours": 1642.0,
@@ -9872,6 +9987,7 @@
         "rate": 16,
         "total": 96
       },
+      "remaining_hours": 1204.7,
       "research_breakdown": {
         "grants": {},
         "phd_students": {
@@ -10039,6 +10155,7 @@
           "total_lecture_hours": 22.0
         }
       },
+      "teaching_pct_of_remaining": 33.4689,
       "total_hours": 840.5
     }
   },
