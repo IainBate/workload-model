@@ -1307,6 +1307,7 @@ def _load_staff_categories_and_fte(filepath: str = "Staff Categories and FTE.csv
                     "teaching_pct_chart": (row.get("Teaching % Chart") or "").strip().lower() not in _NOT_MODELLED_VALUES,
                     "notes": (row.get("Notes") or "").strip(),
                     "email": (row.get("Email") or "").strip(),
+                    "grade": (row.get("Grade") or "").strip(),
                 }
             except (ValueError, TypeError):
                 pass
