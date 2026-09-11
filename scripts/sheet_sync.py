@@ -334,12 +334,19 @@ def sync_source(name: str, config: dict, data_dir: Path = DATA_DIR,
 
 def sync_multi_tab_source(name: str, config: dict, data_dir: Path = DATA_DIR,
                            prompt: Callable[[str], str] = input,
-                           out: Callable[[str], None] = print) -> None:
+                           out: Callable[[str], None] = print,
+                           api_key: Optional[str] = None) -> None:
     """Multi-tab workbook sources (CS WTW Who Teaches What.xlsx, ProjectLoads
     2025-26.xlsx). Full local-.xlsx comparison/write-back is out of scope for
     this pass (see the plan's Global Constraints) - a configured tab is
     fetched and reported for manual review, not automatically diffed or
     written.
+
+    If `api_key` is given (see list_sheet_tabs()), also checks for any tab
+    present in the live sheet but not yet a key in this source's "tabs"
+    config, and flags it - without ever guessing which tab is "current".
+    With no api_key (the default), this check is skipped entirely and
+    behaviour is unchanged from before it existed.
     """
     if config.get("accessible", True) is False:
         out(f"{name}: not accessible (sharing) - flip to 'anyone with link can "
@@ -350,16 +357,25 @@ def sync_multi_tab_source(name: str, config: dict, data_dir: Path = DATA_DIR,
     configured = {tab: gid for tab, gid in tabs.items() if gid}
     if not configured:
         out(f"{name}: skipped - tabs not configured (edit google_sheets_sources.json)")
-        return
-    for tab, gid in configured.items():
+    else:
+        for tab, gid in configured.items():
+            try:
+                live_text = fetch_sheet_csv(config["url"], gid=gid)
+            except FetchError as e:
+                out(f"{name} [{tab}]: could not fetch: {e}")
+                continue
+            row_count = len(parse_csv_rows(live_text))
+            out(f"{name} [{tab}]: fetched ({row_count} rows) - this tool doesn't "
+                f"yet compare/write .xlsx content automatically; review by hand")
+
+    if api_key:
         try:
-            live_text = fetch_sheet_csv(config["url"], gid=gid)
+            live_tabs = list_sheet_tabs(config["url"], api_key)
         except FetchError as e:
-            out(f"{name} [{tab}]: could not fetch: {e}")
-            continue
-        row_count = len(parse_csv_rows(live_text))
-        out(f"{name} [{tab}]: fetched ({row_count} rows) - this tool doesn't "
-            f"yet compare/write .xlsx content automatically; review by hand")
+            out(f"{name}: could not check for new tabs: {e}")
+            return
+        for title, gid in find_unconfigured_tabs(tabs, live_tabs).items():
+            out(f"{name}: new tab detected: '{title}' (gid={gid}) - not yet configured")
 
 
 def find_unconfigured_tabs(configured_tabs: Dict[str, Optional[str]],
