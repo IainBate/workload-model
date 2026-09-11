@@ -386,15 +386,24 @@ def sync_multi_tab_source(name: str, config: dict, data_dir: Path = DATA_DIR,
 
 
 def find_unconfigured_tabs(configured_tabs: Dict[str, Optional[str]],
-                            live_tabs: Dict[str, str]) -> Dict[str, str]:
+                            live_tabs: Dict[str, str],
+                            ignored_tabs: Optional[List[str]] = None) -> Dict[str, str]:
     """Tabs present in the live sheet (title -> gid) that aren't a key in
     `configured_tabs` at all - regardless of whether an existing entry has a
     gid filled in or is still null. A tab already listed (even pending a
     gid) is "known about", not "new"; only a title with no key in
     `configured_tabs` counts as newly discovered. Never guesses which tab is
     "current" - just flags drift for a human to look at.
+
+    `ignored_tabs`: names a human has already reviewed and judged
+    irrelevant (e.g. a planning-aid tab with no pipeline consumer) - these
+    stay silent rather than being flagged every run. A tab only earns a
+    place here after someone has actually looked at it once; nothing is
+    pre-ignored by guesswork.
     """
-    return {title: gid for title, gid in live_tabs.items() if title not in configured_tabs}
+    ignored = set(ignored_tabs or ())
+    return {title: gid for title, gid in live_tabs.items()
+            if title not in configured_tabs and title not in ignored}
 
 
 _DATA_FILE_EXTENSIONS = {".csv", ".xlsx"}
