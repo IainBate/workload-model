@@ -1260,7 +1260,7 @@ def _load_waw_roles(filepath: str = "WAW.csv") -> Dict[str, list]:
     return roles
 
 
-_STAFF_CATEGORIES_HEADER = ["Name", "Category", "FTE", "Modelled", "Notes", "Email"]
+_STAFF_CATEGORIES_HEADER = ["Name", "Category", "FTE", "Modelled", "Notes", "Email", "Teaching % Chart"]
 
 # Values in the Modelled column that mean "No" (case-insensitive). Blank/missing
 # defaults to modelled=True - this file only needs an entry when someone is the
