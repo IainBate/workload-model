@@ -301,6 +301,11 @@ def sync_multi_tab_source(name: str, config: dict, data_dir: Path = DATA_DIR,
     fetched and reported for manual review, not automatically diffed or
     written.
     """
+    if config.get("accessible", True) is False:
+        out(f"{name}: not accessible (sharing) - flip to 'anyone with link can "
+            f"view' to enable, or update the CSV by hand as before")
+        return
+
     tabs = config.get("tabs", {})
     configured = {tab: gid for tab, gid in tabs.items() if gid}
     if not configured:
