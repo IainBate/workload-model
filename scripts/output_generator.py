@@ -2414,6 +2414,9 @@ def generate_all_outputs(results: List[WorkloadResult], year_data: YearData,
     # Generate boxplots
     generate_boxplots(results, year_data, output_dir)
 
+    # Generate teaching-%-of-remaining-time histogram
+    generate_teaching_percentage_histogram(results, output_dir)
+
     # Generate per-staff detailed reports
     generate_per_staff_reports(results, year_data, output_dir)
 
