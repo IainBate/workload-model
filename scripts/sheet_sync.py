@@ -448,7 +448,8 @@ def check_coverage(sources: Dict[str, dict], data_dir: Path = DATA_DIR,
 
 def _sync_one_source(name: str, config: dict, data_dir: Path = DATA_DIR,
                       prompt: Callable[[str], str] = input,
-                      out: Callable[[str], None] = print) -> None:
+                      out: Callable[[str], None] = print,
+                      api_key: Optional[str] = None) -> None:
     """Dispatch one source to sync_source/sync_multi_tab_source, catching and
     reporting any unexpected error (e.g. a malformed config missing 'url',
     or a URL that doesn't contain a recognizable sheet ID) so one bad
@@ -465,7 +466,7 @@ def _sync_one_source(name: str, config: dict, data_dir: Path = DATA_DIR,
                 f"view' to enable, or update the CSV by hand as before")
             return
         if "tabs" in config:
-            sync_multi_tab_source(name, config, data_dir=data_dir, prompt=prompt, out=out)
+            sync_multi_tab_source(name, config, data_dir=data_dir, prompt=prompt, out=out, api_key=api_key)
         else:
             sync_source(name, config, data_dir=data_dir, prompt=prompt, out=out)
     except Exception as e:
@@ -473,13 +474,20 @@ def _sync_one_source(name: str, config: dict, data_dir: Path = DATA_DIR,
 
 
 def main(prompt: Callable[[str], str] = input, out: Callable[[str], None] = print,
-         data_dir: Path = DATA_DIR) -> None:
+         data_dir: Path = DATA_DIR, api_key: Optional[str] = None) -> None:
+    """`api_key` (optional): a Google Sheets API key enabling the new-tab
+    check for multi-tab sources (see list_sheet_tabs()). Defaults to the
+    GOOGLE_SHEETS_API_KEY environment variable if not passed explicitly;
+    never required - every other check works identically without one.
+    """
+    if api_key is None:
+        api_key = os.environ.get("GOOGLE_SHEETS_API_KEY")
     sources_path = data_dir / "google_sheets_sources.json"
     sources = load_sources(sources_path)
     if not sources:
         out(f"No sources configured yet - create {sources_path} to get started.")
         return
     for name, config in sources.items():
-        _sync_one_source(name, config, data_dir=data_dir, prompt=prompt, out=out)
+        _sync_one_source(name, config, data_dir=data_dir, prompt=prompt, out=out, api_key=api_key)
         out("")
     check_coverage(sources, data_dir=data_dir, prompt=prompt, out=out, sources_path=sources_path)
