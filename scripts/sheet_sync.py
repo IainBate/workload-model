@@ -224,8 +224,13 @@ def read_local_file(local_path: Path) -> Optional[str]:
 
 
 def write_local_file(local_path: Path, content: str) -> None:
-    with open(local_path, "w", encoding="utf-8", newline="") as f:
+    """Write content to local_path atomically - via a same-directory temp
+    file and os.replace() - so a crash mid-write can't leave a corrupted
+    data file on disk."""
+    tmp_path = local_path.with_suffix(local_path.suffix + ".tmp")
+    with open(tmp_path, "w", encoding="utf-8", newline="") as f:
         f.write(content)
+    os.replace(tmp_path, local_path)
 
 
 _COMPARE_STRATEGIES: Dict[str, Callable[[str, str], DiffResult]] = {
