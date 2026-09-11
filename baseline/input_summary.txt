@@ -3,7 +3,7 @@ Workload Model Baseline Generation Summary
 
 Year: 2026-7
 Modules: 49
-Staff: 66
+Staff: 63
 
 Modules:
   - ARIA (COM00072H) [20cr, Stage 3] - Tommy Yuan, Peter Nightingale, Alvaro Miyazawa
@@ -75,7 +75,6 @@ Staff:
   - Dimitar Kazakov [FTE: 1.0, Roles: Ethics Committee Member]
   - Dimitris Kolovos [FTE: 1.0, Roles: Research Group Leader, Research Mentor]
   - Fang Yan [FTE: 1.0, Roles: none]
-  - Felix Ulrich-Oltean [FTE: 1.0, Roles: none]
   - Frank Soboczenski [FTE: 1.0, Roles: Academic Admissions Team]
   - Iain Bate [FTE: 1.0, Roles: Head of Department]
   - Ian Gray [FTE: 1.0, Roles: Deputy Head of Department (On-campus teaching)]
@@ -110,7 +109,6 @@ Staff:
   - Sam Braunstein [FTE: 1.0, Roles: none]
   - Sarah Carrington [FTE: 0.8, Roles: none]
   - Siamak Shahandashti [FTE: 1.0, Roles: Deputy Graduate Chair, Research Group Leader]
-  - Simon Burton [FTE: 1.0, Roles: none]
   - Simon Foster [FTE: 1.0, Roles: none]
   - Simos Gerasimou [FTE: 1.0, Roles: Research Mentor]
   - Soumya Banerjee [FTE: 1.0, Roles: Mumbai Campus Partnership Leader]
@@ -121,5 +119,4 @@ Staff:
   - Vasileios Vasilakis [FTE: 1.0, Roles: Deputy CBoEs]
   - William Smith [FTE: 1.0, Roles: Director of Admissions, Internally Distributed Funding panel reviewer]
   - Xinwei Fang [FTE: 1.0, Roles: Other PLs]
-  - Yan Jia [FTE: 1.0, Roles: Ethics Committee Member]
   - Yuchen Zhao [FTE: 1.0, Roles: Other PLs]

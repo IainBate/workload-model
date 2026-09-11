@@ -712,7 +712,10 @@ def generate_teaching_percentage_by_grade_histogram(results: List[WorkloadResult
             Line2D([0], [0], color="black", linestyle="--", linewidth=1.5,
                    label=f"Average: {average_pct:.1f}%")
         )
-    ax.legend(handles=legend_handles, loc="upper right", fontsize=10)
+    # Placed outside the axes (not "upper right") so it can't land on top of
+    # whichever grade's group label happens to be rightmost/tallest.
+    ax.legend(handles=legend_handles, loc="upper left", bbox_to_anchor=(1.005, 1.0),
+              fontsize=10, borderaxespad=0)
 
     footnote_lines = []
     if overloaded:
