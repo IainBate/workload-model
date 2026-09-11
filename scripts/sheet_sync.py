@@ -347,10 +347,14 @@ def check_coverage(sources: Dict[str, dict], data_dir: Path = DATA_DIR,
             f"No Google Sheet registered for data/{name} - "
             f"paste a share link now, or press Enter to skip: "
         ).strip()
-        if answer:
-            sources[name] = {"url": answer}
-            out(f"  added data/{name} -> {answer}")
-            changed = True
+        if not answer:
+            continue
+        if not answer.startswith("http"):
+            out(f"  not a URL, skipping data/{name}: {answer!r}")
+            continue
+        sources[name] = {"url": answer}
+        out(f"  added data/{name} -> {answer}")
+        changed = True
     if changed:
         save_sources(sources, path=sources_path)
 
