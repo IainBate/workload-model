@@ -2024,6 +2024,7 @@ def load_all_data(data_dir: str = None,
             saint_modules=(),
             adjustments=tuple(adj_records_hod),
             adjustment_warnings=tuple(adj_warnings_hod),
+            include_in_teaching_pct_chart=staff_ref_hod["teaching_pct_chart"] if staff_ref_hod else True,
         )
 
     # Ask about any remaining unresolved contract categories. Deliberately done
