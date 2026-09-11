@@ -416,3 +416,37 @@ class TestCheckCoverage:
             out=lambda l: None, sources_path=tmp_path / "sources.json",
         )
         assert prompted == []
+
+
+class TestSyncOneSourceErrorIsolation:
+    """main()'s loop must not let one bad source's config abort every other
+    source's check - see task-8 review finding."""
+
+    def test_missing_url_key_reports_error_and_does_not_raise(self, tmp_path):
+        out = _Recorder()
+        sheet_sync._sync_one_source(
+            "Bad.csv", {}, data_dir=tmp_path, prompt=lambda p: "y", out=out,
+        )
+        assert "unexpected error" in out.text()
+        assert "Bad.csv" in out.text()
+
+    def test_url_with_no_sheet_id_reports_error_and_does_not_raise(self, tmp_path):
+        out = _Recorder()
+        sheet_sync._sync_one_source(
+            "Bad.csv", {"url": "https://example.com/not-a-sheet"},
+            data_dir=tmp_path, prompt=lambda p: "y", out=out,
+        )
+        assert "unexpected error" in out.text()
+        assert "Bad.csv" in out.text()
+
+    def test_second_source_still_processed_after_first_source_errors(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(sheet_sync, "fetch_sheet_csv", lambda *a, **k: "a,b\n1,2\n")
+        out = _Recorder()
+        sources = {
+            "Bad.csv": {},  # missing 'url' - must not abort the loop
+            "Good.csv": {"url": "https://docs.google.com/spreadsheets/d/ABC"},
+        }
+        for name, config in sources.items():
+            sheet_sync._sync_one_source(name, config, data_dir=tmp_path, prompt=lambda p: "y", out=out)
+        assert "Bad.csv: unexpected error" in out.text()
+        assert (tmp_path / "Good.csv").read_text() == "a,b\n1,2\n"
