@@ -867,5 +867,60 @@ class TestMainThreadsApiKey:
         monkeypatch.setattr(sheet_sync, "sync_multi_tab_source", fake_sync_multi_tab_source)
         monkeypatch.delenv("GOOGLE_SHEETS_API_KEY", raising=False)
 
-        sheet_sync.main(prompt=lambda p: "", out=lambda l: None, data_dir=tmp_path)
+        sheet_sync.main(prompt=lambda p: "", out=lambda l: None, data_dir=tmp_path,
+                         secrets_path=tmp_path / "no_such_secrets.yaml")
         assert captured["api_key"] is None
+
+    def test_falls_back_to_secrets_yaml_when_no_env_var(self, tmp_path, monkeypatch):
+        sheet_sync.save_sources(
+            {"Book.xlsx": {"url": "https://docs.google.com/spreadsheets/d/ABC", "tabs": {}}},
+            path=tmp_path / "google_sheets_sources.json",
+        )
+        (tmp_path / "secrets.yaml").write_text("google_sheets_api_key: from-secrets-file\n")
+        captured = {}
+
+        def fake_sync_multi_tab_source(name, config, data_dir=None, prompt=None, out=None, api_key=None):
+            captured["api_key"] = api_key
+        monkeypatch.setattr(sheet_sync, "sync_multi_tab_source", fake_sync_multi_tab_source)
+        monkeypatch.delenv("GOOGLE_SHEETS_API_KEY", raising=False)
+
+        sheet_sync.main(prompt=lambda p: "", out=lambda l: None, data_dir=tmp_path,
+                         secrets_path=tmp_path / "secrets.yaml")
+        assert captured["api_key"] == "from-secrets-file"
+
+    def test_env_var_takes_priority_over_secrets_yaml(self, tmp_path, monkeypatch):
+        sheet_sync.save_sources(
+            {"Book.xlsx": {"url": "https://docs.google.com/spreadsheets/d/ABC", "tabs": {}}},
+            path=tmp_path / "google_sheets_sources.json",
+        )
+        (tmp_path / "secrets.yaml").write_text("google_sheets_api_key: from-secrets-file\n")
+        captured = {}
+
+        def fake_sync_multi_tab_source(name, config, data_dir=None, prompt=None, out=None, api_key=None):
+            captured["api_key"] = api_key
+        monkeypatch.setattr(sheet_sync, "sync_multi_tab_source", fake_sync_multi_tab_source)
+        monkeypatch.setenv("GOOGLE_SHEETS_API_KEY", "from-env-var")
+
+        sheet_sync.main(prompt=lambda p: "", out=lambda l: None, data_dir=tmp_path,
+                         secrets_path=tmp_path / "secrets.yaml")
+        assert captured["api_key"] == "from-env-var"
+
+
+class TestLoadSecret:
+    def test_returns_value_for_existing_key(self, tmp_path):
+        path = tmp_path / "secrets.yaml"
+        path.write_text("google_sheets_api_key: my-key-123\nother_key: something\n")
+        assert sheet_sync._load_secret("google_sheets_api_key", path) == "my-key-123"
+
+    def test_returns_none_for_missing_key(self, tmp_path):
+        path = tmp_path / "secrets.yaml"
+        path.write_text("some_other_key: value\n")
+        assert sheet_sync._load_secret("google_sheets_api_key", path) is None
+
+    def test_returns_none_when_file_does_not_exist(self, tmp_path):
+        assert sheet_sync._load_secret("google_sheets_api_key", tmp_path / "nope.yaml") is None
+
+    def test_returns_none_for_empty_file(self, tmp_path):
+        path = tmp_path / "secrets.yaml"
+        path.write_text("")
+        assert sheet_sync._load_secret("google_sheets_api_key", path) is None
