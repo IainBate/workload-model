@@ -1014,6 +1014,16 @@ def _load_phd_supervision(filepath: str = "PhD Supervision Data.csv") -> Dict[st
     return data
 
 
+# The "Staff" column in % FTE for CS.csv carries a trailing "(username)"
+# (e.g. "Ibrahim Habli (ih126)"), inconsistently - sometimes with a trailing
+# comma ("Mark Sujan (ms529),"), sometimes as a dangling unclosed paren
+# ("Vlado Lazarov ("), sometimes absent entirely. None of that is part of the
+# name normalize_name() can match against, so it's stripped here before the
+# name ever reaches that lookup - same "handle the data source's own quirk in
+# its loader" pattern as the "(NN%)" suffix in CS Research Groups.csv.
+_FTE_STAFF_SUFFIX_RE = re.compile(r"\s*\([^)]*\)?\s*,?\s*$")
+
+
 def _load_fte_data(filepath: str = "% FTE for CS.csv") -> Dict[str, list]:
     """Load research grant/FTE data. Returns {person: [projects]}.
 
@@ -1034,7 +1044,7 @@ def _load_fte_data(filepath: str = "% FTE for CS.csv") -> Dict[str, list]:
     with open(path, "r", encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
         for row in reader:
-            lead = row.get("Staff", "").strip()
+            lead = _FTE_STAFF_SUFFIX_RE.sub("", row.get("Staff", "").strip()).strip()
             if not lead or lead == "Staff":
                 continue
             project = {
