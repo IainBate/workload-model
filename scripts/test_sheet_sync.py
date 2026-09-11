@@ -419,6 +419,20 @@ class TestFindUnmappedFiles:
         (tmp_path / "mapped.csv").write_text("a\n")
         assert sheet_sync.find_unmapped_files({"mapped.csv": {}}, data_dir=tmp_path) == []
 
+    def test_supplementary_file_of_a_configured_source_is_excluded(self, tmp_path):
+        """WAW_supplementary.csv (and any future supplementary file) can
+        never have a Google Sheet of its own by design - it must not be
+        flagged as needing one, forever, by check_coverage()."""
+        (tmp_path / "WAW.csv").write_text("a\n")
+        (tmp_path / "WAW_supplementary.csv").write_text("a\n")
+        sources = {
+            "WAW.csv": {
+                "url": "https://docs.google.com/spreadsheets/d/ABC",
+                "supplementary_file": "WAW_supplementary.csv",
+            }
+        }
+        assert sheet_sync.find_unmapped_files(sources, data_dir=tmp_path) == []
+
 
 class TestCheckCoverage:
     def test_pasted_url_is_added_to_sources_and_saved(self, tmp_path):
