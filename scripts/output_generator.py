@@ -395,6 +395,107 @@ def generate_boxplots(results: List[WorkloadResult], year_data: YearData, output
     print(f"Detailed boxplot saved to {detailed_path}")
 
 
+# Display range for the teaching-%-of-remaining histogram. teaching_pct_of_remaining
+# is deliberately uncapped by workload_calculator.py (an overcommitted person's true
+# value can run to hundreds of percent, positive or negative, near a zero denominator)
+# - these bounds only affect what's drawn, never the underlying number.
+_TEACHING_PCT_CLIP_MIN = -100.0
+_TEACHING_PCT_CLIP_MAX = 200.0
+
+_TEACHING_PCT_CATEGORY_COLORS = {"ART": "#2196F3", "T and S": "#4CAF50"}
+_TEACHING_PCT_DEFAULT_COLOR = "#9E9E9E"
+_TEACHING_PCT_CLIPPED_COLOR = "#F44336"
+
+
+def generate_teaching_percentage_histogram(results: List[WorkloadResult], output_dir: str = None):
+    """
+    Generate a department-wide bar chart of teaching hours as a percentage of
+    each person's "remaining" time (nominal hours minus everything non-teaching
+    - research and admin), one bar per staff member, coloured by category
+    (ART / T and S).
+
+    Reads teaching_pct_of_remaining and include_in_teaching_pct_chart straight
+    off WorkloadResult - both are computed in workload_calculator.py, per the
+    project's command-query separation rule. This function only renders.
+
+    Staff with include_in_teaching_pct_chart=False (Staff Categories and FTE.csv
+    "Teaching % Chart" = No) are omitted entirely, not just clipped - their
+    remaining time is undefined for reasons unrelated to teaching (e.g. a 100%
+    admin role on its own already exceeds nominal hours). A bar whose true value
+    falls outside the displayed y-axis range is drawn clipped to the axis edge in
+    a third colour so it reads as truncated rather than as a real value; nobody's
+    number is hidden - both the excluded and the clipped are listed underneath
+    the chart with their actual figures.
+
+    Output File:
+        - workload_teaching_percentage_histogram.png
+    """
+    if output_dir is None:
+        output_dir = OUTPUT_DIR
+
+    excluded = [r for r in results if not r.include_in_teaching_pct_chart]
+    included = [r for r in results
+                if r.include_in_teaching_pct_chart and r.teaching_pct_of_remaining is not None]
+    undefined = [r for r in results
+                 if r.include_in_teaching_pct_chart and r.teaching_pct_of_remaining is None]
+
+    names = [r.name for r in included]
+    fig, ax = plt.subplots(figsize=(max(18, len(names) * 0.35), 10))
+    fig.suptitle("Teaching as a Percentage of Remaining (Non-Research/Non-Admin) Time",
+                 fontsize=16, fontweight="bold")
+
+    clipped = []
+    colors = []
+    plotted_values = []
+    for r in included:
+        pct = r.teaching_pct_of_remaining
+        if pct < _TEACHING_PCT_CLIP_MIN or pct > _TEACHING_PCT_CLIP_MAX:
+            clipped.append(r)
+            colors.append(_TEACHING_PCT_CLIPPED_COLOR)
+        else:
+            colors.append(_TEACHING_PCT_CATEGORY_COLORS.get(r.category, _TEACHING_PCT_DEFAULT_COLOR))
+        plotted_values.append(max(_TEACHING_PCT_CLIP_MIN, min(_TEACHING_PCT_CLIP_MAX, pct)))
+
+    ax.bar(names, plotted_values, color=colors, edgecolor="white", width=0.7)
+    ax.axhline(y=0, color="black", linewidth=1.0)
+    ax.set_ylim(_TEACHING_PCT_CLIP_MIN - 10, _TEACHING_PCT_CLIP_MAX + 10)
+    ax.set_xlabel("Staff", fontsize=12)
+    ax.set_ylabel("Teaching % of Remaining Time", fontsize=12)
+    ax.set_xticks(range(len(names)))
+    ax.set_xticklabels(names, rotation=90, fontsize=8)
+    ax.grid(axis="y", alpha=0.3)
+
+    legend_handles = [
+        mpatches.Patch(color=_TEACHING_PCT_CATEGORY_COLORS["ART"], label="ART"),
+        mpatches.Patch(color=_TEACHING_PCT_CATEGORY_COLORS["T and S"], label="T and S"),
+        mpatches.Patch(color=_TEACHING_PCT_CLIPPED_COLOR,
+                        label=f"Clipped (true value outside {_TEACHING_PCT_CLIP_MIN:.0f}% to {_TEACHING_PCT_CLIP_MAX:.0f}%)"),
+    ]
+    ax.legend(handles=legend_handles, loc="upper right", fontsize=10)
+
+    footnote_lines = []
+    if clipped:
+        clipped_str = "; ".join(f"{r.name}: {r.teaching_pct_of_remaining:.0f}%" for r in clipped)
+        footnote_lines.append(f"Clipped (actual value): {clipped_str}")
+    if excluded:
+        excluded_str = ", ".join(r.name for r in excluded)
+        footnote_lines.append(f"Excluded (Teaching % Chart = No in Staff Categories and FTE.csv): {excluded_str}")
+    if undefined:
+        undefined_str = ", ".join(r.name for r in undefined)
+        footnote_lines.append(f"Undefined (zero remaining time): {undefined_str}")
+
+    if footnote_lines:
+        fig.text(0.01, 0.01, "\n".join(footnote_lines), fontsize=8, va="bottom", wrap=True)
+        plt.subplots_adjust(bottom=0.05 + 0.02 * len(footnote_lines))
+
+    plt.tight_layout(rect=(0, 0.03 * max(1, len(footnote_lines)), 1, 1))
+
+    histogram_path = os.path.join(output_dir, "workload_teaching_percentage_histogram.png")
+    plt.savefig(histogram_path, dpi=200, bbox_inches="tight")
+    plt.close(fig)
+    print(f"Teaching percentage histogram saved to {histogram_path}")
+
+
 def generate_excel_with_formulas(results: List[WorkloadResult], year_data: YearData,
                                   output_dir: str = None):
     """
