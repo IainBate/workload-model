@@ -405,7 +405,7 @@ def _sync_one_source(name: str, config: dict, data_dir: Path = DATA_DIR,
 
 
 def main(prompt: Callable[[str], str] = input, out: Callable[[str], None] = print,
-          data_dir: Path = DATA_DIR) -> None:
+         data_dir: Path = DATA_DIR) -> None:
     sources_path = data_dir / "google_sheets_sources.json"
     sources = load_sources(sources_path)
     if not sources:
