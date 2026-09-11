@@ -161,7 +161,7 @@ class TestCategoryResolution:
         assert grades.get("Frank Soboczenski") == "SL"
         # Name-matching quirks in that file (typo / alias / "(NN%)" suffix)
         assert grades.get("Soumya Banerjee") == "SL"
-        assert grades.get("Pedro Ribeiro") == "L"
+        assert grades.get("Pedro Ribeiro") == "Lecturer"
         assert grades.get("Simos Gerasimou") == "SL"
         # ART staff missing from CS Research Groups.csv - manual Grade column entry
         assert grades.get("James Stovold") == "Lecturer"
