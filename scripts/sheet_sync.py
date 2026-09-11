@@ -414,6 +414,20 @@ def find_unconfigured_tabs(configured_tabs: Dict[str, Optional[str]],
             if title not in configured_tabs and title not in ignored}
 
 
+def _load_secret(key: str, path: Path = SECRETS_FILE) -> Optional[str]:
+    """Read one key from secrets.yaml (git-crypt encrypted at rest; plain
+    YAML in the working tree on any machine that has run `git-crypt unlock`).
+    Returns None if the file doesn't exist, is empty, or doesn't have `key` -
+    never raises, since a missing/locked secrets file must degrade to "no
+    secret available", not a crash.
+    """
+    if not path.exists():
+        return None
+    with open(path, "r", encoding="utf-8") as f:
+        data = yaml.safe_load(f) or {}
+    return data.get(key)
+
+
 _DATA_FILE_EXTENSIONS = {".csv", ".xlsx"}
 
 
