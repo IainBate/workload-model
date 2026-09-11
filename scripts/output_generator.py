@@ -114,6 +114,7 @@ import matplotlib
 matplotlib.use("Agg")  # Non-interactive backend
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
+from matplotlib.lines import Line2D
 from openpyxl import Workbook
 from openpyxl.chart import BarChart, Reference, Series
 from openpyxl.chart.data_source import StrRef
