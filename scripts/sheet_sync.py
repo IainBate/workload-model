@@ -241,15 +241,27 @@ def sync_source(name: str, config: dict, data_dir: Path = DATA_DIR,
         out(f"{name}: could not fetch: {e}")
         return
 
+    # Build the candidate document (post-merge, if a supplementary file is
+    # configured) once - compare_fn and write_local_file must both operate
+    # on this same document, never on live_text vs a differently-merged
+    # document, or compare_exact's index-keyed comparison sees every row
+    # after the merge point as spuriously shifted/changed on every run.
+    supplementary_name = config.get("supplementary_file")
+    if supplementary_name:
+        supplementary_text = read_local_file(data_dir / supplementary_name) or ""
+        candidate_text = merge_supplementary(live_text, supplementary_text)
+    else:
+        candidate_text = live_text
+
     local_path = data_dir / name
     local_text = read_local_file(local_path)
     if local_text is None:
         out(f"{name}: no local file yet - creating from sheet")
-        write_local_file(local_path, live_text)
+        write_local_file(local_path, candidate_text)
         return
 
     compare_fn = resolve_compare_fn(config)
-    diff = compare_fn(live_text, local_text)
+    diff = compare_fn(candidate_text, local_text)
     if not diff.has_differences:
         out(f"{name}: up to date")
         return
@@ -263,13 +275,7 @@ def sync_source(name: str, config: dict, data_dir: Path = DATA_DIR,
     if answer != "y":
         return
 
-    supplementary_name = config.get("supplementary_file")
-    if supplementary_name:
-        supplementary_text = read_local_file(data_dir / supplementary_name) or ""
-        final_text = merge_supplementary(live_text, supplementary_text)
-    else:
-        final_text = live_text
-    write_local_file(local_path, final_text)
+    write_local_file(local_path, candidate_text)
     out(f"  written to data/{name}")
 
 
