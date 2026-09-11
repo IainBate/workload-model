@@ -5,7 +5,6 @@ monkeypatching urllib.request.urlopen with a fake response, never by
 hitting the real network.
 """
 
-import io
 import sys
 from pathlib import Path
 from unittest.mock import MagicMock
