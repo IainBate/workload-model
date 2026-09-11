@@ -10,6 +10,13 @@ calculation - that stays fully offline and reproducible.
 No OAuth: every source is a Google Sheet shared "anyone with the link can
 view", read via its CSV export URL - a plain unauthenticated HTTP GET.
 
+Optional: set GOOGLE_SHEETS_API_KEY (a project-level Sheets API key, still
+no OAuth - see list_sheet_tabs()) to also flag a tab that exists in a
+multi-tab source's live workbook but isn't yet in that source's "tabs"
+config - e.g. a new academic year's tab being added upstream. Without it,
+every other check still works exactly the same; this only adds that one
+extra signal.
+
 See docs/superpowers/specs/2026-09-11-google-sheets-sync-design.md for the
 full design.
 """
