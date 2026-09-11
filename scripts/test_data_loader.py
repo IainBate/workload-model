@@ -175,6 +175,33 @@ class TestStaffCategoriesModelledAndEmailParsing:
         data = dl._load_staff_categories_and_fte()
         assert data["Someone"]["modelled"] is True
 
+    @pytest.mark.parametrize("value", ["No", "no", "N", "FALSE", "0"])
+    def test_not_teaching_pct_chart_values(self, tmp_path, monkeypatch, value):
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        self._write(tmp_path / "Staff Categories and FTE.csv",
+                    [{"Name": "Someone", "Category": "ART", "FTE": "1.0", "Teaching % Chart": value}],
+                    header=["Name", "Category", "FTE", "Modelled", "Notes", "Email", "Teaching % Chart"])
+        data = dl._load_staff_categories_and_fte()
+        assert data["Someone"]["teaching_pct_chart"] is False
+
+    def test_blank_teaching_pct_chart_defaults_true(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        self._write(tmp_path / "Staff Categories and FTE.csv",
+                    [{"Name": "Someone", "Category": "ART", "FTE": "1.0"}],
+                    header=["Name", "Category", "FTE", "Modelled", "Notes", "Email", "Teaching % Chart"])
+        data = dl._load_staff_categories_and_fte()
+        assert data["Someone"]["teaching_pct_chart"] is True
+
+    def test_missing_teaching_pct_chart_column_defaults_true(self, tmp_path, monkeypatch):
+        """A file predating this column (no 'Teaching % Chart' header at all)
+        must still load - csv.DictReader's restval fills the missing key with
+        None, which parses the same as blank."""
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        self._write(tmp_path / "Staff Categories and FTE.csv",
+                    [{"Name": "Someone", "Category": "ART", "FTE": "1.0"}])
+        data = dl._load_staff_categories_and_fte()
+        assert data["Someone"]["teaching_pct_chart"] is True
+
     def test_email_column_loaded(self, tmp_path, monkeypatch):
         monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
         self._write(tmp_path / "Staff Categories and FTE.csv",
