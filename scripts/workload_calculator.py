@@ -1776,6 +1776,12 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
         # Total: teaching + research (protected + additional) + admin
         total_hours = teaching_hours + research_total + admin_hours
 
+        remaining_hours, teaching_pct_of_remaining, remaining_time_warning = (
+            _calculate_remaining_time_metrics(nominal_hours, teaching_hours, research_total, admin_hours)
+        )
+        if remaining_time_warning:
+            missing_data.append(remaining_time_warning)
+
         # Build detail strings
         teaching_detail_str = "; ".join(staff_teaching.get(canonical_name, {}).get("details", [])) if canonical_name in staff_teaching else "No teaching activities"
 
