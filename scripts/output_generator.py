@@ -462,6 +462,7 @@ def _prepare_teaching_percentage_chart_data(results: List[WorkloadResult]) -> Di
         "excluded": excluded,
         "undefined": undefined,
         "y_max": y_max,
+        "average_pct": average_pct,
     }
 
 
