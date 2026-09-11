@@ -121,7 +121,8 @@ class TestCategoryResolution:
     def test_staff_reference_file_loads_category_and_fte(self):
         data = dl._load_staff_categories_and_fte()
         assert data.get("Sarah Carrington") == {
-            "category": "T and S", "fte": 0.8, "modelled": True, "notes": "", "email": "",
+            "category": "T and S", "fte": 0.8, "modelled": True,
+            "teaching_pct_chart": True, "notes": "", "email": "",
         }
         assert data.get("Rob Alexander", {}).get("category") == "ART"
         assert data.get("Ibrahim Habli", {}).get("category") == "ART"
@@ -134,6 +135,17 @@ class TestCategoryResolution:
         assert data.get("Philippa Ryan", {}).get("modelled") is False
         assert data.get("Phoebe Barraclough", {}).get("modelled") is False
         assert data.get("Rob Alexander", {}).get("modelled") is True
+
+    def test_staff_reference_file_loads_teaching_pct_chart_flag(self):
+        """Teaching % Chart=No (Iain Bate, John McDermid, Ibrahim Habli - their
+        research/admin alone already exceeds nominal hours, so 'remaining time'
+        is undefined/negative for reasons unrelated to teaching) parses to
+        False; everyone else defaults to True without an explicit 'Yes'."""
+        data = dl._load_staff_categories_and_fte()
+        assert data.get("Iain Bate", {}).get("teaching_pct_chart") is False
+        assert data.get("John McDermid", {}).get("teaching_pct_chart") is False
+        assert data.get("Ibrahim Habli", {}).get("teaching_pct_chart") is False
+        assert data.get("Rob Alexander", {}).get("teaching_pct_chart") is True
 
 
 class TestStaffCategoriesModelledAndEmailParsing:
