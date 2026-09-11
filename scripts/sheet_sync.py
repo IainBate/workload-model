@@ -15,7 +15,11 @@ no OAuth - see list_sheet_tabs()) to also flag a tab that exists in a
 multi-tab source's live workbook but isn't yet in that source's "tabs"
 config - e.g. a new academic year's tab being added upstream. Without it,
 every other check still works exactly the same; this only adds that one
-extra signal.
+extra signal. Read from the environment variable if set; otherwise falls
+back to secrets.yaml (see SECRETS_FILE / _load_secret()) - a git-crypt
+encrypted file at the repo root, so the key travels with the repo (any
+machine that has unlocked it via `git-crypt unlock`) rather than needing
+re-entering by hand on every machine.
 
 See docs/superpowers/specs/2026-09-11-google-sheets-sync-design.md for the
 full design.
@@ -31,9 +35,12 @@ import urllib.error
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
+import yaml
+
 SCRIPT_DIR = Path(__file__).parent
 DATA_DIR = SCRIPT_DIR.parent / "data"
 SOURCES_FILE = DATA_DIR / "google_sheets_sources.json"
+SECRETS_FILE = SCRIPT_DIR.parent / "secrets.yaml"
 
 _SHEET_ID_RE = re.compile(r"/d/([a-zA-Z0-9_-]+)")
 
