@@ -408,19 +408,49 @@ _TEACHING_PCT_DEFAULT_COLOR = "#9E9E9E"
 _TEACHING_PCT_OVERLOADED_COLOR = "#F44336"
 
 
+def _bucket_teaching_percentage_staff(
+    results: List[WorkloadResult],
+) -> Tuple[List[WorkloadResult], List[WorkloadResult], List[WorkloadResult]]:
+    """Split staff into (excluded, included, undefined) for both
+    teaching-%-of-remaining charts - shared so the two charts agree on who
+    appears at all. excluded = include_in_teaching_pct_chart is False;
+    undefined = included but teaching_pct_of_remaining is None (zero
+    remaining time); included = has a real percentage to plot.
+    """
+    excluded = [r for r in results if not r.include_in_teaching_pct_chart]
+    included = [r for r in results
+                if r.include_in_teaching_pct_chart and r.teaching_pct_of_remaining is not None]
+    undefined = [r for r in results
+                 if r.include_in_teaching_pct_chart and r.teaching_pct_of_remaining is None]
+    return excluded, included, undefined
+
+
+def _teaching_percentage_axis_stats(included: List[WorkloadResult]) -> Tuple[float, Optional[float]]:
+    """(y_max, average_pct) shared by both teaching-%-of-remaining charts, so
+    they scale and average identically and stay comparable to each other.
+
+    Both are computed over the non-negative ("normal") subset only: a negative
+    percentage (remaining_hours < 0) isn't a meaningful fraction - it would
+    look like "does almost no teaching" when the real story is "this person's
+    non-teaching load alone is already over capacity", a much more severe and
+    structurally different condition - so it's excluded from both the axis
+    scale and the average, and pinned/flagged separately by the caller.
+    """
+    normal_pcts = [r.teaching_pct_of_remaining for r in included if r.teaching_pct_of_remaining >= 0]
+    y_max = max(_TEACHING_PCT_Y_AXIS_FLOOR,
+                (max(normal_pcts) if normal_pcts else 0.0) * _TEACHING_PCT_Y_AXIS_HEADROOM)
+    average_pct = (sum(normal_pcts) / len(normal_pcts)) if normal_pcts else None
+    return y_max, average_pct
+
+
 def _prepare_teaching_percentage_chart_data(results: List[WorkloadResult]) -> Dict[str, Any]:
     """Pure data-shaping for generate_teaching_percentage_histogram() - no
     matplotlib, so it can be unit tested directly.
 
     teaching_pct_of_remaining is deliberately uncapped by workload_calculator.py,
-    but a negative value (remaining_hours < 0: research+admin alone already
-    exceed nominal hours) isn't a meaningful fraction to plot at its literal
-    height - a small negative number would look like "does almost no teaching"
-    when the real story is "this person's non-teaching load alone is already
-    over capacity", a much more severe and structurally different condition.
-    So negative-percentage staff are pinned to the top of the y-axis in a third
-    colour ("Overloaded") instead of plotted at their true height; the axis
-    itself auto-scales to whatever the non-negative data actually spans.
+    but a negative value isn't plotted at its literal height - see
+    _teaching_percentage_axis_stats(). Negative-percentage staff are instead
+    pinned to the top of the y-axis in a third colour ("Overloaded").
 
     Returns per-bar names, plotted values, and colours, plus the three
     "nothing is hidden" footnote lists: staff excluded via
@@ -428,20 +458,8 @@ def _prepare_teaching_percentage_chart_data(results: List[WorkloadResult]) -> Di
     real, negative percentage available for the footnote), and staff whose
     percentage is undefined (zero remaining time) - and the computed y_max.
     """
-    excluded = [r for r in results if not r.include_in_teaching_pct_chart]
-    included = [r for r in results
-                if r.include_in_teaching_pct_chart and r.teaching_pct_of_remaining is not None]
-    undefined = [r for r in results
-                 if r.include_in_teaching_pct_chart and r.teaching_pct_of_remaining is None]
-
-    normal_pcts = [r.teaching_pct_of_remaining for r in included if r.teaching_pct_of_remaining >= 0]
-    y_max = max(_TEACHING_PCT_Y_AXIS_FLOOR,
-                (max(normal_pcts) if normal_pcts else 0.0) * _TEACHING_PCT_Y_AXIS_HEADROOM)
-    # Averaged over the same normal_pcts population that sets the axis scale -
-    # an overloaded person's pinned display value isn't a real number, and their
-    # true (negative) percentage was already judged not comparable to the rest
-    # (see the docstring), so neither belongs in the average.
-    average_pct = (sum(normal_pcts) / len(normal_pcts)) if normal_pcts else None
+    excluded, included, undefined = _bucket_teaching_percentage_staff(results)
+    y_max, average_pct = _teaching_percentage_axis_stats(included)
 
     names, plotted_values, colors, overloaded = [], [], [], []
     for r in included:
@@ -462,6 +480,75 @@ def _prepare_teaching_percentage_chart_data(results: List[WorkloadResult]) -> Di
         "overloaded": overloaded,
         "excluded": excluded,
         "undefined": undefined,
+        "y_max": y_max,
+        "average_pct": average_pct,
+    }
+
+
+# Seniority order for the by-grade chart - most senior first. A grade value
+# that doesn't match one of these (a typo, or a title this list hasn't been
+# taught yet) is not guessed into the nearest bucket - it's flagged in the
+# chart's footnote instead, same as a missing grade.
+_TEACHING_PCT_GRADE_ORDER = ["Prof", "Reader", "SL", "Lecturer"]
+
+
+def _prepare_teaching_percentage_by_grade_chart_data(results: List[WorkloadResult]) -> Dict[str, Any]:
+    """Pure data-shaping for generate_teaching_percentage_by_grade_histogram()
+    - no matplotlib, so it can be unit tested directly.
+
+    Same population and axis scale as _prepare_teaching_percentage_chart_data()
+    (so the two charts are directly comparable), but staff are grouped by
+    academic grade (_TEACHING_PCT_GRADE_ORDER, most senior first) and ranked
+    within each grade by teaching_pct_of_remaining, highest first - including
+    an overloaded (negative) person's true value for the ranking, even though
+    their bar is pinned to the top like the flat chart.
+
+    Staff with no grade recorded, or a grade value outside
+    _TEACHING_PCT_GRADE_ORDER, are left out of the grouped bars entirely (there
+    is nowhere meaningful to place them) but listed in a footnote - "nothing
+    hidden" per the rest of this chart family.
+
+    Returns the same shape as _prepare_teaching_percentage_chart_data() plus
+    "no_grade", "unrecognized_grade", and "grade_groups" - an ordered list of
+    (grade_label, start_index, count) for the non-empty groups actually drawn,
+    used by the renderer to place divider lines and group labels.
+    """
+    excluded, included, undefined = _bucket_teaching_percentage_staff(results)
+    y_max, average_pct = _teaching_percentage_axis_stats(included)
+
+    no_grade = [r for r in included if not r.grade]
+    unrecognized_grade = [r for r in included
+                          if r.grade and r.grade not in _TEACHING_PCT_GRADE_ORDER]
+    graded = [r for r in included if r.grade in _TEACHING_PCT_GRADE_ORDER]
+
+    names, plotted_values, colors, overloaded, grade_groups = [], [], [], [], []
+    for grade in _TEACHING_PCT_GRADE_ORDER:
+        members = sorted((r for r in graded if r.grade == grade),
+                          key=lambda r: r.teaching_pct_of_remaining, reverse=True)
+        if not members:
+            continue
+        grade_groups.append((grade, len(names), len(members)))
+        for r in members:
+            pct = r.teaching_pct_of_remaining
+            names.append(r.name)
+            if pct < 0:
+                overloaded.append(r)
+                colors.append(_TEACHING_PCT_OVERLOADED_COLOR)
+                plotted_values.append(y_max)
+            else:
+                colors.append(_TEACHING_PCT_CATEGORY_COLORS.get(r.category, _TEACHING_PCT_DEFAULT_COLOR))
+                plotted_values.append(pct)
+
+    return {
+        "names": names,
+        "plotted_values": plotted_values,
+        "colors": colors,
+        "overloaded": overloaded,
+        "excluded": excluded,
+        "undefined": undefined,
+        "no_grade": no_grade,
+        "unrecognized_grade": unrecognized_grade,
+        "grade_groups": grade_groups,
         "y_max": y_max,
         "average_pct": average_pct,
     }
