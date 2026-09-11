@@ -184,3 +184,18 @@ def compare_fte_tolerant(live_text: str, local_text: str, tolerance: float = FTE
             removed.append((key, local_row))
 
     return DiffResult(added=added, removed=removed, changed=changed)
+
+
+def merge_supplementary(live_text: str, supplementary_text: str) -> str:
+    """Concatenate the live sheet's CSV rows with a supplementary CSV file's
+    rows (used for WAW.csv - content that has only ever lived in the local
+    file, e.g. the Union role, never the sheet). Result is re-serialized so
+    line endings are consistent regardless of either input's source.
+    """
+    live_rows = parse_csv_rows(live_text)
+    supplementary_rows = parse_csv_rows(supplementary_text) if supplementary_text else []
+    out = io.StringIO()
+    writer = csv.writer(out, lineterminator="\n")
+    for row in live_rows + supplementary_rows:
+        writer.writerow(row)
+    return out.getvalue()
