@@ -115,6 +115,7 @@ class StaffData:
     pastoral_students: int = 0  # Number of pastoral students assigned
     adjustments: Tuple["AdjustmentRecord", ...] = field(default_factory=tuple)  # Parsed workload_adjustments.csv rows for this person
     adjustment_warnings: Tuple[str, ...] = field(default_factory=tuple)  # Malformed/incomplete adjustment rows for this person (not applied)
+    include_in_teaching_pct_chart: bool = True  # Staff Categories and FTE.csv "Teaching % Chart" column (default Yes)
 
 
 @dataclass(frozen=True)
