@@ -147,6 +147,40 @@ class TestCategoryResolution:
         assert data.get("Ibrahim Habli", {}).get("teaching_pct_chart") is False
         assert data.get("Rob Alexander", {}).get("teaching_pct_chart") is True
 
+    def test_full_pipeline_resolves_grades_for_art_and_ts_staff(self):
+        """End-to-end: ART grades auto-parsed from CS Research Groups.csv,
+        T&S grades (and the handful of ART staff missing from that file)
+        manually entered in Staff Categories and FTE.csv's Grade column."""
+        year_data = dl.load_all_data(data_dir=str(dl.DATA_DIR),
+                                     unknown_callback=None, category_callback=None)
+        grades = {s.canonical_name: s.grade for s in year_data.staff}
+
+        # ART, auto-parsed from CS Research Groups.csv
+        assert grades.get("Iain Bate") == "Prof"
+        assert grades.get("Dimitris Kolovos") == "Prof"
+        assert grades.get("Frank Soboczenski") == "SL"
+        # Name-matching quirks in that file (typo / alias / "(NN%)" suffix)
+        assert grades.get("Soumya Banerjee") == "SL"
+        assert grades.get("Pedro Ribeiro") == "L"
+        assert grades.get("Simos Gerasimou") == "SL"
+        # ART staff missing from CS Research Groups.csv - manual Grade column entry
+        assert grades.get("James Stovold") == "Lecturer"
+        # T&S, manual Grade column entry only (no other source)
+        assert grades.get("Tommy Yuan") == "Reader"
+        assert grades.get("David Pumfrey") == "Lecturer"
+        assert grades.get("Mark Nicholson") == "Reader"
+
+    def test_ras_and_research_only_staff_not_modelled(self):
+        """Felix Ulrich-Oltean and Yan Jia (RAs) and Simon Burton (research
+        only) are Modelled=No - they shouldn't appear in the roster at all,
+        so they need no grade."""
+        year_data = dl.load_all_data(data_dir=str(dl.DATA_DIR),
+                                     unknown_callback=None, category_callback=None)
+        names = {s.canonical_name for s in year_data.staff}
+        assert "Felix Ulrich-Oltean" not in names
+        assert "Yan Jia" not in names
+        assert "Simon Burton" not in names
+
 
 class TestStaffCategoriesModelledAndEmailParsing:
     """_load_staff_categories_and_fte() parsing of the Modelled/Email columns,
