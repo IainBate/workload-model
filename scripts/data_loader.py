@@ -1255,6 +1255,7 @@ def _load_waw_roles(filepath: str = "WAW.csv") -> Dict[str, list]:
 
     # Parse the WAW CSV which has a specific structure
     roles = {}
+    last_role = None
     with open(path, "r", encoding="utf-8-sig") as f:
         reader = csv.reader(f)
         for row in reader:
@@ -1264,8 +1265,28 @@ def _load_waw_roles(filepath: str = "WAW.csv") -> Dict[str, list]:
             # WAW structure: col0=role, col1=on-campus staff, col2=empty, col3=online staff
             staff_on_campus = row[1].strip() if len(row) > 1 else ""
             staff_online = row[3].strip() if len(row) > 3 else ""
+
+            # A fully-blank row (role AND person both empty) is a section
+            # separator - reset carry-forward so a role can't leak from one
+            # block into an unrelated block below it.
+            if not role and not staff_on_campus:
+                last_role = None
+                continue
+
+            # A blank role cell (but a person present) is what a merged
+            # Google Sheets cell looks like once exported to CSV - it means
+            # "same role as the row above" (e.g. Research Group Leader /
+            # Research Mentor, each listed once per person on its own row).
+            if not role:
+                role = last_role
+            else:
+                last_role = role
+
+            if not role:
+                continue
+
             # Skip header and non-role rows
-            if not role or role.startswith("Departmental") or role.startswith("Green"):
+            if role.startswith("Departmental") or role.startswith("Green"):
                 continue
             if role.startswith("Red indicates"):
                 continue
