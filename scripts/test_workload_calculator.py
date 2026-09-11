@@ -1832,5 +1832,110 @@ class TestFormatModuleAdjustmentSection:
         assert "Rationale: extra cover" in parts[1]
 
 
+class TestRemainingTimeMetrics:
+    """_calculate_remaining_time_metrics() - teaching % of remaining
+    (non-research/non-admin) time, for the department-wide histogram."""
+
+    def test_basic_positive_remaining(self):
+        from workload_calculator import _calculate_remaining_time_metrics
+
+        remaining, pct, warning = _calculate_remaining_time_metrics(
+            nominal_hours=1642.0, teaching_hours=400.0, research_hours=600.0, admin_hours=200.0
+        )
+        assert remaining == pytest.approx(842.0)
+        assert pct == pytest.approx(400.0 / 842.0 * 100)
+        assert warning is None
+
+    def test_overcommitted_gives_negative_remaining_and_uncapped_percentage(self):
+        """Research+admin exceeding nominal hours must NOT be clamped - the
+        overcommitment should be visible in the numbers, not hidden."""
+        from workload_calculator import _calculate_remaining_time_metrics
+
+        remaining, pct, warning = _calculate_remaining_time_metrics(
+            nominal_hours=1642.0, teaching_hours=100.0, research_hours=1000.0, admin_hours=800.0
+        )
+        assert remaining == pytest.approx(-158.0)
+        assert pct == pytest.approx(100.0 / -158.0 * 100)
+        assert pct < 0
+        assert warning is None
+
+    def test_zero_remaining_is_flagged_not_guessed(self):
+        from workload_calculator import _calculate_remaining_time_metrics
+
+        remaining, pct, warning = _calculate_remaining_time_metrics(
+            nominal_hours=1000.0, teaching_hours=50.0, research_hours=600.0, admin_hours=400.0
+        )
+        assert remaining == 0.0
+        assert pct is None
+        assert warning is not None
+        assert "zero remaining time" in warning
+
+    def test_zero_teaching_hours_gives_zero_percent(self):
+        from workload_calculator import _calculate_remaining_time_metrics
+
+        remaining, pct, warning = _calculate_remaining_time_metrics(
+            nominal_hours=1642.0, teaching_hours=0.0, research_hours=600.0, admin_hours=200.0
+        )
+        assert pct == 0.0
+        assert warning is None
+
+
+class TestRemainingTimeMetricsIntegration:
+    """calculate_workload() wires remaining_hours/teaching_pct_of_remaining/
+    include_in_teaching_pct_chart onto WorkloadResult end-to-end."""
+
+    def test_fields_populated_on_result(self):
+        module = ModuleData(
+            name="TestModule", codes=["TEST001"], credits=20, stage=5,
+            practicals=0, practical_contact_hours=0, practical_groups=0,
+            practical_weeks=None, assessment_count=1, student_count=100,
+            teachers=["Jane Doe"], lead_name=None,
+        )
+        staff_member = StaffData(
+            canonical_name="Jane Doe", fte=1.0, category="T and S",
+            roles=[], phd_supervisions=0, phd_co_supervisions=0,
+            phd_assessor_count=0, research_projects=[], saint_modules=[],
+            active=True, include_in_teaching_pct_chart=True,
+        )
+        year_data = YearData.create(
+            year_label="2026-7", modules=[module], student_counts={}, assessment_counts={},
+            staff={"Jane Doe": staff_member}, known_lecturers=set(), known_lecturers_per_module={}
+        )
+
+        results = calculate_workload(year_data, validate_input=False)
+        assert len(results) == 1
+        result = results[0]
+
+        expected_remaining = result.nominal_hours - (result.research_hours + result.admin_hours)
+        assert result.remaining_hours == pytest.approx(expected_remaining)
+        if expected_remaining != 0:
+            assert result.teaching_pct_of_remaining == pytest.approx(
+                result.teaching_hours / expected_remaining * 100
+            )
+        assert result.include_in_teaching_pct_chart is True
+
+    def test_exclusion_flag_propagates_from_staff_data(self):
+        module = ModuleData(
+            name="TestModule", codes=["TEST002"], credits=20, stage=5,
+            practicals=0, practical_contact_hours=0, practical_groups=0,
+            practical_weeks=None, assessment_count=1, student_count=100,
+            teachers=["Excluded Person"], lead_name=None,
+        )
+        staff_member = StaffData(
+            canonical_name="Excluded Person", fte=1.0, category="ART",
+            roles=[], phd_supervisions=0, phd_co_supervisions=0,
+            phd_assessor_count=0, research_projects=[], saint_modules=[],
+            active=True, include_in_teaching_pct_chart=False,
+        )
+        year_data = YearData.create(
+            year_label="2026-7", modules=[module], student_counts={}, assessment_counts={},
+            staff={"Excluded Person": staff_member}, known_lecturers=set(), known_lecturers_per_module={}
+        )
+
+        results = calculate_workload(year_data, validate_input=False)
+        assert len(results) == 1
+        assert results[0].include_in_teaching_pct_chart is False
+
+
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
