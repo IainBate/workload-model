@@ -349,6 +349,78 @@ class TestResolveGradeFromData:
         assert dl._resolve_grade_from_data("Nobody", None, {}) == ""
 
 
+class TestFTEDataLoading:
+    """_load_fte_data() (% FTE for CS.csv) - the source spreadsheet renamed
+    'Project Lead'/'PI or Co-I' to 'Staff'/'PI or PcL (project co lead) or
+    RcL (researcher co Lead)' (2026-09), which silently zeroed every staff
+    member's research grant hours until caught; these guard the fix and the
+    '(username)' suffix-stripping it needed alongside it."""
+
+    def _write(self, path, rows):
+        header = ["Project ID", "Finance Project Code", "Staff", "Dpt",
+                  "PI or PcL (project co lead) or RcL (researcher co Lead)",
+                  "% FTE", "Comments", "Project Title", "Project Dates Start",
+                  "Project Dates End"]
+        with open(path, "w", newline="", encoding="utf-8") as f:
+            writer = csv.DictWriter(f, fieldnames=header)
+            writer.writeheader()
+            for row in rows:
+                writer.writerow({col: row.get(col, "") for col in header})
+
+    def test_current_column_names_parsed(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        self._write(tmp_path / "% FTE for CS.csv", [
+            {"Project ID": "P1", "Staff": "Someone", "% FTE": "20",
+             "PI or PcL (project co lead) or RcL (researcher co Lead)": "PI",
+             "Project Title": "A Grant"},
+        ])
+        data = dl._load_fte_data()
+        assert list(data.keys()) == ["Someone"]
+        assert data["Someone"][0]["fte"] == "20"
+        assert data["Someone"][0]["role"] == "PI"
+        assert data["Someone"][0]["title"] == "A Grant"
+
+    @pytest.mark.parametrize("raw_name,expected", [
+        ("Ibrahim Habli (ih126)", "Ibrahim Habli"),
+        ("Mark Sujan (ms529),", "Mark Sujan"),
+        ("Roberto Metere (rm2159),", "Roberto Metere"),
+        ("Vlado Lazarov (", "Vlado Lazarov"),
+        ("Ian Gray ", "Ian Gray"),
+        ("Simon Burton", "Simon Burton"),
+    ])
+    def test_username_suffix_variants_stripped(self, tmp_path, monkeypatch, raw_name, expected):
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        self._write(tmp_path / "% FTE for CS.csv", [
+            {"Project ID": "P1", "Staff": raw_name, "% FTE": "10"},
+        ])
+        data = dl._load_fte_data()
+        assert list(data.keys()) == [expected]
+
+    def test_suffix_variants_of_same_person_merge(self, tmp_path, monkeypatch):
+        """Two rows for the same person written with/without the username
+        suffix must land under one key, not split into two people."""
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        self._write(tmp_path / "% FTE for CS.csv", [
+            {"Project ID": "P1", "Staff": "Simon Burton (sb2213)", "% FTE": "10"},
+            {"Project ID": "P2", "Staff": "Simon Burton", "% FTE": "5"},
+        ])
+        data = dl._load_fte_data()
+        assert list(data.keys()) == ["Simon Burton"]
+        assert len(data["Simon Burton"]) == 2
+
+    def test_missing_file_returns_empty(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        assert dl._load_fte_data() == {}
+
+    def test_real_file_resolves_known_grants(self):
+        """End-to-end against the real data file: James Walker's two grants
+        (20% + 10% of nominal hours) must actually be read."""
+        data = dl._load_fte_data()
+        assert "James Walker" in data
+        fte_values = sorted(p["fte"] for p in data["James Walker"])
+        assert fte_values == ["10", "20"]
+
+
 class TestModuleVariantMerging:
     """H/M variant handling - the same class taught to UG and MSc cohorts."""
 
