@@ -324,6 +324,7 @@ def save_sources(sources: Dict[str, dict], path: Path = SOURCES_FILE) -> None:
 def find_unmapped_files(sources: Dict[str, dict], data_dir: Path = DATA_DIR) -> List[str]:
     """Local data/ files (.csv or .xlsx) with no entry in `sources`."""
     mapped = set(sources.keys())
+    mapped.update(c["supplementary_file"] for c in sources.values() if c.get("supplementary_file"))
     return sorted(
         p.name for p in data_dir.iterdir()
         if p.is_file() and p.suffix.lower() in _DATA_FILE_EXTENSIONS and p.name not in mapped
