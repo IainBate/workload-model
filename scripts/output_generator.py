@@ -1305,6 +1305,16 @@ def generate_html_report(results: List[WorkloadResult], year_data: YearData,
             <img src="workload_teaching_percentage_histogram.png" alt="Teaching Percentage of Remaining Time Chart" style="max-width: 1200px;">
         </div>
 
+        <div class="chart-container">
+            <h2>Teaching % of Remaining Time, by Grade</h2>
+            <div class="legend">
+                <div class="legend-item"><div class="legend-color" style="background:#2196F3"></div>ART</div>
+                <div class="legend-item"><div class="legend-color" style="background:#4CAF50"></div>T and S</div>
+                <div class="legend-item"><div class="legend-color" style="background:#F44336"></div>Overloaded</div>
+            </div>
+            <img src="workload_teaching_percentage_by_grade_histogram.png" alt="Teaching Percentage of Remaining Time by Grade Chart" style="max-width: 1200px;">
+        </div>
+
         <!-- Footer -->
         <div class="footer">
             <p><strong>Note:</strong> This dashboard was generated automatically from the Workload Model calculator.</p>
