@@ -199,3 +199,100 @@ def merge_supplementary(live_text: str, supplementary_text: str) -> str:
     for row in live_rows + supplementary_rows:
         writer.writerow(row)
     return out.getvalue()
+
+
+def read_local_file(local_path: Path) -> Optional[str]:
+    """Read a local data file's text, or None if it doesn't exist yet."""
+    if not local_path.exists():
+        return None
+    with open(local_path, "r", encoding="utf-8-sig") as f:
+        return f.read()
+
+
+def write_local_file(local_path: Path, content: str) -> None:
+    with open(local_path, "w", encoding="utf-8", newline="") as f:
+        f.write(content)
+
+
+_COMPARE_STRATEGIES: Dict[str, Callable[[str, str], DiffResult]] = {
+    "fte_tolerant": compare_fte_tolerant,
+}
+
+
+def resolve_compare_fn(config: dict) -> Callable[[str, str], DiffResult]:
+    name = config.get("compare")
+    if name:
+        return _COMPARE_STRATEGIES[name]
+    return compare_exact
+
+
+def sync_source(name: str, config: dict, data_dir: Path = DATA_DIR,
+                 prompt: Callable[[str], str] = input,
+                 out: Callable[[str], None] = print) -> None:
+    """Fetch, compare, and (if confirmed) write one CSV-backed source."""
+    if config.get("accessible", True) is False:
+        out(f"{name}: not accessible (sharing) - flip to 'anyone with link can "
+            f"view' to enable, or update the CSV by hand as before")
+        return
+
+    try:
+        live_text = fetch_sheet_csv(config["url"], gid=config.get("gid"))
+    except FetchError as e:
+        out(f"{name}: could not fetch: {e}")
+        return
+
+    local_path = data_dir / name
+    local_text = read_local_file(local_path)
+    if local_text is None:
+        out(f"{name}: no local file yet - creating from sheet")
+        write_local_file(local_path, live_text)
+        return
+
+    compare_fn = resolve_compare_fn(config)
+    diff = compare_fn(live_text, local_text)
+    if not diff.has_differences:
+        out(f"{name}: up to date")
+        return
+
+    total = len(diff.added) + len(diff.removed) + len(diff.changed)
+    out(f"{name}: {total} difference(s)")
+    for line in diff.summary_lines():
+        out(line)
+
+    answer = prompt(f"Propagate these changes to data/{name}? [y/N] ").strip().lower()
+    if answer != "y":
+        return
+
+    supplementary_name = config.get("supplementary_file")
+    if supplementary_name:
+        supplementary_text = read_local_file(data_dir / supplementary_name) or ""
+        final_text = merge_supplementary(live_text, supplementary_text)
+    else:
+        final_text = live_text
+    write_local_file(local_path, final_text)
+    out(f"  written to data/{name}")
+
+
+def sync_multi_tab_source(name: str, config: dict, data_dir: Path = DATA_DIR,
+                           prompt: Callable[[str], str] = input,
+                           out: Callable[[str], None] = print) -> None:
+    """Multi-tab workbook sources (CS WTW Who Teaches What.xlsx, ProjectLoads
+    2025-26.xlsx). Full local-.xlsx comparison/write-back is out of scope for
+    this pass (see the plan's Global Constraints) - a configured tab is
+    fetched and reported for manual review, not automatically diffed or
+    written.
+    """
+    tabs = config.get("tabs", {})
+    configured = {tab: gid for tab, gid in tabs.items() if gid}
+    if not configured:
+        out(f"{name}: skipped - tabs not configured (edit google_sheets_sources.json)")
+        return
+    for tab, gid in configured.items():
+        try:
+            live_text = fetch_sheet_csv(config["url"], gid=gid)
+        except FetchError as e:
+            out(f"{name} [{tab}]: could not fetch: {e}")
+            continue
+        row_count = len(parse_csv_rows(live_text))
+        out(f"{name} [{tab}]: fetched ({row_count} rows) - this tool doesn't "
+            f"yet compare/write .xlsx content automatically; review by hand")
