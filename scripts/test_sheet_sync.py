@@ -406,6 +406,88 @@ class TestSyncMultiTabSource:
         assert "fetched" in out.text()
 
 
+class TestSyncMultiTabSourceAccessibility:
+    def test_inaccessible_multi_tab_source_reports_and_never_fetches(self, tmp_path, monkeypatch):
+        """Defense in depth: sync_multi_tab_source() must honor 'accessible'
+        itself, matching the pattern already in sync_source() - it must not
+        rely solely on a caller checking first."""
+        out = _Recorder()
+        called = []
+        monkeypatch.setattr(sheet_sync, "fetch_sheet_csv", lambda *a, **k: called.append(1))
+        sheet_sync.sync_multi_tab_source(
+            "Book.xlsx",
+            {"url": "https://docs.google.com/spreadsheets/d/ABC",
+             "tabs": {"Advisor Loads": "123"}, "accessible": False},
+            data_dir=tmp_path, prompt=lambda p: "y", out=out,
+        )
+        assert called == []
+        assert "not accessible" in out.text()
+
+
+class TestSyncOneSourceAccessibilityOrdering:
+    """main() had a latent ordering bug: it checked 'tabs' in config before
+    checking 'accessible', so a multi-tab source marked accessible: false
+    would still get fetched (sync_multi_tab_source never checked that flag).
+    The accessible check must run before the tabs-vs-single-file dispatch."""
+
+    def test_inaccessible_multi_tab_source_never_calls_fetch(self, tmp_path, monkeypatch):
+        out = _Recorder()
+        called = []
+        monkeypatch.setattr(sheet_sync, "fetch_sheet_csv", lambda *a, **k: called.append(1))
+        sheet_sync._sync_one_source(
+            "Book.xlsx",
+            {"url": "https://docs.google.com/spreadsheets/d/ABC",
+             "tabs": {"Advisor Loads": "123"}, "accessible": False},
+            data_dir=tmp_path, prompt=lambda p: "y", out=out,
+        )
+        assert called == []
+        assert "not accessible" in out.text()
+
+
+class TestMain:
+    def test_main_dispatches_all_sources_then_runs_check_coverage(self, tmp_path, monkeypatch):
+        sources_path = tmp_path / "google_sheets_sources.json"
+        sheet_sync.save_sources(
+            {
+                "A.csv": {"url": "https://docs.google.com/spreadsheets/d/AAA"},
+                "B.csv": {"url": "https://docs.google.com/spreadsheets/d/BBB"},
+            },
+            path=sources_path,
+        )
+        monkeypatch.setattr(sheet_sync, "fetch_sheet_csv", lambda *a, **k: "a,b\n1,2\n")
+        # An unmapped file, so check_coverage has something to report -
+        # lets us prove ordering (loop dispatch happens before this prompt).
+        (tmp_path / "C.csv").write_text("x\n")
+
+        events = []
+        out = lambda line: events.append(("out", line))
+
+        def prompt(p):
+            events.append(("prompt", p))
+            return "y"
+
+        sheet_sync.main(prompt=prompt, out=out, data_dir=tmp_path)
+
+        assert (tmp_path / "A.csv").read_text() == "a,b\n1,2\n"
+        assert (tmp_path / "B.csv").read_text() == "a,b\n1,2\n"
+
+        prompt_events = [p for kind, p in events if kind == "prompt"]
+        assert len(prompt_events) == 1
+        assert "C.csv" in prompt_events[0]
+        # check_coverage's prompt must come after both sources were synced.
+        out_before_prompt = "\n".join(
+            line for kind, line in events[: events.index(("prompt", prompt_events[0]))]
+            if kind == "out"
+        )
+        assert "A.csv" in out_before_prompt
+        assert "B.csv" in out_before_prompt
+
+    def test_main_reports_when_no_sources_configured(self, tmp_path):
+        out = _Recorder()
+        sheet_sync.main(prompt=lambda p: "", out=out, data_dir=tmp_path)
+        assert "No sources configured" in out.text()
+
+
 class TestLoadSaveSources:
     def test_load_missing_file_returns_empty_dict(self, tmp_path):
         assert sheet_sync.load_sources(tmp_path / "nope.json") == {}
