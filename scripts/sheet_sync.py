@@ -349,15 +349,29 @@ def check_coverage(sources: Dict[str, dict], data_dir: Path = DATA_DIR,
         save_sources(sources, path=sources_path)
 
 
+def _sync_one_source(name: str, config: dict, data_dir: Path = DATA_DIR,
+                      prompt: Callable[[str], str] = input,
+                      out: Callable[[str], None] = print) -> None:
+    """Dispatch one source to sync_source/sync_multi_tab_source, catching and
+    reporting any unexpected error (e.g. a malformed config missing 'url',
+    or a URL that doesn't contain a recognizable sheet ID) so one bad
+    source's config can't abort main()'s loop over the rest.
+    """
+    try:
+        if "tabs" in config:
+            sync_multi_tab_source(name, config, data_dir=data_dir, prompt=prompt, out=out)
+        else:
+            sync_source(name, config, data_dir=data_dir, prompt=prompt, out=out)
+    except Exception as e:
+        out(f"{name}: unexpected error, skipping: {e}")
+
+
 def main() -> None:
     sources = load_sources()
     if not sources:
         print(f"No sources configured yet - create {SOURCES_FILE} to get started.")
         return
     for name, config in sources.items():
-        if "tabs" in config:
-            sync_multi_tab_source(name, config)
-        else:
-            sync_source(name, config)
+        _sync_one_source(name, config)
         print()
     check_coverage(sources)
