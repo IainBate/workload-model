@@ -381,7 +381,8 @@ def sync_multi_tab_source(name: str, config: dict, data_dir: Path = DATA_DIR,
         except FetchError as e:
             out(f"{name}: could not check for new tabs: {e}")
             return
-        for title, gid in find_unconfigured_tabs(tabs, live_tabs).items():
+        ignored_tabs = config.get("ignored_tabs", [])
+        for title, gid in find_unconfigured_tabs(tabs, live_tabs, ignored_tabs).items():
             out(f"{name}: new tab detected: '{title}' (gid={gid}) - not yet configured")
 
 
