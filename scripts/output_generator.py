@@ -492,6 +492,18 @@ def _prepare_teaching_percentage_chart_data(results: List[WorkloadResult]) -> Di
 _TEACHING_PCT_GRADE_ORDER = ["Prof", "Reader", "SL", "Lecturer"]
 
 
+def _teaching_pct_grade_rank_key(r: WorkloadResult) -> Tuple[int, float]:
+    """Sort key for ranking within a grade group: overloaded (negative
+    percentage) staff first - most-overloaded first among themselves - then
+    everyone else, highest teaching % first. The leading 0/1 keeps every
+    overloaded person ahead of every normal one regardless of magnitude.
+    """
+    pct = r.teaching_pct_of_remaining
+    if pct < 0:
+        return (0, pct)
+    return (1, -pct)
+
+
 def _prepare_teaching_percentage_by_grade_chart_data(results: List[WorkloadResult]) -> Dict[str, Any]:
     """Pure data-shaping for generate_teaching_percentage_by_grade_histogram()
     - no matplotlib, so it can be unit tested directly.
