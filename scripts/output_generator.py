@@ -1097,7 +1097,7 @@ def generate_html_report(results: List[WorkloadResult], year_data: YearData,
             <div class="legend">
                 <div class="legend-item"><div class="legend-color" style="background:#2196F3"></div>ART</div>
                 <div class="legend-item"><div class="legend-color" style="background:#4CAF50"></div>T and S</div>
-                <div class="legend-item"><div class="legend-color" style="background:#F44336"></div>Clipped (out of range)</div>
+                <div class="legend-item"><div class="legend-color" style="background:#F44336"></div>Overloaded</div>
             </div>
             <img src="workload_teaching_percentage_histogram.png" alt="Teaching Percentage of Remaining Time Chart" style="max-width: 1200px;">
         </div>
