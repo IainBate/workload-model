@@ -132,3 +132,55 @@ def compare_exact(live_text: str, local_text: str) -> DiffResult:
         elif live_row != local_row:
             changed.append((i, local_row, live_row))
     return DiffResult(added=added, removed=removed, changed=changed)
+
+
+FTE_TOLERANCE = 1.0  # percentage points - matches observed rounding noise
+
+
+def _fte_row_key(row: Dict[str, str]) -> Tuple[str, str]:
+    return (row.get("Project ID", ""), row.get("Staff", ""))
+
+
+def _fte_rows_differ(live_row: Dict[str, str], local_row: Dict[str, str], tolerance: float) -> bool:
+    for col in live_row:
+        if col == "% FTE":
+            continue
+        if live_row.get(col, "") != local_row.get(col, ""):
+            return True
+    try:
+        live_fte = float(live_row.get("% FTE", "0") or "0")
+        local_fte = float(local_row.get("% FTE", "0") or "0")
+    except ValueError:
+        return live_row.get("% FTE") != local_row.get("% FTE")
+    return abs(live_fte - local_fte) > tolerance
+
+
+def compare_fte_tolerant(live_text: str, local_text: str, tolerance: float = FTE_TOLERANCE) -> DiffResult:
+    """Row-matched by (Project ID, Staff) rather than position, with the
+    '% FTE' column compared within `tolerance` percentage points (rounding
+    noise). Any other column differing, or a row present on only one side,
+    is still reported as a real difference.
+    """
+    live_rows = list(csv.DictReader(io.StringIO(live_text)))
+    local_rows = list(csv.DictReader(io.StringIO(local_text)))
+
+    live_by_key = {_fte_row_key(r): r for r in live_rows}
+    local_by_key = {_fte_row_key(r): r for r in local_rows}
+
+    added: List[Tuple[Any, Any]] = []
+    removed: List[Tuple[Any, Any]] = []
+    changed: List[Tuple[Any, Any, Any]] = []
+
+    for key, live_row in live_by_key.items():
+        if key not in local_by_key:
+            added.append((key, live_row))
+            continue
+        local_row = local_by_key[key]
+        if _fte_rows_differ(live_row, local_row, tolerance):
+            changed.append((key, local_row, live_row))
+
+    for key, local_row in local_by_key.items():
+        if key not in live_by_key:
+            removed.append((key, local_row))
+
+    return DiffResult(added=added, removed=removed, changed=changed)

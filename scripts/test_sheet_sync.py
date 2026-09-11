@@ -139,3 +139,51 @@ class TestCompareExact:
         diff = sheet_sync.compare_exact("a\nb\n", "a\nb\nc\n")
         assert diff.removed == [(2, ["c"])]
         assert diff.added == []
+
+
+class TestCompareFteTolerant:
+    HEADER = "Project ID,Staff,% FTE,Comments\n"
+
+    def test_small_fte_difference_within_tolerance_is_ignored(self):
+        live = self.HEADER + "P1,Alice,19,\n"
+        local = self.HEADER + "P1,Alice,19.09,\n"
+        diff = sheet_sync.compare_fte_tolerant(live, local)
+        assert diff.has_differences is False
+
+    def test_large_fte_difference_is_reported(self):
+        live = self.HEADER + "P1,Alice,20,\n"
+        local = self.HEADER + "P1,Alice,10,\n"
+        diff = sheet_sync.compare_fte_tolerant(live, local)
+        assert len(diff.changed) == 1
+
+    def test_difference_in_non_fte_column_is_reported_even_if_fte_matches(self):
+        live = self.HEADER + "P1,Alice,20,new comment\n"
+        local = self.HEADER + "P1,Alice,20,\n"
+        diff = sheet_sync.compare_fte_tolerant(live, local)
+        assert len(diff.changed) == 1
+
+    def test_row_only_on_live_side_is_added(self):
+        live = self.HEADER + "P1,Alice,20,\nP2,Bob,10,\n"
+        local = self.HEADER + "P1,Alice,20,\n"
+        diff = sheet_sync.compare_fte_tolerant(live, local)
+        assert len(diff.added) == 1
+        assert diff.added[0][0] == ("P2", "Bob")
+
+    def test_row_only_on_local_side_is_removed(self):
+        live = self.HEADER + "P1,Alice,20,\n"
+        local = self.HEADER + "P1,Alice,20,\nP2,Bob,10,\n"
+        diff = sheet_sync.compare_fte_tolerant(live, local)
+        assert len(diff.removed) == 1
+        assert diff.removed[0][0] == ("P2", "Bob")
+
+    def test_custom_tolerance_respected(self):
+        live = self.HEADER + "P1,Alice,20,\n"
+        local = self.HEADER + "P1,Alice,15,\n"
+        assert sheet_sync.compare_fte_tolerant(live, local, tolerance=10.0).has_differences is False
+        assert sheet_sync.compare_fte_tolerant(live, local, tolerance=1.0).has_differences is True
+
+    def test_non_numeric_fte_falls_back_to_string_comparison(self):
+        live = self.HEADER + "P1,Alice,n/a,\n"
+        local = self.HEADER + "P1,Alice,20,\n"
+        diff = sheet_sync.compare_fte_tolerant(live, local)
+        assert len(diff.changed) == 1
