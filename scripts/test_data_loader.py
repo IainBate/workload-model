@@ -304,6 +304,17 @@ class TestResearchGroupGrades:
         grades = dl._load_research_group_grades()
         assert grades == {}
 
+    def test_l_grade_normalized_to_lecturer(self, tmp_path, monkeypatch):
+        """'L' in the source file becomes the full word 'Lecturer', matching
+        the manual Grade-column entries in Staff Categories and FTE.csv, so
+        both sources merge into one group in the by-grade chart."""
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        self._write(tmp_path / "CS Research Groups.csv", [
+            ["Alice Example", "L", "", "TRUE"],
+        ])
+        grades = dl._load_research_group_grades()
+        assert grades == {"Alice Example": "Lecturer"}
+
     def test_percent_annotation_stripped_from_name(self, tmp_path, monkeypatch):
         monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
         self._write(tmp_path / "CS Research Groups.csv", [
