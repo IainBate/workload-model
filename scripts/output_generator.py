@@ -472,28 +472,17 @@ def generate_teaching_percentage_histogram(results: List[WorkloadResult], output
     if output_dir is None:
         output_dir = OUTPUT_DIR
 
-    excluded = [r for r in results if not r.include_in_teaching_pct_chart]
-    included = [r for r in results
-                if r.include_in_teaching_pct_chart and r.teaching_pct_of_remaining is not None]
-    undefined = [r for r in results
-                 if r.include_in_teaching_pct_chart and r.teaching_pct_of_remaining is None]
+    chart_data = _prepare_teaching_percentage_chart_data(results)
+    names = chart_data["names"]
+    plotted_values = chart_data["plotted_values"]
+    colors = chart_data["colors"]
+    clipped = chart_data["clipped"]
+    excluded = chart_data["excluded"]
+    undefined = chart_data["undefined"]
 
-    names = [r.name for r in included]
     fig, ax = plt.subplots(figsize=(max(18, len(names) * 0.35), 10))
     fig.suptitle("Teaching as a Percentage of Remaining (Non-Research/Non-Admin) Time",
                  fontsize=16, fontweight="bold")
-
-    clipped = []
-    colors = []
-    plotted_values = []
-    for r in included:
-        pct = r.teaching_pct_of_remaining
-        if pct < _TEACHING_PCT_CLIP_MIN or pct > _TEACHING_PCT_CLIP_MAX:
-            clipped.append(r)
-            colors.append(_TEACHING_PCT_CLIPPED_COLOR)
-        else:
-            colors.append(_TEACHING_PCT_CATEGORY_COLORS.get(r.category, _TEACHING_PCT_DEFAULT_COLOR))
-        plotted_values.append(max(_TEACHING_PCT_CLIP_MIN, min(_TEACHING_PCT_CLIP_MAX, pct)))
 
     ax.bar(names, plotted_values, color=colors, edgecolor="white", width=0.7)
     ax.axhline(y=0, color="black", linewidth=1.0)
