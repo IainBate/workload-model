@@ -71,3 +71,64 @@ def fetch_sheet_csv(sheet_url: str, gid: Optional[str] = None, timeout: float = 
             f"sheet is probably not shared as 'anyone with the link can view'"
         )
     return text
+
+
+def parse_csv_rows(text: str) -> List[List[str]]:
+    """Parse CSV text into a list of rows (each a list of field strings)."""
+    return list(csv.reader(io.StringIO(text)))
+
+
+class DiffResult:
+    """The result of comparing a live (fetched) source against a local file.
+
+    added/removed/changed entries use `key` to identify a row - a row index
+    (int) for compare_exact, or a (Project ID, Staff) tuple for
+    compare_fte_tolerant - whatever the comparison strategy used to match
+    rows between the two sides.
+    """
+
+    def __init__(self, added: List[Tuple[Any, Any]], removed: List[Tuple[Any, Any]],
+                 changed: List[Tuple[Any, Any, Any]]):
+        self.added = added      # (key, live_row)
+        self.removed = removed  # (key, local_row)
+        self.changed = changed  # (key, local_row, live_row)
+
+    @property
+    def has_differences(self) -> bool:
+        return bool(self.added or self.removed or self.changed)
+
+    def summary_lines(self, limit: int = 20) -> List[str]:
+        lines = []
+        for key, live_row in self.added:
+            lines.append(f"  + {key}: {live_row}")
+        for key, local_row in self.removed:
+            lines.append(f"  - {key}: {local_row}")
+        for key, local_row, live_row in self.changed:
+            lines.append(f"  ~ {key}: {local_row} -> {live_row}")
+        if len(lines) > limit:
+            remaining = len(lines) - limit
+            lines = lines[:limit] + [f"  ... and {remaining} more"]
+        return lines
+
+
+def compare_exact(live_text: str, local_text: str) -> DiffResult:
+    """Row-for-row exact comparison, keyed by row index. A row present past
+    the end of the shorter side is added/removed; a differing row at the
+    same index is changed.
+    """
+    live_rows = parse_csv_rows(live_text)
+    local_rows = parse_csv_rows(local_text)
+    added: List[Tuple[Any, Any]] = []
+    removed: List[Tuple[Any, Any]] = []
+    changed: List[Tuple[Any, Any, Any]] = []
+    max_len = max(len(live_rows), len(local_rows))
+    for i in range(max_len):
+        live_row = live_rows[i] if i < len(live_rows) else None
+        local_row = local_rows[i] if i < len(local_rows) else None
+        if local_row is None:
+            added.append((i, live_row))
+        elif live_row is None:
+            removed.append((i, local_row))
+        elif live_row != local_row:
+            changed.append((i, local_row, live_row))
+    return DiffResult(added=added, removed=removed, changed=changed)
