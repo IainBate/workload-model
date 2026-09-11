@@ -1314,6 +1314,67 @@ def _load_staff_categories_and_fte(filepath: str = "Staff Categories and FTE.csv
     return data
 
 
+# Grade tokens used in CS Research Groups.csv - anything else found in that
+# column position (blank, a stray FTE-hours number, a group/section name) is
+# not a person row, so this set is what distinguishes a real entry from noise.
+_RESEARCH_GROUP_VALID_GRADES = {"Prof", "Reader", "SL", "L"}
+
+# A few names in CS Research Groups.csv carry a "(NN%)" fractional-FTE
+# annotation (e.g. "Simos Gerasimou (20%)") that isn't part of the name itself.
+_RESEARCH_GROUP_PERCENT_SUFFIX_RE = re.compile(r"\s*\(\d+%\)\s*$")
+
+
+def _load_research_group_grades(filepath: str = "CS Research Groups.csv") -> Dict[str, str]:
+    """Load ART staff academic grades (Prof / Reader / SL / L) from CS
+    Research Groups.csv - the sole automatic source for ART grades, used to
+    group/rank staff by seniority in the teaching-%-by-grade chart. T&S
+    staff, and any ART staff this file doesn't cover, get their grade from
+    the Grade column of Staff Categories and FTE.csv instead (a manual entry
+    which also overrides this file for anyone listed in both - see
+    _resolve_grade_from_data()).
+
+    The file lays several research groups out side-by-side as repeating
+    4-column blocks (Name, Grade, Group-Leader marker, Active flag), plus a
+    "Group" summary table and a "Key" legend sharing the same row/column
+    shape but with no grade token in the second position - requiring the
+    second column to be one of the four known grades is what excludes those
+    non-person rows, with no special-casing of the summary/legend blocks
+    needed.
+
+    Returns {raw_name_as_written: grade} - the caller normalizes names via
+    the usual reverse_lookup/staff_name_lookup.json alias mechanism, same as
+    every other data source here.
+    """
+    path = DATA_DIR / filepath
+    if not path.exists():
+        return {}
+
+    grades = {}
+    with open(path, "r", encoding="utf-8-sig") as f:
+        reader = csv.reader(f)
+        for row in reader:
+            for i in range(0, len(row) - 1, 4):
+                name = row[i].strip()
+                grade = row[i + 1].strip()
+                if not name or grade not in _RESEARCH_GROUP_VALID_GRADES:
+                    continue
+                name = _RESEARCH_GROUP_PERCENT_SUFFIX_RE.sub("", name).strip()
+                grades[name] = grade
+    return grades
+
+
+def _resolve_grade_from_data(canonical_name: str, staff_ref: Optional[Dict],
+                             research_group_grades: Dict[str, str]) -> str:
+    """Resolve a staff member's academic grade, in priority order: Staff
+    Categories and FTE.csv's Grade column (a manual entry, and the only
+    source for T&S staff), then CS Research Groups.csv (auto-parsed, ART
+    only). Returns "" if neither covers this person.
+    """
+    if staff_ref and staff_ref.get("grade"):
+        return staff_ref["grade"]
+    return research_group_grades.get(canonical_name, "")
+
+
 def _load_category_overrides(filepath: str = "staff_category_lookup.json") -> Dict[str, str]:
     """Load previously-resolved staff categories (e.g. answered via an
     interactive prompt for a name not covered by any other source).
