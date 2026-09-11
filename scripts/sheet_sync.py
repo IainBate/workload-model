@@ -387,6 +387,15 @@ def _sync_one_source(name: str, config: dict, data_dir: Path = DATA_DIR,
     source's config can't abort main()'s loop over the rest.
     """
     try:
+        # Check accessibility before branching on "tabs" - sync_source()
+        # already checks this, but sync_multi_tab_source() must too, since a
+        # multi-tab source marked accessible: false must never be fetched
+        # either. Checking it once here, first, keeps that ordering correct
+        # regardless of which branch a given source takes.
+        if config.get("accessible", True) is False:
+            out(f"{name}: not accessible (sharing) - flip to 'anyone with link can "
+                f"view' to enable, or update the CSV by hand as before")
+            return
         if "tabs" in config:
             sync_multi_tab_source(name, config, data_dir=data_dir, prompt=prompt, out=out)
         else:
@@ -395,12 +404,14 @@ def _sync_one_source(name: str, config: dict, data_dir: Path = DATA_DIR,
         out(f"{name}: unexpected error, skipping: {e}")
 
 
-def main() -> None:
-    sources = load_sources()
+def main(prompt: Callable[[str], str] = input, out: Callable[[str], None] = print,
+          data_dir: Path = DATA_DIR) -> None:
+    sources_path = data_dir / "google_sheets_sources.json"
+    sources = load_sources(sources_path)
     if not sources:
-        print(f"No sources configured yet - create {SOURCES_FILE} to get started.")
+        out(f"No sources configured yet - create {sources_path} to get started.")
         return
     for name, config in sources.items():
-        _sync_one_source(name, config)
-        print()
-    check_coverage(sources)
+        _sync_one_source(name, config, data_dir=data_dir, prompt=prompt, out=out)
+        out("")
+    check_coverage(sources, data_dir=data_dir, prompt=prompt, out=out, sources_path=sources_path)
