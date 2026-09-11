@@ -21,7 +21,7 @@ Use workload_calculator.calculate_workload(year_data, track_assumptions=True)
 to enable detailed assumption tracking.
 """
 
-from typing import List, Dict
+from typing import List, Dict, Optional, Tuple
 from dataclasses import dataclass
 import math
 
