@@ -498,10 +498,11 @@ def _prepare_teaching_percentage_by_grade_chart_data(results: List[WorkloadResul
 
     Same population and axis scale as _prepare_teaching_percentage_chart_data()
     (so the two charts are directly comparable), but staff are grouped by
-    academic grade (_TEACHING_PCT_GRADE_ORDER, most senior first) and ranked
-    within each grade by teaching_pct_of_remaining, highest first - including
-    an overloaded (negative) person's true value for the ranking, even though
-    their bar is pinned to the top like the flat chart.
+    academic grade (_TEACHING_PCT_GRADE_ORDER, most senior first). Within each
+    grade, overloaded (negative) staff rank first (leftmost) - arguably the
+    most heavily loaded people in the group, even though their bar is pinned
+    to the top rather than showing their true height - most-overloaded first
+    among themselves; everyone else follows, highest teaching % first.
 
     Staff with no grade recorded, or a grade value outside
     _TEACHING_PCT_GRADE_ORDER, are left out of the grouped bars entirely (there
