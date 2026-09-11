@@ -1,0 +1,35 @@
+{
+  "WAW.csv": {
+    "url": "https://docs.google.com/spreadsheets/d/1mMEwW5UUkOguRDdtDNjA-1yRigPO3633F7YQf3C0o4s",
+    "gid": "991769073",
+    "supplementary_file": "WAW_supplementary.csv"
+  },
+  "% FTE for CS.csv": {
+    "url": "https://docs.google.com/spreadsheets/d/1LoF95Hy0J1aHYiy4bC_1FstG1MwnzDZQnxg3rw7jW6Q",
+    "compare": "fte_tolerant"
+  },
+  "CS Module Numbers.csv": {
+    "url": "https://docs.google.com/spreadsheets/d/1WaS8snhkSZiIlCqYtWlD3iwk5GuefNj0GnKzJXiWhY8"
+  },
+  "PhD Supervision Data.csv": {
+    "url": "https://docs.google.com/spreadsheets/d/1DrPBAn-LKFxXzetkoEahzo2hLcMRRkT1gduLoWQ252Y"
+  },
+  "workload_adjustments.csv": {
+    "url": "https://docs.google.com/spreadsheets/d/1A9QYHbOArZc8l05gUt8Rs8TNwuZ-a5v5D000z2MvTlo"
+  },
+  "CS Research Groups.csv": {
+    "url": "https://docs.google.com/spreadsheets/d/1Akv7KO91jLj5JlRmB8vSlRwWHF1cuLH9XeQPrAhLC4M"
+  },
+  "CS Module Assessment Numbers.csv": {
+    "url": "https://docs.google.com/spreadsheets/d/1Nb_og04ZA1egQhia2uoekvuWX1BdpjKLvG-EohJkni0",
+    "accessible": false
+  },
+  "CS WTW Who Teaches What.xlsx": {
+    "url": "https://docs.google.com/spreadsheets/d/1QlWKgsuH_x6qI5tdmpcsf7_y2R0QbAtbBwZNAYvxLVw",
+    "tabs": {}
+  },
+  "ProjectLoads 2025-26.xlsx": {
+    "url": "https://docs.google.com/spreadsheets/d/1J2XRbGXz3JFAUPel3jeGS0JRAmNOo2yx",
+    "tabs": { "Advisor Loads": null }
+  }
+}
