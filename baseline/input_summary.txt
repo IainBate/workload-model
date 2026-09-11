@@ -90,7 +90,7 @@ Staff:
   - Kofi Appiah [FTE: 1.0, Roles: Deputy Director of Admissions (UG Admissions)]
   - Kostas Barmpis [FTE: 1.0, Roles: PGR Training Officer]
   - Mark Nicholson [FTE: 0.8, Roles: StAMP committee]
-  - Mark Sujan [FTE: 0.8, Roles: none]
+  - Mark Sujan [FTE: 0.8, Roles: Ethics Committee Member]
   - Mike Freeman [FTE: 1.0, Roles: Academic Admissions Team]
   - Mike O'Dea [FTE: 1.0, Roles: Other PLs]
   - Nick Pears [FTE: 1.0, Roles: Deputy Head (Research)]

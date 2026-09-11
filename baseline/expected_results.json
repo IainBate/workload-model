@@ -570,9 +570,12 @@
         "total": 0
       },
       "project_breakdown": {},
-      "remaining_hours": 836.7,
+      "remaining_hours": 672.5,
       "research_breakdown": {
-        "grants": {},
+        "grants": {
+          "grant_4683768": 0.0,
+          "grant_4705921": 164.2
+        },
         "phd_students": {
           "co_supervision": {
             "count": 8,
@@ -582,7 +585,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 548.2,
+      "research_hours": 712.4,
       "teaching_breakdown": {
         "pastoral_breakdown": {
           "rate": 3,
@@ -594,7 +597,7 @@
       "teaching_hours": 0.0,
       "teaching_module_breakdowns": {},
       "teaching_pct_of_remaining": 0.0,
-      "total_hours": 805.3
+      "total_hours": 969.5
     },
     "Andrew Pomfret": {
       "adjustments_breakdown": {},
@@ -795,9 +798,12 @@
         "rate": 16,
         "total": 64
       },
-      "remaining_hours": 1150.8,
+      "remaining_hours": 822.4,
       "research_breakdown": {
-        "grants": {},
+        "grants": {
+          "grant_4792719": 164.2,
+          "grant_4849191": 164.2
+        },
         "phd_students": {
           "assessor": {
             "count": 1,
@@ -812,7 +818,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 316.2,
+      "research_hours": 644.6,
       "teaching_breakdown": {
         "assessment_setting": 12.5,
         "drop_in": 0.0,
@@ -956,8 +962,8 @@
           "total_lecture_hours": 22.0
         }
       },
-      "teaching_pct_of_remaining": 31.048,
-      "total_hours": 848.5
+      "teaching_pct_of_remaining": 43.446,
+      "total_hours": 1176.9
     },
     "Carlo Ottaviani": {
       "adjustments_breakdown": {},
@@ -985,9 +991,11 @@
         "rate": 16,
         "total": 96
       },
-      "remaining_hours": 1034.6,
+      "remaining_hours": 952.5,
       "research_breakdown": {
-        "grants": {},
+        "grants": {
+          "grant_4650575": 82.1
+        },
         "phd_students": {
           "assessor": {
             "count": 3,
@@ -1002,7 +1010,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 268.2,
+      "research_hours": 350.3,
       "teaching_breakdown": {
         "assessment_setting": 12.5,
         "drop_in": 0.0,
@@ -1148,8 +1156,8 @@
           "total_lecture_hours": 22.0
         }
       },
-      "teaching_pct_of_remaining": 39.3904,
-      "total_hours": 1014.9333
+      "teaching_pct_of_remaining": 42.7857,
+      "total_hours": 1097.0333
     },
     "Christopher Crispin-Bailey": {
       "adjustments_breakdown": {},
@@ -1635,9 +1643,13 @@
         "rate": 16,
         "total": 96
       },
-      "remaining_hours": 1182.8,
+      "remaining_hours": 1018.6,
       "research_breakdown": {
-        "grants": {},
+        "grants": {
+          "grant_4423879": 82.1,
+          "grant_4717588": 0.0,
+          "grant_4963830": 82.1
+        },
         "phd_students": {
           "assessor": {
             "count": 3,
@@ -1652,7 +1664,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 284.2,
+      "research_hours": 448.4,
       "teaching_breakdown": {
         "assessment_setting": 22.5,
         "drop_in": 0.0,
@@ -1781,8 +1793,8 @@
           "total_lecture_hours": 22.0
         }
       },
-      "teaching_pct_of_remaining": 32.5837,
-      "total_hours": 844.6
+      "teaching_pct_of_remaining": 37.8362,
+      "total_hours": 1008.8
     },
     "Da Li": {
       "adjustments_breakdown": {},
@@ -2511,9 +2523,12 @@
         "total": 0
       },
       "project_breakdown": {},
-      "remaining_hours": 811.86,
+      "remaining_hours": 565.56,
       "research_breakdown": {
-        "grants": {},
+        "grants": {
+          "grant_4792719": 82.1,
+          "grant_4849191": 164.2
+        },
         "phd_students": {
           "assessor": {
             "count": 1,
@@ -2533,7 +2548,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 540.2,
+      "research_hours": 786.5,
       "teaching_breakdown": {
         "assessment_setting": 5.0,
         "drop_in": 0.0,
@@ -2615,8 +2630,8 @@
           "total_lecture_hours": 22.0
         }
       },
-      "teaching_pct_of_remaining": 6.1833,
-      "total_hours": 880.34
+      "teaching_pct_of_remaining": 8.8762,
+      "total_hours": 1126.64
     },
     "Fang Yan": {
       "adjustments_breakdown": {},
@@ -2747,9 +2762,12 @@
         "total": 0
       },
       "project_breakdown": {},
-      "remaining_hours": 1084.7,
+      "remaining_hours": -409.52,
       "research_breakdown": {
-        "grants": {},
+        "grants": {
+          "grant_5042890": 180.62,
+          "grant_5834943": 1313.6
+        },
         "phd_students": {
           "assessor": {
             "count": 5,
@@ -2764,7 +2782,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 300.2,
+      "research_hours": 1794.42,
       "teaching_breakdown": {
         "assessment_setting": 5.0,
         "drop_in": 0.0,
@@ -2837,8 +2855,8 @@
           "total_lecture_hours": 22.0
         }
       },
-      "teaching_pct_of_remaining": 8.4509,
-      "total_hours": 648.9667
+      "teaching_pct_of_remaining": -22.3839,
+      "total_hours": 2143.1867
     },
     "Iain Bate": {
       "adjustments_breakdown": {},
@@ -2913,9 +2931,11 @@
         "total": 0
       },
       "project_breakdown": {},
-      "remaining_hours": 297.8,
+      "remaining_hours": 133.6,
       "research_breakdown": {
-        "grants": {},
+        "grants": {
+          "grant_4849425": 164.2
+        },
         "phd_students": {
           "assessor": {
             "count": 1,
@@ -2935,7 +2955,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 348.2,
+      "research_hours": 512.4,
       "teaching_breakdown": {
         "assessment_setting": 7.5,
         "drop_in": 0.0,
@@ -3020,8 +3040,8 @@
           "total_lecture_hours": 22.0
         }
       },
-      "teaching_pct_of_remaining": 33.5124,
-      "total_hours": 1444.0
+      "teaching_pct_of_remaining": 74.7006,
+      "total_hours": 1608.2
     },
     "Ibrahim Habli": {
       "adjustments_breakdown": {},
@@ -3045,9 +3065,17 @@
         "total": 0
       },
       "project_breakdown": {},
-      "remaining_hours": 1038.8,
+      "remaining_hours": -12.08,
       "research_breakdown": {
-        "grants": {},
+        "grants": {
+          "grant_3912870": 311.98,
+          "grant_4669647": 164.2,
+          "grant_4698151": 164.2,
+          "grant_4726550": 164.2,
+          "grant_4963830": 82.1,
+          "grant_5675862": 82.1,
+          "grant_5909787": 82.1
+        },
         "phd_students": {
           "assessor": {
             "count": 1,
@@ -3067,7 +3095,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 428.2,
+      "research_hours": 1479.08,
       "teaching_breakdown": {
         "pastoral_breakdown": {
           "rate": 3,
@@ -3078,8 +3106,8 @@
       },
       "teaching_hours": 0.0,
       "teaching_module_breakdowns": {},
-      "teaching_pct_of_remaining": 0.0,
-      "total_hours": 603.2
+      "teaching_pct_of_remaining": -0.0,
+      "total_hours": 1654.08
     },
     "Jacob Rigby": {
       "adjustments_breakdown": {},
@@ -3107,13 +3135,15 @@
         "rate": 16,
         "total": 80
       },
-      "remaining_hours": 1138.6,
+      "remaining_hours": 1056.5,
       "research_breakdown": {
-        "grants": {},
+        "grants": {
+          "grant_5041144": 82.1
+        },
         "phd_students": {},
         "protected_research_baseline": 164.2
       },
-      "research_hours": 164.2,
+      "research_hours": 246.3,
       "teaching_breakdown": {
         "assessment_setting": 10.0,
         "drop_in": 0.0,
@@ -3189,8 +3219,8 @@
           "total_lecture_hours": 22.0
         }
       },
-      "teaching_pct_of_remaining": 21.3625,
-      "total_hours": 746.6333
+      "teaching_pct_of_remaining": 23.0226,
+      "total_hours": 828.7333
     },
     "James Stovold": {
       "adjustments_breakdown": {},
@@ -3324,9 +3354,12 @@
         "rate": 16,
         "total": 96
       },
-      "remaining_hours": 958.8,
+      "remaining_hours": 466.2,
       "research_breakdown": {
-        "grants": {},
+        "grants": {
+          "grant_4686835": 328.4,
+          "grant_4822585": 164.2
+        },
         "phd_students": {
           "assessor": {
             "count": 5,
@@ -3346,7 +3379,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 508.2,
+      "research_hours": 1000.8,
       "teaching_breakdown": {
         "assessment_setting": 10.0,
         "drop_in": 0.0,
@@ -3422,8 +3455,8 @@
           "total_lecture_hours": 22.0
         }
       },
-      "teaching_pct_of_remaining": 30.6494,
-      "total_hours": 977.0667
+      "teaching_pct_of_remaining": 63.0345,
+      "total_hours": 1469.6667
     },
     "Jen Beeston": {
       "adjustments_breakdown": {},
@@ -4021,9 +4054,13 @@
         "total": 0
       },
       "project_breakdown": {},
-      "remaining_hours": 1076.7,
+      "remaining_hours": 485.58,
       "research_breakdown": {
-        "grants": {},
+        "grants": {
+          "grant_4846427": 82.1,
+          "grant_4903854": 328.4,
+          "grant_5007045": 180.62
+        },
         "phd_students": {
           "co_supervision": {
             "count": 3,
@@ -4033,7 +4070,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 308.2,
+      "research_hours": 899.32,
       "teaching_breakdown": {
         "pastoral_breakdown": {
           "rate": 3,
@@ -4045,7 +4082,7 @@
       "teaching_hours": 0.0,
       "teaching_module_breakdowns": {},
       "teaching_pct_of_remaining": 0.0,
-      "total_hours": 565.3
+      "total_hours": 1156.42
     },
     "Katrina Attwood": {
       "adjustments_breakdown": {},
@@ -4447,9 +4484,11 @@
         "rate": 16,
         "total": 32
       },
-      "remaining_hours": 1164.7,
+      "remaining_hours": 1000.5,
       "research_breakdown": {
-        "grants": {},
+        "grants": {
+          "grant_4792719": 164.2
+        },
         "phd_students": {
           "assessor": {
             "count": 1,
@@ -4464,7 +4503,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 220.2,
+      "research_hours": 384.4,
       "teaching_breakdown": {
         "assessment_setting": 20.0,
         "drop_in": 0.0,
@@ -4607,8 +4646,8 @@
           "total_lecture_hours": 22.0
         }
       },
-      "teaching_pct_of_remaining": 29.9648,
-      "total_hours": 826.3
+      "teaching_pct_of_remaining": 34.8826,
+      "total_hours": 990.5
     },
     "Mark Nicholson": {
       "adjustments_breakdown": {},
@@ -4756,17 +4795,16 @@
     "Mark Sujan": {
       "adjustments_breakdown": {},
       "admin_breakdown": {
+        "Ethics Committee Member": 262.72,
         "engagement": 80.0,
         "personal_development": 60.0
       },
-      "admin_hours": 140.0,
+      "admin_hours": 402.72,
       "assumptions": [],
       "category": "ART",
       "fte": 0.8,
       "include_in_teaching_pct_chart": true,
-      "missing_data": [
-        "No administrative roles assigned"
-      ],
+      "missing_data": [],
       "name": "Mark Sujan",
       "nominal_hours": 1313.6,
       "pastoral_breakdown": {
@@ -4775,13 +4813,16 @@
         "total": 0
       },
       "project_breakdown": {},
-      "remaining_hours": 1042.24,
+      "remaining_hours": 582.48,
       "research_breakdown": {
-        "grants": {},
+        "grants": {
+          "grant_5007045": 114.94,
+          "grant_5675862": 82.1
+        },
         "phd_students": {},
         "protected_research_baseline": 131.36
       },
-      "research_hours": 131.36,
+      "research_hours": 328.4,
       "teaching_breakdown": {
         "assessment_setting": 7.5,
         "drop_in": 0.0,
@@ -4839,8 +4880,8 @@
           "total_lecture_hours": 22.0
         }
       },
-      "teaching_pct_of_remaining": 4.5479,
-      "total_hours": 318.76
+      "teaching_pct_of_remaining": 8.1376,
+      "total_hours": 778.52
     },
     "Mike Freeman": {
       "adjustments_breakdown": {},
@@ -5588,7 +5629,9 @@
       },
       "remaining_hours": 536.5,
       "research_breakdown": {
-        "grants": {},
+        "grants": {
+          "grant_4962938": 0.0
+        },
         "phd_students": {
           "assessor": {
             "count": 7,
@@ -5774,9 +5817,11 @@
         "rate": 16,
         "total": 64
       },
-      "remaining_hours": 986.6,
+      "remaining_hours": 658.2,
       "research_breakdown": {
-        "grants": {},
+        "grants": {
+          "grant_5042890": 328.4
+        },
         "phd_students": {
           "assessor": {
             "count": 1,
@@ -5791,7 +5836,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 316.2,
+      "research_hours": 644.6,
       "teaching_breakdown": {
         "assessment_setting": 10.0,
         "drop_in": 0.0,
@@ -5934,8 +5979,8 @@
           "total_lecture_hours": 22.0
         }
       },
-      "teaching_pct_of_remaining": 31.6744,
-      "total_hours": 967.9
+      "teaching_pct_of_remaining": 47.478,
+      "total_hours": 1296.3
     },
     "Pengcheng Liu": {
       "adjustments_breakdown": {},
@@ -5965,9 +6010,15 @@
         "rate": 16,
         "total": 64
       },
-      "remaining_hours": 667.46,
+      "remaining_hours": 191.28,
       "research_breakdown": {
-        "grants": {},
+        "grants": {
+          "grant_5009091": 49.26,
+          "grant_5735551": 147.78,
+          "grant_5773838": 147.78,
+          "grant_5976666": 49.26,
+          "grant_5983081": 82.1
+        },
         "phd_students": {
           "assessor": {
             "count": 2,
@@ -5987,7 +6038,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 356.2,
+      "research_hours": 832.38,
       "teaching_breakdown": {
         "assessment_setting": 7.5,
         "drop_in": 0.0,
@@ -6063,8 +6114,8 @@
           "total_lecture_hours": 22.0
         }
       },
-      "teaching_pct_of_remaining": 46.7893,
-      "total_hours": 1286.84
+      "teaching_pct_of_remaining": 163.2685,
+      "total_hours": 1763.02
     },
     "Peter Nightingale": {
       "adjustments_breakdown": {},
@@ -6338,9 +6389,14 @@
         "rate": 16,
         "total": 208
       },
-      "remaining_hours": 682.6,
+      "remaining_hours": -138.4,
       "research_breakdown": {
-        "grants": {},
+        "grants": {
+          "grant_4650575": 328.4,
+          "grant_5476837": 328.4,
+          "grant_5930272": 82.1,
+          "grant_5967567": 82.1
+        },
         "phd_students": {
           "assessor": {
             "count": 1,
@@ -6360,7 +6416,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 620.2,
+      "research_hours": 1441.2,
       "teaching_breakdown": {
         "assessment_setting": 5.0,
         "drop_in": 0.0,
@@ -6436,8 +6492,8 @@
           "total_lecture_hours": 22.0
         }
       },
-      "teaching_pct_of_remaining": 62.5452,
-      "total_hours": 1386.3333
+      "teaching_pct_of_remaining": -308.4778,
+      "total_hours": 2207.3333
     },
     "Pourya Shamsolmoali": {
       "adjustments_breakdown": {},
@@ -6658,9 +6714,17 @@
         "rate": 16,
         "total": 16
       },
-      "remaining_hours": 925.96,
+      "remaining_hours": -469.74,
       "research_breakdown": {
-        "grants": {},
+        "grants": {
+          "grant_4650575": 82.1,
+          "grant_4701725": 0.0,
+          "grant_4705921": 164.2,
+          "grant_4875659": 656.8,
+          "grant_4928324": 164.2,
+          "grant_4965645": 164.2,
+          "grant_5876296": 164.2
+        },
         "phd_students": {
           "assessor": {
             "count": 3,
@@ -6680,7 +6744,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 508.2,
+      "research_hours": 1903.9,
       "teaching_breakdown": {
         "assessment_setting": 22.5,
         "drop_in": 0.0,
@@ -6753,8 +6817,8 @@
           "total_lecture_hours": 22.0
         }
       },
-      "teaching_pct_of_remaining": 14.1475,
-      "total_hours": 847.04
+      "teaching_pct_of_remaining": -27.8878,
+      "total_hours": 2242.74
     },
     "Richard Hawkins": {
       "adjustments_breakdown": {},
@@ -6783,9 +6847,12 @@
         "rate": 24,
         "total": 144
       },
-      "remaining_hours": 944.5,
+      "remaining_hours": 698.2,
       "research_breakdown": {
-        "grants": {},
+        "grants": {
+          "grant_4724861": 164.2,
+          "grant_4890294": 82.1
+        },
         "phd_students": {
           "assessor": {
             "count": 2,
@@ -6800,7 +6867,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 276.2,
+      "research_hours": 522.5,
       "teaching_breakdown": {
         "assessment_setting": 22.5,
         "drop_in": 0.0,
@@ -6945,8 +7012,8 @@
           "total_lecture_hours": 22.0
         }
       },
-      "teaching_pct_of_remaining": 37.5225,
-      "total_hours": 1051.9
+      "teaching_pct_of_remaining": 50.7591,
+      "total_hours": 1298.2
     },
     "Richard Wilson": {
       "adjustments_breakdown": {},
@@ -7247,9 +7314,11 @@
         "rate": 16,
         "total": 96
       },
-      "remaining_hours": 1133.12,
+      "remaining_hours": 1051.02,
       "research_breakdown": {
-        "grants": {},
+        "grants": {
+          "grant_4650575": 82.1
+        },
         "phd_students": {
           "assessor": {
             "count": 1,
@@ -7264,7 +7333,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 268.2,
+      "research_hours": 350.3,
       "teaching_breakdown": {
         "assessment_setting": 31.25,
         "drop_in": 0.0,
@@ -7481,8 +7550,8 @@
           "total_lecture_hours": 22.0
         }
       },
-      "teaching_pct_of_remaining": 52.5525,
-      "total_hours": 1104.3633
+      "teaching_pct_of_remaining": 56.6577,
+      "total_hours": 1186.4633
     },
     "Sam Braunstein": {
       "adjustments_breakdown": {},
@@ -7812,9 +7881,11 @@
         "rate": 16,
         "total": 96
       },
-      "remaining_hours": 824.5,
+      "remaining_hours": 742.4,
       "research_breakdown": {
-        "grants": {},
+        "grants": {
+          "grant_4748293": 82.1
+        },
         "phd_students": {
           "assessor": {
             "count": 1,
@@ -7834,7 +7905,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 396.2,
+      "research_hours": 478.3,
       "teaching_breakdown": {
         "assessment_setting": 10.0,
         "drop_in": 0.0,
@@ -7980,8 +8051,8 @@
           "total_lecture_hours": 22.0
         }
       },
-      "teaching_pct_of_remaining": 44.5927,
-      "total_hours": 1185.1667
+      "teaching_pct_of_remaining": 49.5241,
+      "total_hours": 1267.2667
     },
     "Simon Foster": {
       "adjustments_breakdown": {},
@@ -8187,9 +8258,13 @@
         "total": 0
       },
       "project_breakdown": {},
-      "remaining_hours": 1021.96,
+      "remaining_hours": 693.56,
       "research_breakdown": {
-        "grants": {},
+        "grants": {
+          "grant_4712353": 0.0,
+          "grant_4875659": 328.4,
+          "grant_5021919": 0.0
+        },
         "phd_students": {
           "assessor": {
             "count": 3,
@@ -8209,7 +8284,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 412.2,
+      "research_hours": 740.6,
       "teaching_breakdown": {
         "pastoral_breakdown": {
           "rate": 3,
@@ -8221,7 +8296,7 @@
       "teaching_hours": 0.0,
       "teaching_module_breakdowns": {},
       "teaching_pct_of_remaining": 0.0,
-      "total_hours": 620.04
+      "total_hours": 948.44
     },
     "Soumya Banerjee": {
       "adjustments_breakdown": {},
@@ -8422,9 +8497,11 @@
         "rate": 16,
         "total": 96
       },
-      "remaining_hours": 782.4,
+      "remaining_hours": 618.2,
       "research_breakdown": {
-        "grants": {},
+        "grants": {
+          "grant_3984461": 164.2
+        },
         "phd_students": {
           "assessor": {
             "count": 2,
@@ -8444,7 +8521,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 356.2,
+      "research_hours": 520.4,
       "teaching_breakdown": {
         "assessment_setting": 7.5,
         "drop_in": 0.0,
@@ -8527,8 +8604,8 @@
           "total_lecture_hours": 22.0
         }
       },
-      "teaching_pct_of_remaining": 33.0458,
-      "total_hours": 1118.15
+      "teaching_pct_of_remaining": 41.823,
+      "total_hours": 1282.35
     },
     "Steven Wright": {
       "adjustments_breakdown": {},
@@ -8558,7 +8635,9 @@
       },
       "remaining_hours": 522.2,
       "research_breakdown": {
-        "grants": {},
+        "grants": {
+          "grant_4907746": 0.0
+        },
         "phd_students": {
           "co_supervision": {
             "count": 1,
@@ -8688,9 +8767,11 @@
         "rate": 16,
         "total": 96
       },
-      "remaining_hours": 870.4,
+      "remaining_hours": 739.04,
       "research_breakdown": {
-        "grants": {},
+        "grants": {
+          "grant_5976666": 131.36
+        },
         "phd_students": {
           "assessor": {
             "count": 1,
@@ -8705,7 +8786,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 268.2,
+      "research_hours": 399.56,
       "teaching_breakdown": {
         "assessment_setting": 15.0,
         "drop_in": 0.0,
@@ -8861,8 +8942,8 @@
           "total_lecture_hours": 22.0
         }
       },
-      "teaching_pct_of_remaining": 42.3713,
-      "total_hours": 1140.4
+      "teaching_pct_of_remaining": 49.9026,
+      "total_hours": 1271.76
     },
     "Tommy Yuan": {
       "adjustments_breakdown": {},
@@ -9318,9 +9399,12 @@
         "rate": 16,
         "total": 96
       },
-      "remaining_hours": 585.55,
+      "remaining_hours": 175.05,
       "research_breakdown": {
-        "grants": {},
+        "grants": {
+          "grant_4686835": 328.4,
+          "grant_5728519": 82.1
+        },
         "phd_students": {
           "assessor": {
             "count": 6,
@@ -9340,7 +9424,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 676.2,
+      "research_hours": 1086.7,
       "teaching_breakdown": {
         "assessment_setting": 17.5,
         "drop_in": 0.0,
@@ -9496,8 +9580,8 @@
           "total_lecture_hours": 22.0
         }
       },
-      "teaching_pct_of_remaining": 62.807,
-      "total_hours": 1424.2167
+      "teaching_pct_of_remaining": 210.0924,
+      "total_hours": 1834.7167
     },
     "Xinwei Fang": {
       "adjustments_breakdown": {},
@@ -9525,9 +9609,11 @@
         "rate": 16,
         "total": 80
       },
-      "remaining_hours": 1140.7,
+      "remaining_hours": 976.5,
       "research_breakdown": {
-        "grants": {},
+        "grants": {
+          "grant_5817418": 164.2
+        },
         "phd_students": {
           "supervision": {
             "count": 1,
@@ -9537,7 +9623,7 @@
         },
         "protected_research_baseline": 164.2
       },
-      "research_hours": 244.2,
+      "research_hours": 408.4,
       "teaching_breakdown": {
         "assessment_setting": 30.0,
         "drop_in": 0.0,
@@ -9670,8 +9756,8 @@
           "total_lecture_hours": 22.0
         }
       },
-      "teaching_pct_of_remaining": 34.3473,
-      "total_hours": 893.1
+      "teaching_pct_of_remaining": 40.1229,
+      "total_hours": 1057.3
     },
     "Yuchen Zhao": {
       "adjustments_breakdown": {},
