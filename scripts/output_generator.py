@@ -436,6 +436,11 @@ def _prepare_teaching_percentage_chart_data(results: List[WorkloadResult]) -> Di
     normal_pcts = [r.teaching_pct_of_remaining for r in included if r.teaching_pct_of_remaining >= 0]
     y_max = max(_TEACHING_PCT_Y_AXIS_FLOOR,
                 (max(normal_pcts) if normal_pcts else 0.0) * _TEACHING_PCT_Y_AXIS_HEADROOM)
+    # Averaged over the same normal_pcts population that sets the axis scale -
+    # an overloaded person's pinned display value isn't a real number, and their
+    # true (negative) percentage was already judged not comparable to the rest
+    # (see the docstring), so neither belongs in the average.
+    average_pct = (sum(normal_pcts) / len(normal_pcts)) if normal_pcts else None
 
     names, plotted_values, colors, overloaded = [], [], [], []
     for r in included:
