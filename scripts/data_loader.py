@@ -1568,6 +1568,11 @@ _WAW_ROLE_MAPPING = {
     "Internally Distributed Funding panel reviewer": "Internally Distributed Funding panel reviewer",
     "Research Impact (including REF impact submission)": "Impact",
     "Deputy Director of Admissions (UG Admissions)": "Deputy Director of Admissions (UG Admissions)",
+    # Current WAW.csv section wording (2026-09) for these two blocks -
+    # "Leads"/"Grant Mentors" rather than the singular "Leader"/"Mentor"
+    # workload_parameters.yaml actually uses.
+    "Research Group Leads": "Research Group Leader",
+    "Research Grant Mentors": "Research Mentor",
 }
 
 
