@@ -1316,10 +1316,13 @@ def _load_staff_categories_and_fte(filepath: str = "Staff Categories and FTE.csv
     return data
 
 
-# Grade tokens used in CS Research Groups.csv - anything else found in that
-# column position (blank, a stray FTE-hours number, a group/section name) is
-# not a person row, so this set is what distinguishes a real entry from noise.
-_RESEARCH_GROUP_VALID_GRADES = {"Prof", "Reader", "SL", "L"}
+# Grade tokens used in CS Research Groups.csv, mapped to the canonical display
+# form stored on StaffData/WorkloadResult - "L" becomes "Lecturer" so it matches
+# the full word used for manual Grade-column entries (Staff Categories and
+# FTE.csv) rather than forming a separate, un-mergeable group in the by-grade
+# chart. The dict's keys are also what distinguishes a real person row from
+# noise (blank, a stray FTE-hours number, a group/section name).
+_RESEARCH_GROUP_GRADE_DISPLAY = {"Prof": "Prof", "Reader": "Reader", "SL": "SL", "L": "Lecturer"}
 
 # A few names in CS Research Groups.csv carry a "(NN%)" fractional-FTE
 # annotation (e.g. "Simos Gerasimou (20%)") that isn't part of the name itself.
