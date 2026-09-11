@@ -421,6 +421,71 @@ class TestFTEDataLoading:
         assert fte_values == ["10", "20"]
 
 
+class TestWAWRolesBlankCellCarryForward:
+    """_load_waw_roles() - a blank role cell (column A) inherits the role
+    from the nearest non-blank role above it, as long as no fully-blank
+    separator row comes between them. This is what a merged Google Sheets
+    cell looks like once exported to CSV; the sheet author has started using
+    it for the Research Group Leader / Research Mentor sections."""
+
+    def _write(self, path, rows):
+        with open(path, "w", newline="", encoding="utf-8") as f:
+            writer = csv.writer(f)
+            for row in rows:
+                writer.writerow(row)
+
+    def test_blank_role_inherits_previous_row(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        self._write(tmp_path / "WAW.csv", [
+            ["Research Group Leader", "Alice", "", ""],
+            ["", "Bob", "", ""],
+            ["", "Carol", "", ""],
+        ])
+        roles = dl._load_waw_roles()
+        assert roles == {"Research Group Leader": ["Alice", "Bob", "Carol"]}
+
+    def test_fully_blank_row_resets_carry_forward(self, tmp_path, monkeypatch):
+        """A blank separator row between two unrelated blocks must not let a
+        role leak from the first block into rows of the second."""
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        self._write(tmp_path / "WAW.csv", [
+            ["Research Group Leader", "Alice", "", ""],
+            ["", "", "", ""],
+            ["", "Bob", "", ""],
+        ])
+        roles = dl._load_waw_roles()
+        assert roles == {"Research Group Leader": ["Alice"]}
+
+    def test_existing_repeat_every_row_style_still_works(self, tmp_path, monkeypatch):
+        """Every pre-existing block in WAW.csv repeats the role on every row
+        (e.g. 'Ethics Committee members') rather than leaving it blank -
+        that style must keep working unchanged."""
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        self._write(tmp_path / "WAW.csv", [
+            ["Ethics Committee members", "Alice", "", ""],
+            ["Ethics Committee members", "Bob", "", ""],
+        ])
+        roles = dl._load_waw_roles()
+        assert roles == {"Ethics Committee members": ["Alice", "Bob"]}
+
+    def test_research_grant_mentors_section_parses_with_current_mapping(self, tmp_path, monkeypatch):
+        """Reproduces the live sheet's current 'Research Grant Mentors'
+        block shape exactly (role blank after the first row, person in
+        column B) - this should now parse into 'Research Mentor' once
+        combined with the _WAW_ROLE_MAPPING entry from this task."""
+        monkeypatch.setattr(dl, "DATA_DIR", tmp_path)
+        self._write(tmp_path / "WAW.csv", [
+            ["Research Grant Mentors", "Pengcheng Liu", "", ""],
+            ["", "Radu Calinescu", "", ""],
+        ])
+        roles = dl._load_waw_roles()
+        assert roles == {"Research Grant Mentors": ["Pengcheng Liu", "Radu Calinescu"]}
+        assert dl._WAW_ROLE_MAPPING["Research Grant Mentors"] == "Research Mentor"
+
+    def test_research_group_leads_mapping_entry_present(self):
+        assert dl._WAW_ROLE_MAPPING["Research Group Leads"] == "Research Group Leader"
+
+
 class TestModuleVariantMerging:
     """H/M variant handling - the same class taught to UG and MSc cohorts."""
 
