@@ -2228,6 +2228,7 @@ def _deduplicate_staff(staff: Dict[str, StaffData], mappings: Dict[str, List[str
                 adjustments=tuple(all_adjustments),
                 adjustment_warnings=tuple(all_adjustment_warnings),
                 include_in_teaching_pct_chart=all(e[1].include_in_teaching_pct_chart for e in entries),
+                grade=merged_grade,
             )
 
     return merged
