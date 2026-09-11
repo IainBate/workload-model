@@ -2151,6 +2151,7 @@ def _deduplicate_staff(staff: Dict[str, StaffData], mappings: Dict[str, List[str
                 pastoral_students=0,
                 adjustments=tuple(all_adjustments),
                 adjustment_warnings=tuple(all_adjustment_warnings),
+                include_in_teaching_pct_chart=all(e[1].include_in_teaching_pct_chart for e in entries),
             )
 
     return merged
