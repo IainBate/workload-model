@@ -2388,6 +2388,7 @@ def generate_all_outputs(results: List[WorkloadResult], year_data: YearData,
     Calls each output generator in sequence:
     - CSV file with per-staff workload data
     - Summary and detailed boxplot PNG charts
+    - Teaching-%-of-remaining-time histogram PNG chart
     - Excel workbook with formulas
     - Category-structured Excel workbook (ART/T&S sheets, activity detail, charts)
     - HTML report with embedded charts
