@@ -335,7 +335,7 @@ def load_sources(path: Path = SOURCES_FILE) -> Dict[str, dict]:
 
 def save_sources(sources: Dict[str, dict], path: Path = SOURCES_FILE) -> None:
     with open(path, "w", encoding="utf-8") as f:
-        json.dump(sources, f, indent=2, sort_keys=True)
+        json.dump(sources, f, indent=2)
         f.write("\n")
 
 
