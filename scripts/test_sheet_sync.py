@@ -443,6 +443,20 @@ class TestCheckCoverage:
         )
         assert "new_file.csv" not in sources
 
+    def test_non_url_response_is_rejected_and_not_added(self, tmp_path):
+        """Regression test - a live smoke test once misfired because
+        check_coverage() accepted any non-blank string as a URL."""
+        (tmp_path / "new_file.csv").write_text("a\n")
+        sources = {}
+        out = _Recorder()
+        sheet_sync.check_coverage(
+            sources, data_dir=tmp_path, prompt=lambda p: "not a url",
+            out=out, sources_path=tmp_path / "sources.json",
+        )
+        assert "new_file.csv" not in sources
+        assert "not a URL" in out.text()
+        assert not (tmp_path / "sources.json").exists()
+
     def test_no_unmapped_files_never_prompts(self, tmp_path):
         prompted = []
         sheet_sync.check_coverage(
