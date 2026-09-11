@@ -1982,6 +1982,7 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
             remaining_hours=remaining_hours,
             teaching_pct_of_remaining=teaching_pct_of_remaining,
             include_in_teaching_pct_chart=staff.include_in_teaching_pct_chart,
+            grade=staff.grade,
         )
         results.append(result)
 
