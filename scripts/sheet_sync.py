@@ -296,3 +296,68 @@ def sync_multi_tab_source(name: str, config: dict, data_dir: Path = DATA_DIR,
         row_count = len(parse_csv_rows(live_text))
         out(f"{name} [{tab}]: fetched ({row_count} rows) - this tool doesn't "
             f"yet compare/write .xlsx content automatically; review by hand")
+
+
+_DATA_FILE_EXTENSIONS = {".csv", ".xlsx"}
+
+
+def load_sources(path: Path = SOURCES_FILE) -> Dict[str, dict]:
+    """Load the sheet-to-local-file mapping JSON. Returns {} if missing."""
+    if not path.exists():
+        return {}
+    with open(path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def save_sources(sources: Dict[str, dict], path: Path = SOURCES_FILE) -> None:
+    with open(path, "w", encoding="utf-8") as f:
+        json.dump(sources, f, indent=2, sort_keys=True)
+        f.write("\n")
+
+
+def find_unmapped_files(sources: Dict[str, dict], data_dir: Path = DATA_DIR) -> List[str]:
+    """Local data/ files (.csv or .xlsx) with no entry in `sources`."""
+    mapped = set(sources.keys())
+    return sorted(
+        p.name for p in data_dir.iterdir()
+        if p.is_file() and p.suffix.lower() in _DATA_FILE_EXTENSIONS and p.name not in mapped
+    )
+
+
+def check_coverage(sources: Dict[str, dict], data_dir: Path = DATA_DIR,
+                    prompt: Callable[[str], str] = input,
+                    out: Callable[[str], None] = print,
+                    sources_path: Path = SOURCES_FILE) -> None:
+    """Ask about any local data file with no registered sheet. A pasted URL
+    is added to `sources` (mutated in place) and the file is saved
+    immediately, so the very next run picks it up.
+    """
+    unmapped = find_unmapped_files(sources, data_dir=data_dir)
+    if not unmapped:
+        return
+    changed = False
+    for name in unmapped:
+        answer = prompt(
+            f"No Google Sheet registered for data/{name} - "
+            f"paste a share link now, or press Enter to skip: "
+        ).strip()
+        if answer:
+            sources[name] = {"url": answer}
+            out(f"  added data/{name} -> {answer}")
+            changed = True
+    if changed:
+        save_sources(sources, path=sources_path)
+
+
+def main() -> None:
+    sources = load_sources()
+    if not sources:
+        print(f"No sources configured yet - create {SOURCES_FILE} to get started.")
+        return
+    for name, config in sources.items():
+        if "tabs" in config:
+            sync_multi_tab_source(name, config)
+        else:
+            sync_source(name, config)
+        print()
+    check_coverage(sources)
