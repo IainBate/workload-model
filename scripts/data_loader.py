@@ -2066,6 +2066,7 @@ def load_all_data(data_dir: str = None,
         resolved_category_hod = _resolve_category_from_data(
             hod_name_from_waw, staff_ref_hod, category_overrides
         )
+        resolved_grade_hod = _resolve_grade_from_data(hod_name_from_waw, staff_ref_hod, research_group_grades)
 
         # Collect adjustment rows/warnings for the HoD (if available). This uses the
         # same every-matching-key-collected logic as _find_all_matches above, kept
