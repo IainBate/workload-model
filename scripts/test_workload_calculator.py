@@ -1936,6 +1936,28 @@ class TestRemainingTimeMetricsIntegration:
         assert len(results) == 1
         assert results[0].include_in_teaching_pct_chart is False
 
+    def test_grade_propagates_from_staff_data(self):
+        module = ModuleData(
+            name="TestModule", codes=["TEST003"], credits=20, stage=5,
+            practicals=0, practical_contact_hours=0, practical_groups=0,
+            practical_weeks=None, assessment_count=1, student_count=100,
+            teachers=["Graded Person"], lead_name=None,
+        )
+        staff_member = StaffData(
+            canonical_name="Graded Person", fte=1.0, category="ART",
+            roles=[], phd_supervisions=0, phd_co_supervisions=0,
+            phd_assessor_count=0, research_projects=[], saint_modules=[],
+            active=True, grade="Reader",
+        )
+        year_data = YearData.create(
+            year_label="2026-7", modules=[module], student_counts={}, assessment_counts={},
+            staff={"Graded Person": staff_member}, known_lecturers=set(), known_lecturers_per_module={}
+        )
+
+        results = calculate_workload(year_data, validate_input=False)
+        assert len(results) == 1
+        assert results[0].grade == "Reader"
+
 
 if __name__ == "__main__":
     pytest.main([__file__, "-v"])
