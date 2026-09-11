@@ -327,6 +327,40 @@ class TestSyncSource:
         assert "Bob" in result
         assert "Alice" not in result
 
+    def test_waw_sync_is_idempotent_on_second_run_with_no_upstream_change(self, tmp_path, monkeypatch):
+        """Regression test for the bug where sync_source() compared raw
+        live_text against local_text but wrote merge_supplementary(live_text,
+        supplementary_text) - a different document. That mismatch meant a
+        WAW-style source could never settle into 'up to date', because every
+        run's compare was against the pre-merge document while the file on
+        disk held the post-merge one. Running sync_source twice with the
+        exact same fetch must report 'up to date' (no prompt) the second
+        time."""
+        (tmp_path / "WAW.csv").write_text("Head,Alice,,,\n")
+        (tmp_path / "WAW_supplementary.csv").write_text("Union,Bob,,,\n")
+        monkeypatch.setattr(sheet_sync, "fetch_sheet_csv", lambda *a, **k: "Head,Carol,,,\n")
+
+        config = {
+            "url": "https://docs.google.com/spreadsheets/d/ABC",
+            "supplementary_file": "WAW_supplementary.csv",
+        }
+
+        # First run: there's a real difference (Alice -> Carol), confirm it.
+        sheet_sync.sync_source(
+            "WAW.csv", config, data_dir=tmp_path, prompt=lambda p: "y", out=lambda l: None,
+        )
+
+        # Second run: identical fetch, no upstream change - must be a no-op,
+        # with no prompt needed (an unexpected prompt() call fails the test).
+        def fail_prompt(p):
+            raise AssertionError(f"prompt() should not be called on an idempotent second run: {p!r}")
+
+        out = _Recorder()
+        sheet_sync.sync_source(
+            "WAW.csv", config, data_dir=tmp_path, prompt=fail_prompt, out=out,
+        )
+        assert "up to date" in out.text()
+
 
 class TestSyncMultiTabSource:
     def test_no_configured_tabs_reports_skipped(self, tmp_path, monkeypatch):
