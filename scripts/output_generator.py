@@ -525,7 +525,7 @@ def _prepare_teaching_percentage_by_grade_chart_data(results: List[WorkloadResul
     names, plotted_values, colors, overloaded, grade_groups = [], [], [], [], []
     for grade in _TEACHING_PCT_GRADE_ORDER:
         members = sorted((r for r in graded if r.grade == grade),
-                          key=lambda r: r.teaching_pct_of_remaining, reverse=True)
+                          key=_teaching_pct_grade_rank_key)
         if not members:
             continue
         grade_groups.append((grade, len(names), len(members)))
