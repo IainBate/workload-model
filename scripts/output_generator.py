@@ -472,13 +472,15 @@ def generate_teaching_percentage_histogram(results: List[WorkloadResult], output
     project's command-query separation rule. This function only renders.
 
     Staff with include_in_teaching_pct_chart=False (Staff Categories and FTE.csv
-    "Teaching % Chart" = No) are omitted entirely, not just clipped - their
-    remaining time is undefined for reasons unrelated to teaching (e.g. a 100%
-    admin role on its own already exceeds nominal hours). A bar whose true value
-    falls outside the displayed y-axis range is drawn clipped to the axis edge in
-    a third colour so it reads as truncated rather than as a real value; nobody's
-    number is hidden - both the excluded and the clipped are listed underneath
-    the chart with their actual figures.
+    "Teaching % Chart" = No) are omitted entirely - their remaining time is
+    undefined for reasons unrelated to teaching (e.g. a 100% admin role on its
+    own already exceeds nominal hours). Among the rest, a negative percentage
+    (remaining_hours < 0) is pinned to the top of the y-axis in a third colour
+    rather than plotted at its true (near-zero-looking but structurally very
+    different) height - see _prepare_teaching_percentage_chart_data(). The
+    y-axis itself auto-scales to the real data instead of a fixed range.
+    Nobody's number is hidden: the excluded, the pinned-overloaded, and the
+    undefined are all listed underneath the chart with their actual figures.
 
     Output File:
         - workload_teaching_percentage_histogram.png
@@ -490,17 +492,17 @@ def generate_teaching_percentage_histogram(results: List[WorkloadResult], output
     names = chart_data["names"]
     plotted_values = chart_data["plotted_values"]
     colors = chart_data["colors"]
-    clipped = chart_data["clipped"]
+    overloaded = chart_data["overloaded"]
     excluded = chart_data["excluded"]
     undefined = chart_data["undefined"]
+    y_max = chart_data["y_max"]
 
     fig, ax = plt.subplots(figsize=(max(18, len(names) * 0.35), 10))
     fig.suptitle("Teaching as a Percentage of Remaining (Non-Research/Non-Admin) Time",
                  fontsize=16, fontweight="bold")
 
     ax.bar(names, plotted_values, color=colors, edgecolor="white", width=0.7)
-    ax.axhline(y=0, color="black", linewidth=1.0)
-    ax.set_ylim(_TEACHING_PCT_CLIP_MIN - 10, _TEACHING_PCT_CLIP_MAX + 10)
+    ax.set_ylim(0, y_max)
     ax.set_xlabel("Staff", fontsize=12)
     ax.set_ylabel("Teaching % of Remaining Time", fontsize=12)
     ax.set_xticks(range(len(names)))
@@ -510,15 +512,15 @@ def generate_teaching_percentage_histogram(results: List[WorkloadResult], output
     legend_handles = [
         mpatches.Patch(color=_TEACHING_PCT_CATEGORY_COLORS["ART"], label="ART"),
         mpatches.Patch(color=_TEACHING_PCT_CATEGORY_COLORS["T and S"], label="T and S"),
-        mpatches.Patch(color=_TEACHING_PCT_CLIPPED_COLOR,
-                        label=f"Clipped (true value outside {_TEACHING_PCT_CLIP_MIN:.0f}% to {_TEACHING_PCT_CLIP_MAX:.0f}%)"),
+        mpatches.Patch(color=_TEACHING_PCT_OVERLOADED_COLOR,
+                        label="Overloaded (research + admin alone exceed nominal hours)"),
     ]
     ax.legend(handles=legend_handles, loc="upper right", fontsize=10)
 
     footnote_lines = []
-    if clipped:
-        clipped_str = "; ".join(f"{r.name}: {r.teaching_pct_of_remaining:.0f}%" for r in clipped)
-        footnote_lines.append(f"Clipped (actual value): {clipped_str}")
+    if overloaded:
+        overloaded_str = "; ".join(f"{r.name}: {r.teaching_pct_of_remaining:.0f}%" for r in overloaded)
+        footnote_lines.append(f"Overloaded, bar pinned to top (actual value): {overloaded_str}")
     if excluded:
         excluded_str = ", ".join(r.name for r in excluded)
         footnote_lines.append(f"Excluded (Teaching % Chart = No in Staff Categories and FTE.csv): {excluded_str}")
