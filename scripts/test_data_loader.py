@@ -122,7 +122,7 @@ class TestCategoryResolution:
         data = dl._load_staff_categories_and_fte()
         assert data.get("Sarah Carrington") == {
             "category": "T and S", "fte": 0.8, "modelled": True,
-            "teaching_pct_chart": True, "notes": "", "email": "",
+            "teaching_pct_chart": True, "notes": "", "email": "", "grade": "SL",
         }
         assert data.get("Rob Alexander", {}).get("category") == "ART"
         assert data.get("Ibrahim Habli", {}).get("category") == "ART"
