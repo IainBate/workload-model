@@ -1288,6 +1288,30 @@ def _calculate_admin_workload(staff_member: StaffData, nominal_hours: float) -> 
             unknown_roles)
 
 
+def _calculate_remaining_time_metrics(nominal_hours: float, teaching_hours: float,
+                                       research_hours: float, admin_hours: float
+                                       ) -> Tuple[float, Optional[float], Optional[str]]:
+    """Teaching hours as a percentage of "remaining" time - nominal (FTE-adjusted)
+    hours left over once research and admin are removed.
+
+    Deliberately left negative/uncapped when research+admin alone already exceed
+    nominal_hours (an overcommitted person), rather than clamped to zero - the
+    overcommitment should be visible, not hidden. remaining_hours == 0 exactly is
+    the one case where the percentage is genuinely undefined (division by zero);
+    that's flagged via the returned missing_data message rather than guessed at.
+
+    Returns (remaining_hours, teaching_pct_of_remaining, missing_data_message).
+    The last two are (None, None) unless remaining_hours is nonzero/zero respectively.
+    """
+    remaining_hours = nominal_hours - (research_hours + admin_hours)
+    if remaining_hours == 0:
+        return remaining_hours, None, (
+            "Teaching % of remaining time is undefined - research + admin hours "
+            "exactly equal nominal hours, leaving zero remaining time"
+        )
+    return remaining_hours, (teaching_hours / remaining_hours) * 100, None
+
+
 def _apply_adjustments(staff_member: StaffData, calculated: Dict[str, float],
                         missing_data: List[str]) -> tuple:
     """Apply workload_adjustments.csv entries on top of calculated category totals.
