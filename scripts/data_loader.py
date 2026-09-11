@@ -1015,7 +1015,17 @@ def _load_phd_supervision(filepath: str = "PhD Supervision Data.csv") -> Dict[st
 
 
 def _load_fte_data(filepath: str = "% FTE for CS.csv") -> Dict[str, list]:
-    """Load research grant/FTE data. Returns {person: [projects]}."""
+    """Load research grant/FTE data. Returns {person: [projects]}.
+
+    Column names here must match "Staff" and "PI or PcL (project co lead) or
+    RcL (researcher co Lead)" - the source spreadsheet renamed these from the
+    earlier "Project Lead"/"PI or Co-I" (2026-09, unrelated to any change in
+    this repo); the old names silently matched nothing and zeroed every
+    staff member's research grant hours until this was caught. "Project
+    Type" no longer exists as a column at all in the renamed export and
+    isn't used in any calculation, so it's simply absent from `project` below
+    rather than always being "".
+    """
     path = DATA_DIR / filepath
     if not path.exists():
         return {}
@@ -1024,16 +1034,15 @@ def _load_fte_data(filepath: str = "% FTE for CS.csv") -> Dict[str, list]:
     with open(path, "r", encoding="utf-8-sig") as f:
         reader = csv.DictReader(f)
         for row in reader:
-            lead = row.get("Project Lead", "").strip()
-            if not lead or lead == "Project Lead":
+            lead = row.get("Staff", "").strip()
+            if not lead or lead == "Staff":
                 continue
             project = {
                 "project_id": row.get("Project ID", "").strip(),
                 "finance_code": row.get("Finance Project Code", "").strip(),
-                "project_type": row.get("Project Type", "").strip(),
                 "title": row.get("Project Title", "").strip(),
                 "fte": row.get("% FTE", "0%").strip(),
-                "role": row.get("PI or Co-I", "").strip(),
+                "role": row.get("PI or PcL (project co lead) or RcL (researcher co Lead)", "").strip(),
                 "start_date": row.get("Project Dates Start", "").strip(),
                 "end_date": row.get("Project Dates End", "").strip(),
             }
