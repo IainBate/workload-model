@@ -1361,10 +1361,10 @@ def _load_research_group_grades(filepath: str = "CS Research Groups.csv") -> Dic
             for i in range(0, len(row) - 1, 4):
                 name = row[i].strip()
                 grade = row[i + 1].strip()
-                if not name or grade not in _RESEARCH_GROUP_VALID_GRADES:
+                if not name or grade not in _RESEARCH_GROUP_GRADE_DISPLAY:
                     continue
                 name = _RESEARCH_GROUP_PERCENT_SUFFIX_RE.sub("", name).strip()
-                grades[name] = grade
+                grades[name] = _RESEARCH_GROUP_GRADE_DISPLAY[grade]
     return grades
 
 
