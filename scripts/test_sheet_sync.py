@@ -807,6 +807,22 @@ class TestSyncMultiTabSourceNewTabDetection:
         )
         assert "could not check for new tabs" in out.text()
 
+    def test_ignored_tabs_config_key_is_passed_through_and_silenced(self, tmp_path, monkeypatch):
+        monkeypatch.setattr(sheet_sync, "fetch_sheet_csv", lambda *a, **k: "a,b\n1,2\n")
+        monkeypatch.setattr(
+            sheet_sync, "list_sheet_tabs",
+            lambda url, key, **k: {"2026-7": "123", "Allocation": "999", "2027-8": "555"},
+        )
+        out = _Recorder()
+        sheet_sync.sync_multi_tab_source(
+            "Book.xlsx",
+            {"url": "https://docs.google.com/spreadsheets/d/ABC", "tabs": {"2026-7": "123"},
+             "ignored_tabs": ["Allocation"]},
+            data_dir=tmp_path, prompt=lambda p: "y", out=out, api_key="fake-key",
+        )
+        assert "Allocation" not in out.text()
+        assert "2027-8" in out.text()
+
 
 class TestMainThreadsApiKey:
     def test_main_reads_api_key_from_environment_when_not_passed(self, tmp_path, monkeypatch):
