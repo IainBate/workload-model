@@ -1967,17 +1967,13 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
         # Overwriting here would silently erase that module-scoped contribution whenever a
         # category-wide (blank Teaching Module) adjustment also exists. This is a no-op
         # (adds 0.0) for anyone without a module-scoped adjustment.
-        #
-        # IMPORTANT: The manual_adjustment should NOT be included in the breakdown sum
-        # because it's already accounted for in the adjusted category totals.
         if "teaching" in adjustments_breakdown:
-            # Add to breakdown but don't include in the sum - it's already reflected in teaching_hours
-            teaching_breakdown["manual_adjustment"] = adjustments_breakdown["teaching"]["delta"]
+            teaching_breakdown["manual_adjustment"] = (
+                teaching_breakdown.get("manual_adjustment", 0.0) + adjustments_breakdown["teaching"]["delta"]
+            )
         if "research" in adjustments_breakdown:
-            # Add to breakdown but don't include in the sum - it's already reflected in research_total
             structured_research_breakdown["manual_adjustment"] = adjustments_breakdown["research"]["delta"]
         if "admin" in adjustments_breakdown:
-            # Add to breakdown but don't include in the sum - it's already reflected in admin_hours
             admin_breakdown["manual_adjustment"] = adjustments_breakdown["admin"]["delta"]
 
         result = WorkloadResult(
