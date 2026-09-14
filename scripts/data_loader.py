@@ -1982,7 +1982,8 @@ def load_all_data(data_dir: str = None,
                 aliases=tuple(mappings.get(canonical, [canonical])),
                 fte=staff_ref["fte"] if staff_ref else 1.0,
                 category=resolved_category,
-                project_load=proj_data["project_load"] if proj_data else 0,
+                ug_project_load=proj_data["ug_project_load"] if proj_data else 0,
+                pg_project_load=proj_data["pg_project_load"] if proj_data else 0,
                 # Combine notes from both sources that can carry one - the
                 # ProjectLoads workbook's free-text Notes column and Staff
                 # Categories and FTE.csv's Notes column (e.g. "Working 40% from
