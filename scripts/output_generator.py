@@ -2261,20 +2261,43 @@ def _format_teaching_section_for_staff(result: WorkloadResult, title: str, hours
         </div>""")
         subtotal_terms.append(("Pastoral Supervision", past_hours_total))
 
-    # Project supervision
+    # Project supervision - UG and PGT (postgraduate taught) are shown as
+    # separate sub-rows since they carry different rates (see project_breakdown's
+    # "ug"/"pgt" entries, each {count, rate, total} - built in workload_calculator.py).
+    # Marking and moderating are not shown separately - they are rolled into the
+    # per-project supervision rate itself, per the workload specification.
     if project_breakdown:
         proj_hours_total = project_breakdown.get('total', 0.0)
-        proj_projects_total = project_breakdown.get('project_count', 0)
-        proj_level = project_breakdown.get('level', 'UG')
+        ug_proj = project_breakdown.get('ug')
+        pgt_proj = project_breakdown.get('pgt')
+        setting_proj = project_breakdown.get('setting')
+
+        rows_html = []
+        if ug_proj:
+            ug_count = ug_proj.get('count', 0)
+            rows_html.append(f"""<div class="detail-item teaching-item">
+                    <span class="detail-name">UG Projects</span>
+                    <span class="detail-hours">{ug_count} {_pluralize('projects', ug_count)} x {ug_proj.get('rate', 0)}h = {ug_proj.get('total', 0.0):.1f}h</span>
+                    <span class="detail-activity teaching-activity"></span>
+                </div>""")
+        if pgt_proj:
+            pgt_count = pgt_proj.get('count', 0)
+            rows_html.append(f"""<div class="detail-item teaching-item">
+                    <span class="detail-name">PGT Projects</span>
+                    <span class="detail-hours">{pgt_count} {_pluralize('projects', pgt_count)} x {pgt_proj.get('rate', 0)}h = {pgt_proj.get('total', 0.0):.1f}h</span>
+                    <span class="detail-activity teaching-activity"></span>
+                </div>""")
+        if setting_proj:
+            rows_html.append(f"""<div class="detail-item teaching-item">
+                    <span class="detail-name">Setting</span>
+                    <span class="detail-hours">{setting_proj.get('total', 0.0):.1f}h</span>
+                    <span class="detail-activity teaching-activity"></span>
+                </div>""")
 
         items_html_parts.append(f"""<div style="margin-bottom:25px;">
             <h4 style="color:#333;margin:0 0 10px 0;border-left:4px solid #2196F3;padding-left:10px;">Project Supervision ({proj_hours_total:.1f}h)</h4>
             <div style="margin-left:20px;">
-                <div class="detail-item teaching-item">
-                    <span class="detail-name">Projects</span>
-                    <span class="detail-hours">{proj_projects_total} {_pluralize('projects', proj_projects_total)} x {proj_level} = {proj_hours_total:.1f}h</span>
-                    <span class="detail-activity teaching-activity"></span>
-                </div>
+                {''.join(rows_html)}
             </div>
         </div>""")
         subtotal_terms.append(("Project Supervision", proj_hours_total))
