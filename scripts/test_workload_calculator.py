@@ -1268,7 +1268,7 @@ def _base_staff(canonical_name="Adj Test Person", **overrides):
     defaults = dict(
         canonical_name=canonical_name, fte=1.0, roles=(), phd_supervisions=0,
         phd_co_supervisions=0, phd_assessor_count=0, research_projects=(),
-        saint_modules=(), pastoral_students=0, project_load=0, active=True,
+        saint_modules=(), pastoral_students=0, ug_project_load=0, pg_project_load=0, active=True,
     )
     defaults.update(overrides)
     return StaffData(**defaults)
