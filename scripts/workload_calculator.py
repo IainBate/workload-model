@@ -1846,6 +1846,7 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
                         if isinstance(value, (int, float)):
                             aggregated[key] = aggregated.get(key, 0.0) + value
                         # If it's a dict, skip it - those are structured breakdowns for display
+                        # (but make sure we're not missing scalar values that got lost in conversion)
 
             # Include supervision components (already at staff level, not summed)
             if "pastoral_supervision" in staff_data.get("teaching_breakdown", {}):
