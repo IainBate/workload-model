@@ -1599,19 +1599,21 @@ def allocate_supervision(staff_data: Dict[str, StaffData]) -> SupervisionAllocat
         staff_data: Mapping of canonical_name to StaffData
 
     Returns:
-        Immutable SupervisionAllocation containing pastoral counts, project loads,
-        and PhD supervision counts for each staff member.
+        Immutable SupervisionAllocation containing pastoral counts, UG/PG project
+        loads, and PhD supervision counts for each staff member.
     """
     pastoral = {}
-    projects = {}
+    ug_projects = {}
+    pg_projects = {}
     phd = {}
 
     for name, staff in staff_data.items():
         pastoral[name] = staff.pastoral_students
-        projects[name] = staff.project_load  # Already ceiling'd in data_loader.py
+        ug_projects[name] = staff.ug_project_load  # Already ceiling'd in data_loader.py
+        pg_projects[name] = staff.pg_project_load  # Already ceiling'd in data_loader.py
         phd[name] = staff.phd_supervisions
 
-    return SupervisionAllocation(pastoral, projects, phd)
+    return SupervisionAllocation(pastoral, ug_projects, pg_projects, phd)
 
 
 _UNSET = object()
