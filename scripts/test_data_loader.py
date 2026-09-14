@@ -630,15 +630,17 @@ class TestSupervisionAllocation:
     def test_allocation_mirrors_staff_records(self):
         staff = {
             "A": StaffData(canonical_name="A", fte=1.0, pastoral_students=7,
-                           project_load=3, phd_supervisions=2),
+                           ug_project_load=3, pg_project_load=1, phd_supervisions=2),
             "B": StaffData(canonical_name="B", fte=0.5, pastoral_students=0,
-                           project_load=0, phd_supervisions=0),
+                           ug_project_load=0, pg_project_load=0, phd_supervisions=0),
         }
         alloc = dl.allocate_supervision(staff)
         assert alloc.pastoral_students["A"] == 7
-        assert alloc.project_loads["A"] == 3
+        assert alloc.ug_project_loads["A"] == 3
+        assert alloc.pg_project_loads["A"] == 1
         assert alloc.pastoral_students["B"] == 0
-        assert alloc.project_loads["B"] == 0
+        assert alloc.ug_project_loads["B"] == 0
+        assert alloc.pg_project_loads["B"] == 0
 
 
 class TestAdjustmentParsing:
