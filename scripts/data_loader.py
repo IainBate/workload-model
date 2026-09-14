@@ -46,7 +46,8 @@ class SupervisionAllocation:
     references. Callers should treat these as read-only.
     """
     pastoral_students: Dict[str, int] = field(default_factory=dict)
-    project_loads: Dict[str, float] = field(default_factory=dict)
+    ug_project_loads: Dict[str, int] = field(default_factory=dict)
+    pg_project_loads: Dict[str, int] = field(default_factory=dict)
     phd_supervisions: Dict[str, int] = field(default_factory=dict)
 
 
