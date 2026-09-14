@@ -912,7 +912,7 @@ def _load_pastoral_load(filepath: str = "pastoral_load.csv") -> Dict[str, int]:
 
 
 def _load_project_load(filepath: str = "ProjectLoads 2025-26.xlsx") -> Dict[str, dict]:
-    """Load project supervision load data. Returns {full_name: {"project_load", "notes"}}.
+    """Load project supervision load data. Returns {full_name: {"ug_project_load", "pg_project_load", "notes"}}.
 
     Source is the "Advisor Loads" sheet of the ProjectLoads workbook, which
     supersedes the older 'Project and Pastoral Group Loads - Loadings.csv'
