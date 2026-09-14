@@ -53,7 +53,7 @@ class TestTeachingWorkload:
         known_lecturers_per_module = {}
         supervision = SupervisionAllocation(
             pastoral_students={},
-            project_loads={}
+            ug_project_loads={}, pg_project_loads={}
         )
 
         result = _calculate_teaching_workload(
@@ -88,7 +88,7 @@ class TestTeachingWorkload:
         known_lecturers_per_module = {}
         supervision = SupervisionAllocation(
             pastoral_students={},
-            project_loads={}
+            ug_project_loads={}, pg_project_loads={}
         )
 
         result = _calculate_teaching_workload(
@@ -126,7 +126,7 @@ class TestTeachingWorkload:
         known_lecturers_per_module = {}
         supervision = SupervisionAllocation(
             pastoral_students={},
-            project_loads={}
+            ug_project_loads={}, pg_project_loads={}
         )
 
         result = _calculate_teaching_workload(
@@ -164,7 +164,7 @@ class TestTeachingWorkload:
         known_lecturers_per_module = {}
         supervision = SupervisionAllocation(
             pastoral_students={},
-            project_loads={}
+            ug_project_loads={}, pg_project_loads={}
         )
 
         result = _calculate_teaching_workload(
@@ -204,7 +204,7 @@ class TestTeachingWorkload:
         known_lecturers_per_module = {}
         supervision = SupervisionAllocation(
             pastoral_students={},
-            project_loads={}
+            ug_project_loads={}, pg_project_loads={}
         )
 
         result = _calculate_teaching_workload(
@@ -241,7 +241,7 @@ class TestTeachingWorkload:
         known_lecturers_per_module = {}
         supervision = SupervisionAllocation(
             pastoral_students={},
-            project_loads={}
+            ug_project_loads={}, pg_project_loads={}
         )
 
         result = _calculate_teaching_workload(
@@ -399,7 +399,7 @@ class TestTeachingWorkload:
         known_lecturers_per_module = {}
         supervision = SupervisionAllocation(
             pastoral_students={},
-            project_loads={}
+            ug_project_loads={}, pg_project_loads={}
         )
 
         result = _calculate_teaching_workload(
@@ -1070,7 +1070,7 @@ class TestNewLecturerDetectionRegression:
         }
         supervision = SupervisionAllocation(
             pastoral_students={},
-            project_loads={}
+            ug_project_loads={}, pg_project_loads={}
         )
 
         result = _calculate_teaching_workload(

@@ -51,7 +51,7 @@ class TestPracticalDisplayCalculation:
         known_lecturers_per_module = {}
         supervision = SupervisionAllocation(
             pastoral_students={},
-            project_loads={}
+            ug_project_loads={}, pg_project_loads={}
         )
 
         result = calculate_workload(

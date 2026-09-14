@@ -2273,6 +2273,12 @@ def _format_teaching_section_for_staff(result: WorkloadResult, title: str, hours
         setting_proj = project_breakdown.get('setting')
 
         rows_html = []
+        if setting_proj:
+            rows_html.append(f"""<div class="detail-item teaching-item">
+                    <span class="detail-name">Setting</span>
+                    <span class="detail-hours">{setting_proj.get('total', 0.0):.1f}h</span>
+                    <span class="detail-activity teaching-activity"></span>
+                </div>""")
         if ug_proj:
             ug_count = ug_proj.get('count', 0)
             rows_html.append(f"""<div class="detail-item teaching-item">
@@ -2285,12 +2291,6 @@ def _format_teaching_section_for_staff(result: WorkloadResult, title: str, hours
             rows_html.append(f"""<div class="detail-item teaching-item">
                     <span class="detail-name">PGT Projects</span>
                     <span class="detail-hours">{pgt_count} {_pluralize('projects', pgt_count)} x {pgt_proj.get('rate', 0)}h = {pgt_proj.get('total', 0.0):.1f}h</span>
-                    <span class="detail-activity teaching-activity"></span>
-                </div>""")
-        if setting_proj:
-            rows_html.append(f"""<div class="detail-item teaching-item">
-                    <span class="detail-name">Setting</span>
-                    <span class="detail-hours">{setting_proj.get('total', 0.0):.1f}h</span>
                     <span class="detail-activity teaching-activity"></span>
                 </div>""")
 
