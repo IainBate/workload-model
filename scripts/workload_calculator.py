@@ -1673,44 +1673,65 @@ def calculate_workload(year_data: YearData, validate_input: bool = True) -> List
                 f"Pastoral: {pastoral_count} students x {config.SUPERVISION_MULTIPLIERS['pastoral']}h = {pastoral_hours:.1f}h"
             )
 
-        # Get project load for this teacher from supervision allocation (already ceiling'd)
-        teacher_project_load = supervision.project_loads.get(canonical_name, 0)
+        # Get UG and PG project loads for this teacher from supervision allocation
+        # (already ceiling'd separately per level - see _load_project_load()'s
+        # docstring for why the two counts are kept apart rather than merged).
+        ug_project_count = supervision.ug_project_loads.get(canonical_name, 0)
+        pg_project_count = supervision.pg_project_loads.get(canonical_name, 0)
 
-        # Project setting allowance - removed from teaching hours calculation
-        # Per the workload model, project setting is not included in teaching total
+        if ug_project_count > 0 or pg_project_count > 0:
+            ug_rate = config.SUPERVISION_MULTIPLIERS["ug_project"]
+            pg_rate = config.SUPERVISION_MULTIPLIERS["msc_project"]
+            ug_hours = ug_project_count * ug_rate
+            pg_hours = pg_project_count * pg_rate
+            project_hours = ug_hours + pg_hours
 
-        if teacher_project_load > 0:
-            proj_mult = config.SUPERVISION_MULTIPLIERS["ug_project"]
-            if canonical_name in staff_dict:
-                # Use stage from staff's modules to determine project multiplier
-                for mod in year_data.modules:
-                    if canonical_name in [normalize_name(t, year_data.reverse_lookup, unknown_callback=None) or t for t in mod.teachers]:
-                        if config.is_msc_level(mod.stage):  # MSc level (stage >= 4)
-                            proj_mult = config.SUPERVISION_MULTIPLIERS["msc_project"]
-                            break
-            project_hours = teacher_project_load * proj_mult
-            teaching_hours += project_hours
-            staff_teaching[canonical_name]["hours"] += project_hours
+            # Project setting allowance: a flat allowance for anyone with a
+            # non-zero project load at any level, covering the time to propose
+            # their set of projects to offer (config.PROJECT_SETTING_ALLOWANCE;
+            # docs/Work Allocation Model.docx para 47 / Table 7). Marking and
+            # moderating are not credited separately - see Table 7's note that
+            # they are already rolled into the per-project supervision rate.
+            setting_hours = config.PROJECT_SETTING_ALLOWANCE
+            total_hours_this_person = project_hours + setting_hours
+
+            teaching_hours += total_hours_this_person
+            staff_teaching[canonical_name]["hours"] += total_hours_this_person
             if "teaching_breakdown" not in staff_teaching[canonical_name]:
                 staff_teaching[canonical_name]["teaching_breakdown"] = {}
             staff_teaching[canonical_name]["teaching_breakdown"]["project_supervision"] = project_hours
+            staff_teaching[canonical_name]["teaching_breakdown"]["project_setting"] = setting_hours
 
             # Store structured project breakdown (similar to practicals pattern from Phase 3a)
             if "project_breakdown" not in staff_teaching[canonical_name]["teaching_breakdown"]:
                 staff_teaching[canonical_name]["teaching_breakdown"]["project_breakdown"] = {}
-            proj_level = "UG" if proj_mult == config.SUPERVISION_MULTIPLIERS["ug_project"] else "MSc"
-            staff_teaching[canonical_name]["teaching_breakdown"]["project_breakdown"].update({
-                "project_count": teacher_project_load,
-                "level": proj_level,
-                "rate": proj_mult,
-                "total": round(project_hours, 2)
-            })
+            breakdown_update = {"total": round(total_hours_this_person, 2)}
+            if ug_project_count > 0:
+                breakdown_update["ug"] = {
+                    "count": ug_project_count,
+                    "rate": ug_rate,
+                    "total": round(ug_hours, 2),
+                }
+            if pg_project_count > 0:
+                breakdown_update["pgt"] = {
+                    "count": pg_project_count,
+                    "rate": pg_rate,
+                    "total": round(pg_hours, 2),
+                }
+            breakdown_update["setting"] = {"total": round(setting_hours, 2)}
+            staff_teaching[canonical_name]["teaching_breakdown"]["project_breakdown"].update(breakdown_update)
 
             # Add supervision detail for HTML display
             if "supervision_details" not in staff_teaching[canonical_name]:
                 staff_teaching[canonical_name]["supervision_details"] = []
+            detail_parts = []
+            if ug_project_count > 0:
+                detail_parts.append(f"{ug_project_count} UG x {ug_rate}h = {ug_hours:.1f}h")
+            if pg_project_count > 0:
+                detail_parts.append(f"{pg_project_count} PGT x {pg_rate}h = {pg_hours:.1f}h")
+            detail_parts.append(f"setting {setting_hours:.1f}h")
             staff_teaching[canonical_name]["supervision_details"].append(
-                f"Projects: {teacher_project_load} projects x {proj_level} ({proj_mult}h) = {project_hours:.1f}h"
+                "Projects: " + "; ".join(detail_parts) + f" = {total_hours_this_person:.1f}h"
             )
 
         # General baseline is handled within _calculate_admin_workload via service_points
