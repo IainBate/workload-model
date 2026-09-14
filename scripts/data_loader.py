@@ -104,7 +104,8 @@ class StaffData:
     fte: float = 1.0
     active: bool = True
     category: str = "T and S"
-    project_load: float = 0.0
+    ug_project_load: int = 0
+    pg_project_load: int = 0
     notes: str = ""
     roles: Tuple[str, ...] = field(default_factory=tuple)
     phd_supervisions: int = 0
