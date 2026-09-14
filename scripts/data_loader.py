@@ -924,11 +924,19 @@ def _load_project_load(filepath: str = "ProjectLoads 2025-26.xlsx") -> Dict[str,
     row) had that value transplanted into pastoral_load.csv directly instead.
 
     Each row's "Total Projects (UG + PG)" cell is a formula
-    (=UG Slots + UG Extras - UG Undershoot + PG Slots + PG Extras); it is
-    recomputed here from the four component columns rather than trusted from
-    the cached formula value, since a workbook edited by a tool that doesn't
-    recalculate (e.g. a script-driven save) can leave that cache stale or
-    blank - as seen in this file for at least one row.
+    (=UG Slots + UG Extras - UG Undershoot + PG Slots + PG Extras); the UG and
+    PG portions are recomputed separately here from the four component columns
+    rather than trusted from the cached formula value, since a workbook edited
+    by a tool that doesn't recalculate (e.g. a script-driven save) can leave
+    that cache stale or blank - as seen in this file for at least one row.
+
+    UG and PG counts are kept and ceiling'd separately (not merged into one
+    total then ceiling'd) so the calculator can apply the correct per-level
+    rate (config.SUPERVISION_MULTIPLIERS "ug_project" vs "msc_project") to
+    each portion of a person's load - a person supervising a mix of UG and PG
+    projects previously had their entire count priced at a single rate chosen
+    by an unrelated signal (whether they taught any MSc-level module), which
+    could both over- and under-credit real PG supervision.
     """
     path = DATA_DIR / filepath
     if not path.exists():
