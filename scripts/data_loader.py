@@ -972,16 +972,18 @@ def _load_project_load(filepath: str = "ProjectLoads 2025-26.xlsx") -> Dict[str,
             continue
         person = f"{str(first).strip()} {str(surname).strip()}"
 
-        total = (_num(row, "UG Slots") + _num(row, "UG Extras") - _num(row, "UG Undershoot")
-                 + _num(row, "PG Slots") + _num(row, "PG Extras"))
-        project_load = math.ceil(round(total, 6)) if total > 0 else 0
+        ug_total = _num(row, "UG Slots") + _num(row, "UG Extras") - _num(row, "UG Undershoot")
+        pg_total = _num(row, "PG Slots") + _num(row, "PG Extras")
+        ug_load = math.ceil(round(ug_total, 6)) if ug_total > 0 else 0
+        pg_load = math.ceil(round(pg_total, 6)) if pg_total > 0 else 0
 
         notes = ""
         if notes_idx is not None and notes_idx < len(row) and row[notes_idx]:
             notes = str(row[notes_idx]).strip()
 
         data[person] = {
-            "project_load": project_load,
+            "ug_project_load": ug_load,
+            "pg_project_load": pg_load,
             "notes": notes,
         }
     return data
