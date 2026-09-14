@@ -2271,7 +2271,10 @@ def _deduplicate_staff(staff: Dict[str, StaffData], mappings: Dict[str, List[str
             merged_phd_assessor_count = max((e[1].phd_assessor_count for e in entries), default=0)
 
             # Get first non-zero values for other fields (sorted entries ensures determinism)
-            proj_data = next((e[1] for e in sorted(entries) if e[1].project_load > 0), entries[0][1])
+            proj_data = next(
+                (e[1] for e in sorted(entries) if e[1].ug_project_load > 0 or e[1].pg_project_load > 0),
+                entries[0][1],
+            )
 
             merged[canonical] = StaffData(
                 canonical_name=canonical,
@@ -2279,7 +2282,8 @@ def _deduplicate_staff(staff: Dict[str, StaffData], mappings: Dict[str, List[str
                 fte=merged_fte,
                 active=merged_active,
                 category=merged_category,
-                project_load=proj_data.project_load,
+                ug_project_load=proj_data.ug_project_load,
+                pg_project_load=proj_data.pg_project_load,
                 notes=merged_notes,
                 roles=tuple(sorted(all_roles)),
                 phd_supervisions=merged_phd_supervisions,
